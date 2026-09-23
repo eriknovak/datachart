@@ -216,7 +216,9 @@ def ContourChart(
         sharex: Whether to share the x-axis in subplots.
         sharey: Whether to share the y-axis in subplots.
         style: Style configuration(s) for the contour chart(s).
-        norm: Value normalization method(s) of the colormap.
+        norm: Value normalization method(s) of the colormap. `"centered"` and `"twoslope"`
+            hold `vcenter` in the middle of the theme's diverging colormap;
+            see [`NORMALIZE`][datachart.constants.NORMALIZE].
         vmin: Minimum value(s) for normalization.
         vmax: Maximum value(s) for normalization.
         vcenter: The value(s) a centred normalization holds in the middle of

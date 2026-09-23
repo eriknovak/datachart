@@ -2023,7 +2023,7 @@ class ColorbarSettingAttrs(TypedDict):
             bar sits on.
         format (Union[VALUE_FORMAT, str, None]): The format of the bar's tick
             labels, with the value named `x` (e.g. `"{x:.0f}"`). On a hexbin
-            chart, `valfmt` still applies when this is unset.
+            chart, `value_format` still applies when this is unset.
         ticks (Union[List[Union[int, float]], None]): Explicit tick positions
             on the bar; positions outside the mapped value range are not drawn.
         orientation (Union[ORIENTATION, str, None]): The orientation; derives
@@ -2294,7 +2294,8 @@ class ContourSingleChartAttrs(TypedDict):
         norm (Union[NORMALIZE, str, None]): The value normalization of the filled bands.
         vmin (Union[float, None]): The minimum value to normalize the surface values.
         vmax (Union[float, None]): The maximum value to normalize the surface values.
-        valfmt (Union[VALUE_FORMAT, str, None]): The format of the inline level labels.
+        vcenter (Union[float, None]): The value a centred norm holds mid-colormap.
+        value_format (Union[VALUE_FORMAT, str, None]): The format of the inline level labels.
 
         xticks (Union[int, float, None]): The xtick positions list.
         xticklabels (Union[List[str], None]): The xtick labels.
@@ -2323,7 +2324,8 @@ class ContourSingleChartAttrs(TypedDict):
     norm: Union[str, None]
     vmin: Union[float, None]
     vmax: Union[float, None]
-    valfmt: Union[str, None]
+    vcenter: Union[float, None]
+    value_format: Union[str, None]
 
     xticks: Union[int, float, None]
     xticklabels: Union[List[str], None]
@@ -2378,7 +2380,8 @@ class HexbinSingleChartAttrs(TypedDict):
         norm (Union[NORMALIZE, str, None]): The value normalization of the hexagon colors.
         vmin (Union[float, None]): The minimum value to normalize the hexagon values.
         vmax (Union[float, None]): The maximum value to normalize the hexagon values.
-        valfmt (Union[VALUE_FORMAT, str, None]): The format of the colorbar tick labels when the colorbar setting names none.
+        vcenter (Union[float, None]): The value a centred norm holds mid-colormap.
+        value_format (Union[VALUE_FORMAT, str, None]): The format of the colorbar tick labels when the colorbar setting names none.
 
         xticks (Union[int, float, None]): The xtick positions list.
         xticklabels (Union[List[str], None]): The xtick labels.
@@ -2410,7 +2413,8 @@ class HexbinSingleChartAttrs(TypedDict):
     norm: Union[str, None]
     vmin: Union[float, None]
     vmax: Union[float, None]
-    valfmt: Union[str, None]
+    vcenter: Union[float, None]
+    value_format: Union[str, None]
 
     xticks: Union[int, float, None]
     xticklabels: Union[List[str], None]

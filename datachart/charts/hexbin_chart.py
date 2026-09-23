@@ -208,7 +208,9 @@ def HexbinChart(
         mincnt: The point count below which a hexagon stays blank; every
             hexagon is drawn by default.
         norm: Value normalization method(s) of the colormap; `"log"` spreads
-            heavy-tailed counts.
+            heavy-tailed counts. `"centered"` and `"twoslope"`
+            hold `vcenter` in the middle of the theme's diverging colormap;
+            see [`NORMALIZE`][datachart.constants.NORMALIZE].
         vmin: Minimum value(s) for normalization.
         vmax: Maximum value(s) for normalization.
         vcenter: The value(s) a centred normalization holds in the middle of

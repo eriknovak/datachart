@@ -34,7 +34,7 @@ The parameters that accept a constant, with the class in [datachart.constants](.
 
 | Parameter | Constant |
 | :-- | :-- |
-| `features` | [`BASEMAP_FEATURE`](../constants.md#datachart.constants.BASEMAP_FEATURE) |
+| `data` | [`BASEMAP_FEATURE`](../constants.md#datachart.constants.BASEMAP_FEATURE) |
 | `resolution` | [`BASEMAP_RESOLUTION`](../constants.md#datachart.constants.BASEMAP_RESOLUTION) |
 | `position` | [`DRAW_POSITION`](../constants.md#datachart.constants.DRAW_POSITION) |
 | `figsize` | [`FIG_SIZE`](../constants.md#datachart.constants.FIG_SIZE) |

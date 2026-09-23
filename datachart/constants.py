@@ -725,7 +725,7 @@ class COLORS:
 class NORMALIZE:
     """The supported normalization options.
 
-    Passed as the heatmap's `norm` attribute: normalizes the cell values
+    Passed as the `norm` attribute of a colormapped chart: normalizes the values
     before they are mapped to colors. Distinct from
     [`SCALE`][datachart.constants.SCALE], which sets an axis scale.
 
@@ -748,9 +748,9 @@ class NORMALIZE:
             colormap, with `vmin` and `vmax` at unequal distances from it.
             Equals to `"twoslope"`.
 
-    `CENTERED` and `TWOSLOPE` are read by the heatmap and calendar heatmap,
-    which draw them in the theme's diverging colormap; the other charts
-    taking a `norm` support the first five.
+    `CENTERED` and `TWOSLOPE` are read by the heatmap, calendar heatmap,
+    contour chart and hexbin chart, which draw them in the theme's diverging
+    colormap; the other charts taking a `norm` support the first five.
 
     """
 
@@ -1500,8 +1500,8 @@ class VALUE_FORMAT:
     """The predefined value formats.
 
     Passed as the `value_format` attribute of every chart that takes
-    `show_values` (the value labels printed beside its marks) or as the
-    heatmap's `valfmt` attribute (the values drawn in the cells).
+    `show_values`: the value labels printed beside its marks, or the values
+    drawn in a heatmap's cells.
 
     ![VALUE_FORMAT at a glance](../assets/imgs/const-value-format.svg){ width="100%" }
 

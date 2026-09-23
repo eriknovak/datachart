@@ -168,7 +168,7 @@ def radial():
             [{"label": m, "y": v} for m, v in zip(metrics, ys)]
             for ys in ([8, 6, 7, 9, 4, 6], [5, 9, 8, 7, 8, 9])
         ],
-        type="line",
+        mark="line",
         show_area=True,
         subtitle=["Sport", "Family"],
         show_legend=True,
@@ -327,7 +327,7 @@ def heatmap():
     np.fill_diagonal(corr, 1.0)
     return Heatmap(
         data={"x": features, "y": features, "z": corr.tolist()},
-        show_heatmap_values=True,
+        show_values=True,
         figsize=FIGSIZE,
     )
 

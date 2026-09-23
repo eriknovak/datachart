@@ -76,8 +76,12 @@ python -m build --sdist --wheel --outdir dist/
 
 Release checklist: bump `__version__` and write the CHANGELOG section. Remove
 any `_DEPRECATED_ALIASES` entry in `datachart/typings.py` that already shipped
-in a release, and the private `_<name>` type behind a `None` entry. Publishing
-the GitHub release then triggers PyPI and the versioned docs.
+in a release, and the private `_<name>` type behind a `None` entry. Likewise
+remove any `renamed` entry on a `ChartKind` row in
+`datachart/utils/_internal/chart_kinds.py` that already shipped, with its
+deprecated keyword in the front's signature, and the legacy kind-as-
+`show_values` branch in `_validate_value_kind`. Publishing the GitHub release
+then triggers PyPI and the versioned docs.
 
 ## Architecture
 
@@ -97,7 +101,7 @@ The package is organized into six main modules:
 The `_internal` submodule contains implementation details not exposed to users:
 
 - **layers.py**: The single drawing seam (ADR 0001): `Layer` classes per chart type with `draw(ax, ctx)`, `Panel` owning every cross-layer concern (colors, bar slotting, shared bins, scales, limits, legend, twin axes), `LayerGroup`, and the frozen `DrawContext`
-- **chart_kinds.py**: One frozen `ChartKind` row per front in `CHART_KINDS`, read through `chart_kind()` (ADR 0065); the engine, builder, and composition branch on the row, never on the chart-type string. Also holds its build-time readers `build_layers()` and `build_chart_panel_settings()`
+- **chart_kinds.py**: One frozen `ChartKind` row per front in `CHART_KINDS`, read through `chart_kind()` (ADR 0065); the engine, builder, and composition branch on the row, never on the chart-type string. Beside it, `SHARED_PARAMETERS`: one name, annotation and default per parameter the fronts share, which `test/test_front_body.py` checks every signature against (ADR 0067). Also holds its build-time readers `build_layers()` and `build_chart_panel_settings()`
 - **plot_engine.py**: Figure assembly: `render()` splits a front's arguments by its row (ADR 0066); `render_chart()` builds layers, assembles panels, renders them, and stores the metadata transport
 - **chart_builder.py**: Chart attribute building and validation logic
 - **config_helpers.py**: Helper functions for retrieving and applying style configurations

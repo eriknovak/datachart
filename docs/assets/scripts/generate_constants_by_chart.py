@@ -22,6 +22,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3]))
 import datachart.charts as ch
 import datachart.constants as K
 import datachart.typings as T
+from datachart.utils._internal.chart_kinds import SHARED_PARAMETERS
 
 CLASSES = {n for n in dir(K) if n.isupper() and inspect.isclass(getattr(K, n))}
 TYPINGS = {n for n in dir(T) if n.endswith("Attrs") and not n.startswith("_")}
@@ -195,8 +196,11 @@ def guide_title(name):
 def params(name):
     source = inspect.getsource(getattr(ch, name))
     sig = source.split('"""', 1)[0]
-    # a parameter the docstring marks "Not supported" raises when passed
-    unsupported = set(re.findall(r"^        (\w+): Not supported", source, re.M))
+    # a parameter the docstring marks "Not supported" raises when passed, and
+    # one it marks "Deprecated" is a renamed parameter's old name
+    unsupported = set(
+        re.findall(r"^        (\w+): (?:Not supported|Deprecated)", source, re.M)
+    )
     rows, seen = [], set()
     for line in sig.splitlines():
         m = re.match(r"\s*(\w+):\s*([^=]*)", line)
@@ -264,7 +268,8 @@ def owner(name):
 
 SIGS = {n: inspect.signature(getattr(ch, n)) for n in ORDER}
 # the parameter that takes a chart's records; the basemap's are optional outlines
-DATA_PARAM = {n: "data" if "data" in SIGS[n].parameters else "geometry" for n in ORDER}
+# the basemap's `data` names features; its records are the overlay geometry
+DATA_PARAM = {n: "geometry" if n == "BasemapChart" else "data" for n in ORDER}
 DATA = {
     n: [
         t
@@ -286,7 +291,33 @@ CHART_BLOCKS = re.findall(
     r"::: datachart\.constants\.(\w+)",
     CONSTANTS_MD.read_text().split("## Chart Constants", 1)[1],
 )
-SPECIFIC = {c for c, fronts in uses.items() if len(fronts) == 1 and c in CHART_BLOCKS}
+
+
+def constants_in(annotation, acc):
+    """The constants classes an annotation names."""
+    if inspect.isclass(annotation) and annotation.__name__ in CLASSES:
+        acc.add(annotation.__name__)
+    for arg in typing.get_args(annotation):
+        constants_in(arg, acc)
+    return acc
+
+
+# a constant a shared parameter takes is shared even where one front uses it
+SHARED_CONSTANTS = set()
+for row in SHARED_PARAMETERS.values():
+    constants_in(row.annotation, SHARED_CONSTANTS)
+    constants_in(row.per_chart, SHARED_CONSTANTS)
+SPECIFIC = {
+    c
+    for c, fronts in uses.items()
+    if len(fronts) == 1 and c in CHART_BLOCKS and c not in SHARED_CONSTANTS
+}
+
+
+def own_first(rows):
+    """A front's parameter rows, its own before the shared ones."""
+    shared = [r for r in rows if re.match(r"`(\w+)", r[0])[1] in SHARED_PARAMETERS]
+    return [r for r in rows if r not in shared] + shared
 
 
 def link(c, rel):
@@ -398,9 +429,7 @@ def constants_section(n):
     rows = TABLE[n]
     if not rows:
         return ""
-    ordered = [r for r in rows if any(c in SPECIFIC for c in r[1])] + [
-        r for r in rows if not any(c in SPECIFIC for c in r[1])
-    ]
+    ordered = own_first(rows)
     lines = [
         "## Constants",
         "",
@@ -561,9 +590,7 @@ for n, rows in TABLE.items():
         src = src + ("\n\n" + tail if tail.strip() else "")
     lines = src.split("\n")
     last = max(i for i, l in enumerate(lines) if l.startswith("|"))
-    ordered = [r for r in rows if any(c in SPECIFIC for c in r[1])] + [
-        r for r in rows if not any(c in SPECIFIC for c in r[1])
-    ]
+    ordered = own_first(rows)
     tbl = ["| Parameter | Constant |", "| :-- | :-- |"] + [
         f"| {p} | {', '.join(link(c, '../../../references/constants/') for c in cs)} |"
         for p, cs in ordered

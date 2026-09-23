@@ -34,7 +34,9 @@ The parameters that accept a constant, with the class in [datachart.constants](.
 
 | Parameter | Constant |
 | :-- | :-- |
-| `normalize` | [`RIDGELINE_SCALE`](../constants.md#datachart.constants.RIDGELINE_SCALE) |
+| `xticks_format` | [`VALUE_FORMAT`](../constants.md#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](../constants.md#datachart.constants.DATE_FORMAT) |
+| `ridge_scale` | [`RIDGELINE_SCALE`](../constants.md#datachart.constants.RIDGELINE_SCALE) |
+| `inner` | [`VIOLIN_INNER`](../constants.md#datachart.constants.VIOLIN_INNER) |
 | `emphasis` | [`EMPHASIS`](../constants.md#datachart.constants.EMPHASIS) |
 | `figsize` | [`FIG_SIZE`](../constants.md#datachart.constants.FIG_SIZE) |
 | `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](../constants.md#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](../constants.md#datachart.constants.LEGEND_ALIGN) |
@@ -42,8 +44,6 @@ The parameters that accept a constant, with the class in [datachart.constants](.
 | `aspect_ratio` | [`ASPECT_RATIO`](../constants.md#datachart.constants.ASPECT_RATIO) |
 | `orientation` | [`ORIENTATION`](../constants.md#datachart.constants.ORIENTATION) |
 | `scaley` | [`SCALE`](../constants.md#datachart.constants.SCALE) |
-| `xticks_format` | [`VALUE_FORMAT`](../constants.md#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](../constants.md#datachart.constants.DATE_FORMAT) |
 | `yticks_format` | [`VALUE_FORMAT`](../constants.md#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](../constants.md#datachart.constants.DATE_FORMAT) |
 | `bandwidth` | [`BANDWIDTH`](../constants.md#datachart.constants.BANDWIDTH) |
-| `inner` | [`VIOLIN_INNER`](../constants.md#datachart.constants.VIOLIN_INNER) |
 | `sort` | [`SORT`](../constants.md#datachart.constants.SORT) |

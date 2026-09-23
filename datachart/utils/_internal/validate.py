@@ -1009,7 +1009,7 @@ def validate_gantt_arrow_entry(value):
 
 
 def _validate_value_kind(show_values, value_kind, kinds: tuple, default: str):
-    """`show_values` and the value label kind of a range front (ADR 0067).
+    """`show_values` and the value label kind of a range front.
 
     A kind passed as `show_values` warns at the front's caller and moves to
     `value_kind`; an unset kind is `default`.

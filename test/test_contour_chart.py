@@ -467,3 +467,21 @@ class TestContourLevels(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestContourCentredNorm(unittest.TestCase):
+    """A centred norm holds `vcenter` mid-colormap, as on the heatmap."""
+
+    def test_vcenter_moves_the_centre_of_filled_bands(self):
+        ax = ContourChart(surface(), filled=True, norm="centered", vcenter=2).axes[0]
+        bands = _contour_sets(ax)[0]
+        self.assertIsInstance(bands.norm, matplotlib.colors.CenteredNorm)
+        self.assertEqual(bands.norm.vcenter, 2)
+        self.assertEqual(bands.cmap.name, config["plot_heatmap_cmap_diverging"])
+
+    def test_twoslope_keeps_its_bounds(self):
+        ax = ContourChart(
+            surface(), filled=True, norm="twoslope", vmin=-1, vmax=4
+        ).axes[0]
+        norm = _contour_sets(ax)[0].norm
+        self.assertEqual((norm.vmin, norm.vcenter, norm.vmax), (-1, 0, 4))

@@ -35,5 +35,6 @@ The parameters that accept a constant, with the class in [datachart.constants](.
 | Parameter | Constant |
 | :-- | :-- |
 | `diagonal` | [`SCATTER_MATRIX_DIAGONAL`](../constants.md#datachart.constants.SCATTER_MATRIX_DIAGONAL) |
+| `figsize` | [`FIG_SIZE`](../constants.md#datachart.constants.FIG_SIZE) |
 | `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](../constants.md#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](../constants.md#datachart.constants.LEGEND_ALIGN) |
 | `show_grid` | [`SHOW_GRID`](../constants.md#datachart.constants.SHOW_GRID) |

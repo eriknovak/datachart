@@ -35,8 +35,9 @@ The parameters that accept a constant, with the class in [datachart.constants](.
 | Parameter | Constant |
 | :-- | :-- |
 | `period` | [`GANTT_DATE_PERIOD`](../constants.md#datachart.constants.GANTT_DATE_PERIOD) |
-| `show_values` | [`GANTT_VALUE`](../constants.md#datachart.constants.GANTT_VALUE) |
+| `value_kind` | [`GANTT_VALUE`](../constants.md#datachart.constants.GANTT_VALUE) |
 | `sort_by` | [`GANTT_SORT_KEY`](../constants.md#datachart.constants.GANTT_SORT_KEY) |
+| `xticks_format` | [`DATE_FORMAT`](../constants.md#datachart.constants.DATE_FORMAT) |
 | `style={"plot_gantt_dependency_entry": ...}` | [`GANTT_ARROW_ENTRY`](../constants.md#datachart.constants.GANTT_ARROW_ENTRY) |
 | `figsize` | [`FIG_SIZE`](../constants.md#datachart.constants.FIG_SIZE) |
 | `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](../constants.md#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](../constants.md#datachart.constants.LEGEND_ALIGN) |
@@ -44,4 +45,3 @@ The parameters that accept a constant, with the class in [datachart.constants](.
 | `value_format` | [`VALUE_FORMAT`](../constants.md#datachart.constants.VALUE_FORMAT) |
 | `sort` | [`SORT`](../constants.md#datachart.constants.SORT) |
 | `emphasis` | [`EMPHASIS`](../constants.md#datachart.constants.EMPHASIS) |
-| `xticks_format` | [`DATE_FORMAT`](../constants.md#datachart.constants.DATE_FORMAT) |

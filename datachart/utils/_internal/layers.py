@@ -6488,7 +6488,7 @@ def colormap_scaling(chart: dict) -> dict:
 
     A centred norm is an instance holding `vcenter` in the middle of the
     colormap and carrying the bounds itself: `centered` folds them into one
-    half-range each side of `vcenter`, `twoslope` keeps them apart (ADR 0056).
+    half-range each side of `vcenter`, `twoslope` keeps them apart.
     Any other norm passes by name beside the bounds.
     """
 

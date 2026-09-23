@@ -364,3 +364,18 @@ class TestHexbinScales(unittest.TestCase):
         ax = figure.axes[0]
         self.assertEqual((ax.get_xscale(), ax.get_yscale()), ("log", "log"))
         self.assert_whole_hexagons(figure)
+
+
+class TestHexbinCentredNorm(unittest.TestCase):
+    """A centred norm holds `vcenter` mid-colormap, as on the heatmap."""
+
+    def test_vcenter_moves_the_centre(self):
+        ax = HexbinChart(points_with_c(), norm=NORMALIZE.CENTERED, vcenter=0.5).axes[0]
+        tiles = _hexbins(ax)[0]
+        self.assertIsInstance(tiles.norm, matplotlib.colors.CenteredNorm)
+        self.assertEqual(tiles.norm.vcenter, 0.5)
+        self.assertEqual(tiles.cmap.name, config["plot_heatmap_cmap_diverging"])
+
+    def test_show_colorbars_defaults_on(self):
+        figure = HexbinChart(points())
+        self.assertEqual(len(figure.axes), 2)
