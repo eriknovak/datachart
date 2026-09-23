@@ -365,6 +365,19 @@ BASE_THEME: StyleAttrs = {
     "plot_image_cmap": "gray",
     "plot_image_interpolation": "antialiased",
     "plot_image_aspect": "auto",
+    # plot basemap style; muted greys, the map is furniture (ADR 0061)
+    "plot_basemap_land_color": "#EDEDED",
+    "plot_basemap_highlight_color": "#C8C8C8",
+    # the outline of the highlighted countries; a width of 0 draws none
+    "plot_basemap_highlight_edge_color": "#1A1A1A",
+    "plot_basemap_highlight_edge_width": 0,
+    "plot_basemap_coastline_color": "#A6A6A6",
+    "plot_basemap_coastline_width": 0.6,
+    "plot_basemap_border_color": "#BDBDBD",
+    "plot_basemap_border_width": 0.5,
+    "plot_basemap_border_style": "-",
+    # None takes the axes background, so a lake reads as the sea does
+    "plot_basemap_lake_color": None,
     # plot scatter style
     "plot_scatter_color": None,
     "plot_scatter_alpha": 0.75,

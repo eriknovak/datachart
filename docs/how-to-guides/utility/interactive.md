@@ -98,6 +98,7 @@ The table lists, per chart, the mark that is picked and what its annotation show
 | [Parallel Coordinates](../charts/parallelcoords.ipynb) | row line, at the nearest axis | the `hue` value (or the legend label), the axis name and the row's value there |
 | [Network Chart](../charts/networkchart.ipynb) | node or edge | node: its label, `degree` (`in` / `out` when directed, the weight sum when weighted), its `group` and `size` when given; edge: `source`, `target`, `weight` |
 | [Image Chart](../charts/imagechart.ipynb) | none | the picture reports nothing; the marks composed over it keep their own |
+| [Basemap Chart](../charts/basemapchart.ipynb) | none | the map reports nothing; the marks composed over it keep their own |
 | [Scatter Matrix](../charts/scattermatrix.ipynb) | point, bin, or density curve | as the scatter chart and histogram marks; a density curve reports the legend label (the `hue` group), `x`, and the density as `y` |
 | [Sankey Chart](../charts/sankeychart.ipynb) | node or link | node: its name, `flow`; link: `source`, `target`, `flow` |
 | [Treemap](../charts/treemap.ipynb) | tile or group band | its label, `value` (a band's group total) |

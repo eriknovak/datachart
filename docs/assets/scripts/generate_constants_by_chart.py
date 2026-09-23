@@ -63,6 +63,7 @@ FAMILIES = [
             "NetworkChart",
             "ScatterMatrix",
             "ImageChart",
+            "BasemapChart",
         ],
     ),
     ("Flows", ["SankeyChart"]),
@@ -94,6 +95,7 @@ SHOWS = {
     "NetworkChart": "Nodes joined by edges, placed by a layout.",
     "ScatterMatrix": "A scatter chart for every pair of dimensions, distributions on the diagonal.",
     "ImageChart": "A picture in data coordinates, under or over the other charts.",
+    "BasemapChart": "Coastlines, land, borders and lakes under a chart of longitude and latitude.",
     "SankeyChart": "Weighted flows between categories, as ribbons between node columns.",
     "Treemap": "Part-of-whole data as nested rectangles sized by value.",
 }
@@ -192,7 +194,7 @@ def guide_title(name):
 
 def params(name):
     source = inspect.getsource(getattr(ch, name))
-    sig = source.split("):", 1)[0]
+    sig = source.split('"""', 1)[0]
     # a parameter the docstring marks "Not supported" raises when passed
     unsupported = set(re.findall(r"^        (\w+): Not supported", source, re.M))
     rows, seen = [], set()
@@ -261,10 +263,12 @@ def owner(name):
 
 
 SIGS = {n: inspect.signature(getattr(ch, n)) for n in ORDER}
+# the parameter that takes a chart's records; the basemap's are optional outlines
+DATA_PARAM = {n: "data" if "data" in SIGS[n].parameters else "geometry" for n in ORDER}
 DATA = {
     n: [
         t
-        for t in typings_in(SIGS[n].parameters["data"].annotation, [])
+        for t in typings_in(SIGS[n].parameters[DATA_PARAM[n]].annotation, [])
         if t not in SHARED
     ]
     for n in ORDER
@@ -348,7 +352,9 @@ def data_section(n):
         if keys
         else ""
     )
-    lines.append(f"Each record in `data` is a {tlink(top[0], page)}{rename}.")
+    lines.append(
+        f"Each record in `{DATA_PARAM[n]}` is a {tlink(top[0], page)}{rename}."
+    )
     lines += render(n, top + [t for x in top for t in nested(x, [])])
     return "\n".join(lines) + "\n"
 

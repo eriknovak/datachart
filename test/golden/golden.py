@@ -46,12 +46,14 @@ from datachart.charts import (
     Treemap,
     NetworkChart,
     ImageChart,
+    BasemapChart,
 )
 from datachart.utils import Panel, Grid, Annotate
 from datachart.config import config
 from datachart.constants import (
     ARROW_STYLE,
     ASPECT_RATIO,
+    BASEMAP_FEATURE,
     BUMP_LABEL_POSITION,
     BUMP_RANK,
     CALENDAR_WEEKDAY,
@@ -61,7 +63,7 @@ from datachart.constants import (
     DATE_FORMAT,
     HEXBIN_REDUCE,
     HISTOGRAM_TYPE,
-    IMAGE_POSITION,
+    DRAW_POSITION,
     LEGEND_LOCATION,
     NETWORK_LABEL_POSITION,
     NETWORK_LAYOUT,
@@ -77,6 +79,13 @@ from datachart.utils.stats import kde1d, kde2d
 
 # Cases whose output intentionally changed since the last published baseline.
 EXPECTED_CHANGES = {
+    # new basemap chart cases (ADR 0061)
+    "basemap_default",
+    "basemap_borders_lakes",
+    "basemap_geometry",
+    "basemap_geographic_aspect",
+    "basemap_under_hexbin_in_grid",
+    "basemap_countries_highlight",
     # new image chart cases (ADR 0060)
     "image_below_scatter",
     "image_above_line",
@@ -3657,7 +3666,7 @@ def image_above_line():
             LineChart(LINE1, subtitle="line", hlines={"y": 45}),
             ImageChart(
                 {"image": watermark, "extent": (2, 7, 20, 70)},
-                position=IMAGE_POSITION.ABOVE,
+                position=DRAW_POSITION.ABOVE,
             ),
         ],
         title="A picture above the marks, under the reference line",
@@ -3689,6 +3698,93 @@ def image_panel_in_grid():
     )
     return Grid(
         [[under, ImageChart({"image": image_pixels(), "extent": (0, 3, 0, 2)})]]
+    )
+
+
+# ----- basemap chart (ADR 0061) -----
+
+
+@case
+def basemap_default():
+    return BasemapChart(title="Coastline and land, the world")
+
+
+@case
+def basemap_borders_lakes():
+    return BasemapChart(
+        [BASEMAP_FEATURE.LAND, BASEMAP_FEATURE.LAKES, BASEMAP_FEATURE.BORDERS],
+        title="Borders and lakes around the Great Lakes",
+        xmin=-100,
+        xmax=-65,
+        ymin=35,
+        ymax=55,
+    )
+
+
+@case
+def basemap_geometry():
+    island = {
+        "lon": [0, 6, 7, 5, 1, 0, np.nan, 2, 2, 3, 3],
+        "lat": [0, 0, 3, 5, 4, 0, np.nan, 1, 2, 2, 1],
+        "feature": "land",
+    }
+    road = {"lon": [0.5, 3.5, 6.5], "lat": [3.5, 2.5, 3.5], "feature": "borders"}
+    return BasemapChart(
+        geometry=[island, road], title="Caller outlines, a lake as a hole"
+    )
+
+
+@case
+def basemap_geographic_aspect():
+    return Panel(
+        [
+            BasemapChart([BASEMAP_FEATURE.LAND, BASEMAP_FEATURE.BORDERS]),
+            ScatterChart(
+                [
+                    {"x": 10.8, "y": 59.9},
+                    {"x": 18.1, "y": 59.3},
+                    {"x": 24.9, "y": 60.2},
+                ],
+                subtitle="capitals",
+            ),
+        ],
+        title="Scandinavia at true proportions",
+        xmin=0,
+        xmax=35,
+        ymin=53,
+        ymax=72,
+        aspect_ratio=ASPECT_RATIO.GEOGRAPHIC,
+    )
+
+
+@case
+def basemap_under_hexbin_in_grid():
+    rng = np.random.default_rng(7)
+    lon = np.concatenate([rng.normal(22, 1.5, 300), rng.normal(37, 1.0, 300)])
+    lat = np.concatenate([rng.normal(38, 1.0, 300), rng.normal(37.5, 0.6, 300)])
+    under = Panel(
+        [
+            HexbinChart({"x": lon.tolist(), "y": lat.tolist()}, gridsize=20, mincnt=1),
+            BasemapChart(),
+        ],
+        title="Hexbin over the coast",
+        aspect_ratio=ASPECT_RATIO.GEOGRAPHIC,
+    )
+    return Grid([[under, LineChart(LINE1, title="Neighbour")]])
+
+
+@case
+def basemap_countries_highlight():
+    return BasemapChart(
+        [BASEMAP_FEATURE.COUNTRIES, BASEMAP_FEATURE.BORDERS],
+        highlight=["SVN", "AUT", "HRV", "HUN", "ITA"],
+        style={"plot_basemap_highlight_edge_width": 1.2},
+        title="Five countries picked out and outlined",
+        xmin=5,
+        xmax=25,
+        ymin=40,
+        ymax=50,
+        aspect_ratio=ASPECT_RATIO.GEOGRAPHIC,
     )
 
 

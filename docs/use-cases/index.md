@@ -76,6 +76,6 @@ The section grows one field at a time: AI, machine learning and NLP, statistics,
 | | Planning | What ships when, and what is late? | `GanttChart` |
 | [Economics and Finance](economics.ipynb) | Growth | When did the economies shrink, which are the largest, and how does structure change with growth? | `LineChart`, `BumpChart`, `StackedAreaChart` in a `Grid` |
 | | Prices, incomes and the shocks | Where did inflation bite, what did the pandemic cost, who caught up, and how do the G20 compare at once? | `Heatmap`, `BarChart`, `DumbbellChart`, `ParallelCoords` |
-| [Seismology and Geodesy](seismology.ipynb) | Where the earthquakes are | Where does the seismicity concentrate, and what does the ground under it look like? | `HexbinChart`, `ImageChart`, `ContourChart` |
+| [Seismology and Geodesy](seismology.ipynb) | Where the earthquakes are | Where does the seismicity concentrate, and what does the ground under it look like? | `HexbinChart`, `ImageChart`, `BasemapChart`, `ContourChart` |
 | | The sequence | How are the magnitudes distributed, how fast did the aftershocks decay, when did they arrive, and which way did the rupture run? | `LineChart` on log axes, `CalendarHeatmap`, `RadialChart` |
 | | The instruments | Which stations were watching, and how are they spread? | `NetworkChart` |

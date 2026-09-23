@@ -49,6 +49,10 @@ CHART_CONFIGS = {
         "multiplot": True,
         "subplots": True,
     },
+    "basemapchart": {
+        "multiplot": False,
+        "subplots": False,
+    },
     "scatterchart": {
         "multiplot": True,
         "subplots": True,

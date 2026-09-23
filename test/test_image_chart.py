@@ -14,10 +14,10 @@ from PIL import Image as PILImage
 
 from datachart.charts import ImageChart, ScatterChart, LineChart
 from datachart.config import config
-from datachart.constants import IMAGE_POSITION, THEME
+from datachart.constants import DRAW_POSITION, THEME
 from datachart.config.configuration import THEMES
 from datachart.utils import Panel, Grid
-from datachart.utils._internal.layers import IMAGE_ZORDER, REF_LINE_ZORDER
+from datachart.utils._internal.layers import DRAW_ZORDER, REF_LINE_ZORDER
 
 EXTENT = (0.0, 10.0, -5.0, 5.0)
 
@@ -172,15 +172,15 @@ class TestImageDrawOrder(unittest.TestCase):
     def test_below_sits_under_the_gridlines(self):
         figure = ImageChart({"image": rgb(), "extent": EXTENT}, show_grid="both")
         ax = figure.axes[0]
-        self.assertEqual(images(figure)[0].get_zorder(), IMAGE_ZORDER["below"])
-        self.assertLess(IMAGE_ZORDER["below"], ax.xaxis.get_zorder())
+        self.assertEqual(images(figure)[0].get_zorder(), DRAW_ZORDER["below"])
+        self.assertLess(DRAW_ZORDER["below"], ax.xaxis.get_zorder())
 
     def test_above_sits_over_the_marks_under_reference_lines(self):
         figure = ImageChart(
-            {"image": rgb(), "extent": EXTENT}, position=IMAGE_POSITION.ABOVE
+            {"image": rgb(), "extent": EXTENT}, position=DRAW_POSITION.ABOVE
         )
         z = images(figure)[0].get_zorder()
-        self.assertEqual(z, IMAGE_ZORDER["above"])
+        self.assertEqual(z, DRAW_ZORDER["above"])
         self.assertGreater(z, config["plot_scatter_zorder"])
         self.assertLess(z, REF_LINE_ZORDER)
 
@@ -196,7 +196,7 @@ class TestImageDrawOrder(unittest.TestCase):
             ax = figure.axes[0]
             image_z = ax.get_images()[0].get_zorder()
             mark_z = max(c.get_zorder() for c in ax.collections)
-            self.assertEqual(image_z, IMAGE_ZORDER["below"])
+            self.assertEqual(image_z, DRAW_ZORDER["below"])
             self.assertLess(image_z, mark_z)
 
     def test_panel_order_keeps_the_limits(self):
@@ -212,7 +212,7 @@ class TestImageDrawOrder(unittest.TestCase):
 
     def test_panel_above(self):
         image = ImageChart(
-            {"image": rgb(), "extent": EXTENT}, position=IMAGE_POSITION.ABOVE
+            {"image": rgb(), "extent": EXTENT}, position=DRAW_POSITION.ABOVE
         )
         figure = Panel([image, ScatterChart(points())])
         ax = figure.axes[0]

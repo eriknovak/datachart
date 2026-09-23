@@ -19,6 +19,8 @@ from PIL import Image
 from ...constants import (
     ARROW_STYLE,
     BANDWIDTH,
+    BASEMAP_FEATURE,
+    BASEMAP_RESOLUTION,
     BUMP_LABEL_POSITION,
     BUMP_RANK,
     CALENDAR_WEEKDAY,
@@ -30,7 +32,7 @@ from ...constants import (
     GANTT_DATE_PERIOD,
     GANTT_SORT_KEY,
     GANTT_VALUE,
-    IMAGE_POSITION,
+    DRAW_POSITION,
     NETWORK_LAYOUT,
     NETWORK_LABEL_POSITION,
     NORMALIZE,
@@ -53,7 +55,25 @@ AXIS_TEMPORAL = "temporal"
 AXIS_NUMERIC = "numeric"
 AXIS_CATEGORICAL = "categorical"
 EMPHASIS_ROLES = (EMPHASIS.BACKGROUND, EMPHASIS.HIGHLIGHT)
-IMAGE_POSITIONS = (IMAGE_POSITION.BELOW, IMAGE_POSITION.ABOVE)
+DRAW_POSITIONS = (DRAW_POSITION.BELOW, DRAW_POSITION.ABOVE)
+# in draw order, bottom up: a lake sits on the land and a line on both
+BASEMAP_FEATURES = (
+    BASEMAP_FEATURE.LAND,
+    BASEMAP_FEATURE.COUNTRIES,
+    BASEMAP_FEATURE.LAKES,
+    BASEMAP_FEATURE.BORDERS,
+    BASEMAP_FEATURE.COASTLINE,
+)
+BASEMAP_FILLED = (
+    BASEMAP_FEATURE.LAND,
+    BASEMAP_FEATURE.COUNTRIES,
+    BASEMAP_FEATURE.LAKES,
+)
+BASEMAP_RESOLUTIONS = (
+    BASEMAP_RESOLUTION.LOW,
+    BASEMAP_RESOLUTION.MEDIUM,
+    BASEMAP_RESOLUTION.HIGH,
+)
 # PIL modes an array keeps as is: grey levels read through the colormap
 IMAGE_ARRAY_MODES = ("L", "I", "F", "RGB", "RGBA")
 RANK_RULES = (BUMP_RANK.VALUE_DESCENDING, BUMP_RANK.VALUE_ASCENDING, BUMP_RANK.GIVEN)
@@ -1173,15 +1193,15 @@ def validate_gantt_groups(records, sort_by, show_group_headers=False) -> None:
         )
 
 
-def validate_image_position(position):
-    """Validate an image draw position; None means below the marks."""
+def validate_draw_position(position):
+    """Validate an image or basemap draw position; None means below the marks."""
 
     if position is None:
-        return IMAGE_POSITION.DEFAULT
-    if position not in IMAGE_POSITIONS:
+        return DRAW_POSITION.DEFAULT
+    if position not in DRAW_POSITIONS:
         raise ValueError(
             f"Invalid `position` value {position!r}. "
-            f"Must be one of {IMAGE_POSITIONS} or None."
+            f"Must be one of {DRAW_POSITIONS} or None."
         )
     return position
 
@@ -1255,3 +1275,165 @@ def validate_image(image) -> np.ndarray:
             + (f" of shape {array.shape}." if array is not None else ".")
         )
     return array
+
+
+def validate_basemap_source(
+    features, geometry, resolution=None, highlight=None
+) -> None:
+    """Raise when caller outlines come with a setting of the Natural Earth set."""
+
+    if geometry is None:
+        return
+    for name, value in (
+        ("features", features),
+        ("resolution", resolution),
+        ("highlight", highlight),
+    ):
+        if value is not None:
+            raise ValueError(
+                f"Pass either basemap `{name}` or `geometry`: the geometry "
+                "replaces the Natural Earth outlines."
+            )
+
+
+def validate_basemap_highlight(highlight, features) -> tuple:
+    """The highlighted country codes, upper case; empty when none are."""
+
+    if highlight is None:
+        return ()
+    if BASEMAP_FEATURE.COUNTRIES not in features:
+        raise ValueError(
+            "`highlight` picks countries out, so `features` must include "
+            f"{BASEMAP_FEATURE.COUNTRIES!r}."
+        )
+    codes = (highlight,) if isinstance(highlight, str) else tuple(highlight)
+    malformed = [
+        c for c in codes if not (isinstance(c, str) and len(c) == 3 and c.isalpha())
+    ]
+    if malformed:
+        raise ValueError(
+            f"Invalid basemap `highlight` codes {malformed!r}. Each must be a "
+            "three-letter country code, such as 'SVN' or 'FRA'."
+        )
+    return tuple(c.upper() for c in codes)
+
+
+def validate_basemap_resolution(resolution) -> str:
+    """The Natural Earth scale; None means the bundled 1:110m."""
+
+    if resolution is None:
+        return BASEMAP_RESOLUTION.DEFAULT
+    if resolution not in BASEMAP_RESOLUTIONS:
+        raise ValueError(
+            f"Invalid basemap `resolution` {resolution!r}. "
+            f"Must be one of {BASEMAP_RESOLUTIONS} or None."
+        )
+    return resolution
+
+
+def validate_basemap_company(non_numeric_kinds, horizontal) -> None:
+    """Raise when a basemap shares a panel with a chart that has no longitude.
+
+    Args:
+        non_numeric_kinds: The kinds of the panel's data layers whose x is
+            categorical, a date, or its own axes.
+        horizontal: Whether the panel is horizontal, x and y swapped.
+    """
+
+    if horizontal or non_numeric_kinds:
+        culprit = (
+            "a horizontal chart"
+            if horizontal
+            else f"a {non_numeric_kinds[0]!r} chart whose x is not a number"
+        )
+        raise ValueError(
+            "A basemap draws longitude on x and latitude on y, so every chart "
+            f"it shares a panel with must too; this panel holds {culprit}. "
+            "Compose the two side by side with `Grid` instead."
+        )
+
+
+def validate_basemap_features(features) -> tuple:
+    """The features as a tuple of names; None means coastline and land."""
+
+    if features is None:
+        return BASEMAP_FEATURE.DEFAULT
+    if isinstance(features, str):
+        features = (features,)
+    features = tuple(features)
+    unknown = [f for f in features if f not in BASEMAP_FEATURES]
+    if unknown or not features:
+        raise ValueError(
+            f"Invalid basemap `features` {unknown or list(features)!r}. "
+            f"Must be one or more of {BASEMAP_FEATURES}."
+        )
+    return features
+
+
+def validate_basemap_geometry(geometry) -> list:
+    """The caller's outlines as `(feature, (n, 2) float array)` pairs.
+
+    Each outline set is a `{"lon", "lat", "feature"}` dict, `NaN` separating
+    one outline from the next; one dict or a list of them.
+    """
+
+    entries = [geometry] if isinstance(geometry, dict) else geometry
+    if not isinstance(entries, (list, tuple)) or not entries:
+        raise ValueError(
+            "Invalid basemap `geometry`: must be a `{lon, lat, feature}` dict "
+            f"or a non-empty list of them; got {type(geometry).__name__}."
+        )
+    outlines = []
+    for i, entry in enumerate(entries):
+        where = f"basemap `geometry` entry {i}"
+        if not isinstance(entry, dict) or "lon" not in entry or "lat" not in entry:
+            raise ValueError(f"Invalid {where}: must be a dict with `lon` and `lat`.")
+        feature = entry.get("feature") or BASEMAP_FEATURE.COASTLINE
+        if feature == BASEMAP_FEATURE.COUNTRIES:
+            raise ValueError(
+                f"Invalid {where}: {feature!r} needs Natural Earth's country "
+                "codes; draw your own areas as 'land'."
+            )
+        if feature not in BASEMAP_FEATURES:
+            raise ValueError(
+                f"Invalid {where}: `feature` {feature!r} must be one of "
+                f"{BASEMAP_FEATURES}."
+            )
+        try:
+            lon = np.asarray(entry["lon"], dtype=float)
+            lat = np.asarray(entry["lat"], dtype=float)
+        except (TypeError, ValueError) as error:
+            raise ValueError(
+                f"Invalid {where}: `lon` and `lat` must be numbers."
+            ) from error
+        if lon.ndim != 1 or lon.shape != lat.shape:
+            raise ValueError(
+                f"Invalid {where}: `lon` and `lat` must be flat sequences of "
+                "the same length."
+            )
+        rows = np.column_stack([lon, lat])
+        # a filled outline needs a ring: three points between two NaN breaks
+        finite = np.isfinite(rows).all(axis=1)
+        runs = np.diff(np.flatnonzero(np.concatenate([[1], ~finite, [1]]))) - 1
+        needed = 3 if feature in BASEMAP_FILLED else 1
+        if not (runs >= needed).any():
+            raise ValueError(
+                f"Invalid {where}: a {feature!r} outline needs at least "
+                f"{needed} point{'s' if needed > 1 else ''} with a finite `lon` "
+                "and `lat`."
+            )
+        outlines.append((feature, rows))
+    return outlines
+
+
+def validate_geographic_latitudes(ylim) -> float:
+    """The mid latitude of a geographic axes; raise past the poles."""
+
+    lo, hi = sorted(ylim)
+    if lo < -90 or hi > 90:
+        raise ValueError(
+            f'`aspect_ratio="geographic"` reads the y-axis as latitude, but it '
+            f"runs from {lo:g} to {hi:g}, outside -90 to 90. Plot latitude on "
+            "y, or set `ymin` and `ymax` within it."
+        )
+    return (lo + hi) / 2

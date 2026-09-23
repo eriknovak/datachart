@@ -34,7 +34,7 @@ The parameters that accept a constant, with the class in [datachart.constants](.
 
 | Parameter | Constant |
 | :-- | :-- |
-| `position` | [`IMAGE_POSITION`](../constants.md#datachart.constants.IMAGE_POSITION) |
+| `position` | [`DRAW_POSITION`](../constants.md#datachart.constants.DRAW_POSITION) |
 | `figsize` | [`FIG_SIZE`](../constants.md#datachart.constants.FIG_SIZE) |
 | `show_grid` | [`SHOW_GRID`](../constants.md#datachart.constants.SHOW_GRID) |
 | `aspect_ratio` | [`ASPECT_RATIO`](../constants.md#datachart.constants.ASPECT_RATIO) |

@@ -53,6 +53,7 @@ Classes:
     SCALE:             The supported scale options.
     ASPECT_RATIO:      The supported aspect ratio options.
     COLORBAR_LOCATION: The supported colorbar locations.
+    DRAW_POSITION:     The supported draw positions of the image and basemap.
 
 **Chart-Specific Constants**
 
@@ -73,10 +74,11 @@ Classes:
     RIDGELINE_SCALE:         The supported ridgeline density scales.
     CONTOUR_LEVELS:          The supported contour level rules.
     HEXBIN_REDUCE:           The supported hexbin aggregations.
-    IMAGE_POSITION:          The supported image chart draw positions.
     NETWORK_LAYOUT:          The supported network chart layouts.
     NETWORK_LABEL_POSITION:     The supported network node label positions.
     SCATTER_MATRIX_DIAGONAL: The supported scatter matrix diagonal cells.
+    BASEMAP_FEATURE:         The supported basemap features.
+    BASEMAP_RESOLUTION:      The supported basemap outline resolutions.
 
 """
 
@@ -984,32 +986,73 @@ class HEXBIN_REDUCE:
     MAX = "max"
 
 
-class IMAGE_POSITION:
-    """The supported image chart draw positions.
+class BASEMAP_FEATURE:
+    """The supported basemap features.
 
-    Passed as the `position` setting of the image chart: where the picture
-    sits in the draw order of the axes it shares with other charts. The
-    position decides it, never the order of the figures in `Panel`.
+    Passed as the `features` of the basemap chart: which of the bundled
+    Natural Earth 1:110m outlines are drawn. The ocean is not a feature; it
+    is the axes background the land sits on.
 
-    ![IMAGE_POSITION at a glance](../assets/imgs/const-image-position.svg){ width="100%" }
+    ![BASEMAP_FEATURE at a glance](../assets/imgs/const-basemap-feature.svg){ width="100%" }
 
     Examples:
-        >>> from datachart.constants import IMAGE_POSITION
-        >>> IMAGE_POSITION.DEFAULT
-        "below"
+        >>> from datachart.constants import BASEMAP_FEATURE
+        >>> BASEMAP_FEATURE.DEFAULT
+        ("coastline", "land")
 
     Attributes:
-        DEFAULT (str): The default position. Same as `IMAGE_POSITION.BELOW`.
-        BELOW (str): Under every mark and under the gridlines, so the grid and
-            the data read over the picture. Equals to `"below"`.
-        ABOVE (str): Over the marks, under the reference lines and the text
-            annotations; a watermark or a mask. Equals to `"above"`.
+        DEFAULT (Tuple[str, str]): The default features. Same as
+            `(BASEMAP_FEATURE.COASTLINE, BASEMAP_FEATURE.LAND)`.
+        COASTLINE (str): The coastlines, as lines. Equals to `"coastline"`.
+        LAND (str): The land, as a filled area. Equals to `"land"`.
+        COUNTRIES (str): The land, one filled area per country, so the
+            `highlight` setting can pick countries out. Equals to
+            `"countries"`.
+        BORDERS (str): The land borders between countries, as lines. Equals
+            to `"borders"`.
+        LAKES (str): The large lakes, filled with the axes background.
+            Equals to `"lakes"`.
 
     """
 
-    DEFAULT = "below"
-    BELOW = "below"
-    ABOVE = "above"
+    DEFAULT = ("coastline", "land")
+    COASTLINE = "coastline"
+    LAND = "land"
+    COUNTRIES = "countries"
+    BORDERS = "borders"
+    LAKES = "lakes"
+
+
+class BASEMAP_RESOLUTION:
+    """The supported basemap outline resolutions.
+
+    Passed as the `resolution` of the basemap chart: the Natural Earth scale
+    the outlines are drawn at. The coarsest ships with the package; the finer
+    ones are downloaded the first time they are asked for and kept in a
+    local cache, so they need the network once. The cache folder is
+    `DATACHART_CACHE_DIR` when that environment variable is set, else
+    `datachart` under `XDG_CACHE_HOME` or `~/.cache`.
+
+    Examples:
+        >>> from datachart.constants import BASEMAP_RESOLUTION
+        >>> BASEMAP_RESOLUTION.DEFAULT
+        "110m"
+
+    Attributes:
+        DEFAULT (str): The default resolution. Same as `BASEMAP_RESOLUTION.LOW`.
+        LOW (str): 1:110 million, bundled; a continent or a region. Equals to
+            `"110m"`.
+        MEDIUM (str): 1:50 million, about 5 MB on first use; a country.
+            Equals to `"50m"`.
+        HIGH (str): 1:10 million, about 28 MB on first use; a coast or a
+            city's surroundings. Equals to `"10m"`.
+
+    """
+
+    DEFAULT = "110m"
+    LOW = "110m"
+    MEDIUM = "50m"
+    HIGH = "10m"
 
 
 class STACKED_AREA_BASELINE:
@@ -1667,12 +1710,17 @@ class ASPECT_RATIO:
         DEFAULT (str): The default aspect ratio. Same as `ASPECT_RATIO.AUTO`.
         AUTO (str): Automatic aspect ratio. Equals to `"auto"`.
         EQUAL (str): Equal aspect ratio (1:1). Equals to `"equal"`.
+        GEOGRAPHIC (str): Longitude on x and latitude on y at true
+            proportions: one degree of longitude is narrowed by the cosine
+            of the latitude in the middle of the y-axis. The y-axis must
+            stay within -90 and 90. Equals to `"geographic"`.
 
     """
 
     DEFAULT = "auto"
     AUTO = "auto"
     EQUAL = "equal"
+    GEOGRAPHIC = "geographic"
 
 
 class COLORBAR_LOCATION:
@@ -1700,3 +1748,32 @@ class COLORBAR_LOCATION:
     LEFT = "left"
     TOP = "top"
     BOTTOM = "bottom"
+
+
+class DRAW_POSITION:
+    """The supported draw positions of the image and basemap.
+
+    Passed as the `position` setting of the image chart and the basemap
+    chart: where the picture or the map sits in the draw order of the axes
+    it shares with other charts. The position decides it, never the order
+    of the figures in `Panel`.
+
+    ![DRAW_POSITION at a glance](../assets/imgs/const-draw-position.svg){ width="100%" }
+
+    Examples:
+        >>> from datachart.constants import DRAW_POSITION
+        >>> DRAW_POSITION.DEFAULT
+        "below"
+
+    Attributes:
+        DEFAULT (str): The default position. Same as `DRAW_POSITION.BELOW`.
+        BELOW (str): Under every mark and under the gridlines, so the grid and
+            the data read over the picture. Equals to `"below"`.
+        ABOVE (str): Over the marks, under the reference lines and the text
+            annotations; a watermark or a mask. Equals to `"above"`.
+
+    """
+
+    DEFAULT = "below"
+    BELOW = "below"
+    ABOVE = "above"

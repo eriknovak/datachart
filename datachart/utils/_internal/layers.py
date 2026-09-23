@@ -28,7 +28,12 @@ from matplotlib.font_manager import FontProperties
 from matplotlib import cbook, rc_context
 import matplotlib.ticker as mticker
 from matplotlib.ticker import MaxNLocator
-from matplotlib.collections import LineCollection, PathCollection, PolyCollection
+from matplotlib.collections import (
+    LineCollection,
+    PatchCollection,
+    PathCollection,
+    PolyCollection,
+)
 from matplotlib.container import BarContainer
 from matplotlib.colors import (
     CenteredNorm,
@@ -62,6 +67,7 @@ from matplotlib.legend_handler import (
     HandlerPolyCollection,
 )
 
+from .basemap import load_basemap, load_country_codes
 from .colors import (
     create_color_cycle,
     create_colormap,
@@ -95,9 +101,18 @@ from .validate import (
     validate_gantt_arrow_entry,
     validate_gantt_show_values,
     validate_gantt_sort_by,
+    BASEMAP_FEATURES,
+    BASEMAP_FILLED,
+    validate_basemap_company,
+    validate_basemap_features,
+    validate_basemap_geometry,
+    validate_basemap_highlight,
+    validate_basemap_resolution,
+    validate_basemap_source,
+    validate_geographic_latitudes,
     validate_image,
     validate_image_extent,
-    validate_image_position,
+    validate_draw_position,
     validate_log_values,
     validate_overlap,
     validate_ridge_marks,
@@ -156,6 +171,7 @@ from .config_helpers import (
     get_contour_label_style,
     get_hexbin_style,
     get_image_style,
+    get_basemap_style,
     get_colorbar_setting,
     get_scatter_style,
     get_scatter_error_style,
@@ -207,7 +223,8 @@ from ...constants import (
     GANTT_VALUE,
     HEXBIN_REDUCE,
     HISTOGRAM_TYPE,
-    IMAGE_POSITION,
+    BASEMAP_FEATURE,
+    DRAW_POSITION,
     LEGEND_LOCATION,
     NETWORK_LAYOUT,
     NETWORK_LABEL_POSITION,
@@ -1276,15 +1293,37 @@ TEXT_COORDS = ("data", "axes")
 TEXT_ANNOTATION_ZORDER = 5
 # reference lines sit above every mark (zorder 3), below annotations (ADR 0054)
 REF_LINE_ZORDER = 3.5
-# an image's rung (ADR 0054, 0060): below under the gridlines (0.5), above
-# over the marks (3) and under the reference lines
-IMAGE_ZORDER = {IMAGE_POSITION.BELOW: 0.25, IMAGE_POSITION.ABOVE: 3.25}
+# an image's or basemap's rung (ADR 0054, 0060, 0061): below under the
+# gridlines (0.5), above over the marks (3) and under the reference lines
+DRAW_ZORDER = {DRAW_POSITION.BELOW: 0.25, DRAW_POSITION.ABOVE: 3.25}
 
 
-def image_zorder_key(position: str) -> str:
-    """An image's key in a Panel overlay's zorder table."""
+def draw_zorder_key(position: str) -> str:
+    """An image's or basemap's key in a Panel overlay's zorder table."""
 
-    return f"image_{position}"
+    return f"draw_{position}"
+
+
+def _split_outlines(rows: np.ndarray) -> List[np.ndarray]:
+    """The outlines of `NaN`-separated rows; empty ones dropped."""
+
+    breaks = np.flatnonzero(np.isnan(rows).any(axis=1))
+    parts = np.split(rows, breaks)
+    return [part[np.isfinite(part).all(axis=1)] for part in parts if len(part)]
+
+
+def _filled_path(outlines: List[np.ndarray]) -> Path:
+    """One compound path of closed rings; a ring wound the other way is a hole."""
+
+    rings = [ring for ring in outlines if len(ring) >= 3]
+    vertices = np.concatenate([np.vstack([ring, ring[:1]]) for ring in rings])
+    codes = np.concatenate(
+        [
+            [Path.MOVETO] + [Path.LINETO] * (len(ring) - 1) + [Path.CLOSEPOLY]
+            for ring in rings
+        ]
+    )
+    return Path(vertices, codes)
 
 
 # a diagonal is straight in data space, so on a non-linear axis it is a curve
@@ -7404,16 +7443,30 @@ class HexbinLayer(Layer):
         ax.add_collection(outline, autolim=False)
 
 
-class ImageLayer(Layer):
-    """A picture stretched over its extent in data coordinates (ADR 0060).
+class DrawPositionLayer(Layer):
+    """A layer that carries no series, on the rung its `DRAW_POSITION` picks.
 
-    Carries no series: it takes no cycle color, no legend entry and no
-    emphasis. Its position picks its rung on the draw-order ladder.
+    Takes no cycle color, no legend entry and no emphasis (ADR 0054, 0060).
     """
+
+    takes_color = False
+    position: str = DRAW_POSITION.DEFAULT
+
+    @property
+    def zorder_key(self) -> str:
+        return draw_zorder_key(self.position)
+
+    def rung(self, ctx) -> float:
+        """The layer's zorder: its position's rung unless the panel set one."""
+
+        return DRAW_ZORDER[self.position] if ctx.z_order is None else ctx.z_order
+
+
+class ImageLayer(DrawPositionLayer):
+    """A picture stretched over its extent in data coordinates (ADR 0060)."""
 
     # the picture fills its extent; the axes end where it does
     ticks_at_axis_ends = False
-    takes_color = False
 
     kind = "image"
 
@@ -7421,7 +7474,7 @@ class ImageLayer(Layer):
         data = self.chart.get("data") or {}
         self.image = validate_image(data.get("image"))
         self.extent = validate_image_extent(data.get("extent"))
-        self.position = validate_image_position(self.settings.get("position"))
+        self.position = validate_draw_position(self.settings.get("position"))
         style = get_image_style(self.style)
         if self.image.ndim == 2:
             style["cmap"] = get_colormap(style["cmap"])
@@ -7432,10 +7485,6 @@ class ImageLayer(Layer):
             style.pop("cmap", None)
         self.image_style = style
 
-    @property
-    def zorder_key(self) -> str:
-        return image_zorder_key(self.position)
-
     def value_data(self):
         return np.array(self.extent[2:])
 
@@ -7443,7 +7492,7 @@ class ImageLayer(Layer):
         return np.array(self.extent[:2])
 
     def draw(self, ax, ctx):
-        z_order = IMAGE_ZORDER[self.position] if ctx.z_order is None else ctx.z_order
+        z_order = self.rung(ctx)
         ax.imshow(
             self.image,
             extent=self.extent,
@@ -7453,6 +7502,127 @@ class ImageLayer(Layer):
         )
         # imshow pins the view to the extent; earlier marks must count too
         ax.autoscale_view()
+
+
+class BasemapLayer(DrawPositionLayer):
+    """Coastlines, land, borders and lakes in longitude and latitude (ADR 0061).
+
+    Composed with data it leaves the limits to the data; alone it frames its
+    own outlines.
+    """
+
+    kind = "basemap"
+
+    def _resolve_style(self):
+        data = self.chart.get("data") or {}
+        geometry = data.get("geometry")
+        validate_basemap_source(
+            data.get("features"),
+            geometry,
+            data.get("resolution"),
+            data.get("highlight"),
+        )
+        self.highlight = ()
+        if geometry is None:
+            features = validate_basemap_features(data.get("features"))
+            resolution = validate_basemap_resolution(data.get("resolution"))
+            outlines = [(f, load_basemap(f, resolution)) for f in features]
+            self.highlight = validate_basemap_highlight(data.get("highlight"), features)
+            if BASEMAP_FEATURE.COUNTRIES in features:
+                self.country_codes = load_country_codes(resolution)
+                self._warn_missing_countries(resolution)
+        else:
+            outlines = validate_basemap_geometry(geometry)
+        # bottom up, the caller's order kept within one feature
+        self.outlines = sorted(outlines, key=lambda o: BASEMAP_FEATURES.index(o[0]))
+        self.position = validate_draw_position(self.settings.get("position"))
+        self.feature_style = get_basemap_style(self.style)
+        lakes = self.feature_style[BASEMAP_FEATURE.LAKES]
+        lakes.setdefault("facecolor", self.ground)
+
+    def _warn_missing_countries(self, resolution: str) -> None:
+        """Warn about highlighted codes the map at this scale does not draw."""
+
+        missing = sorted(set(self.highlight) - set(self.country_codes))
+        if missing:
+            warnings.warn(
+                f"The basemap at 1:{resolution} draws no country coded "
+                f"{missing}: too small at this scale, or not a Natural Earth "
+                "ADM0_A3 code. A finer `resolution` may draw it."
+            )
+
+    def _draw_countries(self, ax, rows, z_order) -> list:
+        """One patch per country, so an enclave keeps its own fill.
+
+        Returns the paths of the highlighted countries, for their outline.
+        """
+
+        style = self.feature_style[BASEMAP_FEATURE.COUNTRIES]
+        rings = defaultdict(list)
+        for code, ring in zip(self.country_codes, _split_outlines(rows)):
+            rings[code].append(ring)
+        codes = list(rings)
+        faces = [
+            style["highlight"] if code in self.highlight else style["facecolor"]
+            for code in codes
+        ]
+        paths = [_filled_path(rings[code]) for code in codes]
+        ax.add_collection(
+            PatchCollection(
+                [PathPatch(path) for path in paths],
+                facecolors=faces,
+                edgecolors="none",
+                zorder=z_order,
+            ),
+            autolim=False,
+        )
+        return [path for code, path in zip(codes, paths) if code in self.highlight]
+
+    def bounds(self) -> tuple:
+        """The `(xmin, xmax, ymin, ymax)` the outlines span."""
+
+        rows = np.concatenate([rows for _, rows in self.outlines])
+        rows = rows[np.isfinite(rows).all(axis=1)]
+        (x0, y0), (x1, y1) = rows.min(axis=0), rows.max(axis=0)
+        return float(x0), float(x1), float(y0), float(y1)
+
+    def draw(self, ax, ctx):
+        z_order = self.rung(ctx)
+        highlighted = []
+        for feature, rows in self.outlines:
+            if feature == BASEMAP_FEATURE.COUNTRIES:
+                highlighted = self._draw_countries(ax, rows, z_order)
+                continue
+            outlines = _split_outlines(rows)
+            style = self.feature_style[feature]
+            # a basemap never widens the view; a lone one frames it in render
+            if feature in BASEMAP_FILLED:
+                # add_artist, unlike add_patch, leaves the data limits alone
+                ax.add_artist(
+                    PathPatch(
+                        _filled_path(outlines),
+                        edgecolor="none",
+                        zorder=z_order,
+                        **style,
+                    )
+                )
+            else:
+                ax.add_collection(
+                    LineCollection(outlines, zorder=z_order, **style), autolim=False
+                )
+        edge = self.feature_style[BASEMAP_FEATURE.COUNTRIES]
+        if highlighted and edge.get("edge_width"):
+            # added last, so the borders and the coastline never cross it
+            ax.add_collection(
+                PatchCollection(
+                    [PathPatch(path) for path in highlighted],
+                    facecolors="none",
+                    edgecolors=edge["edge_color"],
+                    linewidths=edge["edge_width"],
+                    zorder=z_order,
+                ),
+                autolim=False,
+            )
 
 
 class ParallelCoordsLayer(Layer):
@@ -10248,6 +10418,7 @@ LAYER_TYPES = {
     "ganttchart": GanttLayer,
     "dumbbellchart": DumbbellLayer,
     "imagechart": ImageLayer,
+    "basemapchart": BasemapLayer,
 }
 
 RADIAL_LAYER_TYPES = {
@@ -11296,6 +11467,15 @@ class Panel:
             ("ridge", "ridgeline plot"),
         ):
             validate_single_dataset([l for l in self.layers if l.kind == kind], name)
+        if any(isinstance(l, BasemapLayer) for l in self.layers):
+            validate_basemap_company(
+                [
+                    l.kind
+                    for l in self.layers
+                    if l.takes_color and l.x_kind() != AXIS_NUMERIC
+                ],
+                self.horizontal,
+            )
 
         horizontal = self.horizontal
         polar = self.projection == "polar"
@@ -11311,13 +11491,13 @@ class Panel:
         assignments = ["left"] * len(self.groups)
         ax_right = None
         if s.get("twin_axes") and not polar:
-            # text carrier groups hold no data, and an image shares the data's
-            # coordinates: both stay on the primary axis and never enter the
-            # scale clustering
+            # text carrier groups hold no data, and an image or a basemap
+            # shares the data's coordinates: they stay on the primary axis and
+            # never enter the scale clustering
             data_indices = [
                 i
                 for i, group in enumerate(self.groups)
-                if any(l.kind not in ("text", "image") for l in group.layers)
+                if any(l.takes_color for l in group.layers)
             ]
             data_assignments = determine_axis_assignment(
                 [self.groups[i] for i in data_indices],
@@ -11817,6 +11997,23 @@ class Panel:
         style["alpha"] = style.get("alpha", 1.0) * MINOR_GRID_ALPHA_SCALE
         ax.grid(axis=name, which="minor", **style)
 
+    def _geographic_aspect(self, ax) -> float:
+        """The aspect that narrows a degree of longitude by cos(mid latitude)."""
+
+        lo, hi = ax.get_ylim()
+        data = ax.dataLim.intervaly
+        user_set = any(self.settings.get(k) is not None for k in ("ymin", "ymax"))
+        if (
+            not user_set
+            and np.isfinite(data).all()
+            and -90 <= min(data) <= max(data) <= 90
+        ):
+            # the autoscale margin may overshoot a pole the data stays within
+            lo, hi = np.clip((lo, hi), -90, 90)
+            ax.set_ylim(lo, hi)
+        middle = validate_geographic_latitudes((lo, hi))
+        return 1 / math.cos(math.radians(middle))
+
     def _finalize(
         self, ax, ax_right, bar_layers, horizontal, scales, group_axes, limit_marks
     ) -> None:
@@ -11884,6 +12081,19 @@ class Panel:
         # the y-axis is a rank axis only when every data layer draws ranks;
         # beside other charts it follows the panel as usual (ADR 0046)
         data_layers = [l for l in layers if l.kind != "text"]
+
+        # a lone basemap frames its outlines; beside data it frames nothing
+        if data_layers and all(isinstance(l, BasemapLayer) for l in data_layers):
+            bounds = np.array([l.bounds() for l in data_layers])
+            x0, x1 = bounds[:, 0].min(), bounds[:, 1].max()
+            y0, y1 = bounds[:, 2].min(), bounds[:, 3].max()
+            ax.update_datalim([(x0, y0), (x1, y1)])
+            ax.autoscale_view()
+            # a flat outline keeps the autoscale's padding on its flat axis
+            for axis_name, lo, hi in (("x", x0, x1), ("y", y0, y1)):
+                if hi > lo:
+                    getattr(ax, f"set_{axis_name}lim")(lo, hi)
+                    pinned.add(axis_name)
         rank_axis = bool(data_layers) and all(
             isinstance(l, BumpLayer) for l in data_layers
         )
@@ -12146,7 +12356,10 @@ class Panel:
 
         # aspect ratio (a polar axes keeps its own; a bare layer fixed its own)
         if s.get("aspect_ratio") and not polar and not bare:
-            ax.set(adjustable="box", aspect=s["aspect_ratio"])
+            aspect = s["aspect_ratio"]
+            if aspect == ASPECT_RATIO.GEOGRAPHIC:
+                aspect = self._geographic_aspect(ax)
+            ax.set(adjustable="box", aspect=aspect)
 
         # a cell inside a shared grid leaves its inner tick labels to the edge
         for axis in s.get("hide_ticklabels") or ():

@@ -23,7 +23,7 @@ import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 
 from ..config import config
-from ..constants import BAR_MODE, FIG_SIZE, SCALE, SHOW_GRID
+from ..constants import ASPECT_RATIO, BAR_MODE, FIG_SIZE, SCALE, SHOW_GRID
 from ..typings import LegendSettingAttrs, TextSettingAttrs
 from .figure import (
     _grid_from_dicts,
@@ -50,13 +50,14 @@ from ._internal.layers import (
     ContourLayer,
     HexbinLayer,
     ImageLayer,
+    BasemapLayer,
     StackedAreaLayer,
     ParallelCoordsLayer,
     RadialLayer,
     GroupLayer,
     TextLayer,
-    IMAGE_ZORDER,
-    image_zorder_key,
+    DRAW_ZORDER,
+    draw_zorder_key,
     value_axis_grid,
 )
 
@@ -80,6 +81,7 @@ OVERLAYABLE_LAYERS = (
     ContourLayer,
     HexbinLayer,
     ImageLayer,
+    BasemapLayer,
     StackedAreaLayer,
     ParallelCoordsLayer,
     RadialLayer,
@@ -211,6 +213,7 @@ def Panel(
     scaley: Optional[Union[SCALE, str]] = None,
     scaley_right: Optional[Union[SCALE, str]] = None,
     bar_mode: Optional[Union[BAR_MODE, str]] = None,
+    aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
 ) -> plt.Figure:
     """Overlay rendered chart figures in one coordinate space.
 
@@ -344,6 +347,9 @@ def Panel(
             Default: the mode of the first figure that was built with one, then
             the config (overlay_bar_mode, default "group"). See
             [`BAR_MODE`][datachart.constants.BAR_MODE].
+        aspect_ratio: The aspect ratio of the axes box; `"geographic"` keeps a
+            map of longitude against latitude at true proportions. Default:
+            `"auto"`. See [`ASPECT_RATIO`][datachart.constants.ASPECT_RATIO].
 
     Returns:
         A matplotlib Figure containing the overlaid charts.
@@ -437,8 +443,8 @@ def Panel(
             # a filled surface is background, contour lines draw with lines
             "surface": 1,
             "contour": 2,
-            # an image takes its position's rung, whatever the figure order
-            **{image_zorder_key(p): z for p, z in IMAGE_ZORDER.items()},
+            # an image or basemap takes its position's rung, whatever the order
+            **{draw_zorder_key(p): z for p, z in DRAW_ZORDER.items()},
         },
         "show_grid": show_grid,
         # the caller's own value, unresolved: a polar panel draws only the
@@ -465,6 +471,7 @@ def Panel(
         "scalex": scalex,
         "scaley": scaley,
         "scaley_right": scaley_right,
+        "aspect_ratio": aspect_ratio,
     }
 
     # the x-axis hugs the data only when every source figure hugs it too
