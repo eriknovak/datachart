@@ -18,7 +18,7 @@
         <link rel="prev" href="../scattermatrix/">
       
       
-        <link rel="next" href="../sankeychart/">
+        <link rel="next" href="../basemapchart/">
       
       
         
@@ -1193,6 +1193,8 @@
       
         
       
+        
+      
     
     
     
@@ -1447,6 +1449,34 @@
     
   
     Image Chart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../how-to-guides/charts/basemapchart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basemap Chart
   
 
     
@@ -3280,6 +3310,8 @@
       
         
       
+        
+      
     
     
     
@@ -3684,6 +3716,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../basemapchart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    BasemapChart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -4342,7 +4402,7 @@
 <div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">ImageChart</span><span class="p">(</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">data</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ImageDataAttrs&lt;/span&gt;" href="#datachart.typings.ImageDataAttrs">ImageDataAttrs</a></span> <span class="o">|</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.ImageDataAttrs&lt;/span&gt;" href="#datachart.typings.ImageDataAttrs">ImageDataAttrs</a></span><span class="p">],</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">*</span><span class="p">,</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">position</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.IMAGE_POSITION&lt;/span&gt;" href="../../constants/#datachart.constants.IMAGE_POSITION">IMAGE_POSITION</a></span> <span class="o">|</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">position</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.DRAW_POSITION&lt;/span&gt;" href="../../constants/#datachart.constants.DRAW_POSITION">DRAW_POSITION</a></span> <span class="o">|</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">title</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">xlabel</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">ylabel</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -4436,12 +4496,12 @@ list of them to overlay several pictures or draw one per subplot. See
                 <p>Where the picture sits in the draw order: <code>"below"</code> (default)
 under the gridlines and every mark, or <code>"above"</code> over the marks and
 under the reference lines. See
-<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.IMAGE_POSITION&lt;/span&gt;" href="../../constants/#datachart.constants.IMAGE_POSITION"><code>IMAGE_POSITION</code></a>.</p>
+<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.DRAW_POSITION&lt;/span&gt;" href="../../constants/#datachart.constants.DRAW_POSITION"><code>DRAW_POSITION</code></a>.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
                     <b>TYPE:</b>
-                      <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.IMAGE_POSITION&lt;/span&gt;" href="../../constants/#datachart.constants.IMAGE_POSITION">IMAGE_POSITION</a> | <span title="str">str</span> | None</code>
+                      <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.DRAW_POSITION&lt;/span&gt;" href="../../constants/#datachart.constants.DRAW_POSITION">DRAW_POSITION</a> | <span title="str">str</span> | None</code>
                   </span>
                   <span class="doc-param-default">
                     <b>DEFAULT:</b>
@@ -4861,7 +4921,7 @@ none. The grid draws over a picture placed below. See
               <div class="doc-md-description">
                 <p>If the image is not a readable picture or array, the
 <code>extent</code> is missing, not four finite numbers, or has no width or
-height, or <code>position</code> is not an <code>IMAGE_POSITION</code>.</p>
+height, or <code>position</code> is not a <code>DRAW_POSITION</code>.</p>
               </div>
             </td>
           </tr>
@@ -5091,7 +5151,7 @@ height, or <code>position</code> is not an <code>IMAGE_POSITION</code>.</p>
 <tbody>
 <tr>
 <td style="text-align: left;"><code>position</code></td>
-<td style="text-align: left;"><a href="../../constants/#datachart.constants.IMAGE_POSITION"><code>IMAGE_POSITION</code></a></td>
+<td style="text-align: left;"><a href="../../constants/#datachart.constants.DRAW_POSITION"><code>DRAW_POSITION</code></a></td>
 </tr>
 <tr>
 <td style="text-align: left;"><code>figsize</code></td>
@@ -5162,13 +5222,13 @@ height, or <code>position</code> is not an <code>IMAGE_POSITION</code>.</p>
         
         
           
-          <a href="../sankeychart/" class="md-footer__link md-footer__link--next" aria-label="Next: SankeyChart">
+          <a href="../basemapchart/" class="md-footer__link md-footer__link--next" aria-label="Next: BasemapChart">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                SankeyChart
+                BasemapChart
               </div>
             </div>
             <div class="md-footer__button md-icon">

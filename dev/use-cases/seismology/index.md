@@ -2,7 +2,7 @@
 
 An earthquake report asks the same questions in the same order: where the shaking concentrates, what the ground under it looks like, how the sizes are distributed, how fast the aftershocks die away, when they arrived, which way the rupture ran, and which instruments were watching. This page walks one year of one region through those questions and names the figure that answers each, so the chart to reach for arrives with the question rather than the other way round. Every figure links to the chart guide that covers it in full.
 
-The region is the Aegean and Anatolia, between 34 and 42 degrees north and 19 and 45 degrees east, and the year is 2023, when the Kahramanmaraş sequence struck southern Türkiye. Every number is real. The 831 earthquakes of magnitude 4 and above come from the [USGS earthquake catalogue](https://earthquake.usgs.gov/fdsnws/event/1/) (public domain), the relief grid from [NOAA's ETOPO](https://www.ncei.noaa.gov/products/etopo-global-relief-model) global model (public domain), and the 28 broadband seismic stations from the [FDSN station service](https://service.iris.edu/fdsnws/station/1/) (EarthScope, CC BY 4.0). The axes carry longitude and latitude in degrees. datachart draws no coastlines, so the map under the epicentres is the relief grid itself, placed on the same axes as a picture.
+The region is the Aegean and Anatolia, between 34 and 42 degrees north and 19 and 45 degrees east, and the year is 2023, when the Kahramanmaraş sequence struck southern Türkiye. Every number is real. The 831 earthquakes of magnitude 4 and above come from the [USGS earthquake catalogue](https://earthquake.usgs.gov/fdsnws/event/1/) (public domain), the relief grid from [NOAA's ETOPO](https://www.ncei.noaa.gov/products/etopo-global-relief-model) global model (public domain), and the 28 broadband seismic stations from the [FDSN station service](https://service.iris.edu/fdsnws/station/1/) (EarthScope, CC BY 4.0). The axes carry longitude and latitude in degrees, and the coastline under the epicentres is the Natural Earth outline that datachart bundles, drawn on the same axes over the relief grid.
 
 ```
 import math
@@ -14,6 +14,7 @@ from datachart.charts import (
     CalendarHeatmap,
     ContourChart,
     HexbinChart,
+    BasemapChart,
     ImageChart,
     LineChart,
     NetworkChart,
@@ -21,6 +22,7 @@ from datachart.charts import (
 )
 from datachart.constants import (
     ASPECT_RATIO,
+    BASEMAP_FEATURE,
     FIG_SIZE,
     NETWORK_LABEL_POSITION,
     NETWORK_LAYOUT,
@@ -38,7 +40,7 @@ The hidden cell below holds the three tables. `EVENTS` is one tuple per earthqua
 
 ### Where does the seismicity concentrate?
 
-The first figure of an earthquake report is the map of the epicentres, and eight hundred points on one axes overplot wherever the activity is densest, which is exactly where the reader looks. A [hexbin chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/hexbinchart/index.md) bins them instead: the plane is tiled with hexagons and each one is coloured by the number of events inside it, so density reads as colour and nothing hides behind a marker. The counts span three orders of magnitude between a quiet hexagon and the aftershock zone, so `norm=NORMALIZE.LOG` gives the colour scale a logarithmic reach and keeps the sparse cells visible. `mincnt=1` leaves the empty cells blank rather than colouring them as zero, and through them shows the ground: an [image chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/imagechart/index.md) draws the relief grid as a faded grey picture stretched over its extent, and [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) puts it under the hexagons, so the density reads against the land and the sea it falls on. The grid's first row is its southern edge while a picture's first row is its top, so the rows are flipped.
+The first figure of an earthquake report is the map of the epicentres, and eight hundred points on one axes overplot wherever the activity is densest, which is exactly where the reader looks. A [hexbin chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/hexbinchart/index.md) bins them instead: the plane is tiled with hexagons and each one is coloured by the number of events inside it, so density reads as colour and nothing hides behind a marker. The counts span three orders of magnitude between a quiet hexagon and the aftershock zone, so `norm=NORMALIZE.LOG` gives the colour scale a logarithmic reach and keeps the sparse cells visible. `mincnt=1` leaves the empty cells blank rather than colouring them as zero, and through them shows the ground: an [image chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/imagechart/index.md) draws the relief grid as a faded grey picture stretched over its extent, a [basemap chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/basemapchart/index.md) traces the coastline over it, and [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) puts both under the hexagons, so the density reads against the land and the sea it falls on. The grid's first row is its southern edge while a picture's first row is its top, so the rows are flipped. A degree of longitude at 38 degrees north is a fifth shorter than a degree of latitude, so `aspect_ratio=ASPECT_RATIO.GEOGRAPHIC` narrows it by that much and the region keeps its true shape.
 
 ```
 LATITUDE, LONGITUDE, DEPTH, MAGNITUDE = 1, 2, 3, 4
@@ -85,12 +87,22 @@ density = HexbinChart(
     },
 )
 
-# the image sits below the hexagons whatever the order of the figures
+# the coastline alone, so the relief shows through the land, drawn darker
+# than the theme grey so it reads on the relief
+coastline = BasemapChart(
+    BASEMAP_FEATURE.COASTLINE,
+    style={"plot_basemap_coastline_color": "#4d4d4d", "plot_basemap_coastline_width": 0.8},
+)
+
+# the image and the coastline sit below the hexagons whatever the order of
+# the figures; between the two, the one listed first draws first
 epicentre_figure = Panel(
-    [relief_image, density],
+    [relief_image, coastline, density],
     title="A year of earthquakes: the faults draw themselves",
     xlabel="Longitude (°E)",
     ylabel_left="Latitude (°N)",
+    # a degree of longitude narrowed by the cosine of the mid latitude
+    aspect_ratio=ASPECT_RATIO.GEOGRAPHIC,
     figsize=(9.0, 4.2),
 )
 epicentre_figure.show()

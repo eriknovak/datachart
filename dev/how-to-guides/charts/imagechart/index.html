@@ -18,7 +18,7 @@
         <link rel="prev" href="../scattermatrix/">
       
       
-        <link rel="next" href="../sankeychart/">
+        <link rel="next" href="../basemapchart/">
       
       
         
@@ -1202,6 +1202,8 @@
       
         
       
+        
+      
     
     
     
@@ -1688,6 +1690,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../basemapchart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basemap Chart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -3504,6 +3534,8 @@
       
         
       
+        
+      
     
     
     
@@ -3758,6 +3790,34 @@
     
   
     ImageChart
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../references/charts/basemapchart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    BasemapChart
   
 
     
@@ -5491,7 +5551,7 @@ ImageChart(
 <tbody>
 <tr>
 <td style="text-align:left"><code>position</code></td>
-<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.IMAGE_POSITION"><code>IMAGE_POSITION</code></a></td>
+<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.DRAW_POSITION"><code>DRAW_POSITION</code></a></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>figsize</code></td>
@@ -6019,7 +6079,7 @@ ImageChart(
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="composing-with-panel">Composing with Panel<a class="anchor-link" href="#composing-with-panel">¶</a></h2><p>An image chart is made to sit under another chart. <a href="../../utility/panel/">Panel</a> overlays figures in one coordinate space, and the image and the data meet there because they share the same units. The picture carries no series: it takes no color from the palette, adds no legend entry, and ignores emphasis, so the chart over it looks as it would alone. The extent counts toward the axis range like any other chart's data, so the axes cover both the picture and the marks.</p>
-<p><code>position</code> decides where the picture sits in the drawing order, with an <a href="../../../references/constants/#datachart.constants.IMAGE_POSITION">IMAGE_POSITION</a> member. The default, <code>IMAGE_POSITION.BELOW</code>, puts it under the grid and every mark, whatever the order of the figures in <code>Panel</code>: below, the scatter chart comes first and still draws on top.</p>
+<p><code>position</code> decides where the picture sits in the drawing order, with a <a href="../../../references/constants/#datachart.constants.DRAW_POSITION">DRAW_POSITION</a> member. The default, <code>DRAW_POSITION.BELOW</code>, puts it under the grid and every mark, whatever the order of the figures in <code>Panel</code>: below, the scatter chart comes first and still draws on top.</p>
 </div>
 </div>
 </div>
@@ -6042,7 +6102,7 @@ ImageChart(
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">IMAGE_POSITION</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">DRAW_POSITION</span>
 
 <span class="n">relief</span> <span class="o">=</span> <span class="n">ImageChart</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">"image"</span><span class="p">:</span> <span class="n">elevation</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="s2">"extent"</span><span class="p">:</span> <span class="n">EXTENT</span><span class="p">},</span>
@@ -6061,7 +6121,7 @@ ImageChart(
     <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">9.0</span><span class="p">,</span> <span class="mf">3.6</span><span class="p">),</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-11">from datachart.constants import IMAGE_POSITION
+<div class="clipboard-copy-txt" id="cell-11">from datachart.constants import DRAW_POSITION
 
 relief = ImageChart(
     data={"image": elevation[::-1], "extent": EXTENT},
@@ -6103,7 +6163,7 @@ Panel(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><code>IMAGE_POSITION.ABOVE</code> draws the picture over the marks instead, and still under reference lines and text notes. Its use is a picture that is meant to cover: a watermark, or a mask. The mask below is an RGBA array, transparent over the study area around the 2023 mainshocks and a translucent grey everywhere else, so the rest of the region recedes without disappearing.</p>
+<p><code>DRAW_POSITION.ABOVE</code> draws the picture over the marks instead, and still under reference lines and text notes. Its use is a picture that is meant to cover: a watermark, or a mask. The mask below is an RGBA array, transparent over the study area around the 2023 mainshocks and a translucent grey everywhere else, so the rest of the region recedes without disappearing.</p>
 </div>
 </div>
 </div>
@@ -6139,7 +6199,7 @@ Panel(
     <span class="p">[</span>
         <span class="n">relief</span><span class="p">,</span>
         <span class="n">quakes</span><span class="p">,</span>
-        <span class="n">ImageChart</span><span class="p">({</span><span class="s2">"image"</span><span class="p">:</span> <span class="n">mask</span><span class="p">,</span> <span class="s2">"extent"</span><span class="p">:</span> <span class="n">EXTENT</span><span class="p">},</span> <span class="n">position</span><span class="o">=</span><span class="n">IMAGE_POSITION</span><span class="o">.</span><span class="n">ABOVE</span><span class="p">),</span>
+        <span class="n">ImageChart</span><span class="p">({</span><span class="s2">"image"</span><span class="p">:</span> <span class="n">mask</span><span class="p">,</span> <span class="s2">"extent"</span><span class="p">:</span> <span class="n">EXTENT</span><span class="p">},</span> <span class="n">position</span><span class="o">=</span><span class="n">DRAW_POSITION</span><span class="o">.</span><span class="n">ABOVE</span><span class="p">),</span>
     <span class="p">],</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"The study area around the 2023 mainshocks"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Longitude (°E)"</span><span class="p">,</span>
@@ -6160,7 +6220,7 @@ Panel(
     [
         relief,
         quakes,
-        ImageChart({"image": mask, "extent": EXTENT}, position=IMAGE_POSITION.ABOVE),
+        ImageChart({"image": mask, "extent": EXTENT}, position=DRAW_POSITION.ABOVE),
     ],
     title="The study area around the 2023 mainshocks",
     xlabel="Longitude (°E)",
@@ -6608,13 +6668,13 @@ Grid(
         
         
           
-          <a href="../sankeychart/" class="md-footer__link md-footer__link--next" aria-label="Next: Sankey Chart">
+          <a href="../basemapchart/" class="md-footer__link md-footer__link--next" aria-label="Next: Basemap Chart">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Sankey Chart
+                Basemap Chart
               </div>
             </div>
             <div class="md-footer__button md-icon">

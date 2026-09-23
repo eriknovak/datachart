@@ -159,6 +159,12 @@ How two or more variables relate to each other.
 
   A picture in data coordinates, under or over another chart: a map, a floor plan, a microscope image.
 
+- [Basemap Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/basemapchart/index.md)
+
+  [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md)
+
+  Coastlines, land, borders and lakes under a chart of longitude and latitude, bundled with the package.
+
 ## Flows
 
 How a quantity moves between categories: where it comes from and where it goes.

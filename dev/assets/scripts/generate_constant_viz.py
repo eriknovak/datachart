@@ -33,6 +33,7 @@ from datachart.charts import (
     HexbinChart,
     Histogram,
     ImageChart,
+    BasemapChart,
     LineChart,
     NetworkChart,
     RadialChart,
@@ -67,7 +68,8 @@ from datachart.constants import (
     HATCH_STYLE,
     HEXBIN_REDUCE,
     HISTOGRAM_TYPE,
-    IMAGE_POSITION,
+    DRAW_POSITION,
+    BASEMAP_FEATURE,
     LEGEND_ALIGN,
     LINE_DRAW_STYLE,
     LINE_MARKER,
@@ -858,7 +860,7 @@ def hexbin_reduce():
     )
 
 
-def image_position():
+def draw_position():
     # a translucent square over the middle of a line, grid on
     square = np.zeros((10, 10, 4))
     square[..., :3] = to_rgba(DARK)[:3]
@@ -872,15 +874,49 @@ def image_position():
                 line,
                 ImageChart({"image": square, "extent": (2, 6, 1, 12)}, position=value),
             ],
-            title=f"IMAGE_POSITION.{label}",
+            title=f"DRAW_POSITION.{label}",
             show_grid="both",
         )
         for label, value in [
-            ("BELOW", IMAGE_POSITION.BELOW),
-            ("ABOVE", IMAGE_POSITION.ABOVE),
+            ("BELOW", DRAW_POSITION.BELOW),
+            ("ABOVE", DRAW_POSITION.ABOVE),
         ]
     ]
-    chart_grid(figs, "const-image-position.svg", 2.2)
+    chart_grid(figs, "const-draw-position.svg", 2.2)
+
+
+def basemap_feature():
+    # each feature alone, over the Baltic, where all four show
+    members = [
+        ("COASTLINE", BASEMAP_FEATURE.COASTLINE),
+        ("LAND", BASEMAP_FEATURE.LAND),
+        ("COUNTRIES", BASEMAP_FEATURE.COUNTRIES),
+        ("BORDERS", BASEMAP_FEATURE.BORDERS),
+        ("LAKES", BASEMAP_FEATURE.LAKES),
+    ]
+    figs = [
+        BasemapChart(
+            value,
+            # countries are one area each; highlight picks the Baltic states
+            highlight=["EST", "LVA", "LTU"] if label == "COUNTRIES" else None,
+            title=f"BASEMAP_FEATURE.{label}",
+            xmin=5,
+            xmax=40,
+            ymin=50,
+            ymax=66,
+            style={"plot_basemap_lake_color": "#9ecae1"},
+        )
+        for label, value in members
+    ]
+    chart_grid(
+        figs,
+        "const-basemap-feature.svg",
+        6.4,
+        cols=2,
+        footnote="COUNTRIES highlights the Baltic states here. The lakes are drawn "
+        "in blue; by default they take the axes background, so they read as "
+        "the sea does.",
+    )
 
 
 def swarm_mode():
@@ -1545,7 +1581,8 @@ def main():
     bandwidth()
     contour_levels()
     hexbin_reduce()
-    image_position()
+    draw_position()
+    basemap_feature()
     swarm_mode()
     radial_type()
     direction()

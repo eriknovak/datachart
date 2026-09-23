@@ -10,7 +10,7 @@ A picture in data coordinates, under or over the other charts. The [Image Chart 
 ImageChart(
     data: ImageDataAttrs | list[ImageDataAttrs],
     *,
-    position: IMAGE_POSITION | str | None = None,
+    position: DRAW_POSITION | str | None = None,
     title: str | None = None,
     xlabel: str | None = None,
     ylabel: str | None = None,
@@ -58,36 +58,36 @@ Examples:
 ... )
 ```
 
-| PARAMETER      | DESCRIPTION                                                                                                                                                                                             |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `data`         | The picture and where it sits: a {"image", "extent"} dict, or a list of them to overlay several pictures or draw one per subplot. See ImageDataAttrs. **TYPE:** \`ImageDataAttrs                        |
-| `position`     | Where the picture sits in the draw order: "below" (default) under the gridlines and every mark, or "above" over the marks and under the reference lines. See IMAGE_POSITION. **TYPE:** \`IMAGE_POSITION |
-| `title`        | The title of the chart. **TYPE:** \`str                                                                                                                                                                 |
-| `xlabel`       | The label of the x-axis. **TYPE:** \`str                                                                                                                                                                |
-| `ylabel`       | The label of the y-axis. **TYPE:** \`str                                                                                                                                                                |
-| `subtitle`     | The subtitle of each chart. **TYPE:** \`str                                                                                                                                                             |
-| `figsize`      | The size of the figure as (width, height) in inches. See FIG_SIZE. **TYPE:** \`FIG_SIZE                                                                                                                 |
-| `xmin`         | The minimum value of the x-axis. **TYPE:** \`int                                                                                                                                                        |
-| `xmax`         | The maximum value of the x-axis. **TYPE:** \`int                                                                                                                                                        |
-| `ymin`         | The minimum value of the y-axis. **TYPE:** \`int                                                                                                                                                        |
-| `ymax`         | The maximum value of the y-axis. **TYPE:** \`int                                                                                                                                                        |
-| `vmin`         | The value at the low end of the colormap; a 2-D array only. **TYPE:** \`float                                                                                                                           |
-| `vmax`         | The value at the high end of the colormap; a 2-D array only. **TYPE:** \`float                                                                                                                          |
-| `show_grid`    | Which grid lines to show ("both", "x", "y"); False draws none. The grid draws over a picture placed below. See SHOW_GRID. **TYPE:** \`SHOW_GRID                                                         |
-| `aspect_ratio` | The aspect ratio of the axes box. See ASPECT_RATIO. **TYPE:** \`ASPECT_RATIO                                                                                                                            |
-| `subplots`     | Whether to draw each picture in its own subplot. **TYPE:** \`bool                                                                                                                                       |
-| `max_cols`     | The maximum number of subplot columns. **TYPE:** \`int                                                                                                                                                  |
-| `sharex`       | Whether the subplots share the x-axis. **TYPE:** \`bool                                                                                                                                                 |
-| `sharey`       | Whether the subplots share the y-axis. **TYPE:** \`bool                                                                                                                                                 |
-| `style`        | Style configuration(s) for each chart. See ImageStyleAttrs. **TYPE:** \`ImageStyleAttrs                                                                                                                 |
+| PARAMETER      | DESCRIPTION                                                                                                                                                                                           |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `data`         | The picture and where it sits: a {"image", "extent"} dict, or a list of them to overlay several pictures or draw one per subplot. See ImageDataAttrs. **TYPE:** \`ImageDataAttrs                      |
+| `position`     | Where the picture sits in the draw order: "below" (default) under the gridlines and every mark, or "above" over the marks and under the reference lines. See DRAW_POSITION. **TYPE:** \`DRAW_POSITION |
+| `title`        | The title of the chart. **TYPE:** \`str                                                                                                                                                               |
+| `xlabel`       | The label of the x-axis. **TYPE:** \`str                                                                                                                                                              |
+| `ylabel`       | The label of the y-axis. **TYPE:** \`str                                                                                                                                                              |
+| `subtitle`     | The subtitle of each chart. **TYPE:** \`str                                                                                                                                                           |
+| `figsize`      | The size of the figure as (width, height) in inches. See FIG_SIZE. **TYPE:** \`FIG_SIZE                                                                                                               |
+| `xmin`         | The minimum value of the x-axis. **TYPE:** \`int                                                                                                                                                      |
+| `xmax`         | The maximum value of the x-axis. **TYPE:** \`int                                                                                                                                                      |
+| `ymin`         | The minimum value of the y-axis. **TYPE:** \`int                                                                                                                                                      |
+| `ymax`         | The maximum value of the y-axis. **TYPE:** \`int                                                                                                                                                      |
+| `vmin`         | The value at the low end of the colormap; a 2-D array only. **TYPE:** \`float                                                                                                                         |
+| `vmax`         | The value at the high end of the colormap; a 2-D array only. **TYPE:** \`float                                                                                                                        |
+| `show_grid`    | Which grid lines to show ("both", "x", "y"); False draws none. The grid draws over a picture placed below. See SHOW_GRID. **TYPE:** \`SHOW_GRID                                                       |
+| `aspect_ratio` | The aspect ratio of the axes box. See ASPECT_RATIO. **TYPE:** \`ASPECT_RATIO                                                                                                                          |
+| `subplots`     | Whether to draw each picture in its own subplot. **TYPE:** \`bool                                                                                                                                     |
+| `max_cols`     | The maximum number of subplot columns. **TYPE:** \`int                                                                                                                                                |
+| `sharex`       | Whether the subplots share the x-axis. **TYPE:** \`bool                                                                                                                                               |
+| `sharey`       | Whether the subplots share the y-axis. **TYPE:** \`bool                                                                                                                                               |
+| `style`        | Style configuration(s) for each chart. See ImageStyleAttrs. **TYPE:** \`ImageStyleAttrs                                                                                                               |
 
 | RETURNS      | DESCRIPTION                            |
 | ------------ | -------------------------------------- |
 | `plt.Figure` | The figure containing the image chart. |
 
-| RAISES       | DESCRIPTION                                                                                                                                                       |
-| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ValueError` | If the image is not a readable picture or array, the extent is missing, not four finite numbers, or has no width or height, or position is not an IMAGE_POSITION. |
+| RAISES       | DESCRIPTION                                                                                                                                                     |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ValueError` | If the image is not a readable picture or array, the extent is missing, not four finite numbers, or has no width or height, or position is not a DRAW_POSITION. |
 
 ## Data
 
@@ -125,9 +125,9 @@ The typing for the image chart style.
 
 The parameters that accept a constant, with the class in [datachart.constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md) that lists its values.
 
-| Parameter      | Constant                                                                                                               |
-| -------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `position`     | [`IMAGE_POSITION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.IMAGE_POSITION) |
-| `figsize`      | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)             |
-| `show_grid`    | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)           |
-| `aspect_ratio` | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)     |
+| Parameter      | Constant                                                                                                             |
+| -------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `position`     | [`DRAW_POSITION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DRAW_POSITION) |
+| `figsize`      | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)           |
+| `show_grid`    | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)         |
+| `aspect_ratio` | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)   |

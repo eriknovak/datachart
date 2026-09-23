@@ -60,12 +60,12 @@ Every customization is either a keyword argument of `ImageChart` or a `plot_imag
 
 The parameters that accept a constant, with the class in [datachart.constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md) that lists its values:
 
-| Parameter      | Constant                                                                                                               |
-| -------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `position`     | [`IMAGE_POSITION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.IMAGE_POSITION) |
-| `figsize`      | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)             |
-| `show_grid`    | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)           |
-| `aspect_ratio` | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)     |
+| Parameter      | Constant                                                                                                             |
+| -------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `position`     | [`DRAW_POSITION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DRAW_POSITION) |
+| `figsize`      | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)           |
+| `show_grid`    | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)         |
+| `aspect_ratio` | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)   |
 
 The keys of the data dictionary are listed in [ImageDataAttrs](https://eriknovak.github.io/datachart/dev/references/charts/imagechart/#datachart.typings.ImageDataAttrs), the style attributes in [ImageStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/imagechart/#datachart.typings.ImageStyleAttrs).
 
@@ -201,10 +201,10 @@ ImageChart(
 
 An image chart is made to sit under another chart. [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) overlays figures in one coordinate space, and the image and the data meet there because they share the same units. The picture carries no series: it takes no color from the palette, adds no legend entry, and ignores emphasis, so the chart over it looks as it would alone. The extent counts toward the axis range like any other chart's data, so the axes cover both the picture and the marks.
 
-`position` decides where the picture sits in the drawing order, with an [IMAGE_POSITION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.IMAGE_POSITION) member. The default, `IMAGE_POSITION.BELOW`, puts it under the grid and every mark, whatever the order of the figures in `Panel`: below, the scatter chart comes first and still draws on top.
+`position` decides where the picture sits in the drawing order, with a [DRAW_POSITION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DRAW_POSITION) member. The default, `DRAW_POSITION.BELOW`, puts it under the grid and every mark, whatever the order of the figures in `Panel`: below, the scatter chart comes first and still draws on top.
 
 ```
-from datachart.constants import IMAGE_POSITION
+from datachart.constants import DRAW_POSITION
 
 relief = ImageChart(
     data={"image": elevation[::-1], "extent": EXTENT},
@@ -224,7 +224,7 @@ Panel(
 ).show()
 ```
 
-`IMAGE_POSITION.ABOVE` draws the picture over the marks instead, and still under reference lines and text notes. Its use is a picture that is meant to cover: a watermark, or a mask. The mask below is an RGBA array, transparent over the study area around the 2023 mainshocks and a translucent grey everywhere else, so the rest of the region recedes without disappearing.
+`DRAW_POSITION.ABOVE` draws the picture over the marks instead, and still under reference lines and text notes. Its use is a picture that is meant to cover: a watermark, or a mask. The mask below is an RGBA array, transparent over the study area around the 2023 mainshocks and a translucent grey everywhere else, so the rest of the region recedes without disappearing.
 
 ```
 # transparent inside the study area, a translucent grey outside it
@@ -240,7 +240,7 @@ Panel(
     [
         relief,
         quakes,
-        ImageChart({"image": mask, "extent": EXTENT}, position=IMAGE_POSITION.ABOVE),
+        ImageChart({"image": mask, "extent": EXTENT}, position=DRAW_POSITION.ABOVE),
     ],
     title="The study area around the 2023 mainshocks",
     xlabel="Longitude (°E)",

@@ -47,21 +47,22 @@ The `constants` module provides a set of predefined constants used in the packag
 
 **Chart Constants**
 
-| CLASS               | DESCRIPTION                                   |
-| ------------------- | --------------------------------------------- |
-| `BAR_MODE`          | The supported bar modes.                      |
-| `SORT`              | The supported category sort orders.           |
-| `NORMALIZE`         | The supported normalization options.          |
-| `ORIENTATION`       | The supported orientations.                   |
-| `VIOLIN_INNER`      | The supported violin inner marks.             |
-| `BANDWIDTH`         | The supported kernel density bandwidth rules. |
-| `SWARM_MODE`        | The supported swarm plot modes.               |
-| `VALUE_FORMAT`      | The predefined value formats.                 |
-| `DATE_FORMAT`       | The predefined date formats.                  |
-| `SHOW_GRID`         | The supported show grid options.              |
-| `SCALE`             | The supported scale options.                  |
-| `ASPECT_RATIO`      | The supported aspect ratio options.           |
-| `COLORBAR_LOCATION` | The supported colorbar locations.             |
+| CLASS               | DESCRIPTION                                            |
+| ------------------- | ------------------------------------------------------ |
+| `BAR_MODE`          | The supported bar modes.                               |
+| `SORT`              | The supported category sort orders.                    |
+| `NORMALIZE`         | The supported normalization options.                   |
+| `ORIENTATION`       | The supported orientations.                            |
+| `VIOLIN_INNER`      | The supported violin inner marks.                      |
+| `BANDWIDTH`         | The supported kernel density bandwidth rules.          |
+| `SWARM_MODE`        | The supported swarm plot modes.                        |
+| `VALUE_FORMAT`      | The predefined value formats.                          |
+| `DATE_FORMAT`       | The predefined date formats.                           |
+| `SHOW_GRID`         | The supported show grid options.                       |
+| `SCALE`             | The supported scale options.                           |
+| `ASPECT_RATIO`      | The supported aspect ratio options.                    |
+| `COLORBAR_LOCATION` | The supported colorbar locations.                      |
+| `DRAW_POSITION`     | The supported draw positions of the image and basemap. |
 
 **Chart-Specific Constants**
 
@@ -83,10 +84,11 @@ The `constants` module provides a set of predefined constants used in the packag
 | `RIDGELINE_SCALE`         | The supported ridgeline density scales.       |
 | `CONTOUR_LEVELS`          | The supported contour level rules.            |
 | `HEXBIN_REDUCE`           | The supported hexbin aggregations.            |
-| `IMAGE_POSITION`          | The supported image chart draw positions.     |
 | `NETWORK_LAYOUT`          | The supported network chart layouts.          |
 | `NETWORK_LABEL_POSITION`  | The supported network node label positions.   |
 | `SCATTER_MATRIX_DIAGONAL` | The supported scatter matrix diagonal cells.  |
+| `BASEMAP_FEATURE`         | The supported basemap features.               |
+| `BASEMAP_RESOLUTION`      | The supported basemap outline resolutions.    |
 
 ## Constants by Chart
 
@@ -128,7 +130,8 @@ Which constants the parameters of each chart accept, by chart family. A constant
 | [ParallelCoords](https://eriknovak.github.io/datachart/dev/references/charts/parallelcoords/#datachart.charts.ParallelCoords) | —                                                                                                                                | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`EMPHASIS`](#datachart.constants.EMPHASIS), [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`SHOW_GRID`](#datachart.constants.SHOW_GRID), [`ASPECT_RATIO`](#datachart.constants.ASPECT_RATIO)                                                                                                                                                                                                                                                                                                                 |
 | [NetworkChart](https://eriknovak.github.io/datachart/dev/references/charts/networkchart/#datachart.charts.NetworkChart)       | [`NETWORK_LAYOUT`](#datachart.constants.NETWORK_LAYOUT), [`NETWORK_LABEL_POSITION`](#datachart.constants.NETWORK_LABEL_POSITION) | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`VALUE_FORMAT`](#datachart.constants.VALUE_FORMAT)                                                                                                                                                                                                                                                                                                                                                                                                             |
 | [ScatterMatrix](https://eriknovak.github.io/datachart/dev/references/charts/scattermatrix/#datachart.charts.ScatterMatrix)    | [`SCATTER_MATRIX_DIAGONAL`](#datachart.constants.SCATTER_MATRIX_DIAGONAL)                                                        | [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`SHOW_GRID`](#datachart.constants.SHOW_GRID)                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| [ImageChart](https://eriknovak.github.io/datachart/dev/references/charts/imagechart/#datachart.charts.ImageChart)             | [`IMAGE_POSITION`](#datachart.constants.IMAGE_POSITION)                                                                          | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`SHOW_GRID`](#datachart.constants.SHOW_GRID), [`ASPECT_RATIO`](#datachart.constants.ASPECT_RATIO)                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| [ImageChart](https://eriknovak.github.io/datachart/dev/references/charts/imagechart/#datachart.charts.ImageChart)             | —                                                                                                                                | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`SHOW_GRID`](#datachart.constants.SHOW_GRID), [`ASPECT_RATIO`](#datachart.constants.ASPECT_RATIO), [`DRAW_POSITION`](#datachart.constants.DRAW_POSITION)                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| [BasemapChart](https://eriknovak.github.io/datachart/dev/references/charts/basemapchart/#datachart.charts.BasemapChart)       | [`BASEMAP_FEATURE`](#datachart.constants.BASEMAP_FEATURE), [`BASEMAP_RESOLUTION`](#datachart.constants.BASEMAP_RESOLUTION)       | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`SHOW_GRID`](#datachart.constants.SHOW_GRID), [`ASPECT_RATIO`](#datachart.constants.ASPECT_RATIO), [`DRAW_POSITION`](#datachart.constants.DRAW_POSITION)                                                                                                                                                                                                                                                                                                                                                                                                                       |
 
 ### Flows
 
@@ -805,11 +808,12 @@ Examples:
 "auto"
 ```
 
-| ATTRIBUTE | DESCRIPTION                                                          |
-| --------- | -------------------------------------------------------------------- |
-| `DEFAULT` | The default aspect ratio. Same as ASPECT_RATIO.AUTO. **TYPE:** `str` |
-| `AUTO`    | Automatic aspect ratio. Equals to "auto". **TYPE:** `str`            |
-| `EQUAL`   | Equal aspect ratio (1:1). Equals to "equal". **TYPE:** `str`         |
+| ATTRIBUTE    | DESCRIPTION                                                                                                                                                                                                                          |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `DEFAULT`    | The default aspect ratio. Same as ASPECT_RATIO.AUTO. **TYPE:** `str`                                                                                                                                                                 |
+| `AUTO`       | Automatic aspect ratio. Equals to "auto". **TYPE:** `str`                                                                                                                                                                            |
+| `EQUAL`      | Equal aspect ratio (1:1). Equals to "equal". **TYPE:** `str`                                                                                                                                                                         |
+| `GEOGRAPHIC` | Longitude on x and latitude on y at true proportions: one degree of longitude is narrowed by the cosine of the latitude in the middle of the y-axis. The y-axis must stay within -90 and 90. Equals to "geographic". **TYPE:** `str` |
 
 ### datachart.constants.COLORBAR_LOCATION
 
@@ -831,6 +835,26 @@ Examples:
 | `LEFT`    | Left side of the chart. Equals to "left". **TYPE:** `str`   |
 | `TOP`     | Top of the chart. Equals to "top". **TYPE:** `str`          |
 | `BOTTOM`  | Bottom of the chart. Equals to "bottom". **TYPE:** `str`    |
+
+### datachart.constants.DRAW_POSITION
+
+The supported draw positions of the image and basemap.
+
+Passed as the `position` setting of the image chart and the basemap chart: where the picture or the map sits in the draw order of the axes it shares with other charts. The position decides it, never the order of the figures in `Panel`.
+
+Examples:
+
+```
+>>> from datachart.constants import DRAW_POSITION
+>>> DRAW_POSITION.DEFAULT
+"below"
+```
+
+| ATTRIBUTE | DESCRIPTION                                                                                                                   |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `DEFAULT` | The default position. Same as DRAW_POSITION.BELOW. **TYPE:** `str`                                                            |
+| `BELOW`   | Under every mark and under the gridlines, so the grid and the data read over the picture. Equals to "below". **TYPE:** `str`  |
+| `ABOVE`   | Over the marks, under the reference lines and the text annotations; a watermark or a mask. Equals to "above". **TYPE:** `str` |
 
 ## Chart-Specific Constants
 
@@ -1240,22 +1264,46 @@ Examples:
 | `KDE`     | A kernel density curve of the dimension, one per hue group. Equals to "kde". **TYPE:** `str` |
 | `NONE`    | A blank cell. Equals to "none". **TYPE:** `str`                                              |
 
-### datachart.constants.IMAGE_POSITION
+### datachart.constants.BASEMAP_FEATURE
 
-The supported image chart draw positions.
+The supported basemap features.
 
-Passed as the `position` setting of the image chart: where the picture sits in the draw order of the axes it shares with other charts. The position decides it, never the order of the figures in `Panel`.
+Passed as the `features` of the basemap chart: which of the bundled Natural Earth 1:110m outlines are drawn. The ocean is not a feature; it is the axes background the land sits on.
 
 Examples:
 
 ```
->>> from datachart.constants import IMAGE_POSITION
->>> IMAGE_POSITION.DEFAULT
-"below"
+>>> from datachart.constants import BASEMAP_FEATURE
+>>> BASEMAP_FEATURE.DEFAULT
+("coastline", "land")
 ```
 
-| ATTRIBUTE | DESCRIPTION                                                                                                                   |
-| --------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `DEFAULT` | The default position. Same as IMAGE_POSITION.BELOW. **TYPE:** `str`                                                           |
-| `BELOW`   | Under every mark and under the gridlines, so the grid and the data read over the picture. Equals to "below". **TYPE:** `str`  |
-| `ABOVE`   | Over the marks, under the reference lines and the text annotations; a watermark or a mask. Equals to "above". **TYPE:** `str` |
+| ATTRIBUTE   | DESCRIPTION                                                                                                                    |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `DEFAULT`   | The default features. Same as (BASEMAP_FEATURE.COASTLINE, BASEMAP_FEATURE.LAND). **TYPE:** `Tuple[str, str]`                   |
+| `COASTLINE` | The coastlines, as lines. Equals to "coastline". **TYPE:** `str`                                                               |
+| `LAND`      | The land, as a filled area. Equals to "land". **TYPE:** `str`                                                                  |
+| `COUNTRIES` | The land, one filled area per country, so the highlight setting can pick countries out. Equals to "countries". **TYPE:** `str` |
+| `BORDERS`   | The land borders between countries, as lines. Equals to "borders". **TYPE:** `str`                                             |
+| `LAKES`     | The large lakes, filled with the axes background. Equals to "lakes". **TYPE:** `str`                                           |
+
+### datachart.constants.BASEMAP_RESOLUTION
+
+The supported basemap outline resolutions.
+
+Passed as the `resolution` of the basemap chart: the Natural Earth scale the outlines are drawn at. The coarsest ships with the package; the finer ones are downloaded the first time they are asked for and kept in a local cache, so they need the network once. The cache folder is `DATACHART_CACHE_DIR` when that environment variable is set, else `datachart` under `XDG_CACHE_HOME` or `~/.cache`.
+
+Examples:
+
+```
+>>> from datachart.constants import BASEMAP_RESOLUTION
+>>> BASEMAP_RESOLUTION.DEFAULT
+"110m"
+```
+
+| ATTRIBUTE | DESCRIPTION                                                                                                |
+| --------- | ---------------------------------------------------------------------------------------------------------- |
+| `DEFAULT` | The default resolution. Same as BASEMAP_RESOLUTION.LOW. **TYPE:** `str`                                    |
+| `LOW`     | 1:110 million, bundled; a continent or a region. Equals to "110m". **TYPE:** `str`                         |
+| `MEDIUM`  | 1:50 million, about 5 MB on first use; a country. Equals to "50m". **TYPE:** `str`                         |
+| `HIGH`    | 1:10 million, about 28 MB on first use; a coast or a city's surroundings. Equals to "10m". **TYPE:** `str` |

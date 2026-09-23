@@ -22,7 +22,7 @@ import numpy as np
 from PIL import Image
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3]))
-from datachart.constants import COLORS
+from datachart.constants import BASEMAP_FEATURE, COLORS
 from datachart.utils import Annotate, Grid, Panel
 from datachart.utils._internal.colors import get_colormap
 from generate_example_themes import THEMES, tile
@@ -38,6 +38,7 @@ from datachart.charts import (
     HexbinChart,
     Histogram,
     ImageChart,
+    BasemapChart,
     LineChart,
     NetworkChart,
     ParallelCoords,
@@ -449,6 +450,33 @@ def image():
     )
 
 
+def basemap():
+    # epicentre-like clusters along two arcs, over the Aegean and Anatolia
+    # its own stream, so the charts after it keep their draws
+    local = np.random.default_rng(263)
+    arc = local.uniform(0, 1, 60)
+    lon = np.concatenate([22 + 6 * arc[:30], 36 + 3 * arc[30:]])
+    lat = np.concatenate([35.2 + 0.4 * np.sin(6 * arc[:30]), 37 + 1.2 * arc[30:]])
+    lon += local.normal(0, 0.3, 60)
+    lat += local.normal(0, 0.2, 60)
+    return Panel(
+        [
+            BasemapChart([BASEMAP_FEATURE.LAND, BASEMAP_FEATURE.BORDERS]),
+            ScatterChart(
+                [{"x": float(x), "y": float(y)} for x, y in zip(lon, lat)],
+                style={"plot_scatter_color": "#b2182b", "plot_scatter_alpha": 0.7},
+            ),
+        ],
+        xlabel="Longitude (°E)",
+        ylabel_left="Latitude (°N)",
+        xmin=19,
+        xmax=45,
+        ymin=33,
+        ymax=42,
+        figsize=FIGSIZE,
+    )
+
+
 def scattermatrix():
     n = 40
     species = [["setosa", "virginica"][i % 2] for i in range(n)]
@@ -662,6 +690,7 @@ CHARTS = (
     network,
     scattermatrix,
     image,
+    basemap,
     sankey,
     treemap,
 )
