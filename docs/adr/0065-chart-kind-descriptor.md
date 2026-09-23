@@ -29,12 +29,14 @@ table, read through one accessor.
   front, before any drawing. Internal identities that are not fronts (`kde`,
   the `ScatterMatrix` diagonal) may have rows; every exported front must.
 - **The row holds every fact the engine reads about a front**: layer class
-  (or the builder for fronts assembled from several layers), record shape,
-  projection, the group / bare / gridless / tighten-xlim flags, emphasis unit
-  builder and default `by`, the multiplot and subplot rules, the reference-mark
-  families it accepts, and the parameters it rejects. A fact about a front
-  that the engine, builder, or composition branches on lives on the row — not
-  in a tuple next to the branch.
+  (or the builder for fronts assembled from several layers), whether one
+  chart's data is a dict, projection, the group / overlayable / gridless /
+  tighten-xlim flags, emphasis unit builder and default `by`, the multiplot
+  and subplot rules, and the parameters it rejects. A fact about a front that
+  the engine, builder, or composition branches on lives on the row — not in a
+  tuple next to the branch; a fact nothing branches on stays off it.
+  Whether a single *layer* may join an overlay is the layer class's own
+  `overlayable` attribute, since overlays filter layers, not fronts.
 - **The eight registries and the string dispatches go.** `build_layers`,
   `build_chart_panel_settings`, `build_charts_structure`, `render_chart`,
   `Panel` and `Grid` read the row. No `chart_type == "…"` or `chart_type in

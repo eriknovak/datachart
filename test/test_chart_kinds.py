@@ -1,4 +1,5 @@
 import unittest
+from dataclasses import FrozenInstanceError
 
 import datachart.charts
 from datachart.utils._internal.chart_kinds import CHART_KINDS, ChartKind, chart_kind
@@ -23,7 +24,7 @@ class TestChartKinds(unittest.TestCase):
             chart_kind("piechart")
 
     def test_rows_are_frozen(self):
-        with self.assertRaises(Exception):
+        with self.assertRaises(FrozenInstanceError):
             chart_kind("linechart").multiplot = False
 
     def test_front_without_row_fails_before_drawing(self):
