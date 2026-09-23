@@ -2,8 +2,8 @@ from typing import Union, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 
-from ..utils._internal.plot_engine import render_chart
-from ..utils._internal.chart_builder import build_charts_structure
+from ..utils._internal.plot_engine import render
+from ..utils._internal.chart_builder import dict_datasets
 from ..utils._internal.validate import validate_treemap_records
 from ..typings import (
     EmphasisRuleAttrs,
@@ -117,35 +117,9 @@ def Treemap(
             `emphasis` is not a role.
 
     """
-    datasets = data if isinstance(data, list) else [data]
-    if not all(isinstance(d, dict) and "data" in d for d in datasets):
-        raise ValueError(
-            'Treemap `data` must be a `{"data": [...]}` dict, or a list of '
-            "such dicts."
-        )
-    for dataset in datasets:
+    params = dict(locals())
+
+    for dataset in dict_datasets("treemap", data):
         validate_treemap_records(dataset["data"])
 
-    charts = build_charts_structure(
-        "treemap",
-        data,
-        emphasis=emphasis,
-        subtitle=subtitle,
-        style=style,
-        texts=texts,
-    )
-
-    # Figure-level settings; None values resolve to defaults downstream
-    settings = {
-        "emphasis_rule": emphasis_rule,
-        "title": title,
-        "figsize": figsize,
-        "subplots": subplots,
-        "max_cols": max_cols,
-        "show_values": show_values,
-        "value_format": value_format,
-        "show_legend": show_legend,
-        "legend": legend,
-    }
-
-    return render_chart("treemap", charts, settings)
+    return render("treemap", params)

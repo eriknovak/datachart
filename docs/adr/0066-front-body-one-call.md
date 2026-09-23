@@ -19,9 +19,15 @@ live in front bodies instead.
 ## Commitments
 
 - **The front is its signature, its docstring, its own one-off checks, and
-  one call.** The body captures `locals()` as its first statement — at entry
-  that is exactly the arguments — may validate or warn on what it names, and
-  returns `render(kind, params)`. No forwarding dict remains in any front.
+  one call.** The body copies `locals()` as its first statement —
+  `params = dict(locals())`; at entry that is exactly the arguments, and the
+  copy keeps later locals out under a tracer, where Python before 3.13
+  writes them back into the frame's dict — may validate or warn on what it
+  names, and returns `render(kind, params)`. A front whose one chart is not
+  its `data` argument sets `params["data"]` (the pyramid's negated left side,
+  the basemap's features); a front whose charts are not one per dataset
+  passes `render` an `expand` step (the calendar's one chart per year). No
+  forwarding dict remains in any front.
 - **The row declares the split; the engine performs it.** Sixteen per-chart
   keys are shared by every front and live as one constant in the engine
   (`subtitle`, `style`, the tick lists and rotations, the reference-mark
@@ -30,10 +36,13 @@ live in front bodies instead.
   shared key back to the figure when the panel needs it whole (the pyramid's
   mirrored `xticks`). Every other signature parameter is per-figure by
   complement, so a new figure-level parameter needs no row edit.
-- **The two repeated shapes become row facts.** `legend_default` is a
-  callable of the settings that supplies `show_legend` when the caller left
-  it `None`; `dict_key` names the key one chart's dict must carry, and the
-  builder raises one message pattern naming the front and the key. One-off
+- **The repeated shapes become row facts.** `legend_default` is a callable
+  of the charts and settings that supplies `show_legend` when the caller left
+  it `None` (the gantt rule reads the records' groups); `data_keys` names the
+  keys one chart's dict must carry, and the builder raises one message
+  pattern naming the front and the keys; `defaults` holds the settings a
+  front fixes when the caller left them unset (the gantt's one column, the
+  pyramid's horizontal orientation). One-off
   validation and warnings stay in the front: a hook with one caller is
   indirection, and ADR 0003's allowlist reads as "the front may check what it
   names".
