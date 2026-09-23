@@ -3,8 +3,7 @@ from typing import Union, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 
-from ..utils._internal.plot_engine import render_chart
-from ..utils._internal.chart_builder import build_charts_structure
+from ..utils._internal.plot_engine import render
 from ..typings import (
     BumpStyleAttrs,
     EmphasisRuleAttrs,
@@ -236,60 +235,5 @@ def BumpChart(
         The figure containing the bump chart.
 
     """
-    charts = build_charts_structure(
-        "bumpchart",
-        data,
-        subtitle=subtitle,
-        emphasis=emphasis,
-        style=style,
-        xticks=xticks,
-        xticklabels=xticklabels,
-        xtickrotate=xtickrotate,
-        vlines=vlines,
-        hlines=hlines,
-        dlines=dlines,
-        brackets=brackets,
-        vspans=vspans,
-        hspans=hspans,
-        texts=texts,
-        x=x,
-        y=y,
-    )
-
-    # end labels name the lines, so the legend is off unless asked for;
-    # subplots have no shared legend to show
-    if show_legend is None:
-        show_legend = show_labels is False and not subplots
-
-    # Figure-level settings; None values resolve to defaults downstream
-    settings = {
-        "rank_by": rank_by,
-        "emphasis_rule": emphasis_rule,
-        "title": title,
-        "xlabel": xlabel,
-        "ylabel": ylabel,
-        "figsize": figsize,
-        "xmin": xmin,
-        "xmax": xmax,
-        "ymin": ymin,
-        "ymax": ymax,
-        "show_labels": show_labels,
-        "label_position": label_position,
-        "show_markers": show_markers,
-        "line_curve": line_curve,
-        "show_legend": show_legend,
-        "legend": legend,
-        "show_grid": show_grid,
-        "aspect_ratio": aspect_ratio,
-        "subplots": subplots,
-        "max_cols": max_cols,
-        "sharex": sharex,
-        "sharey": sharey,
-        "show_values": show_values,
-        "value_format": value_format,
-        "value_step": value_step,
-        "scalex": scalex,
-        "xticks_format": xticks_format,
-    }
-
-    return render_chart("bumpchart", charts, settings)
+    params = dict(locals())
+    return render("bumpchart", params)

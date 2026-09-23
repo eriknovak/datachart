@@ -201,7 +201,7 @@ def _parallel_layers(charts: List[dict], settings: dict) -> List[Layer]:
 
 
 def _radial_layers(charts: List[dict], settings: dict) -> List[Layer]:
-    visual = settings.get("radial_type") or RADIAL_TYPE.LINE
+    visual = settings.get("type") or RADIAL_TYPE.LINE
     if visual not in RADIAL_LAYER_TYPES:
         raise ValueError(
             f"Invalid radial `type` value {visual!r}. "

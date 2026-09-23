@@ -2,8 +2,7 @@ from typing import Union, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 
-from ..utils._internal.plot_engine import render_chart
-from ..utils._internal.chart_builder import build_charts_structure
+from ..utils._internal.plot_engine import render
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
@@ -222,6 +221,8 @@ def RadialChart(
         The figure containing the radial chart.
 
     """
+    params = dict(locals())
+
     if scalex is not None:
         raise ValueError(
             "RadialChart does not support `scalex`: "
@@ -260,53 +261,4 @@ def RadialChart(
             f"bar visual only; the {radial_type!r} visual has no bars to order."
         )
 
-    # Build the charts structure using shared utility
-    charts = build_charts_structure(
-        "radialchart",
-        data,
-        subtitle=subtitle,
-        emphasis=emphasis,
-        style=style,
-        texts=texts,
-        vspans=vspans,
-        hspans=hspans,
-        label=label,
-        x=x,
-        y=y,
-        yerr=yerr,
-    )
-
-    # Figure-level settings; None values resolve to defaults downstream
-    settings = {
-        "radial_type": radial_type,
-        "title": title,
-        "xlabel": xlabel,
-        "ylabel": ylabel,
-        "figsize": figsize,
-        "ymin": ymin,
-        "ymax": ymax,
-        "show_legend": show_legend,
-        "legend": legend,
-        "show_grid": show_grid,
-        "show_yerr": show_yerr,
-        "show_area": show_area,
-        "show_values": show_values,
-        "show_tip_labels": show_tip_labels,
-        "show_border": show_border,
-        "value_format": value_format,
-        "bar_mode": bar_mode,
-        "sort": sort,
-        "sort_by": sort_by,
-        "emphasis_rule": emphasis_rule,
-        "num_bins": num_bins,
-        "startangle": startangle,
-        "direction": direction,
-        "innerradius": innerradius,
-        "scaley": scaley,
-        "subplots": subplots,
-        "max_cols": max_cols,
-        "sharex": sharex,
-        "sharey": sharey,
-    }
-
-    return render_chart("radialchart", charts, settings)
+    return render("radialchart", params)

@@ -2,8 +2,8 @@ from typing import Union, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 
-from ..utils._internal.plot_engine import render_chart
-from ..utils._internal.chart_builder import build_charts_structure, _get_indexed_value
+from ..utils._internal.plot_engine import render
+from ..utils._internal.chart_builder import _get_indexed_value
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
@@ -20,7 +20,6 @@ from ..typings import (
 from ..constants import (
     DATE_FORMAT,
     FIG_SIZE,
-    ORIENTATION,
     SHOW_GRID,
     SORT,
     VALUE_FORMAT,
@@ -169,6 +168,8 @@ def PyramidChart(
         The figure containing the pyramid chart.
 
     """
+    params = dict(locals())
+
     if xmin is not None:
         raise ValueError(
             "PyramidChart does not support `xmin`: "
@@ -195,52 +196,6 @@ def PyramidChart(
         {**point, left_y_key: -point[left_y_key]} if left_y_key in point else point
         for point in data[0]
     ]
+    params["data"] = [left_side, data[1]]
 
-    charts = build_charts_structure(
-        "pyramidchart",
-        [left_side, data[1]],
-        subtitle=subtitle,
-        style=style,
-        yticks=yticks,
-        yticklabels=yticklabels,
-        ytickrotate=ytickrotate,
-        vlines=vlines,
-        hlines=hlines,
-        dlines=dlines,
-        brackets=brackets,
-        vspans=vspans,
-        hspans=hspans,
-        texts=texts,
-        label=label,
-        y=y,
-        yerr=yerr,
-    )
-
-    # Figure-level settings; None values resolve to defaults downstream.
-    # The pyramid marker routes the engine to the mirrored bar panel; xticks
-    # stay out of the charts structure so the panel can mirror them.
-    settings = {
-        "pyramid": True,
-        "title": title,
-        "xlabel": xlabel,
-        "ylabel": ylabel,
-        "figsize": figsize,
-        "xmax": xmax,
-        "show_legend": show_legend,
-        "legend": legend,
-        "show_grid": show_grid,
-        "show_yerr": show_yerr,
-        "show_values": show_values,
-        "value_format": value_format,
-        "sort": sort,
-        "sort_by": sort_by,
-        "emphasis_rule": emphasis_rule,
-        "orientation": ORIENTATION.HORIZONTAL,
-        "xticks": xticks,
-        "xticklabels": xticklabels,
-        "xtickrotate": xtickrotate,
-        "xticks_format": xticks_format,
-        "yticks_format": yticks_format,
-    }
-
-    return render_chart("pyramidchart", charts, settings)
+    return render("pyramidchart", params)

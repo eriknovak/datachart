@@ -168,7 +168,7 @@ class TestCalendarFront(unittest.TestCase):
     def test_bad_data_shape_raises(self):
         with self.assertRaises(ValueError) as cm:
             CalendarHeatmap([date(2024, 1, 1)])
-        self.assertIn('{"date": ', str(cm.exception))
+        self.assertIn("with `date` and `value` keys", str(cm.exception))
         with self.assertRaises(ValueError):
             CalendarHeatmap({"date": [date(2024, 1, 1)]})
 
