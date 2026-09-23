@@ -599,7 +599,7 @@ def colorbar_location():
     save(fig, "const-colorbar-location.svg")
 
 
-def chart_grid(figs, name, height, cols=None, footnote=None):
+def chart_grid(figs, name, height, cols=None, footnote=None, rasterize=False):
     """Compose chart-front figures with Grid, restyled to the const-* look.
 
     Chart-setting constants are rendered through the datachart fronts, so the
@@ -609,6 +609,10 @@ def chart_grid(figs, name, height, cols=None, footnote=None):
     for ax in fig.axes:
         ax.title.set_fontfamily("monospace")
         ax.title.set_fontsize(FS_LABEL)
+        if rasterize:
+            # an SVG keeps every vertex, even off view: a world outline is MBs
+            for artist in ax.collections + ax.patches:
+                artist.set_rasterized(True)
     if footnote:
         # centered so a note wider than the grid cannot push it off-center,
         # with a fixed 0.22 in gap whatever the figure height
@@ -922,6 +926,7 @@ def basemap_feature():
         "const-basemap-feature.svg",
         8.5,
         cols=2,
+        rasterize=True,
         footnote="COUNTRIES highlights the Baltic states; the lakes are blue "
         "here. RIVERS is drawn at 1:50m, ROADS at 1:10m, its only scale.",
     )
@@ -950,6 +955,7 @@ def basemap_resolution():
         figs,
         "const-basemap-resolution.svg",
         2.4,
+        rasterize=True,
         footnote="The head of the Adriatic, Slovenia's coast and borders: "
         "1:110m, 1:50m and 1:10m.",
     )
