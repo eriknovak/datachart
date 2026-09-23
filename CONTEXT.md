@@ -439,10 +439,11 @@ _Avoid_: underlay, background, raster, watermark (that is one use of
 
 **Basemap**:
 The land under a geographic chart (`BasemapChart`: coastlines, land fill,
-country areas, country borders and lakes, picked with `BASEMAP_FEATURE`;
-`highlight` picks countries out by code), drawn from
-outlines bundled with the package rather than fetched or computed; the
-finer `BASEMAP_RESOLUTION` scales are downloaded once on request and cached.
+country areas, country borders, lakes, rivers and roads, picked with
+`BASEMAP_FEATURE`; `highlight` picks countries out by code), drawn from
+Natural Earth outlines rather than computed. No outlines ship with the
+package: every `BASEMAP_RESOLUTION` scale is downloaded on first use and kept
+in the cache (ADR 0062).
 Shares `DRAW_POSITION` with the image, `BELOW` by default. Composed under a chart
 whose x and y are already longitude and latitude — it transforms nothing, so
 the marks it sits under need no transform either.
