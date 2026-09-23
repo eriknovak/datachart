@@ -113,8 +113,16 @@ class TestDumbbellValidation(unittest.TestCase):
             "`sort_by`", data=records(), sort=SORT.ASCENDING, sort_by="group"
         )
 
-    def test_invalid_show_values_raises(self):
-        self.assertRaisesWith("show_values", data=records(), show_values=True)
+    def test_invalid_value_kind_raises(self):
+        self.assertRaisesWith(
+            "value_kind", data=records(), show_values=True, value_kind="ratio"
+        )
+
+    def test_kind_in_both_names_raises(self):
+        with self.assertWarns(DeprecationWarning):
+            self.assertRaisesWith(
+                "value_kind", data=records(), show_values="delta", value_kind="delta"
+            )
 
     def test_invalid_marker_pair_raises(self):
         self.assertRaisesWith("`marker`", data=records(), marker="o")
@@ -220,12 +228,31 @@ class TestDumbbellMarks(unittest.TestCase):
         self.assertEqual(to_hex(start.get_facecolor()[0]), "#111111")
         self.assertEqual(to_hex(end.get_facecolor()[0]), "#222222")
 
+    def test_show_values_prints_the_default_kind(self):
+        ax = DumbbellChart(records(), show_values=True).axes[0]
+        expected = DumbbellChart(
+            records(), show_values=True, value_kind=DUMBBELL_VALUE.ENDPOINTS
+        ).axes[0]
+        self.assertTrue(texts(ax))
+        self.assertEqual(texts(ax), texts(expected))
+
+    def test_kind_as_show_values_warns_and_maps(self):
+        with self.assertWarnsRegex(DeprecationWarning, "value_kind") as caught:
+            ax = DumbbellChart(records(), show_values=DUMBBELL_VALUE.DELTA).axes[0]
+        self.assertEqual(caught.filename, __file__)
+        expected = DumbbellChart(
+            records(), show_values=True, value_kind=DUMBBELL_VALUE.DELTA
+        ).axes[0]
+        self.assertEqual(texts(ax), texts(expected))
+
     def test_coincident_endpoints_draw_one_dot_no_connector(self):
         data = [
             {"label": "A", "start": 2, "end": 2},
             {"label": "B", "start": 1, "end": 3},
         ]
-        ax = DumbbellChart(data, show_values=DUMBBELL_VALUE.DELTA).axes[0]
+        ax = DumbbellChart(
+            data, show_values=True, value_kind=DUMBBELL_VALUE.DELTA
+        ).axes[0]
         start, end = dots(ax)
         self.assertEqual(len(start.get_offsets()), 1)
         self.assertEqual(len(end.get_offsets()), 2)
@@ -265,7 +292,8 @@ class TestDumbbellMarks(unittest.TestCase):
                     records(),
                     start_name="Before",
                     end_name="After",
-                    show_values=DUMBBELL_VALUE.ENDPOINTS,
+                    show_values=True,
+                    value_kind=DUMBBELL_VALUE.ENDPOINTS,
                 )
                 figure.canvas.draw()
                 self.assertEqual(len(dots(figure.axes[0])), 2)
@@ -370,14 +398,18 @@ class TestDumbbellLabelsAndLegend(unittest.TestCase):
 
     def test_endpoint_values(self):
         ax = DumbbellChart(
-            records(), show_values=DUMBBELL_VALUE.ENDPOINTS, value_format="{:.0f}"
+            records(),
+            show_values=True,
+            value_kind=DUMBBELL_VALUE.ENDPOINTS,
+            value_format="{:.0f}",
         ).axes[0]
         self.assertEqual(sorted(texts(ax)), sorted(["3", "7", "5", "4", "1", "9"]))
 
     def test_endpoint_labels_point_away_from_connector(self):
         ax = DumbbellChart(
             [{"label": "A", "start": 3, "end": 7}],
-            show_values=DUMBBELL_VALUE.ENDPOINTS,
+            show_values=True,
+            value_kind=DUMBBELL_VALUE.ENDPOINTS,
             value_format="{:.0f}",
         ).axes[0]
         by_text = {t.get_text(): t for t in ax.texts}
@@ -386,7 +418,10 @@ class TestDumbbellLabelsAndLegend(unittest.TestCase):
 
     def test_delta_values(self):
         ax = DumbbellChart(
-            records(), show_values=DUMBBELL_VALUE.DELTA, value_format="{:+.0f}"
+            records(),
+            show_values=True,
+            value_kind=DUMBBELL_VALUE.DELTA,
+            value_format="{:+.0f}",
         ).axes[0]
         self.assertEqual(texts(ax), ["+4", "-1", "+8"])
 

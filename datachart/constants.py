@@ -1247,8 +1247,8 @@ class NETWORK_LABEL_POSITION:
 class GANTT_VALUE:
     """The supported gantt chart value labels.
 
-    Passed as the `show_values` setting of the gantt chart: what each bar
-    prints past its end. None prints nothing.
+    Passed as the `value_kind` setting of the gantt chart: what each bar
+    prints past its end when `show_values` is on.
 
     ![GANTT_VALUE at a glance](../assets/imgs/const-gantt-value.svg){ width="100%" }
 
@@ -1258,12 +1258,14 @@ class GANTT_VALUE:
         "duration"
 
     Attributes:
-        NONE (None): No value labels. Equals to `None`.
+        DEFAULT (str): The default label. Same as `GANTT_VALUE.DURATION`.
+        NONE (None): Equals to `None`, which `value_kind` reads as `DEFAULT`.
         DURATION (str): The task's duration in days. Equals to `"duration"`.
         PROGRESS (str): The task's progress as a percentage. Equals to `"progress"`.
 
     """
 
+    DEFAULT = "duration"
     NONE = None
     DURATION = "duration"
     PROGRESS = "progress"
@@ -1325,8 +1327,8 @@ class GANTT_ARROW_ENTRY:
 class DUMBBELL_VALUE:
     """The supported dumbbell chart value labels.
 
-    Passed as the `show_values` setting of the dumbbell chart: what each
-    record prints. None prints nothing.
+    Passed as the `value_kind` setting of the dumbbell chart: what each
+    record prints when `show_values` is on.
 
     ![DUMBBELL_VALUE at a glance](../assets/imgs/const-dumbbell-value.svg){ width="100%" }
 
@@ -1336,7 +1338,8 @@ class DUMBBELL_VALUE:
         "delta"
 
     Attributes:
-        NONE (None): No value labels. Equals to `None`.
+        DEFAULT (str): The default label. Same as `DUMBBELL_VALUE.ENDPOINTS`.
+        NONE (None): Equals to `None`, which `value_kind` reads as `DEFAULT`.
         ENDPOINTS (str): Each endpoint's value, past its dot, away from the
             connector. Equals to `"endpoints"`.
         DELTA (str): The record's `end - start`, at the connector midpoint.
@@ -1344,6 +1347,7 @@ class DUMBBELL_VALUE:
 
     """
 
+    DEFAULT = "endpoints"
     NONE = None
     ENDPOINTS = "endpoints"
     DELTA = "delta"

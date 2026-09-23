@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from ..utils._internal.plot_engine import render
 from ..utils._internal.validate import (
     validate_dumbbell_records,
-    validate_dumbbell_show_values,
+    validate_dumbbell_value_kind,
     validate_dumbbell_sort_by,
     validate_marker_pair,
     validate_sort,
@@ -65,7 +65,8 @@ def DumbbellChart(
     show_legend: Optional[bool] = None,
     legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
-    show_values: Optional[Union[DUMBBELL_VALUE, str]] = None,
+    show_values: Optional[bool] = None,
+    value_kind: Optional[Union[DUMBBELL_VALUE, str]] = None,
     show_direction: Optional[bool] = None,
     value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     sort: Optional[Union[SORT, str]] = None,
@@ -114,7 +115,8 @@ def DumbbellChart(
         ...     title="Life Expectancy",
         ...     start_name="2000",
         ...     end_name="2019",
-        ...     show_values="delta",
+        ...     show_values=True,
+        ...     value_kind="delta",
         ... )
 
     Args:
@@ -155,9 +157,11 @@ def DumbbellChart(
             draws none. Unset, the theme's grid runs along the value axis,
             whichever way it points. See
             [`SHOW_GRID`][datachart.constants.SHOW_GRID].
-        show_values: The value labels: None (none), `"endpoints"` (each
-            endpoint's value past its dot, away from the connector), or
-            `"delta"` (`end - start` at the connector midpoint). See
+        show_values: Whether to print the value labels `value_kind` names.
+        value_kind: The value labels `show_values` prints: `"endpoints"`
+            (default, each endpoint's value past its dot, away from the
+            connector) or `"delta"` (`end - start` at the connector midpoint).
+            Ignored while `show_values` is off. See
             [`DUMBBELL_VALUE`][datachart.constants.DUMBBELL_VALUE].
         show_direction: Whether to draw a thin arrow beside each connector,
             pointing from `start` to `end`: above a horizontal dumbbell, right
@@ -207,7 +211,9 @@ def DumbbellChart(
     for records in charts_data:
         validate_dumbbell_records(records)
     validate_dumbbell_sort_by(validate_sort(sort), sort_by)
-    validate_dumbbell_show_values(show_values)
+    params["show_values"], params["value_kind"] = validate_dumbbell_value_kind(
+        show_values, value_kind
+    )
     validate_marker_pair(marker)
 
     return render("dumbbellchart", params)

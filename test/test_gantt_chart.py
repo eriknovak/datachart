@@ -117,8 +117,10 @@ class TestGanttValidation(unittest.TestCase):
             "pass `sort` as well", data=schedule(), sort_by=GANTT_SORT_KEY.START
         )
 
-    def test_invalid_show_values_raises(self):
-        self.assertRaisesWith("show_values", data=schedule(), show_values=True)
+    def test_invalid_value_kind_raises(self):
+        self.assertRaisesWith(
+            "value_kind", data=schedule(), show_values=True, value_kind="cost"
+        )
 
     def test_invalid_record_emphasis_raises(self):
         self.assertRaisesWith("emphasis", data=[task("A", 0, 1, emphasis="loud")])
@@ -261,13 +263,34 @@ class TestGanttMarks(unittest.TestCase):
         self.assertAlmostEqual(progress[1].get_width(), 15.0)
         self.assertLess(progress[0].get_height(), bars[0].get_height())
 
-    def test_duration_and_progress_values(self):
-        ax = GanttChart(schedule(), show_values=GANTT_VALUE.DURATION).axes[0]
+    def test_show_values_prints_the_default_kind(self):
+        ax = GanttChart(schedule(), show_values=True).axes[0]
         self.assertEqual([t.get_text() for t in ax.texts], ["10d", "30d", "12d", "14d"])
-        ax = GanttChart(schedule(), show_values=GANTT_VALUE.PROGRESS).axes[0]
+
+    def test_value_kind_without_show_values_prints_nothing(self):
+        ax = GanttChart(schedule(), value_kind=GANTT_VALUE.PROGRESS).axes[0]
+        self.assertEqual(len(ax.texts), 0)
+
+    def test_kind_as_show_values_warns_and_maps(self):
+        with self.assertWarnsRegex(DeprecationWarning, "value_kind") as caught:
+            ax = GanttChart(schedule(), show_values=GANTT_VALUE.PROGRESS).axes[0]
+        self.assertEqual(caught.filename, __file__)
+        self.assertEqual([t.get_text() for t in ax.texts], ["100%", "50%", "", ""])
+
+    def test_duration_and_progress_values(self):
+        ax = GanttChart(
+            schedule(), show_values=True, value_kind=GANTT_VALUE.DURATION
+        ).axes[0]
+        self.assertEqual([t.get_text() for t in ax.texts], ["10d", "30d", "12d", "14d"])
+        ax = GanttChart(
+            schedule(), show_values=True, value_kind=GANTT_VALUE.PROGRESS
+        ).axes[0]
         self.assertEqual([t.get_text() for t in ax.texts], ["100%", "50%", "", ""])
         ax = GanttChart(
-            schedule(), show_values=GANTT_VALUE.DURATION, value_format="{x:.1f} days"
+            schedule(),
+            show_values=True,
+            value_kind=GANTT_VALUE.DURATION,
+            value_format="{x:.1f} days",
         ).axes[0]
         self.assertEqual(ax.texts[0].get_text(), "10.0 days")
 
@@ -337,7 +360,8 @@ class TestGanttMarks(unittest.TestCase):
                     show_dependencies=True,
                     show_today=True,
                     today_label="Today",
-                    show_values=GANTT_VALUE.DURATION,
+                    show_values=True,
+                    value_kind=GANTT_VALUE.DURATION,
                     show_group_headers=True,
                     period=GANTT_DATE_PERIOD.WEEK,
                 ).savefig(__import__("io").BytesIO(), format="png")
@@ -619,7 +643,9 @@ class TestGanttMilestonesAndArrows(unittest.TestCase):
         self.assertFalse(task_bars(ax, 5)[4].get_visible())
 
     def test_milestone_prints_its_date(self):
-        ax = GanttChart(self.records(), show_values=GANTT_VALUE.DURATION).axes[0]
+        ax = GanttChart(
+            self.records(), show_values=True, value_kind=GANTT_VALUE.DURATION
+        ).axes[0]
         texts = [t.get_text() for t in ax.texts]
         self.assertIn("19 Feb", texts)
         self.assertNotIn("0d", texts)
@@ -721,7 +747,10 @@ class TestMarksOutsideUserLimits(unittest.TestCase):
     def test_milestone_past_xmax_is_hidden(self):
         records = schedule() + [task("Release", 49, 0, group="Make")]
         ax = GanttChart(
-            records, xmax=D0 + timedelta(days=30), show_values=GANTT_VALUE.DURATION
+            records,
+            xmax=D0 + timedelta(days=30),
+            show_values=True,
+            value_kind=GANTT_VALUE.DURATION,
         ).axes[0]
         markers = [
             l

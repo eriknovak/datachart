@@ -94,11 +94,9 @@ from .validate import (
     validate_line_curve,
     validate_rank_by,
     validate_emphasis_rule,
-    validate_dumbbell_show_values,
     validate_dumbbell_sort_by,
     validate_marker_pair,
     validate_gantt_arrow_entry,
-    validate_gantt_show_values,
     validate_gantt_sort_by,
     BASEMAP_FEATURES,
     BASEMAP_FILLED,
@@ -2156,6 +2154,12 @@ def _oriented(ax: plt.Axes, transpose: bool) -> tuple:
     )
 
 
+def resolve_value_kind(settings: dict) -> Optional[str]:
+    """The value label kind a range front prints; None when `show_values` is off."""
+
+    return settings.get("value_kind") if resolve_show_values(settings) else None
+
+
 def resolve_show_values(settings: dict) -> bool:
     """`show_values` as set, else the theme default for a front that takes it (ADR 0033)."""
 
@@ -3693,7 +3697,8 @@ class GanttLayer(BarLayer):
         self.milestones = self.durations == 0
         # the front validated the task records, their roles included
         self.record_roles = [t.get("emphasis") for t in tasks]
-        self.value_mode = validate_gantt_show_values(self.settings.get("show_values"))
+        # the front validated the kind and filled its default
+        self.value_mode = resolve_value_kind(self.settings)
         self._resolve_value_labels()
         self.show_values = self.value_mode is not None
         if self.settings.get("value_format") is None:
@@ -5581,9 +5586,8 @@ class DumbbellLayer(UnclippedMarksMixin, GroupLayer):
             for key in ("start_color", "end_color")
         )
         self.names = (self.settings.get("start_name"), self.settings.get("end_name"))
-        self.value_mode = validate_dumbbell_show_values(
-            self.settings.get("show_values")
-        )
+        # the front validated the kind and filled its default
+        self.value_mode = resolve_value_kind(self.settings)
         self._resolve_value_labels()
         self.show_values = self.value_mode is not None
         self.labels_below_range = self.value_mode == DUMBBELL_VALUE.ENDPOINTS
