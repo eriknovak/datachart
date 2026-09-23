@@ -4,7 +4,7 @@ title: BasemapChart
 
 # BasemapChart
 
-Coastlines, land, borders and lakes under a chart of longitude and latitude. The [Basemap Chart guide](../../how-to-guides/charts/basemapchart.ipynb) shows every feature on real data; this page is the contract: the function, the shape of its data, the keys `style` takes, and the constant each parameter accepts.
+Coastlines, land, borders, lakes, rivers and roads under a chart of longitude and latitude. The [Basemap Chart guide](../../how-to-guides/charts/basemapchart.ipynb) shows every feature on real data; this page is the contract: the function, the shape of its data, the keys `style` takes, and the constant each parameter accepts.
 
 ## Function
 

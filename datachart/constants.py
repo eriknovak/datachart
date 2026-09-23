@@ -1045,6 +1045,8 @@ class BASEMAP_RESOLUTION:
     `XDG_CACHE_HOME` or `~/.cache`; a machine without the network works from
     a copy of a warm one.
 
+    ![BASEMAP_RESOLUTION at a glance](../assets/imgs/const-basemap-resolution.svg){ width="100%" }
+
     Examples:
         >>> from datachart.constants import BASEMAP_RESOLUTION
         >>> BASEMAP_RESOLUTION.DEFAULT

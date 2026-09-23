@@ -95,7 +95,7 @@ SHOWS = {
     "NetworkChart": "Nodes joined by edges, placed by a layout.",
     "ScatterMatrix": "A scatter chart for every pair of dimensions, distributions on the diagonal.",
     "ImageChart": "A picture in data coordinates, under or over the other charts.",
-    "BasemapChart": "Coastlines, land, borders and lakes under a chart of longitude and latitude.",
+    "BasemapChart": "Coastlines, land, borders, lakes, rivers and roads under a chart of longitude and latitude.",
     "SankeyChart": "Weighted flows between categories, as ribbons between node columns.",
     "Treemap": "Part-of-whole data as nested rectangles sized by value.",
 }

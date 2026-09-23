@@ -927,6 +927,34 @@ def basemap_feature():
     )
 
 
+def basemap_resolution():
+    # the same stretch of coast at each scale, where the detail shows
+    figs = [
+        BasemapChart(
+            [BASEMAP_FEATURE.LAND, BASEMAP_FEATURE.BORDERS],
+            resolution=value,
+            title=f"BASEMAP_RESOLUTION.{label}",
+            xmin=12.5,
+            xmax=16,
+            ymin=44.5,
+            ymax=46.5,
+            aspect_ratio=ASPECT_RATIO.GEOGRAPHIC,
+        )
+        for label, value in [
+            ("LOW", BASEMAP_RESOLUTION.LOW),
+            ("MEDIUM", BASEMAP_RESOLUTION.MEDIUM),
+            ("HIGH", BASEMAP_RESOLUTION.HIGH),
+        ]
+    ]
+    chart_grid(
+        figs,
+        "const-basemap-resolution.svg",
+        2.4,
+        footnote="The head of the Adriatic, Slovenia's coast and borders: "
+        "1:110m, 1:50m and 1:10m.",
+    )
+
+
 def swarm_mode():
     members = [("SWARM", SWARM_MODE.SWARM), ("STRIP", SWARM_MODE.STRIP)]
     figs = [
@@ -1591,6 +1619,7 @@ def main():
     hexbin_reduce()
     draw_position()
     basemap_feature()
+    basemap_resolution()
     swarm_mode()
     radial_type()
     direction()
