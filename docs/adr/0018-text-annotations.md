@@ -1,5 +1,6 @@
 ---
 status: accepted
+amended-by: [0043]
 ---
 
 # Text annotations ride the layer, with a post-hoc Annotate front

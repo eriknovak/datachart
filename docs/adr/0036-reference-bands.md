@@ -1,5 +1,6 @@
 ---
 status: accepted
+amended-by: [0043]
 ---
 
 # A reference band is a span type per axis, drawn over the grid and under the marks

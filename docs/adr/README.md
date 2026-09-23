@@ -82,9 +82,9 @@ theme faces out of the wheel.
 
 ## Annotations and reference marks
 
-- [0018](0018-text-annotations.md) — Text annotations ride the layer, with a post-hoc Annotate front
+- [0018](0018-text-annotations.md) — Text annotations ride the layer, with a post-hoc Annotate front (amended by [0043](0043-setting-payloads-take-the-setting-suffix.md))
 - [0033](0033-value-labels-across-charts.md) — Value labels are a cross-chart feature with per-geometry placement
-- [0036](0036-reference-bands.md) — A reference band is a span type per axis, drawn over the grid and under the marks
+- [0036](0036-reference-bands.md) — A reference band is a span type per axis, drawn over the grid and under the marks (amended by [0043](0043-setting-payloads-take-the-setting-suffix.md))
 - [0038](0038-stats-annotation-helpers.md) — Annotation statistics degrade to nan, and every rule delegates to a library
 - [0055](0055-diagonal-reference-lines.md) — A diagonal reference line is a third line family, defined by slope and intercept in data space
 - [0059](0059-pairwise-brackets.md) — A pairwise bracket is a fourth reference-mark family, placed on the category axis and stacked automatically
