@@ -6,6 +6,7 @@ import os
 import tempfile
 import unittest
 import warnings
+from unittest import mock
 
 import matplotlib
 import numpy as np
@@ -39,7 +40,11 @@ from datachart.config import config
 from datachart.constants import THEME
 from datachart.themes import QUILL_THEME
 from datachart.utils import Grid
-from datachart.utils._internal.config_helpers import _font_available
+from datachart.utils._internal import fonts
+from datachart.utils._internal.config_helpers import (
+    _font_available,
+    resolve_font_family,
+)
 from datachart.utils._internal.layers import Etch, InkStroke
 
 LINE = [{"x": x, "y": y} for x, y in enumerate([1.0, 3.0, 2.0, 4.0, 3.5])]
@@ -360,14 +365,19 @@ class TestQuillTheme(unittest.TestCase):
         self.assertEqual(config.config, QUILL_THEME)
         self.assertEqual(config["color_general_multiple"], [INK])
 
-    def test_bundled_fonts_registered(self):
-        self.assertTrue(_font_available("IM FELL English"))
+    def test_theme_faces_register_on_resolve(self):
+        config.set_theme(THEME.QUILL)
+        self.assertEqual(resolve_font_family()[0], "IM FELL English")
         styles = {
             entry.style
             for entry in font_manager.fontManager.ttflist
             if entry.name == "IM FELL English"
         }
         self.assertEqual(styles, {"normal", "italic"})
+        # a face named directly, not through a stack, registers too
+        self.assertEqual(
+            resolve_font_family("IM FELL English SC"), "IM FELL English SC"
+        )
         self.assertTrue(_font_available("IM FELL English SC"))
 
     def test_series_draw_in_ink_with_their_own_marks(self):
@@ -414,6 +424,88 @@ GRID = {"z": [[0.0, 1.0, 2.0], [3.0, 4.0, 5.0], [6.0, 7.0, 8.0]]}
 
 def step_collections(ax):
     return [c for c in ax.collections if c.get_gid() == "value-step"]
+
+
+class TestDownloadedFaces(unittest.TestCase):
+    """A face in the download map is fetched on first resolve (ADR 0063)."""
+
+    FACE = "Datachart Test Face"
+
+    def setUp(self):
+        self.folder = tempfile.TemporaryDirectory()
+        env = mock.patch.dict(os.environ, {"DATACHART_CACHE_DIR": self.folder.name})
+        faces = mock.patch.dict(fonts.FACES, {self.FACE: ["ofl/test/Test-Regular.ttf"]})
+        for patch in (env, faces):
+            patch.start()
+            self.addCleanup(patch.stop)
+        self.addCleanup(self.folder.cleanup)
+        fonts.ensure_face.cache_clear()
+        self.addCleanup(fonts.ensure_face.cache_clear)
+
+    def tearDown(self):
+        config.set_theme(THEME.DEFAULT)
+
+    def urlopen(self, **kwargs):
+        return mock.patch.object(fonts.urllib.request, "urlopen", **kwargs)
+
+    def test_face_downloads_into_the_cache_and_registers(self):
+        with (
+            self.urlopen(return_value=io.BytesIO(b"ttf")) as urlopen,
+            mock.patch.object(fonts.font_manager.fontManager, "addfont") as addfont,
+        ):
+            fonts.ensure_face(self.FACE)
+        url = urlopen.call_args[0][0]
+        self.assertIn(fonts.COMMIT, url)
+        self.assertTrue(url.endswith("ofl/test/Test-Regular.ttf"))
+        path = os.path.join(self.folder.name, "fonts", "Test-Regular.ttf")
+        with open(path, "rb") as cached:
+            self.assertEqual(cached.read(), b"ttf")
+        addfont.assert_called_once_with(path)
+
+    def test_cached_face_needs_no_network(self):
+        os.makedirs(os.path.join(self.folder.name, "fonts"))
+        path = os.path.join(self.folder.name, "fonts", "Test-Regular.ttf")
+        with open(path, "wb") as cached:
+            cached.write(b"ttf")
+        with (
+            self.urlopen(side_effect=AssertionError("network")),
+            mock.patch.object(fonts.font_manager.fontManager, "addfont") as addfont,
+        ):
+            fonts.ensure_face(self.FACE)
+        addfont.assert_called_once_with(path)
+
+    def test_corrupt_face_warns_and_leaves_the_cache(self):
+        with self.urlopen(return_value=io.BytesIO(b"<html>proxy</html>")):
+            with self.assertWarns(UserWarning):
+                self.assertFalse(fonts.ensure_face(self.FACE))
+        self.assertEqual(os.listdir(os.path.join(self.folder.name, "fonts")), [])
+
+    def test_unreachable_face_warns_once_and_drops_out(self):
+        config.update_config({"font_general_serif": [self.FACE, "DejaVu Serif"]})
+        with self.urlopen(side_effect=OSError("offline")) as urlopen:
+            with self.assertWarnsRegex(UserWarning, "offline") as caught:
+                stack = resolve_font_family("serif")
+            self.assertIn(fonts.COMMIT, str(caught.warning))
+            self.assertIn(self.folder.name, str(caught.warning))
+            with warnings.catch_warnings():
+                warnings.simplefilter("error")
+                self.assertEqual(resolve_font_family("serif"), stack)
+        self.assertEqual(stack, ["DejaVu Serif", "serif"])
+        self.assertEqual(urlopen.call_count, 1)
+        self.assertEqual(os.listdir(self.folder.name), [])
+
+    def test_unreachable_named_face_falls_back_to_the_theme_family(self):
+        with self.urlopen(side_effect=OSError("offline")):
+            with self.assertWarns(UserWarning):
+                family = resolve_font_family(self.FACE)
+        self.assertEqual(family, resolve_font_family())
+
+    def test_unreachable_theme_family_falls_back_to_sans_serif(self):
+        config.update_config({"font_general_family": self.FACE})
+        with self.urlopen(side_effect=OSError("offline")):
+            with self.assertWarns(UserWarning):
+                family = resolve_font_family()
+        self.assertEqual(family, resolve_font_family("sans-serif"))
 
 
 class TestValueEtch(unittest.TestCase):

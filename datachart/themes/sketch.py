@@ -1,9 +1,6 @@
-from ._base import make_theme, register_bundled_fonts
+from ._base import make_theme
 from ..typings import StyleAttrs
 from ..constants import COLORS, FONT_WEIGHT
-
-# Comic Neue Regular + Bold (SIL OFL, licence alongside) ship with the package
-register_bundled_fonts("ComicNeue-Regular.ttf", "ComicNeue-Bold.ttf")
 
 SKETCH_THEME: StyleAttrs = make_theme(
     {
@@ -23,7 +20,7 @@ SKETCH_THEME: StyleAttrs = make_theme(
             "#99000D",
         ],
         "font_general_family": "sans-serif",
-        # the fallbacks only apply when the bundled face fails to register
+        # Comic Neue downloads on first use; the fallbacks cover an offline miss
         "font_general_sansserif": ["Comic Neue", "Humor Sans", "Comic Sans MS"],
         "font_general_size": 11,
         "font_general_color": "#222222",
@@ -58,6 +55,6 @@ SKETCH_THEME: StyleAttrs = make_theme(
 """The sketch theme: hand-drawn, xkcd-style wobble and halo, Comic Neue font.
 
 Paths wobble, lines carry a white halo, spines and lines are thick, the grid is
-off, and text is set in Comic Neue, which ships with the package; Humor Sans
-and Comic Sans MS are the fallbacks should the bundled face fail to register.
+off, and text is set in Comic Neue, downloaded on first use; Humor Sans and Comic
+Sans MS are the fallbacks should the download fail.
 """

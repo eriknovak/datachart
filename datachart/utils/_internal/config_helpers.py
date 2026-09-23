@@ -10,6 +10,7 @@ from ...config import config, Config
 from ...config.charts import CHART_CONFIGS
 from ...constants import ARROW_STYLE, COLORBAR_LOCATION, LEGEND_LOCATION, ORIENTATION
 from ...themes._base import canonical_style
+from .fonts import FACES, ensure_face, font_available
 
 # ================================================
 # Helper Functions
@@ -113,17 +114,8 @@ def get_subplot_config(
 # -------------------------------------
 
 
-@lru_cache(maxsize=None)
-def _font_available(name: str) -> bool:
-    """Whether the font is installed; missing names would make matplotlib warn."""
-
-    try:
-        font_manager.findfont(
-            font_manager.FontProperties(family=name), fallback_to_default=False
-        )
-        return True
-    except ValueError:
-        return False
+# missing names would make matplotlib warn, so the stack drops them first
+_font_available = lru_cache(maxsize=None)(font_available)
 
 
 def resolve_font_family(family: Union[str, None] = None) -> Union[str, List[str]]:
@@ -140,6 +132,10 @@ def resolve_font_family(family: Union[str, None] = None) -> Union[str, List[str]
 
     family = family if family is not None else config.get("font_general_family")
     family = family or "sans-serif"
+    if family in FACES and not ensure_face(family):
+        # an unreachable face named directly falls back to the theme's family
+        general = config.get("font_general_family")
+        return resolve_font_family(general if general != family else "sans-serif")
     if family == "serif":
         stack = config.get("font_general_serif")
     elif family == "sans-serif":
@@ -148,7 +144,11 @@ def resolve_font_family(family: Union[str, None] = None) -> Union[str, List[str]
         stack = None
     if stack:
         # drop fonts not installed here; they would only trigger findfont warnings
-        stack = [name for name in stack if _font_available(name)]
+        stack = [
+            name
+            for name in stack
+            if (name not in FACES or ensure_face(name)) and _font_available(name)
+        ]
     return list(stack) + [family] if stack else family
 
 

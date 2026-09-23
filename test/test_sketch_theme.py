@@ -16,7 +16,7 @@ from datachart.config import config
 from datachart.constants import THEME
 from datachart.themes import SKETCH_THEME
 from datachart.utils import Grid, Panel
-from datachart.utils._internal.config_helpers import _font_available
+from datachart.utils._internal.config_helpers import resolve_font_family
 
 LINE = [{"x": x, "y": y} for x, y in enumerate([1.0, 3.0, 2.0, 4.0])]
 NEGATIVE = [{"x": x, "y": y} for x, y in enumerate([-3.0, -1.0, -2.0, 0.0])]
@@ -144,14 +144,15 @@ class TestSketchTheme(unittest.TestCase):
         )
         self.assertTrue(any(l.get_visible() for l in on.axes[0].yaxis.get_gridlines()))
 
-    def test_bundled_font_registered(self):
-        self.assertTrue(_font_available("Comic Neue"))
+    def test_face_registers_on_resolve(self):
+        config.set_theme(THEME.SKETCH)
+        self.assertEqual(resolve_font_family()[0], "Comic Neue")
         paths = [
             entry.fname
             for entry in font_manager.fontManager.ttflist
             if entry.name == "Comic Neue"
         ]
-        # registration is idempotent: one entry per bundled face
+        # registration is idempotent: one entry per face file
         self.assertEqual(len(paths), len(set(paths)))
         self.assertEqual(
             {

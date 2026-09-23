@@ -26,12 +26,12 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: uv sync --group test
-      # the basemap outlines download on first use; fetched once per key (ADR 0062)
+      # the outlines and faces download on first use; fetched once per key (ADR 0062, 0063)
       - uses: actions/cache@v4
         with:
           path: ~/.cache/datachart
-          key: natural-earth-${{ hashFiles('datachart/utils/_internal/basemap.py') }}-110m-50m
-      - run: uv run python datachart/charts/_basemap/prewarm.py 110m 50m
+          key: datachart-cache-${{ hashFiles('datachart/utils/_internal/cache.py', 'datachart/utils/_internal/basemap.py', 'datachart/utils/_internal/fonts.py') }}-fonts-110m-50m
+      - run: uv run python datachart/utils/_internal/prewarm.py fonts 110m 50m
       - run: uv run python -m unittest discover test
 
   notebooks:
@@ -44,10 +44,10 @@ jobs:
         with:
           python-version: "3.12"
       - run: uv sync --group test
-      # the basemap outlines download on first use; fetched once per key (ADR 0062)
+      # the outlines and faces download on first use; fetched once per key (ADR 0062, 0063)
       - uses: actions/cache@v4
         with:
           path: ~/.cache/datachart
-          key: natural-earth-${{ hashFiles('datachart/utils/_internal/basemap.py') }}-110m-50m
-      - run: uv run python datachart/charts/_basemap/prewarm.py 110m 50m
+          key: datachart-cache-${{ hashFiles('datachart/utils/_internal/cache.py', 'datachart/utils/_internal/basemap.py', 'datachart/utils/_internal/fonts.py') }}-fonts-110m-50m
+      - run: uv run python datachart/utils/_internal/prewarm.py fonts 110m 50m
       - run: uv run pytest

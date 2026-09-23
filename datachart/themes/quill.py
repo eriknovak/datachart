@@ -1,4 +1,4 @@
-from ._base import make_theme, register_bundled_fonts
+from ._base import make_theme
 from ..typings import StyleAttrs
 from ..constants import (
     ARROW_STYLE,
@@ -8,9 +8,6 @@ from ..constants import (
     LINE_STYLE,
     NETWORK_LABEL_POSITION,
 )
-
-# IM Fell English Roman, Italic and SC (SIL OFL, licence alongside)
-register_bundled_fonts("IMFeENrm28P.ttf", "IMFeENit28P.ttf", "IMFeENsc28P.ttf")
 
 INK = "#1A120A"
 PAPER = "#FFFFFF"
@@ -26,7 +23,7 @@ QUILL_THEME: StyleAttrs = make_theme(
         "color_parallel_hue_continuous": ["#D9CCAA", "#8C7E5E", "#4A3C2A", INK],
         "muted_color": "#C9B892",
         "font_general_family": "serif",
-        # the fallbacks only apply when the bundled face fails to register
+        # IM FELL downloads on first use; the fallbacks cover an offline miss
         "font_general_serif": ["IM FELL English", "IM FELL English SC", "Georgia"],
         "font_general_size": 11,
         "font_general_color": INK,
@@ -239,6 +236,6 @@ QUILL_THEME: StyleAttrs = make_theme(
 One ink only: series differ by line style, marker and etching, never by
 color. Series lines are broad-nib pen strokes whose width varies along the
 line, bars, areas and bodies are etched by hand instead of hatched, the
-furniture wobbles, and text is set in IM Fell English, which ships with the
-package, titles in its italic.
+furniture wobbles, and text is set in IM Fell English, downloaded on first
+use, titles in its italic.
 """
