@@ -103,6 +103,7 @@ from .validate import (
     validate_gantt_sort_by,
     BASEMAP_FEATURES,
     BASEMAP_FILLED,
+    validate_basemap_availability,
     validate_basemap_company,
     validate_basemap_features,
     validate_basemap_geometry,
@@ -7505,7 +7506,8 @@ class ImageLayer(DrawPositionLayer):
 
 
 class BasemapLayer(DrawPositionLayer):
-    """Coastlines, land, borders and lakes in longitude and latitude (ADR 0061).
+    """Coastlines, land, borders, lakes, rivers and roads in longitude and
+    latitude (ADR 0061, 0062).
 
     Composed with data it leaves the limits to the data; alone it frames its
     own outlines.
@@ -7526,6 +7528,7 @@ class BasemapLayer(DrawPositionLayer):
         if geometry is None:
             features = validate_basemap_features(data.get("features"))
             resolution = validate_basemap_resolution(data.get("resolution"))
+            validate_basemap_availability(features, resolution)
             outlines = [(f, load_basemap(f, resolution)) for f in features]
             self.highlight = validate_basemap_highlight(data.get("highlight"), features)
             if BASEMAP_FEATURE.COUNTRIES in features:

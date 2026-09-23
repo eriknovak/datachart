@@ -50,7 +50,7 @@ One page per chart: the function and its parameters, the shape of its data, the 
 | [NetworkChart](networkchart.md) | Nodes joined by edges, placed by a layout. | [`NetworkSingleChartAttrs`](networkchart.md#datachart.typings.NetworkSingleChartAttrs) | [`NetworkStyleAttrs`](networkchart.md#datachart.typings.NetworkStyleAttrs) | [Network Chart](../../how-to-guides/charts/networkchart.ipynb) |
 | [ScatterMatrix](scattermatrix.md) | A scatter chart for every pair of dimensions, distributions on the diagonal. | [`ScatterMatrixDataPointAttrs`](scattermatrix.md#datachart.typings.ScatterMatrixDataPointAttrs) | [`StyleAttrs`](../typings.md#datachart.typings.StyleAttrs) | [Scatter Matrix](../../how-to-guides/charts/scattermatrix.ipynb) |
 | [ImageChart](imagechart.md) | A picture in data coordinates, under or over the other charts. | [`ImageDataAttrs`](imagechart.md#datachart.typings.ImageDataAttrs) | [`ImageStyleAttrs`](imagechart.md#datachart.typings.ImageStyleAttrs) | [Image Chart](../../how-to-guides/charts/imagechart.ipynb) |
-| [BasemapChart](basemapchart.md) | Coastlines, land, borders and lakes under a chart of longitude and latitude. | [`BasemapDataAttrs`](basemapchart.md#datachart.typings.BasemapDataAttrs) | [`BasemapStyleAttrs`](basemapchart.md#datachart.typings.BasemapStyleAttrs) | [Basemap Chart](../../how-to-guides/charts/basemapchart.ipynb) |
+| [BasemapChart](basemapchart.md) | Coastlines, land, borders, lakes, rivers and roads under a chart of longitude and latitude. | [`BasemapDataAttrs`](basemapchart.md#datachart.typings.BasemapDataAttrs) | [`BasemapStyleAttrs`](basemapchart.md#datachart.typings.BasemapStyleAttrs) | [Basemap Chart](../../how-to-guides/charts/basemapchart.ipynb) |
 
 ### Flows
 

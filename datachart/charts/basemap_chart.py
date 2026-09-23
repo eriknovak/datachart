@@ -42,9 +42,10 @@ def BasemapChart(
     """Creates the basemap chart.
 
     A basemap chart draws the land under a geographic chart: coastlines, a
-    land fill, the borders between countries and the large lakes, from the
-    Natural Earth 1:110m outlines that ship with the package, so it needs no
-    download and no extra dependency. Longitude runs along x and latitude
+    land fill, the borders between countries, the large lakes, the rivers
+    and the main roads, from the Natural Earth outlines. Each is downloaded
+    the first time it is drawn and kept in a local cache, so a map needs the
+    network once and no extra dependency. Longitude runs along x and latitude
     along y, drawn straight; nothing is projected, so the marks composed
     over the map with `Panel` need no transform either — a hexbin of
     epicentres, a scatter of stations, a line of a ship's track.
@@ -61,9 +62,10 @@ def BasemapChart(
     narrows each degree of longitude by the cosine of the middle latitude,
     so a region keeps its proportions.
 
-    The bundled outlines suit a continent or a region. `resolution` asks for
-    the finer Natural Earth scales, which are downloaded the first time they
-    are used and kept in a local cache. `geometry` takes your own longitude
+    The default 1:110m outlines suit a continent or a region; `resolution`
+    asks for the finer Natural Earth scales, for a country or a coast. The
+    roads exist at 1:10m alone, and a 1:110m river is only a few strokes
+    across a continent. `geometry` takes your own longitude
     and latitude outlines in their place: a country's provinces, a coast at
     street scale, or a map that is not of the Earth.
 
@@ -85,16 +87,16 @@ def BasemapChart(
         ... )
 
     Args:
-        features: The bundled features to draw: one name or a list of them,
+        features: The features to draw: one name or a list of them,
             coastline and land by default. See
             [`BASEMAP_FEATURE`][datachart.constants.BASEMAP_FEATURE].
-        resolution: The Natural Earth scale: `"110m"` (default) ships with the
-            package, `"50m"` and `"10m"` are downloaded once on first use. See
+        resolution: The Natural Earth scale: `"110m"` (default), `"50m"` or
+            `"10m"`, each downloaded once on first use. See
             [`BASEMAP_RESOLUTION`][datachart.constants.BASEMAP_RESOLUTION].
         highlight: The countries to pick out, as Natural Earth's three-letter
             `ADM0_A3` codes (`"SVN"`, `"FRA"`); needs the `"countries"`
             feature. A code too small to draw at the chosen resolution warns.
-        geometry: Your own outlines, drawn in place of the bundled ones: a
+        geometry: Your own outlines, drawn in place of Natural Earth's: a
             `{"lon", "lat", "feature"}` dict, or a list of them. Cannot be
             combined with `features`, `resolution` or `highlight`. See
             [`BasemapDataAttrs`][datachart.typings.BasemapDataAttrs].
@@ -128,11 +130,10 @@ def BasemapChart(
             a `BASEMAP_RESOLUTION`, `geometry` is not outlines of matching
             longitudes and latitudes or comes with `features`, `resolution`
             or `highlight`, a `highlight` code is not three letters or comes
-            without the countries feature,
-            `position` is not a `DRAW_POSITION`, or a geographic aspect meets a
-            y-axis outside -90 to 90.
-        RuntimeError: If a finer resolution is not cached and cannot be
-            downloaded.
+            without the countries feature, a feature is not published at
+            `resolution`, `position` is not a `DRAW_POSITION`, or a geographic
+            aspect meets a y-axis outside -90 to 90.
+        RuntimeError: If a feature is not cached and cannot be downloaded.
 
     """
     validate_draw_position(position)

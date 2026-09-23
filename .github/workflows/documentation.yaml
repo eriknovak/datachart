@@ -32,6 +32,12 @@ jobs:
       # clone when the notebooks render here
       - run: sudo apt-get install -y --no-install-recommends fonts-liberation
       - run: uv sync --group docs
+      # the basemap outlines download on first use; fetched once per key (ADR 0062)
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/datachart
+          key: natural-earth-${{ hashFiles('datachart/utils/_internal/basemap.py') }}-110m-50m
+      - run: uv run python datachart/charts/_basemap/prewarm.py 110m 50m
       - run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com

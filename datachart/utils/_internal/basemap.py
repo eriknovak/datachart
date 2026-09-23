@@ -1,5 +1,5 @@
-"""The basemap outlines: the bundled 1:110m set and the finer ones fetched
-on first use into a local cache (ADR 0061).
+"""The basemap outlines, fetched from Natural Earth on first use into a
+local cache (ADR 0061, 0062).
 
 Every set is a float32 `(n, 2)` array of longitude and latitude per feature,
 a `NaN` row between one outline and the next. Polygon rings are oriented so
@@ -18,8 +18,9 @@ import urllib.request
 import numpy as np
 
 from ...constants import BASEMAP_RESOLUTION
+from .validate import BASEMAP_FEATURE_RESOLUTIONS, BASEMAP_RESOLUTIONS
 
-# a tagged release, so a download reproduces the bundled conversion
+# a tagged release, so every download converts the same outlines
 SOURCE = (
     "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/"
     "v5.1.2/geojson/ne_{resolution}_{layer}.geojson"
@@ -32,17 +33,14 @@ LAYERS = {
     # land boundaries only: a country outline would redraw the coastline
     "borders": "admin_0_boundary_lines_land",
     "lakes": "lakes",
+    "rivers": "rivers_lake_centerlines",
+    "roads": "roads",
 }
-BUNDLED = (
-    pathlib.Path(__file__).resolve().parents[2]
-    / "charts"
-    / "_basemap"
-    / "natural_earth_110m.npz"
-)
 # the key of a country: ISO_A3 is -99 for France and Norway, this never is
 COUNTRY_KEY = "ADM0_A3"
 CACHE_ENV = "DATACHART_CACHE_DIR"
-DOWNLOAD_TIMEOUT = 60
+# 1:10m roads is a 50 MB GeoJSON; 60 s does not finish it (ADR 0062)
+DOWNLOAD_TIMEOUT = 300
 
 
 def cache_dir() -> pathlib.Path:
@@ -105,21 +103,15 @@ def fetch(feature: str, resolution: str) -> tuple:
     except (OSError, ValueError, KeyError) as error:
         raise RuntimeError(
             f"Cannot download the 1:{resolution} basemap {feature!r} from {url}: "
-            f"{error}. The finer resolutions need the network once; the default "
-            f"{BASEMAP_RESOLUTION.LOW!r} outlines ship with the package."
+            f"{error}. A basemap needs the network once per feature and scale; "
+            f"after that it is read from {cache_dir()}."
         ) from error
 
 
 @functools.lru_cache(maxsize=None)
 def load_outlines(feature: str, resolution: str) -> dict:
-    """One feature's `rows` and `codes`, downloading a finer one once."""
+    """One feature's `rows` and `codes`, downloaded into the cache once."""
 
-    if resolution == BASEMAP_RESOLUTION.LOW:
-        with np.load(BUNDLED) as bundle:
-            return {
-                "rows": bundle[feature].astype(float),
-                "codes": bundle.get(f"{feature}_codes"),
-            }
     path = cache_dir() / f"natural_earth_{resolution}_{feature}.npz"
     if not path.exists():
         rows, codes = fetch(feature, resolution)
@@ -144,3 +136,17 @@ def load_country_codes(resolution: str = BASEMAP_RESOLUTION.LOW) -> np.ndarray:
     """The `ADM0_A3` code of each country outline, in outline order."""
 
     return load_outlines("countries", resolution)["codes"]
+
+
+def prewarm(resolution: str) -> list:
+    """Cache every feature Natural Earth publishes at the scale, so later
+    maps need no network; returns the features."""
+
+    features = [
+        feature
+        for feature in LAYERS
+        if resolution in BASEMAP_FEATURE_RESOLUTIONS.get(feature, BASEMAP_RESOLUTIONS)
+    ]
+    for feature in features:
+        load_outlines(feature, resolution)
+    return features

@@ -61,6 +61,8 @@ BASEMAP_FEATURES = (
     BASEMAP_FEATURE.LAND,
     BASEMAP_FEATURE.COUNTRIES,
     BASEMAP_FEATURE.LAKES,
+    BASEMAP_FEATURE.RIVERS,
+    BASEMAP_FEATURE.ROADS,
     BASEMAP_FEATURE.BORDERS,
     BASEMAP_FEATURE.COASTLINE,
 )
@@ -74,6 +76,8 @@ BASEMAP_RESOLUTIONS = (
     BASEMAP_RESOLUTION.MEDIUM,
     BASEMAP_RESOLUTION.HIGH,
 )
+# the scales Natural Earth publishes a feature at; unlisted means every one
+BASEMAP_FEATURE_RESOLUTIONS = {BASEMAP_FEATURE.ROADS: (BASEMAP_RESOLUTION.HIGH,)}
 # PIL modes an array keeps as is: grey levels read through the colormap
 IMAGE_ARRAY_MODES = ("L", "I", "F", "RGB", "RGBA")
 RANK_RULES = (BUMP_RANK.VALUE_DESCENDING, BUMP_RANK.VALUE_ASCENDING, BUMP_RANK.GIVEN)
@@ -1319,7 +1323,7 @@ def validate_basemap_highlight(highlight, features) -> tuple:
 
 
 def validate_basemap_resolution(resolution) -> str:
-    """The Natural Earth scale; None means the bundled 1:110m."""
+    """The Natural Earth scale; None means 1:110m."""
 
     if resolution is None:
         return BASEMAP_RESOLUTION.DEFAULT
@@ -1329,6 +1333,19 @@ def validate_basemap_resolution(resolution) -> str:
             f"Must be one of {BASEMAP_RESOLUTIONS} or None."
         )
     return resolution
+
+
+def validate_basemap_availability(features, resolution) -> None:
+    """Raise when Natural Earth publishes a feature at another scale only."""
+
+    for feature in features:
+        scales = BASEMAP_FEATURE_RESOLUTIONS.get(feature, BASEMAP_RESOLUTIONS)
+        if resolution not in scales:
+            raise ValueError(
+                f"The basemap feature {feature!r} is not published at "
+                f"1:{resolution}; Natural Earth has it at {scales} only. "
+                f"Pass `resolution` as one of them."
+            )
 
 
 def validate_basemap_company(non_numeric_kinds, horizontal) -> None:
