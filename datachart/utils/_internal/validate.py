@@ -20,6 +20,7 @@ from ...constants import (
     ARROW_STYLE,
     BANDWIDTH,
     BASEMAP_FEATURE,
+    BASEMAP_RESOLUTION,
     BUMP_LABEL_POSITION,
     BUMP_RANK,
     CALENDAR_WEEKDAY,
@@ -63,6 +64,11 @@ BASEMAP_FEATURES = (
     BASEMAP_FEATURE.COASTLINE,
 )
 BASEMAP_FILLED = (BASEMAP_FEATURE.LAND, BASEMAP_FEATURE.LAKES)
+BASEMAP_RESOLUTIONS = (
+    BASEMAP_RESOLUTION.LOW,
+    BASEMAP_RESOLUTION.MEDIUM,
+    BASEMAP_RESOLUTION.HIGH,
+)
 # PIL modes an array keeps as is: grey levels read through the colormap
 IMAGE_ARRAY_MODES = ("L", "I", "F", "RGB", "RGBA")
 RANK_RULES = (BUMP_RANK.VALUE_DESCENDING, BUMP_RANK.VALUE_ASCENDING, BUMP_RANK.GIVEN)
@@ -1266,14 +1272,30 @@ def validate_image(image) -> np.ndarray:
     return array
 
 
-def validate_basemap_source(features, geometry) -> None:
-    """Raise when both the bundled features and caller outlines are given."""
+def validate_basemap_source(features, geometry, resolution=None) -> None:
+    """Raise when caller outlines come with a setting of the Natural Earth set."""
 
-    if features is not None and geometry is not None:
+    if geometry is None:
+        return
+    for name, value in (("features", features), ("resolution", resolution)):
+        if value is not None:
+            raise ValueError(
+                f"Pass either basemap `{name}` or `geometry`: the geometry "
+                "replaces the Natural Earth outlines."
+            )
+
+
+def validate_basemap_resolution(resolution) -> str:
+    """The Natural Earth scale; None means the bundled 1:110m."""
+
+    if resolution is None:
+        return BASEMAP_RESOLUTION.DEFAULT
+    if resolution not in BASEMAP_RESOLUTIONS:
         raise ValueError(
-            "Pass either basemap `features` or `geometry`: the geometry "
-            "replaces the bundled outlines."
+            f"Invalid basemap `resolution` {resolution!r}. "
+            f"Must be one of {BASEMAP_RESOLUTIONS} or None."
         )
+    return resolution
 
 
 def validate_basemap_features(features) -> tuple:

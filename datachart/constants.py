@@ -78,6 +78,7 @@ Classes:
     NETWORK_LABEL_POSITION:     The supported network node label positions.
     SCATTER_MATRIX_DIAGONAL: The supported scatter matrix diagonal cells.
     BASEMAP_FEATURE:         The supported basemap features.
+    BASEMAP_RESOLUTION:      The supported basemap outline resolutions.
 
 """
 
@@ -1016,6 +1017,38 @@ class BASEMAP_FEATURE:
     LAND = "land"
     BORDERS = "borders"
     LAKES = "lakes"
+
+
+class BASEMAP_RESOLUTION:
+    """The supported basemap outline resolutions.
+
+    Passed as the `resolution` of the basemap chart: the Natural Earth scale
+    the outlines are drawn at. The coarsest ships with the package; the finer
+    ones are downloaded the first time they are asked for and kept in a
+    local cache, so they need the network once. The cache folder is
+    `DATACHART_CACHE_DIR` when that environment variable is set, else
+    `datachart` under `XDG_CACHE_HOME` or `~/.cache`.
+
+    Examples:
+        >>> from datachart.constants import BASEMAP_RESOLUTION
+        >>> BASEMAP_RESOLUTION.DEFAULT
+        "110m"
+
+    Attributes:
+        DEFAULT (str): The default resolution. Same as `BASEMAP_RESOLUTION.LOW`.
+        LOW (str): 1:110 million, bundled; a continent or a region. Equals to
+            `"110m"`.
+        MEDIUM (str): 1:50 million, about 5 MB on first use; a country.
+            Equals to `"50m"`.
+        HIGH (str): 1:10 million, about 28 MB on first use; a coast or a
+            city's surroundings. Equals to `"10m"`.
+
+    """
+
+    DEFAULT = "110m"
+    LOW = "110m"
+    MEDIUM = "50m"
+    HIGH = "10m"
 
 
 class STACKED_AREA_BASELINE:

@@ -1,8 +1,13 @@
 """Tests for the basemap chart: features, geometry, draw order, composition,
 and the geographic aspect every chart takes."""
 
+import io
+import json
 import math
+import os
+import tempfile
 import unittest
+from unittest import mock
 
 import numpy as np
 import matplotlib
@@ -14,9 +19,17 @@ from matplotlib.patches import PathPatch
 
 from datachart.charts import BasemapChart, HexbinChart, LineChart, ScatterChart
 from datachart.config import config
-from datachart.constants import ASPECT_RATIO, BASEMAP_FEATURE, DRAW_POSITION, THEME
+from datachart.constants import (
+    ASPECT_RATIO,
+    BASEMAP_FEATURE,
+    BASEMAP_RESOLUTION,
+    DRAW_POSITION,
+    THEME,
+)
 from datachart.utils import Grid, Panel
-from datachart.utils._internal.layers import DRAW_ZORDER, load_basemap
+from datachart.utils._internal import basemap
+from datachart.utils._internal.basemap import load_basemap
+from datachart.utils._internal.layers import DRAW_ZORDER
 
 # a square island with a square lake, and a line across it
 ISLAND = {
@@ -50,6 +63,77 @@ class TestBundledData(unittest.TestCase):
             self.assertTrue((np.abs(finite[:, 1]) <= 90).all())
             # several outlines, separated by NaN rows
             self.assertGreater(np.isnan(outlines[:, 0]).sum(), 1)
+
+
+# a GeoJSON coastline of two lines, standing in for a Natural Earth download
+COAST_JSON = json.dumps(
+    {
+        "type": "FeatureCollection",
+        "features": [
+            {"geometry": {"type": "LineString", "coordinates": [[0, 0], [1, 1]]}},
+            {
+                "geometry": {
+                    "type": "MultiLineString",
+                    "coordinates": [[[2, 2], [3, 3]], [[4, 4], [5, 5]]],
+                }
+            },
+        ],
+    }
+).encode()
+
+
+class TestDownloadedResolutions(unittest.TestCase):
+    def setUp(self):
+        self.folder = tempfile.TemporaryDirectory()
+        env = mock.patch.dict(os.environ, {"DATACHART_CACHE_DIR": self.folder.name})
+        env.start()
+        self.addCleanup(env.stop)
+        self.addCleanup(self.folder.cleanup)
+        load_basemap.cache_clear()
+        self.addCleanup(load_basemap.cache_clear)
+
+    def tearDown(self):
+        plt.close("all")
+
+    def urlopen(self, **kwargs):
+        return mock.patch.object(basemap.urllib.request, "urlopen", **kwargs)
+
+    def test_bundled_resolution_never_downloads(self):
+        with self.urlopen(side_effect=AssertionError("network")):
+            load_basemap("coastline", BASEMAP_RESOLUTION.LOW)
+            BasemapChart()
+
+    def test_finer_resolution_downloads_once_into_the_cache(self):
+        with self.urlopen(return_value=io.BytesIO(COAST_JSON)) as urlopen:
+            rows = load_basemap("coastline", BASEMAP_RESOLUTION.MEDIUM)
+        self.assertIn("ne_50m_coastline", urlopen.call_args[0][0])
+        self.assertEqual(np.isnan(rows[:, 0]).sum(), 2)
+        self.assertEqual(len(os.listdir(self.folder.name)), 1)
+
+        load_basemap.cache_clear()
+        with self.urlopen(side_effect=AssertionError("network")):
+            cached = load_basemap("coastline", BASEMAP_RESOLUTION.MEDIUM)
+        np.testing.assert_array_equal(cached, rows)
+
+    def test_front_takes_the_resolution(self):
+        with self.urlopen(return_value=io.BytesIO(COAST_JSON)) as urlopen:
+            figure = BasemapChart("coastline", resolution=BASEMAP_RESOLUTION.HIGH)
+        self.assertIn("ne_10m_coastline", urlopen.call_args[0][0])
+        self.assertEqual(figure.axes[0].get_xlim(), (0.0, 5.0))
+
+    def test_failed_download_raises_one_error(self):
+        with self.urlopen(side_effect=OSError("offline")):
+            with self.assertRaisesRegex(RuntimeError, "offline"):
+                BasemapChart("coastline", resolution=BASEMAP_RESOLUTION.MEDIUM)
+        self.assertEqual(os.listdir(self.folder.name), [])
+
+    def test_unknown_resolution_raises(self):
+        with self.assertRaisesRegex(ValueError, "resolution"):
+            BasemapChart(resolution="1m")
+
+    def test_resolution_with_geometry_raises(self):
+        with self.assertRaisesRegex(ValueError, "resolution"):
+            BasemapChart(geometry=ROAD, resolution=BASEMAP_RESOLUTION.MEDIUM)
 
 
 class TestBasemapFeatures(unittest.TestCase):

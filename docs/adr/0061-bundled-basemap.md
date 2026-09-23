@@ -32,10 +32,18 @@ smaller file.
   that converts the source shapefiles is committed beside the data, so the
   bundle is reproducible rather than a binary of unknown origin. The source
   license ships alongside it, as `OFL.txt` does for the fonts.
-- **One resolution, and an escape hatch.** 1:110m suits continental and
-  regional figures and is wrong for a city. Rather than bundle a second
-  resolution, `geometry=` accepts the caller's own longitude and latitude
-  outlines, which also covers a non-Earth map.
+- **One bundled resolution; the finer ones on request.** 1:110m suits
+  continental and regional figures and is wrong for a city. It is the
+  default and the only set that ships. `resolution=` (a `BASEMAP_RESOLUTION`)
+  asks for 1:50m or 1:10m, which are downloaded from the same pinned Natural
+  Earth release the first time they are used, converted to the bundled
+  format, and kept in a user cache (`DATACHART_CACHE_DIR`, else
+  `$XDG_CACHE_HOME/datachart`, else `~/.cache/datachart`). A failed download
+  raises one error naming the URL; nothing half-written stays in the cache.
+  The download is opt-in, so the default map keeps working offline, and the
+  docs never execute one, so the build never depends on the host.
+  `geometry=` still accepts the caller's own outlines, for a scale Natural
+  Earth does not have or a map that is not of the Earth.
 - **No projection, in this front or anywhere.** Longitude goes on x and
   latitude on y, drawn straight. Every chart in the package draws in data
   coordinates, so a projected basemap under unprojected marks would be a
@@ -72,11 +80,12 @@ smaller file.
 - **An optional `datachart[geo]` extra on cartopy.** Rejected: the `GeoAxes`
   model conflicts with `Panel`, and the system libraries are a real install
   burden for outlines.
-- **Fetch and cache Natural Earth on first use.** Rejected: offline
-  rendering breaks, and a docs build would depend on a third-party host.
-- **Bundle 1:50m as well.** Rejected for now: several megabytes for a
-  sharpness most figures at this package's scale do not use, and `geometry=`
-  covers the caller who needs it.
+- **Fetch and cache every resolution on first use, the default included.**
+  Rejected: offline rendering of the default map breaks, and a docs build
+  would depend on a third-party host. Fetching stays for the opt-in scales.
+- **Bundle 1:50m or 1:10m as well.** Rejected: 5 and 28 MB of source for a
+  sharpness most figures at this package's scale do not use; the caller who
+  needs it pays the download once.
 - **A projection parameter accepting Mercator and the conics.** Rejected: it
   is meaningless until every layer transforms, which is a far larger change
   than this issue asked for.

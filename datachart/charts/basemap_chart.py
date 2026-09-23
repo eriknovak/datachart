@@ -9,6 +9,7 @@ from ..typings import BasemapDataAttrs, BasemapStyleAttrs
 from ..constants import (
     ASPECT_RATIO,
     BASEMAP_FEATURE,
+    BASEMAP_RESOLUTION,
     DRAW_POSITION,
     FIG_SIZE,
     SHOW_GRID,
@@ -22,6 +23,7 @@ from ..constants import (
 def BasemapChart(
     features: Optional[Union[BASEMAP_FEATURE, str, List[str]]] = None,
     *,
+    resolution: Optional[Union[BASEMAP_RESOLUTION, str]] = None,
     geometry: Optional[Union[BasemapDataAttrs, List[BasemapDataAttrs]]] = None,
     position: Optional[Union[DRAW_POSITION, str]] = None,
     title: Optional[str] = None,
@@ -54,10 +56,11 @@ def BasemapChart(
     narrows each degree of longitude by the cosine of the middle latitude,
     so a region keeps its proportions.
 
-    The bundled outlines suit a continent or a region and are too coarse
-    for a city. `geometry` takes your own longitude and latitude outlines in
-    their place: a finer coastline, a country's provinces, or a map that is
-    not of the Earth.
+    The bundled outlines suit a continent or a region. `resolution` asks for
+    the finer Natural Earth scales, which are downloaded the first time they
+    are used and kept in a local cache. `geometry` takes your own longitude
+    and latitude outlines in their place: a country's provinces, a coast at
+    street scale, or a map that is not of the Earth.
 
     Examples:
         >>> from datachart.charts import BasemapChart, ScatterChart
@@ -80,9 +83,12 @@ def BasemapChart(
         features: The bundled features to draw: one name or a list of them,
             coastline and land by default. See
             [`BASEMAP_FEATURE`][datachart.constants.BASEMAP_FEATURE].
+        resolution: The Natural Earth scale: `"110m"` (default) ships with the
+            package, `"50m"` and `"10m"` are downloaded once on first use. See
+            [`BASEMAP_RESOLUTION`][datachart.constants.BASEMAP_RESOLUTION].
         geometry: Your own outlines, drawn in place of the bundled ones: a
             `{"lon", "lat", "feature"}` dict, or a list of them. Cannot be
-            combined with `features`. See
+            combined with `features` or `resolution`. See
             [`BasemapDataAttrs`][datachart.typings.BasemapDataAttrs].
         position: Where the map sits in the draw order: `"below"` (default)
             under the gridlines and every mark, or `"above"` over the marks and
@@ -110,16 +116,19 @@ def BasemapChart(
         The figure containing the basemap chart.
 
     Raises:
-        ValueError: If a feature is not a `BASEMAP_FEATURE`, `geometry` is not
-            outlines of matching longitudes and latitudes, both `features` and
-            `geometry` are given, `position` is not a `DRAW_POSITION`, or a
-            geographic aspect meets a y-axis outside -90 to 90.
+        ValueError: If a feature is not a `BASEMAP_FEATURE`, `resolution` is not
+            a `BASEMAP_RESOLUTION`, `geometry` is not outlines of matching
+            longitudes and latitudes or comes with `features` or `resolution`,
+            `position` is not a `DRAW_POSITION`, or a geographic aspect meets a
+            y-axis outside -90 to 90.
+        RuntimeError: If a finer resolution is not cached and cannot be
+            downloaded.
 
     """
     validate_draw_position(position)
 
     charts = build_charts_structure(
-        {"features": features, "geometry": geometry},
+        {"features": features, "resolution": resolution, "geometry": geometry},
         style=style,
         is_2d_data=True,
     )

@@ -8,12 +8,10 @@ histogram bins, axis scales and limits, grid, legend assembly, and twin-axis
 frozen DrawContext with its per-layer instructions.
 """
 
-import functools
 import hashlib
 from contextlib import contextmanager
 import json
 import math
-import os
 import warnings
 from collections import defaultdict
 from datetime import date, datetime, time, timedelta, tzinfo
@@ -64,6 +62,7 @@ from matplotlib.legend_handler import (
     HandlerPolyCollection,
 )
 
+from .basemap import load_basemap
 from .colors import (
     create_color_cycle,
     create_colormap,
@@ -101,6 +100,7 @@ from .validate import (
     BASEMAP_FILLED,
     validate_basemap_features,
     validate_basemap_geometry,
+    validate_basemap_resolution,
     validate_basemap_source,
     validate_geographic_latitudes,
     validate_image,
@@ -1295,25 +1295,6 @@ def draw_zorder_key(position: str) -> str:
     """An image's or basemap's key in a Panel overlay's zorder table."""
 
     return f"draw_{position}"
-
-
-# the Natural Earth 1:110m outlines bundled with the package (ADR 0061)
-BASEMAP_FILE = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)),
-    os.pardir,
-    os.pardir,
-    "charts",
-    "_basemap",
-    "natural_earth_110m.npz",
-)
-
-
-@functools.lru_cache(maxsize=None)
-def load_basemap(feature: str) -> np.ndarray:
-    """One bundled feature as `(n, 2)` lon/lat rows, `NaN` between outlines."""
-
-    with np.load(BASEMAP_FILE) as bundle:
-        return bundle[feature].astype(float)
 
 
 def _split_outlines(rows: np.ndarray) -> List[np.ndarray]:
@@ -7528,10 +7509,11 @@ class BasemapLayer(DrawPositionLayer):
     def _resolve_style(self):
         data = self.chart.get("data") or {}
         geometry = data.get("geometry")
-        validate_basemap_source(data.get("features"), geometry)
+        validate_basemap_source(data.get("features"), geometry, data.get("resolution"))
         if geometry is None:
             features = validate_basemap_features(data.get("features"))
-            outlines = [(f, load_basemap(f)) for f in features]
+            resolution = validate_basemap_resolution(data.get("resolution"))
+            outlines = [(f, load_basemap(f, resolution)) for f in features]
         else:
             outlines = validate_basemap_geometry(geometry)
         # bottom up, the caller's order kept within one feature
