@@ -59,16 +59,23 @@ bundle collapses it to one rule.
   `plot_basemap_river_*` and `plot_basemap_road_*` styles resolving to the
   same muted furniture greys the rest of the basemap uses. Neither joins
   `BASEMAP_FEATURE.DEFAULT`.
-- **A feature is offered per resolution, and asking outside that raises.**
-  Rivers are offered at 1:50m and 1:10m, roads at 1:10m alone. Anything else
-  raises one `ValueError` naming the resolutions that do carry the feature.
-  The two exclusions are not the same kind of fact and the messages say so:
-  Natural Earth publishes no `roads` layer below 1:10m, while 1:110m rivers
-  exist and are 38 KB — they are refused because at that scale a river is a
-  few strokes across a continent, which is 0061's legibility judgement and
-  not an availability one. Recording the difference matters, because the day
-  someone disagrees about legibility it should be clear that only taste
-  stands in the way.
+- **A feature is offered wherever Natural Earth has it, and nowhere else.**
+  Rivers are offered at all three scales; roads at 1:10m alone, because
+  Natural Earth publishes no `roads` layer below it. Asking for a feature at
+  a scale without it raises one `ValueError` naming the scales that do carry
+  it. Availability is the only gate: the error never means "we think this
+  would look bad".
+
+  This drops 0061's exclusion of 1:110m rivers, which was a legibility
+  judgement rather than an availability fact — the layer exists and is 38 KB.
+  A river at 1:110m is a few strokes across a continent and will not suit
+  most figures, but that is the caller's call to make on their own map, and
+  the cost of letting them make it is a docstring sentence rather than a
+  refusal. Gating a feature the data supports, on taste, is the kind of
+  restriction a library earns nothing by keeping: it cannot be worked around
+  except by leaving the front, and it leaves the caller arguing with their
+  tools. The legibility caveat is documented where it helps and enforced
+  nowhere.
 - **The fonts stay, and name the principle's next application.** The five OFL
   faces are 684 KB against the outlines' 164 KB, so the wheel is not empty
   until they go too. They are held back only because registration currently
@@ -88,9 +95,9 @@ bundle collapses it to one rule.
   path but the data still ships. Rejected: it buys the code simplification
   and none of the principle, and leaves the wheel carrying a dataset under a
   different name.
-- **Bundle 1:110m rivers too**, now that the 38 KB is known to be small.
-  Rejected on 0061's own legibility grounds, which nothing here disturbs, and
-  moot once nothing is bundled.
+- **Keep 0061's refusal of 1:110m rivers** on legibility grounds. Rejected:
+  see above — a gate the data does not require is one the caller cannot route
+  around, and a coarse river is a worse figure, not a broken one.
 - **Defer roads to its own issue** on the strength of the 50 MB and Natural
   Earth's thin coverage outside North America and Europe. Rejected: the
   coverage caveat belongs in the docstring, and splitting a two-layer change
