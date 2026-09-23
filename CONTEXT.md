@@ -63,10 +63,10 @@ _Avoid_: polar mode, chart geometry
 
 **Radial visual**:
 The mark family a `RadialChart` draws — line, bar, scatter, or histogram —
-selected by its `type` parameter for the whole figure. The one figure-level
+selected by its `mark` parameter for the whole figure. The one figure-level
 visual switch in the package; mixing visuals in one radial panel is `Panel`'s
 job.
-_Avoid_: radial chart type (for the parameter), sub-chart
+_Avoid_: radial chart type, type (for the parameter), sub-chart
 
 **Bar slot**:
 A bar layer's assigned lane within a category's group of bars. Slots divide the
@@ -212,8 +212,9 @@ _Avoid_: scale (for this), spacing, height
 Whether ridges share one density scale (`RIDGELINE_SCALE.COMMON`: the
 tallest ridge reaches the peak height, the rest in proportion) or each is
 scaled to the same peak (`PER_ROW`, the default: shapes compare). Passed
-as `normalize`; distinct from the heatmap's `NORMALIZE` colormap norm.
-_Avoid_: normalization (for the concept), common scale (for the enum)
+as `ridge_scale`; distinct from the heatmap's `NORMALIZE` colormap norm.
+_Avoid_: normalization, normalize (for the parameter), common scale (for
+the enum)
 
 **Reference line**:
 A straight line drawn against the data as a marker, not a series — a threshold,
@@ -743,8 +744,22 @@ _Avoid_: edge threshold, min marker size
 The number a chart prints beside a mark it has already drawn, turned on with
 `show_values` and rendered through `value_format`. It is derived from the
 data, unlike a text annotation, which the caller writes and positions. A
-distribution chart's value label is its median.
+distribution chart's value label is its median. `show_values` only says
+whether; a front with more than one candidate number (the gantt's duration
+or end, the dumbbell's endpoints or delta) picks which through `value_kind`.
 _Avoid_: data label, annotation, callout
+
+**Shared parameter**:
+A front parameter that means the same thing on every front that has it —
+`show_values`, `value_format`, `orientation`, `figsize`, `texts`, the
+colormap `norm` and `vcenter`, and their peers. It carries one name, one
+type and one signature default everywhere; a front that needs its own
+default (the dumbbell's horizontal orientation) supplies it behind the
+signature, never in it. A parameter that selects something only one front
+has — the network's `layout`, the swarm's `mode`, the scatter matrix's
+`diagonal`, the bump's `rank_by`, the radial's `mark` — is not shared and
+keeps its own noun.
+_Avoid_: common parameter, variant (for the per-front selectors)
 
 **Theme-level default**:
 A nullable theme attribute that supplies the default for a per-chart setting

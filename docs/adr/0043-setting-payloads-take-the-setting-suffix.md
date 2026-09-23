@@ -1,5 +1,6 @@
 ---
 status: accepted
+amended-by: [0067]
 ---
 
 # Every setting payload takes the `*SettingAttrs` suffix, old names warn for one release
