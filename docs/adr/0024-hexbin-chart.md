@@ -1,5 +1,6 @@
 ---
 status: accepted
+amended-by: [0035]
 ---
 
 # HexbinChart bins dense scatter data into colormapped hexagons

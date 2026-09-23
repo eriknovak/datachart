@@ -56,6 +56,13 @@ ADRs are internal records: never reference them in docstrings or anything else
 mkdocs renders (`docs/adr/` and `docs/agents/` are excluded from the site via
 `exclude_docs`). Citing ADRs in code comments is fine — comments never render.
 
+A new ADR is added to `docs/adr/README.md` under its subsystem. When it changes
+a commitment an earlier ADR made, that earlier file gets `amended-by: [NNNN]`
+in its frontmatter and the index line says so; a whole-record reversal instead
+sets the earlier file's `status: superseded by ADR NNNN` (ADR 0064). Citations
+never move — an ADR keeps its number for good. `test/test_adr_index.py` fails
+if the index or the frontmatter drifts.
+
 ### Building and Publishing
 ```bash
 # Install package in development mode

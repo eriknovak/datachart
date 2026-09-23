@@ -1,5 +1,6 @@
 ---
 status: accepted
+amended-by: [0007]
 ---
 
 # Grid figures nest inside Grid via a recursive cell-tree transport

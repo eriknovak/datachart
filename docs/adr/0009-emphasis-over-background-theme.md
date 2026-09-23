@@ -1,5 +1,6 @@
 ---
 status: accepted
+amended-by: [0042]
 ---
 
 # Emphasis replaces the background theme; themes are named for their look

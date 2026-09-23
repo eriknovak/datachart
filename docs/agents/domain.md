@@ -6,7 +6,9 @@ How the engineering skills should consume this repo's domain documentation when 
 
 - **`CONTEXT.md`** at the repo root, or
 - **`CONTEXT-MAP.md`** at the repo root if it exists — it points at one `CONTEXT.md` per context. Read each one relevant to the topic.
-- **`docs/adr/`** — read ADRs that touch the area you're about to work in. In multi-context repos, also check `src/<context>/docs/adr/` for context-scoped decisions.
+- **`docs/adr/`** — read ADRs that touch the area you're about to work in. `docs/adr/README.md` indexes them by subsystem; start there to find every record on one area. In multi-context repos, also check `src/<context>/docs/adr/` for context-scoped decisions.
+
+An ADR whose frontmatter carries `amended-by: [NNNN]` still governs, but a later record changed part of it — read both. `status: superseded by ADR NNNN` means read the successor instead.
 
 If any of these files don't exist, **proceed silently**. Don't flag their absence; don't suggest creating them upfront. The `/dev-tools:domain-modeling` skill (reached via `/dev-tools:grill-with-docs` and `/dev-tools:improve-codebase-architecture`) creates them lazily when terms or decisions actually get resolved.
 
@@ -49,3 +51,5 @@ If the concept you need isn't in the glossary yet, that's a signal — either yo
 If your output contradicts an existing ADR, surface it explicitly rather than silently overriding:
 
 > _Contradicts ADR-0007 (event-sourced orders) — but worth reopening because…_
+
+When a new ADR does change an earlier one's commitment, tag the earlier file with `amended-by: [NNNN]` and add the new one to `docs/adr/README.md` (ADR 0064). Never renumber or delete an ADR to resolve a contradiction — its number is cited from code comments, issues, and merged PRs.

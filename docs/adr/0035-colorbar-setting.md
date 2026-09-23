@@ -1,5 +1,6 @@
 ---
 status: accepted
+amended-by: [0043]
 ---
 
 # The colorbar is a per-figure setting located by edge, and its type takes the setting suffix
