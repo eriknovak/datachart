@@ -368,6 +368,9 @@ BASE_THEME: StyleAttrs = {
     # plot basemap style; muted greys, the map is furniture (ADR 0061)
     "plot_basemap_land_color": "#EDEDED",
     "plot_basemap_highlight_color": "#C8C8C8",
+    # the outline of the highlighted countries; a width of 0 draws none
+    "plot_basemap_highlight_edge_color": "#1A1A1A",
+    "plot_basemap_highlight_edge_width": 0,
     "plot_basemap_coastline_color": "#A6A6A6",
     "plot_basemap_coastline_width": 0.6,
     "plot_basemap_border_color": "#BDBDBD",

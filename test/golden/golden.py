@@ -3778,7 +3778,8 @@ def basemap_countries_highlight():
     return BasemapChart(
         [BASEMAP_FEATURE.COUNTRIES, BASEMAP_FEATURE.BORDERS],
         highlight=["SVN", "AUT", "HRV", "HUN", "ITA"],
-        title="Five countries picked out",
+        style={"plot_basemap_highlight_edge_width": 1.2},
+        title="Five countries picked out and outlined",
         xmin=5,
         xmax=25,
         ymin=40,

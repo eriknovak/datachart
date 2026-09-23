@@ -73,6 +73,7 @@ DARK_THEME: StyleAttrs = make_theme(
         # the land a step above the face, its outlines a step above the land
         "plot_basemap_land_color": "#262B33",
         "plot_basemap_highlight_color": "#434B57",
+        "plot_basemap_highlight_edge_color": TEXT,
         "plot_basemap_coastline_color": "#59626E",
         "plot_basemap_border_color": EDGE,
         "plot_scatter_edge_color": PAGE,

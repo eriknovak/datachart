@@ -1241,7 +1241,7 @@ def get_basemap_style(chart_style: dict) -> dict:
     Returns:
         The style of each feature: a line feature keyed as `LineCollection`
         takes it, a filled one as `PathPatch` does; the countries add the
-        `highlight` face.
+        `highlight` face and its outline's `edge_color` and `edge_width`.
 
     """
 
@@ -1259,6 +1259,8 @@ def get_basemap_style(chart_style: dict) -> dict:
         "countries": [
             ("facecolor", "plot_basemap_land_color"),
             ("highlight", "plot_basemap_highlight_color"),
+            ("edge_color", "plot_basemap_highlight_edge_color"),
+            ("edge_width", "plot_basemap_highlight_edge_width"),
         ],
         "lakes": [("facecolor", "plot_basemap_lake_color")],
     }

@@ -875,6 +875,8 @@ class BasemapStyleAttrs(TypedDict):
     Attributes:
         plot_basemap_land_color (Union[str, None]): The fill color of the land, and of the countries `highlight` leaves out.
         plot_basemap_highlight_color (Union[str, None]): The fill color of the countries `highlight` picks out.
+        plot_basemap_highlight_edge_color (Union[str, None]): The color of the outline around the countries `highlight` picks out, coast included.
+        plot_basemap_highlight_edge_width (Union[float, None]): The width of that outline, in points; 0 (default) draws none.
         plot_basemap_coastline_color (Union[str, None]): The color of the coastlines.
         plot_basemap_coastline_width (Union[float, None]): The width of the coastlines, in points.
         plot_basemap_border_color (Union[str, None]): The color of the borders between countries.
@@ -886,6 +888,8 @@ class BasemapStyleAttrs(TypedDict):
 
     plot_basemap_land_color: Union[str, None]
     plot_basemap_highlight_color: Union[str, None]
+    plot_basemap_highlight_edge_color: Union[str, None]
+    plot_basemap_highlight_edge_width: Union[float, None]
     plot_basemap_coastline_color: Union[str, None]
     plot_basemap_coastline_width: Union[float, None]
     plot_basemap_border_color: Union[str, None]

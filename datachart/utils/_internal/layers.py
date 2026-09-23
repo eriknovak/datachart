@@ -7550,8 +7550,11 @@ class BasemapLayer(DrawPositionLayer):
                 "ADM0_A3 code. A finer `resolution` may draw it."
             )
 
-    def _draw_countries(self, ax, rows, z_order) -> None:
-        """One patch per country, so an enclave keeps its own fill."""
+    def _draw_countries(self, ax, rows, z_order) -> list:
+        """One patch per country, so an enclave keeps its own fill.
+
+        Returns the paths of the highlighted countries, for their outline.
+        """
 
         style = self.feature_style[BASEMAP_FEATURE.COUNTRIES]
         rings = defaultdict(list)
@@ -7562,13 +7565,17 @@ class BasemapLayer(DrawPositionLayer):
             style["highlight"] if code in self.highlight else style["facecolor"]
             for code in codes
         ]
-        patches = [PathPatch(_filled_path(rings[code])) for code in codes]
+        paths = [_filled_path(rings[code]) for code in codes]
         ax.add_collection(
             PatchCollection(
-                patches, facecolors=faces, edgecolors="none", zorder=z_order
+                [PathPatch(path) for path in paths],
+                facecolors=faces,
+                edgecolors="none",
+                zorder=z_order,
             ),
             autolim=False,
         )
+        return [path for code, path in zip(codes, paths) if code in self.highlight]
 
     def bounds(self) -> tuple:
         """The `(xmin, xmax, ymin, ymax)` the outlines span."""
@@ -7580,9 +7587,10 @@ class BasemapLayer(DrawPositionLayer):
 
     def draw(self, ax, ctx):
         z_order = self.rung(ctx)
+        highlighted = []
         for feature, rows in self.outlines:
             if feature == BASEMAP_FEATURE.COUNTRIES:
-                self._draw_countries(ax, rows, z_order)
+                highlighted = self._draw_countries(ax, rows, z_order)
                 continue
             outlines = _split_outlines(rows)
             style = self.feature_style[feature]
@@ -7601,6 +7609,19 @@ class BasemapLayer(DrawPositionLayer):
                 ax.add_collection(
                     LineCollection(outlines, zorder=z_order, **style), autolim=False
                 )
+        edge = self.feature_style[BASEMAP_FEATURE.COUNTRIES]
+        if highlighted and edge.get("edge_width"):
+            # added last, so the borders and the coastline never cross it
+            ax.add_collection(
+                PatchCollection(
+                    [PathPatch(path) for path in highlighted],
+                    facecolors="none",
+                    edgecolors=edge["edge_color"],
+                    linewidths=edge["edge_width"],
+                    zorder=z_order,
+                ),
+                autolim=False,
+            )
 
 
 class ParallelCoordsLayer(Layer):

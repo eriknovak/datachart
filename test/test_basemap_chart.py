@@ -149,6 +149,35 @@ class TestCountries(unittest.TestCase):
         ):
             np.testing.assert_allclose(pixel(figure, lon, lat), color, atol=0.03)
 
+    def test_highlight_edge_is_off_by_default(self):
+        figure = BasemapChart("countries", highlight=["SVN"])
+        collections = [
+            c for c in figure.axes[0].collections if isinstance(c, PatchCollection)
+        ]
+        self.assertEqual(len(collections), 1)
+
+    def test_highlight_edge_outlines_the_picked_countries_on_top(self):
+        figure = BasemapChart(
+            [BASEMAP_FEATURE.COUNTRIES, BASEMAP_FEATURE.BORDERS],
+            highlight=["SVN", "AUT", "MLT"],
+            style={
+                "plot_basemap_highlight_edge_color": "#000000",
+                "plot_basemap_highlight_edge_width": 1.5,
+            },
+        )
+        ax = figure.axes[0]
+        fills_, edges = [c for c in ax.collections if isinstance(c, PatchCollection)]
+        # Malta is not drawn at 1:110m, so two outlines
+        self.assertEqual(len(edges.get_paths()), 2)
+        self.assertEqual(len(edges.get_facecolors()), 0)
+        np.testing.assert_allclose(edges.get_edgecolors()[0], (0, 0, 0, 1))
+        self.assertEqual(edges.get_linewidths()[0], 1.5)
+        # drawn after the borders, so the grey lines never cross it
+        self.assertGreater(
+            ax.collections.index(edges),
+            ax.collections.index(lines(figure)[0]),
+        )
+
     def test_an_enclave_is_not_cancelled_by_its_host(self):
         figure = BasemapChart(
             "countries", highlight="LSO", xmin=24, xmax=32, ymin=-32, ymax=-26
