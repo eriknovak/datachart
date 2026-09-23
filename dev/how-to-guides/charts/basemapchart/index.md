@@ -1,6 +1,6 @@
 # Basemap Chart
 
-A basemap chart draws the land under a chart whose x and y are longitude and latitude: coastlines, a land fill, the borders between countries and the large lakes. The outlines are the [Natural Earth](https://www.naturalearthdata.com) 1:110m set (public domain), and they ship with the package, so a map needs no download, no extra dependency and no picture made somewhere else. On its own it is a map with axes; its use is underneath another chart, so that the marks sit on the coast they describe: epicentres, weather stations, a ship's track. This guide shows how to create basemap charts with the [datachart.charts.BasemapChart](https://eriknovak.github.io/datachart/dev/references/charts/basemapchart/#datachart.charts.BasemapChart) function and how to compose them with other charts, starting with the basics and building up to worked examples on real data.
+A basemap chart draws the land under a chart whose x and y are longitude and latitude: coastlines, a land fill, the borders between countries, the large lakes, the rivers and the main roads. The outlines are [Natural Earth](https://www.naturalearthdata.com)'s (public domain), downloaded the first time a map draws them and kept in a local cache, so a map needs the network once, no extra dependency and no picture made somewhere else. On its own it is a map with axes; its use is underneath another chart, so that the marks sit on the coast they describe: epicentres, weather stations, a ship's track. This guide shows how to create basemap charts with the [datachart.charts.BasemapChart](https://eriknovak.github.io/datachart/dev/references/charts/basemapchart/#datachart.charts.BasemapChart) function and how to compose them with other charts, starting with the basics and building up to worked examples on real data.
 
 Looking for a specific customization? Jump straight to the [quick reference](#customizing-the-basemap-chart), which maps common tasks to the parameter or style attribute that does the job.
 
@@ -32,6 +32,7 @@ Every customization is either a keyword argument of `BasemapChart` or a `plot_ba
 | I want to…                                | Use                                                | See                                                                                               |
 | ----------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
 | choose coastlines, land, borders or lakes | `features`                                         | [Features](#features)                                                                             |
+| draw rivers or roads                      | `features=RIVERS`, `features=ROADS`, `resolution`  | [Rivers and roads](#rivers-and-roads)                                                             |
 | add a title and axis labels               | `title`, `xlabel`, `ylabel`                        | [Title, axis labels and limits](#title-axis-labels-and-limits)                                    |
 | show one region                           | `xmin`, `xmax`, `ymin`, `ymax`                     | [Title, axis labels and limits](#title-axis-labels-and-limits)                                    |
 | keep the region at its true proportions   | `aspect_ratio="geographic"`                        | [Geographic aspect](#geographic-aspect)                                                           |
@@ -44,11 +45,22 @@ Every customization is either a keyword argument of `BasemapChart` or a `plot_ba
 | put the map under or over other charts    | `position`, `Panel`                                | [Composing with Panel](#composing-with-panel)                                                     |
 | save the chart as an image                | `save_figure`                                      | [Saving figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md) |
 
+The parameters that accept a constant, with the class in [datachart.constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md) that lists its values:
+
+| Parameter      | Constant                                                                                                                       |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `features`     | [`BASEMAP_FEATURE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BASEMAP_FEATURE)       |
+| `resolution`   | [`BASEMAP_RESOLUTION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BASEMAP_RESOLUTION) |
+| `position`     | [`DRAW_POSITION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DRAW_POSITION)           |
+| `figsize`      | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                     |
+| `show_grid`    | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                   |
+| `aspect_ratio` | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)             |
+
 The outline keys of `geometry` are listed in [BasemapDataAttrs](https://eriknovak.github.io/datachart/dev/references/charts/basemapchart/#datachart.typings.BasemapDataAttrs), the style attributes in [BasemapStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/basemapchart/#datachart.typings.BasemapStyleAttrs).
 
 ### Features
 
-A map should carry only what the reader needs to find their way, and which outlines those are depends on the question. `features` takes one [BASEMAP_FEATURE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BASEMAP_FEATURE) member or a list of them: `COASTLINE` and `LAND` by default, `BORDERS` for the lines between countries, and `LAKES` for the large lakes, filled with the axes background so they read as water. The ocean is not a feature: it is the background the land sits on. Below, Europe with its land, borders and lakes: the lakes of Russia and Finland and the Caspian read as the sea does.
+A map should carry only what the reader needs to find their way, and which outlines those are depends on the question. `features` takes one [BASEMAP_FEATURE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BASEMAP_FEATURE) member or a list of them: `COASTLINE` and `LAND` by default, `BORDERS` for the lines between countries, `LAKES` for the large lakes, filled with the axes background so they read as water, and `RIVERS` and `ROADS`, which have [a subsection of their own](#rivers-and-roads). The ocean is not a feature: it is the background the land sits on. Below, Europe with its land, borders and lakes: the lakes of Russia and Finland and the Caspian read as the sea does.
 
 ```
 from datachart.constants import BASEMAP_FEATURE
@@ -117,7 +129,7 @@ BasemapChart(
 
 ### Colors and lines
 
-The map is furniture, not data, so the theme draws it in muted greys that stay behind whatever is composed over it. When a figure needs another look, the `plot_basemap_*` style attributes set it: `plot_basemap_land_color`, `plot_basemap_coastline_color` and `plot_basemap_coastline_width`, `plot_basemap_border_color`, `plot_basemap_border_width` and `plot_basemap_border_style`, and `plot_basemap_lake_color`. Below, a sand-colored land with blue-grey water lines and dashed borders.
+The map is furniture, not data, so the theme draws it in muted greys that stay behind whatever is composed over it. When a figure needs another look, the `plot_basemap_*` style attributes set it: `plot_basemap_land_color`, `plot_basemap_coastline_color` and `plot_basemap_coastline_width`, `plot_basemap_border_color`, `plot_basemap_border_width` and `plot_basemap_border_style`, `plot_basemap_lake_color`, and the color and width of the rivers and the roads, `plot_basemap_river_*` and `plot_basemap_road_*`. Below, a sand-colored land with blue-grey water lines and dashed borders.
 
 ```
 BasemapChart(
@@ -169,7 +181,7 @@ A country too small for the chosen scale is not drawn, so its code draws nothing
 
 ### Resolution
 
-The bundled outlines are Natural Earth's 1:110 million scale: right for a continent or a region, visibly angular once a figure zooms into a single country. `resolution` takes a [BASEMAP_RESOLUTION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BASEMAP_RESOLUTION) member. `LOW`, the default, is the bundled set. `MEDIUM` (1:50 million) and `HIGH` (1:10 million) are too large to ship, so the first figure that asks for one downloads it from the same Natural Earth release, about 5 MB and 28 MB, and keeps it in a local cache; every later figure reads the cache and needs no network. The cache folder is the `DATACHART_CACHE_DIR` environment variable when it is set, else `datachart` under `XDG_CACHE_HOME` or `~/.cache`. This guide does not run the example below, so that building it never depends on the download:
+The default outlines are Natural Earth's 1:110 million scale: right for a continent or a region, visibly angular once a figure zooms into a single country. `resolution` takes a [BASEMAP_RESOLUTION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BASEMAP_RESOLUTION) member: `LOW` (1:110 million), the default, `MEDIUM` (1:50 million) and `HIGH` (1:10 million). Nothing ships with the package: the first figure that asks for a feature at a scale downloads it from a pinned Natural Earth release, under 1 MB at `LOW`, about 5 MB at `MEDIUM` and 28 MB at `HIGH`, and keeps it in a local cache; every later figure reads the cache and needs no network. The cache folder is the `DATACHART_CACHE_DIR` environment variable when it is set, else `datachart` under `XDG_CACHE_HOME` or `~/.cache`. Below, Slovenia's coast and borders at 1:50 million.
 
 ```
 from datachart.constants import BASEMAP_RESOLUTION
@@ -186,11 +198,48 @@ BasemapChart(
 ).show()
 ```
 
-Without the network, a resolution that is not cached yet raises an error that names the file it tried to fetch; the default outlines keep working offline.
+Without the network, a feature that is not cached yet raises an error that names the file it tried to fetch, and leaves no half-written file behind. A machine that never has the network, or a CI job that should not depend on it, works from a warm cache: render the maps once where the network is, or run `python datachart/charts/_basemap/prewarm.py 110m 50m` from a clone of the repository, and copy the cache folder over.
+
+### Rivers and roads
+
+A map of one country usually wants the lines people find their way by. `BASEMAP_FEATURE.RIVERS` draws the rivers, and the centerlines of the lakes they run through, in a muted blue-grey; `BASEMAP_FEATURE.ROADS` draws the main roads in a warm grey. Both are lines, drawn over the land and the lakes and under the borders and the coastline, and neither is in the default features. Rivers exist at every scale, but at 1:110 million only the largest are drawn, as a few strokes across a continent, so a country wants `MEDIUM` or finer. Below, the rivers of central Europe at 1:50 million.
+
+```
+BasemapChart(
+    [BASEMAP_FEATURE.LAND, BASEMAP_FEATURE.RIVERS, BASEMAP_FEATURE.BORDERS],
+    resolution=BASEMAP_RESOLUTION.MEDIUM,
+    # from the Rhine to the Carpathians
+    xmin=2,
+    xmax=30,
+    ymin=42,
+    ymax=56,
+    aspect_ratio=ASPECT_RATIO.GEOGRAPHIC,
+).show()
+```
+
+Natural Earth publishes the roads at 1:10 million alone, so `ROADS` at a coarser scale raises an error naming the scale that has them. The layer is about 50 MB on first use, and it maps North America and Europe in more detail than the rest of the world. This guide does not run the example below, so that building it never waits for that download:
+
+```
+BasemapChart(
+    [
+        BASEMAP_FEATURE.LAND,
+        BASEMAP_FEATURE.RIVERS,
+        BASEMAP_FEATURE.ROADS,
+        BASEMAP_FEATURE.BORDERS,
+    ],
+    # Slovenia's roads and rivers at 1:10 million, the only scale with roads
+    resolution=BASEMAP_RESOLUTION.HIGH,
+    xmin=13,
+    xmax=16.8,
+    ymin=45.3,
+    ymax=47,
+    aspect_ratio=ASPECT_RATIO.GEOGRAPHIC,
+).show()
+```
 
 ### Your own outlines
 
-Some maps need a scale Natural Earth does not have, and some are not of the Earth at all. `geometry` takes your own outlines in place of the bundled ones: a `{"lon", "lat", "feature"}` dictionary, or a list of them. `lon` and `lat` run along one outline after another, with a `NaN` between two outlines, and `feature` says how they are drawn: `"coastline"` and `"borders"` as lines, `"land"` and `"lakes"` as filled areas, each in its own style. A ring inside a filled area that runs the other way round is a hole. The site plan below is illustrative, in metres rather than degrees: the building is land, its courtyard a hole, and the paths are drawn as borders.
+Some maps need a scale Natural Earth does not have, and some are not of the Earth at all. `geometry` takes your own outlines in place of Natural Earth's: a `{"lon", "lat", "feature"}` dictionary, or a list of them. `lon` and `lat` run along one outline after another, with a `NaN` between two outlines, and `feature` says how they are drawn: `"coastline"`, `"borders"`, `"rivers"` and `"roads"` as lines, `"land"` and `"lakes"` as filled areas, each in its own style. A ring inside a filled area that runs the other way round is a hole. The site plan below is illustrative, in metres rather than degrees: the building is land, its courtyard a hole, and the paths are drawn as borders.
 
 ```
 nan = float("nan")
@@ -302,7 +351,7 @@ Panel(
 
 ### How far apart are the capitals of the European Union? (highlighted countries, point labels, geographic aspect)
 
-A map of the member states' capitals shows at a glance how far the Union reaches: from Lisbon to Nicosia, and from Valletta to Helsinki. The coordinates are those of the 27 capital cities, rounded to a tenth of a degree. The member states are picked out with `highlight`, so the Union's outline reads against its neighbours, and each point carries its city's name. Malta is too small for the bundled outlines, so its code is left out of the list; its capital still gets its point.
+A map of the member states' capitals shows at a glance how far the Union reaches: from Lisbon to Nicosia, and from Valletta to Helsinki. The coordinates are those of the 27 capital cities, rounded to a tenth of a degree. The member states are picked out with `highlight`, so the Union's outline reads against its neighbours, and each point carries its city's name. Malta is too small for the 1:110m outlines, so its code is left out of the list; its capital still gets its point.
 
 ```
 # (city, latitude, longitude), rounded to a tenth of a degree

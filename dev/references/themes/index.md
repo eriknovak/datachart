@@ -270,6 +270,8 @@ DARK_THEME: StyleAttrs = make_theme(
         "plot_basemap_highlight_edge_color": TEXT,
         "plot_basemap_coastline_color": "#59626E",
         "plot_basemap_border_color": EDGE,
+        "plot_basemap_river_color": "#4B6178",
+        "plot_basemap_road_color": "#5E5850",
         "plot_scatter_edge_color": PAGE,
         "plot_swarm_edge_color": PAGE,
         "plot_gantt_dependency_color": DIM,

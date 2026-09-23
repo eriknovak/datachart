@@ -13853,9 +13853,11 @@ group. Equals to <code>"kde"</code>.</p>
 
 
         <p>The supported basemap features.</p>
-<p>Passed as the <code>features</code> of the basemap chart: which of the bundled
-Natural Earth 1:110m outlines are drawn. The ocean is not a feature; it
-is the axes background the land sits on.</p>
+<p>Passed as the <code>features</code> of the basemap chart: which of the Natural
+Earth outlines are drawn. The ocean is not a feature; it is the axes
+background the land sits on. Every feature is drawn at every
+<code>BASEMAP_RESOLUTION</code> except the roads, which Natural Earth publishes at
+1:10 million alone.</p>
 <p><img alt="BASEMAP_FEATURE at a glance" src="../../assets/imgs/const-basemap-feature.svg" width="100%" /></p>
 
 
@@ -13963,6 +13965,39 @@ Equals to <code>"lakes"</code>.</p>
               </p>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.BASEMAP_FEATURE.RIVERS">RIVERS</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The rivers and the centerlines of the lakes they run
+through, as lines. At 1:110 million only the largest are a few
+strokes across a continent; a country wants a finer scale. Equals
+to <code>"rivers"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.BASEMAP_FEATURE.ROADS">ROADS</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The main roads, as lines; 1:10 million only, about 50 MB
+on first use. Natural Earth maps North America and Europe in more
+detail than the rest of the world. Equals to <code>"roads"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
       </tbody>
     </table>
 
@@ -14012,11 +14047,13 @@ Equals to <code>"lakes"</code>.</p>
 
         <p>The supported basemap outline resolutions.</p>
 <p>Passed as the <code>resolution</code> of the basemap chart: the Natural Earth scale
-the outlines are drawn at. The coarsest ships with the package; the finer
-ones are downloaded the first time they are asked for and kept in a
-local cache, so they need the network once. The cache folder is
-<code>DATACHART_CACHE_DIR</code> when that environment variable is set, else
-<code>datachart</code> under <code>XDG_CACHE_HOME</code> or <code>~/.cache</code>.</p>
+the outlines are drawn at. Each feature is downloaded the first time it
+is asked for at a scale and kept in a local cache, so a map needs the
+network once and never again. The cache folder is <code>DATACHART_CACHE_DIR</code>
+when that environment variable is set, else <code>datachart</code> under
+<code>XDG_CACHE_HOME</code> or <code>~/.cache</code>; a machine without the network works from
+a copy of a warm one.</p>
+<p><img alt="BASEMAP_RESOLUTION at a glance" src="../../assets/imgs/const-basemap-resolution.svg" width="100%" /></p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -14052,8 +14089,8 @@ local cache, so they need the network once. The cache folder is
             <td><code><span title="datachart.constants.BASEMAP_RESOLUTION.LOW">LOW</span></code></td>
             <td class="doc-attribute-details">
               <div class="doc-md-description">
-                <p>1:110 million, bundled; a continent or a region. Equals to
-<code>"110m"</code>.</p>
+                <p>1:110 million, under 1 MB on first use; a continent or a
+region. Equals to <code>"110m"</code>.</p>
               </div>
               <p>
                   <span class="doc-attribute-annotation">
@@ -14082,8 +14119,9 @@ Equals to <code>"50m"</code>.</p>
             <td><code><span title="datachart.constants.BASEMAP_RESOLUTION.HIGH">HIGH</span></code></td>
             <td class="doc-attribute-details">
               <div class="doc-md-description">
-                <p>1:10 million, about 28 MB on first use; a coast or a
-city's surroundings. Equals to <code>"10m"</code>.</p>
+                <p>1:10 million, about 28 MB on first use, and 50 MB more
+for the roads; a coast or a city's surroundings. Equals to
+<code>"10m"</code>.</p>
               </div>
               <p>
                   <span class="doc-attribute-annotation">

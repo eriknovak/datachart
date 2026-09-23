@@ -70,6 +70,7 @@ from datachart.constants import (
     HISTOGRAM_TYPE,
     DRAW_POSITION,
     BASEMAP_FEATURE,
+    BASEMAP_RESOLUTION,
     LEGEND_ALIGN,
     LINE_DRAW_STYLE,
     LINE_MARKER,
@@ -598,7 +599,7 @@ def colorbar_location():
     save(fig, "const-colorbar-location.svg")
 
 
-def chart_grid(figs, name, height, cols=None, footnote=None):
+def chart_grid(figs, name, height, cols=None, footnote=None, rasterize=False):
     """Compose chart-front figures with Grid, restyled to the const-* look.
 
     Chart-setting constants are rendered through the datachart fronts, so the
@@ -608,6 +609,10 @@ def chart_grid(figs, name, height, cols=None, footnote=None):
     for ax in fig.axes:
         ax.title.set_fontfamily("monospace")
         ax.title.set_fontsize(FS_LABEL)
+        if rasterize:
+            # an SVG keeps every vertex, even off view: a world outline is MBs
+            for artist in ax.collections + ax.patches:
+                artist.set_rasterized(True)
     if footnote:
         # centered so a note wider than the grid cannot push it off-center,
         # with a fixed 0.22 in gap whatever the figure height
@@ -886,17 +891,25 @@ def draw_position():
 
 
 def basemap_feature():
-    # each feature alone, over the Baltic, where all four show
+    # each feature alone, over the Baltic, where all of them show
     members = [
         ("COASTLINE", BASEMAP_FEATURE.COASTLINE),
         ("LAND", BASEMAP_FEATURE.LAND),
         ("COUNTRIES", BASEMAP_FEATURE.COUNTRIES),
         ("BORDERS", BASEMAP_FEATURE.BORDERS),
         ("LAKES", BASEMAP_FEATURE.LAKES),
+        ("RIVERS", BASEMAP_FEATURE.RIVERS),
+        ("ROADS", BASEMAP_FEATURE.ROADS),
     ]
+    # the lines read at a finer scale, and roads exist at 1:10m alone
+    resolutions = {
+        "RIVERS": BASEMAP_RESOLUTION.MEDIUM,
+        "ROADS": BASEMAP_RESOLUTION.HIGH,
+    }
     figs = [
         BasemapChart(
             value,
+            resolution=resolutions.get(label),
             # countries are one area each; highlight picks the Baltic states
             highlight=["EST", "LVA", "LTU"] if label == "COUNTRIES" else None,
             title=f"BASEMAP_FEATURE.{label}",
@@ -911,11 +924,40 @@ def basemap_feature():
     chart_grid(
         figs,
         "const-basemap-feature.svg",
-        6.4,
+        8.5,
         cols=2,
-        footnote="COUNTRIES highlights the Baltic states here. The lakes are drawn "
-        "in blue; by default they take the axes background, so they read as "
-        "the sea does.",
+        rasterize=True,
+        footnote="COUNTRIES highlights the Baltic states; the lakes are blue "
+        "here. RIVERS is drawn at 1:50m, ROADS at 1:10m, its only scale.",
+    )
+
+
+def basemap_resolution():
+    # the same stretch of coast at each scale, where the detail shows
+    figs = [
+        BasemapChart(
+            [BASEMAP_FEATURE.LAND, BASEMAP_FEATURE.BORDERS],
+            resolution=value,
+            title=f"BASEMAP_RESOLUTION.{label}",
+            xmin=12.5,
+            xmax=16,
+            ymin=44.5,
+            ymax=46.5,
+            aspect_ratio=ASPECT_RATIO.GEOGRAPHIC,
+        )
+        for label, value in [
+            ("LOW", BASEMAP_RESOLUTION.LOW),
+            ("MEDIUM", BASEMAP_RESOLUTION.MEDIUM),
+            ("HIGH", BASEMAP_RESOLUTION.HIGH),
+        ]
+    ]
+    chart_grid(
+        figs,
+        "const-basemap-resolution.svg",
+        2.4,
+        rasterize=True,
+        footnote="The head of the Adriatic, Slovenia's coast and borders: "
+        "1:110m, 1:50m and 1:10m.",
     )
 
 
@@ -1583,6 +1625,7 @@ def main():
     hexbin_reduce()
     draw_position()
     basemap_feature()
+    basemap_resolution()
     swarm_mode()
     radial_type()
     direction()

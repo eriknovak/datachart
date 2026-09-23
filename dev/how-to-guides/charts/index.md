@@ -163,7 +163,7 @@ How two or more variables relate to each other.
 
   [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md)
 
-  Coastlines, land, borders and lakes under a chart of longitude and latitude, bundled with the package.
+  Coastlines, land, borders, lakes, rivers and roads under a chart of longitude and latitude, from Natural Earth.
 
 ## Flows
 

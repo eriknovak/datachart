@@ -395,7 +395,7 @@ How two or more variables relate to each other.
 
   [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md)
 
-  Coastlines, land, borders and lakes under a chart of longitude and latitude, bundled with the package.
+  Coastlines, land, borders, lakes, rivers and roads under a chart of longitude and latitude, from Natural Earth.
 
 ## Flows
 
@@ -16276,7 +16276,7 @@ Grid(
 
 # Basemap Chart
 
-A basemap chart draws the land under a chart whose x and y are longitude and latitude: coastlines, a land fill, the borders between countries and the large lakes. The outlines are the [Natural Earth](https://www.naturalearthdata.com) 1:110m set (public domain), and they ship with the package, so a map needs no download, no extra dependency and no picture made somewhere else. On its own it is a map with axes; its use is underneath another chart, so that the marks sit on the coast they describe: epicentres, weather stations, a ship's track. This guide shows how to create basemap charts with the [datachart.charts.BasemapChart](https://eriknovak.github.io/datachart/dev/references/charts/basemapchart/#datachart.charts.BasemapChart) function and how to compose them with other charts, starting with the basics and building up to worked examples on real data.
+A basemap chart draws the land under a chart whose x and y are longitude and latitude: coastlines, a land fill, the borders between countries, the large lakes, the rivers and the main roads. The outlines are [Natural Earth](https://www.naturalearthdata.com)'s (public domain), downloaded the first time a map draws them and kept in a local cache, so a map needs the network once, no extra dependency and no picture made somewhere else. On its own it is a map with axes; its use is underneath another chart, so that the marks sit on the coast they describe: epicentres, weather stations, a ship's track. This guide shows how to create basemap charts with the [datachart.charts.BasemapChart](https://eriknovak.github.io/datachart/dev/references/charts/basemapchart/#datachart.charts.BasemapChart) function and how to compose them with other charts, starting with the basics and building up to worked examples on real data.
 
 Looking for a specific customization? Jump straight to the [quick reference](#customizing-the-basemap-chart), which maps common tasks to the parameter or style attribute that does the job.
 
@@ -16308,6 +16308,7 @@ Every customization is either a keyword argument of `BasemapChart` or a `plot_ba
 | I want to…                                | Use                                                | See                                                                                               |
 | ----------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
 | choose coastlines, land, borders or lakes | `features`                                         | [Features](#features)                                                                             |
+| draw rivers or roads                      | `features=RIVERS`, `features=ROADS`, `resolution`  | [Rivers and roads](#rivers-and-roads)                                                             |
 | add a title and axis labels               | `title`, `xlabel`, `ylabel`                        | [Title, axis labels and limits](#title-axis-labels-and-limits)                                    |
 | show one region                           | `xmin`, `xmax`, `ymin`, `ymax`                     | [Title, axis labels and limits](#title-axis-labels-and-limits)                                    |
 | keep the region at its true proportions   | `aspect_ratio="geographic"`                        | [Geographic aspect](#geographic-aspect)                                                           |
@@ -16320,11 +16321,22 @@ Every customization is either a keyword argument of `BasemapChart` or a `plot_ba
 | put the map under or over other charts    | `position`, `Panel`                                | [Composing with Panel](#composing-with-panel)                                                     |
 | save the chart as an image                | `save_figure`                                      | [Saving figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md) |
 
+The parameters that accept a constant, with the class in [datachart.constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md) that lists its values:
+
+| Parameter      | Constant                                                                                                                       |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `features`     | [`BASEMAP_FEATURE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BASEMAP_FEATURE)       |
+| `resolution`   | [`BASEMAP_RESOLUTION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BASEMAP_RESOLUTION) |
+| `position`     | [`DRAW_POSITION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DRAW_POSITION)           |
+| `figsize`      | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                     |
+| `show_grid`    | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                   |
+| `aspect_ratio` | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)             |
+
 The outline keys of `geometry` are listed in [BasemapDataAttrs](https://eriknovak.github.io/datachart/dev/references/charts/basemapchart/#datachart.typings.BasemapDataAttrs), the style attributes in [BasemapStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/basemapchart/#datachart.typings.BasemapStyleAttrs).
 
 ### Features
 
-A map should carry only what the reader needs to find their way, and which outlines those are depends on the question. `features` takes one [BASEMAP_FEATURE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BASEMAP_FEATURE) member or a list of them: `COASTLINE` and `LAND` by default, `BORDERS` for the lines between countries, and `LAKES` for the large lakes, filled with the axes background so they read as water. The ocean is not a feature: it is the background the land sits on. Below, Europe with its land, borders and lakes: the lakes of Russia and Finland and the Caspian read as the sea does.
+A map should carry only what the reader needs to find their way, and which outlines those are depends on the question. `features` takes one [BASEMAP_FEATURE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BASEMAP_FEATURE) member or a list of them: `COASTLINE` and `LAND` by default, `BORDERS` for the lines between countries, `LAKES` for the large lakes, filled with the axes background so they read as water, and `RIVERS` and `ROADS`, which have [a subsection of their own](#rivers-and-roads). The ocean is not a feature: it is the background the land sits on. Below, Europe with its land, borders and lakes: the lakes of Russia and Finland and the Caspian read as the sea does.
 
 ```
 from datachart.constants import BASEMAP_FEATURE
@@ -16393,7 +16405,7 @@ BasemapChart(
 
 ### Colors and lines
 
-The map is furniture, not data, so the theme draws it in muted greys that stay behind whatever is composed over it. When a figure needs another look, the `plot_basemap_*` style attributes set it: `plot_basemap_land_color`, `plot_basemap_coastline_color` and `plot_basemap_coastline_width`, `plot_basemap_border_color`, `plot_basemap_border_width` and `plot_basemap_border_style`, and `plot_basemap_lake_color`. Below, a sand-colored land with blue-grey water lines and dashed borders.
+The map is furniture, not data, so the theme draws it in muted greys that stay behind whatever is composed over it. When a figure needs another look, the `plot_basemap_*` style attributes set it: `plot_basemap_land_color`, `plot_basemap_coastline_color` and `plot_basemap_coastline_width`, `plot_basemap_border_color`, `plot_basemap_border_width` and `plot_basemap_border_style`, `plot_basemap_lake_color`, and the color and width of the rivers and the roads, `plot_basemap_river_*` and `plot_basemap_road_*`. Below, a sand-colored land with blue-grey water lines and dashed borders.
 
 ```
 BasemapChart(
@@ -16445,7 +16457,7 @@ A country too small for the chosen scale is not drawn, so its code draws nothing
 
 ### Resolution
 
-The bundled outlines are Natural Earth's 1:110 million scale: right for a continent or a region, visibly angular once a figure zooms into a single country. `resolution` takes a [BASEMAP_RESOLUTION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BASEMAP_RESOLUTION) member. `LOW`, the default, is the bundled set. `MEDIUM` (1:50 million) and `HIGH` (1:10 million) are too large to ship, so the first figure that asks for one downloads it from the same Natural Earth release, about 5 MB and 28 MB, and keeps it in a local cache; every later figure reads the cache and needs no network. The cache folder is the `DATACHART_CACHE_DIR` environment variable when it is set, else `datachart` under `XDG_CACHE_HOME` or `~/.cache`. This guide does not run the example below, so that building it never depends on the download:
+The default outlines are Natural Earth's 1:110 million scale: right for a continent or a region, visibly angular once a figure zooms into a single country. `resolution` takes a [BASEMAP_RESOLUTION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BASEMAP_RESOLUTION) member: `LOW` (1:110 million), the default, `MEDIUM` (1:50 million) and `HIGH` (1:10 million). Nothing ships with the package: the first figure that asks for a feature at a scale downloads it from a pinned Natural Earth release, under 1 MB at `LOW`, about 5 MB at `MEDIUM` and 28 MB at `HIGH`, and keeps it in a local cache; every later figure reads the cache and needs no network. The cache folder is the `DATACHART_CACHE_DIR` environment variable when it is set, else `datachart` under `XDG_CACHE_HOME` or `~/.cache`. Below, Slovenia's coast and borders at 1:50 million.
 
 ```
 from datachart.constants import BASEMAP_RESOLUTION
@@ -16462,11 +16474,48 @@ BasemapChart(
 ).show()
 ```
 
-Without the network, a resolution that is not cached yet raises an error that names the file it tried to fetch; the default outlines keep working offline.
+Without the network, a feature that is not cached yet raises an error that names the file it tried to fetch, and leaves no half-written file behind. A machine that never has the network, or a CI job that should not depend on it, works from a warm cache: render the maps once where the network is, or run `python datachart/charts/_basemap/prewarm.py 110m 50m` from a clone of the repository, and copy the cache folder over.
+
+### Rivers and roads
+
+A map of one country usually wants the lines people find their way by. `BASEMAP_FEATURE.RIVERS` draws the rivers, and the centerlines of the lakes they run through, in a muted blue-grey; `BASEMAP_FEATURE.ROADS` draws the main roads in a warm grey. Both are lines, drawn over the land and the lakes and under the borders and the coastline, and neither is in the default features. Rivers exist at every scale, but at 1:110 million only the largest are drawn, as a few strokes across a continent, so a country wants `MEDIUM` or finer. Below, the rivers of central Europe at 1:50 million.
+
+```
+BasemapChart(
+    [BASEMAP_FEATURE.LAND, BASEMAP_FEATURE.RIVERS, BASEMAP_FEATURE.BORDERS],
+    resolution=BASEMAP_RESOLUTION.MEDIUM,
+    # from the Rhine to the Carpathians
+    xmin=2,
+    xmax=30,
+    ymin=42,
+    ymax=56,
+    aspect_ratio=ASPECT_RATIO.GEOGRAPHIC,
+).show()
+```
+
+Natural Earth publishes the roads at 1:10 million alone, so `ROADS` at a coarser scale raises an error naming the scale that has them. The layer is about 50 MB on first use, and it maps North America and Europe in more detail than the rest of the world. This guide does not run the example below, so that building it never waits for that download:
+
+```
+BasemapChart(
+    [
+        BASEMAP_FEATURE.LAND,
+        BASEMAP_FEATURE.RIVERS,
+        BASEMAP_FEATURE.ROADS,
+        BASEMAP_FEATURE.BORDERS,
+    ],
+    # Slovenia's roads and rivers at 1:10 million, the only scale with roads
+    resolution=BASEMAP_RESOLUTION.HIGH,
+    xmin=13,
+    xmax=16.8,
+    ymin=45.3,
+    ymax=47,
+    aspect_ratio=ASPECT_RATIO.GEOGRAPHIC,
+).show()
+```
 
 ### Your own outlines
 
-Some maps need a scale Natural Earth does not have, and some are not of the Earth at all. `geometry` takes your own outlines in place of the bundled ones: a `{"lon", "lat", "feature"}` dictionary, or a list of them. `lon` and `lat` run along one outline after another, with a `NaN` between two outlines, and `feature` says how they are drawn: `"coastline"` and `"borders"` as lines, `"land"` and `"lakes"` as filled areas, each in its own style. A ring inside a filled area that runs the other way round is a hole. The site plan below is illustrative, in metres rather than degrees: the building is land, its courtyard a hole, and the paths are drawn as borders.
+Some maps need a scale Natural Earth does not have, and some are not of the Earth at all. `geometry` takes your own outlines in place of Natural Earth's: a `{"lon", "lat", "feature"}` dictionary, or a list of them. `lon` and `lat` run along one outline after another, with a `NaN` between two outlines, and `feature` says how they are drawn: `"coastline"`, `"borders"`, `"rivers"` and `"roads"` as lines, `"land"` and `"lakes"` as filled areas, each in its own style. A ring inside a filled area that runs the other way round is a hole. The site plan below is illustrative, in metres rather than degrees: the building is land, its courtyard a hole, and the paths are drawn as borders.
 
 ```
 nan = float("nan")
@@ -16578,7 +16627,7 @@ Panel(
 
 ### How far apart are the capitals of the European Union? (highlighted countries, point labels, geographic aspect)
 
-A map of the member states' capitals shows at a glance how far the Union reaches: from Lisbon to Nicosia, and from Valletta to Helsinki. The coordinates are those of the 27 capital cities, rounded to a tenth of a degree. The member states are picked out with `highlight`, so the Union's outline reads against its neighbours, and each point carries its city's name. Malta is too small for the bundled outlines, so its code is left out of the list; its capital still gets its point.
+A map of the member states' capitals shows at a glance how far the Union reaches: from Lisbon to Nicosia, and from Valletta to Helsinki. The coordinates are those of the 27 capital cities, rounded to a tenth of a degree. The member states are picked out with `highlight`, so the Union's outline reads against its neighbours, and each point carries its city's name. Malta is too small for the 1:110m outlines, so its code is left out of the list; its capital still gets its point.
 
 ```
 # (city, latitude, longitude), rounded to a tenth of a degree
@@ -22269,17 +22318,17 @@ One page per chart: the function and its parameters, the shape of its data, the 
 
 ### Relationships
 
-| Chart                                                                                                 | Shows                                                                        | Data                                                                                                                                                         | Style                                                                                                                                                | Guide                                                                                                          |
-| ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| [ScatterChart](https://eriknovak.github.io/datachart/dev/references/charts/scatterchart/index.md)     | One point per observation, placed by two numeric variables.                  | [`ScatterDataPointAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/scatterchart/#datachart.typings.ScatterDataPointAttrs)                 | [`ScatterStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/scatterchart/#datachart.typings.ScatterStyleAttrs)                 | [Scatter Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/scatterchart/index.md)          |
-| [Heatmap](https://eriknovak.github.io/datachart/dev/references/charts/heatmap/index.md)               | A two-dimensional matrix as colored cells.                                   | [`HeatmapDataAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/heatmap/#datachart.typings.HeatmapDataAttrs)                                | [`HeatmapStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/heatmap/#datachart.typings.HeatmapStyleAttrs)                      | [Heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/index.md)                     |
-| [ContourChart](https://eriknovak.github.io/datachart/dev/references/charts/contourchart/index.md)     | A surface sampled on a grid, as iso-lines or filled bands.                   | [`ContourDataAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/contourchart/#datachart.typings.ContourDataAttrs)                           | [`ContourStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/contourchart/#datachart.typings.ContourStyleAttrs)                 | [Contour Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/contourchart/index.md)          |
-| [HexbinChart](https://eriknovak.github.io/datachart/dev/references/charts/hexbinchart/index.md)       | Point density on the plane, as colored hexagons.                             | [`HexbinDataAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/hexbinchart/#datachart.typings.HexbinDataAttrs)                              | [`HexbinStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/hexbinchart/#datachart.typings.HexbinStyleAttrs)                    | [Hexbin Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/hexbinchart/index.md)            |
-| [ParallelCoords](https://eriknovak.github.io/datachart/dev/references/charts/parallelcoords/index.md) | Each record as a polyline across one axis per dimension.                     | [`ParallelCoordsDataPointAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/parallelcoords/#datachart.typings.ParallelCoordsDataPointAttrs) | [`ParallelCoordsStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/parallelcoords/#datachart.typings.ParallelCoordsStyleAttrs) | [Parallel Coordinates](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/parallelcoords/index.md) |
-| [NetworkChart](https://eriknovak.github.io/datachart/dev/references/charts/networkchart/index.md)     | Nodes joined by edges, placed by a layout.                                   | [`NetworkSingleChartAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/networkchart/#datachart.typings.NetworkSingleChartAttrs)             | [`NetworkStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/networkchart/#datachart.typings.NetworkStyleAttrs)                 | [Network Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/networkchart/index.md)          |
-| [ScatterMatrix](https://eriknovak.github.io/datachart/dev/references/charts/scattermatrix/index.md)   | A scatter chart for every pair of dimensions, distributions on the diagonal. | [`ScatterMatrixDataPointAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/scattermatrix/#datachart.typings.ScatterMatrixDataPointAttrs)    | [`StyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.StyleAttrs)                                           | [Scatter Matrix](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/scattermatrix/index.md)        |
-| [ImageChart](https://eriknovak.github.io/datachart/dev/references/charts/imagechart/index.md)         | A picture in data coordinates, under or over the other charts.               | [`ImageDataAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/imagechart/#datachart.typings.ImageDataAttrs)                                 | [`ImageStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/imagechart/#datachart.typings.ImageStyleAttrs)                       | [Image Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/imagechart/index.md)              |
-| [BasemapChart](https://eriknovak.github.io/datachart/dev/references/charts/basemapchart/index.md)     | Coastlines, land, borders and lakes under a chart of longitude and latitude. | [`BasemapDataAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/basemapchart/#datachart.typings.BasemapDataAttrs)                           | [`BasemapStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/basemapchart/#datachart.typings.BasemapStyleAttrs)                 | [Basemap Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/basemapchart/index.md)          |
+| Chart                                                                                                 | Shows                                                                                       | Data                                                                                                                                                         | Style                                                                                                                                                | Guide                                                                                                          |
+| ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| [ScatterChart](https://eriknovak.github.io/datachart/dev/references/charts/scatterchart/index.md)     | One point per observation, placed by two numeric variables.                                 | [`ScatterDataPointAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/scatterchart/#datachart.typings.ScatterDataPointAttrs)                 | [`ScatterStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/scatterchart/#datachart.typings.ScatterStyleAttrs)                 | [Scatter Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/scatterchart/index.md)          |
+| [Heatmap](https://eriknovak.github.io/datachart/dev/references/charts/heatmap/index.md)               | A two-dimensional matrix as colored cells.                                                  | [`HeatmapDataAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/heatmap/#datachart.typings.HeatmapDataAttrs)                                | [`HeatmapStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/heatmap/#datachart.typings.HeatmapStyleAttrs)                      | [Heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/index.md)                     |
+| [ContourChart](https://eriknovak.github.io/datachart/dev/references/charts/contourchart/index.md)     | A surface sampled on a grid, as iso-lines or filled bands.                                  | [`ContourDataAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/contourchart/#datachart.typings.ContourDataAttrs)                           | [`ContourStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/contourchart/#datachart.typings.ContourStyleAttrs)                 | [Contour Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/contourchart/index.md)          |
+| [HexbinChart](https://eriknovak.github.io/datachart/dev/references/charts/hexbinchart/index.md)       | Point density on the plane, as colored hexagons.                                            | [`HexbinDataAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/hexbinchart/#datachart.typings.HexbinDataAttrs)                              | [`HexbinStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/hexbinchart/#datachart.typings.HexbinStyleAttrs)                    | [Hexbin Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/hexbinchart/index.md)            |
+| [ParallelCoords](https://eriknovak.github.io/datachart/dev/references/charts/parallelcoords/index.md) | Each record as a polyline across one axis per dimension.                                    | [`ParallelCoordsDataPointAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/parallelcoords/#datachart.typings.ParallelCoordsDataPointAttrs) | [`ParallelCoordsStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/parallelcoords/#datachart.typings.ParallelCoordsStyleAttrs) | [Parallel Coordinates](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/parallelcoords/index.md) |
+| [NetworkChart](https://eriknovak.github.io/datachart/dev/references/charts/networkchart/index.md)     | Nodes joined by edges, placed by a layout.                                                  | [`NetworkSingleChartAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/networkchart/#datachart.typings.NetworkSingleChartAttrs)             | [`NetworkStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/networkchart/#datachart.typings.NetworkStyleAttrs)                 | [Network Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/networkchart/index.md)          |
+| [ScatterMatrix](https://eriknovak.github.io/datachart/dev/references/charts/scattermatrix/index.md)   | A scatter chart for every pair of dimensions, distributions on the diagonal.                | [`ScatterMatrixDataPointAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/scattermatrix/#datachart.typings.ScatterMatrixDataPointAttrs)    | [`StyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.StyleAttrs)                                           | [Scatter Matrix](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/scattermatrix/index.md)        |
+| [ImageChart](https://eriknovak.github.io/datachart/dev/references/charts/imagechart/index.md)         | A picture in data coordinates, under or over the other charts.                              | [`ImageDataAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/imagechart/#datachart.typings.ImageDataAttrs)                                 | [`ImageStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/imagechart/#datachart.typings.ImageStyleAttrs)                       | [Image Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/imagechart/index.md)              |
+| [BasemapChart](https://eriknovak.github.io/datachart/dev/references/charts/basemapchart/index.md)     | Coastlines, land, borders, lakes, rivers and roads under a chart of longitude and latitude. | [`BasemapDataAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/basemapchart/#datachart.typings.BasemapDataAttrs)                           | [`BasemapStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/basemapchart/#datachart.typings.BasemapStyleAttrs)                 | [Basemap Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/basemapchart/index.md)          |
 
 ### Flows
 
@@ -27606,7 +27655,7 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 
 # BasemapChart
 
-Coastlines, land, borders and lakes under a chart of longitude and latitude. The [Basemap Chart guide](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/basemapchart/index.md) shows every feature on real data; this page is the contract: the function, the shape of its data, the keys `style` takes, and the constant each parameter accepts.
+Coastlines, land, borders, lakes, rivers and roads under a chart of longitude and latitude. The [Basemap Chart guide](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/basemapchart/index.md) shows every feature on real data; this page is the contract: the function, the shape of its data, the keys `style` takes, and the constant each parameter accepts.
 
 ## Function
 
@@ -27640,11 +27689,11 @@ BasemapChart(
 
 Creates the basemap chart.
 
-A basemap chart draws the land under a geographic chart: coastlines, a land fill, the borders between countries and the large lakes, from the Natural Earth 1:110m outlines that ship with the package, so it needs no download and no extra dependency. Longitude runs along x and latitude along y, drawn straight; nothing is projected, so the marks composed over the map with `Panel` need no transform either — a hexbin of epicentres, a scatter of stations, a line of a ship's track.
+A basemap chart draws the land under a geographic chart: coastlines, a land fill, the borders between countries, the large lakes, the rivers and the main roads, from the Natural Earth outlines. Each is downloaded the first time it is drawn and kept in a local cache, so a map needs the network once and no extra dependency. Longitude runs along x and latitude along y, drawn straight; nothing is projected, so the marks composed over the map with `Panel` need no transform either — a hexbin of epicentres, a scatter of stations, a line of a ship's track.
 
 The map carries no series: it takes no cycle color, no legend entry and no emphasis, and its greys come from the theme. With the countries feature, `highlight` picks countries out by their three-letter code: the ones listed take the highlight color, the rest stay the land's grey. `position` decides where it sits in the draw order, under the gridlines and every mark by default. Composed with other charts it leaves the axis limits to their data; alone it frames its own outlines. `Panel` refuses to compose it with a chart that has categories or dates on an axis, or is horizontal, since that chart has no longitude to draw the map at. `aspect_ratio="geographic"` narrows each degree of longitude by the cosine of the middle latitude, so a region keeps its proportions.
 
-The bundled outlines suit a continent or a region. `resolution` asks for the finer Natural Earth scales, which are downloaded the first time they are used and kept in a local cache. `geometry` takes your own longitude and latitude outlines in their place: a country's provinces, a coast at street scale, or a map that is not of the Earth.
+The default 1:110m outlines suit a continent or a region; `resolution` asks for the finer Natural Earth scales, for a country or a coast. The roads exist at 1:10m alone, and a 1:110m river is only a few strokes across a continent. `geometry` takes your own longitude and latitude outlines in their place: a country's provinces, a coast at street scale, or a map that is not of the Earth.
 
 Examples:
 
@@ -27666,33 +27715,33 @@ Examples:
 ... )
 ```
 
-| PARAMETER      | DESCRIPTION                                                                                                                                                                                                               |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `features`     | The bundled features to draw: one name or a list of them, coastline and land by default. See BASEMAP_FEATURE. **TYPE:** \`BASEMAP_FEATURE                                                                                 |
-| `resolution`   | The Natural Earth scale: "110m" (default) ships with the package, "50m" and "10m" are downloaded once on first use. See BASEMAP_RESOLUTION. **TYPE:** \`BASEMAP_RESOLUTION                                                |
-| `highlight`    | The countries to pick out, as Natural Earth's three-letter ADM0_A3 codes ("SVN", "FRA"); needs the "countries" feature. A code too small to draw at the chosen resolution warns. **TYPE:** \`str                          |
-| `geometry`     | Your own outlines, drawn in place of the bundled ones: a {"lon", "lat", "feature"} dict, or a list of them. Cannot be combined with features, resolution or highlight. See BasemapDataAttrs. **TYPE:** \`BasemapDataAttrs |
-| `position`     | Where the map sits in the draw order: "below" (default) under the gridlines and every mark, or "above" over the marks and under the reference lines. See DRAW_POSITION. **TYPE:** \`DRAW_POSITION                         |
-| `title`        | The title of the chart. **TYPE:** \`str                                                                                                                                                                                   |
-| `xlabel`       | The label of the x-axis. **TYPE:** \`str                                                                                                                                                                                  |
-| `ylabel`       | The label of the y-axis. **TYPE:** \`str                                                                                                                                                                                  |
-| `figsize`      | The size of the figure as (width, height) in inches. See FIG_SIZE. **TYPE:** \`FIG_SIZE                                                                                                                                   |
-| `xmin`         | The minimum value of the x-axis. **TYPE:** \`int                                                                                                                                                                          |
-| `xmax`         | The maximum value of the x-axis. **TYPE:** \`int                                                                                                                                                                          |
-| `ymin`         | The minimum value of the y-axis. **TYPE:** \`int                                                                                                                                                                          |
-| `ymax`         | The maximum value of the y-axis. **TYPE:** \`int                                                                                                                                                                          |
-| `show_grid`    | Which grid lines to show ("both", "x", "y"); False draws none. The grid draws over a map placed below. See SHOW_GRID. **TYPE:** \`SHOW_GRID                                                                               |
-| `aspect_ratio` | The aspect ratio of the axes box; "geographic" keeps the region at true proportions. See ASPECT_RATIO. **TYPE:** \`ASPECT_RATIO                                                                                           |
-| `style`        | Style configuration of the map. See BasemapStyleAttrs. **TYPE:** \`BasemapStyleAttrs                                                                                                                                      |
+| PARAMETER      | DESCRIPTION                                                                                                                                                                                                              |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `features`     | The features to draw: one name or a list of them, coastline and land by default. See BASEMAP_FEATURE. **TYPE:** \`BASEMAP_FEATURE                                                                                        |
+| `resolution`   | The Natural Earth scale: "110m" (default), "50m" or "10m", each downloaded once on first use. See BASEMAP_RESOLUTION. **TYPE:** \`BASEMAP_RESOLUTION                                                                     |
+| `highlight`    | The countries to pick out, as Natural Earth's three-letter ADM0_A3 codes ("SVN", "FRA"); needs the "countries" feature. A code too small to draw at the chosen resolution warns. **TYPE:** \`str                         |
+| `geometry`     | Your own outlines, drawn in place of Natural Earth's: a {"lon", "lat", "feature"} dict, or a list of them. Cannot be combined with features, resolution or highlight. See BasemapDataAttrs. **TYPE:** \`BasemapDataAttrs |
+| `position`     | Where the map sits in the draw order: "below" (default) under the gridlines and every mark, or "above" over the marks and under the reference lines. See DRAW_POSITION. **TYPE:** \`DRAW_POSITION                        |
+| `title`        | The title of the chart. **TYPE:** \`str                                                                                                                                                                                  |
+| `xlabel`       | The label of the x-axis. **TYPE:** \`str                                                                                                                                                                                 |
+| `ylabel`       | The label of the y-axis. **TYPE:** \`str                                                                                                                                                                                 |
+| `figsize`      | The size of the figure as (width, height) in inches. See FIG_SIZE. **TYPE:** \`FIG_SIZE                                                                                                                                  |
+| `xmin`         | The minimum value of the x-axis. **TYPE:** \`int                                                                                                                                                                         |
+| `xmax`         | The maximum value of the x-axis. **TYPE:** \`int                                                                                                                                                                         |
+| `ymin`         | The minimum value of the y-axis. **TYPE:** \`int                                                                                                                                                                         |
+| `ymax`         | The maximum value of the y-axis. **TYPE:** \`int                                                                                                                                                                         |
+| `show_grid`    | Which grid lines to show ("both", "x", "y"); False draws none. The grid draws over a map placed below. See SHOW_GRID. **TYPE:** \`SHOW_GRID                                                                              |
+| `aspect_ratio` | The aspect ratio of the axes box; "geographic" keeps the region at true proportions. See ASPECT_RATIO. **TYPE:** \`ASPECT_RATIO                                                                                          |
+| `style`        | Style configuration of the map. See BasemapStyleAttrs. **TYPE:** \`BasemapStyleAttrs                                                                                                                                     |
 
 | RETURNS      | DESCRIPTION                              |
 | ------------ | ---------------------------------------- |
 | `plt.Figure` | The figure containing the basemap chart. |
 
-| RAISES         | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                           |
-| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ValueError`   | If a feature is not a BASEMAP_FEATURE, resolution is not a BASEMAP_RESOLUTION, geometry is not outlines of matching longitudes and latitudes or comes with features, resolution or highlight, a highlight code is not three letters or comes without the countries feature, position is not a DRAW_POSITION, or a geographic aspect meets a y-axis outside -90 to 90. |
-| `RuntimeError` | If a finer resolution is not cached and cannot be downloaded.                                                                                                                                                                                                                                                                                                         |
+| RAISES         | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                     |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ValueError`   | If a feature is not a BASEMAP_FEATURE, resolution is not a BASEMAP_RESOLUTION, geometry is not outlines of matching longitudes and latitudes or comes with features, resolution or highlight, a highlight code is not three letters or comes without the countries feature, a feature is not published at resolution, position is not a DRAW_POSITION, or a geographic aspect meets a y-axis outside -90 to 90. |
+| `RuntimeError` | If a feature is not cached and cannot be downloaded.                                                                                                                                                                                                                                                                                                                                                            |
 
 ## Data
 
@@ -27732,6 +27781,10 @@ The typing for the basemap chart style.
 | `plot_basemap_border_width`         | The width of the borders, in points. **TYPE:** \`float                                                 |
 | `plot_basemap_border_style`         | The line style of the borders. See LINE_STYLE. **TYPE:** \`LINE_STYLE                                  |
 | `plot_basemap_lake_color`           | The fill color of the lakes; None takes the axes background, so a lake reads as water. **TYPE:** \`str |
+| `plot_basemap_river_color`          | The color of the rivers. **TYPE:** \`str                                                               |
+| `plot_basemap_river_width`          | The width of the rivers, in points. **TYPE:** \`float                                                  |
+| `plot_basemap_road_color`           | The color of the roads. **TYPE:** \`str                                                                |
+| `plot_basemap_road_width`           | The width of the roads, in points. **TYPE:** \`float                                                   |
 
 ## Constants
 
@@ -29786,6 +29839,8 @@ DARK_THEME: StyleAttrs = make_theme(
         "plot_basemap_highlight_edge_color": TEXT,
         "plot_basemap_coastline_color": "#59626E",
         "plot_basemap_border_color": EDGE,
+        "plot_basemap_river_color": "#4B6178",
+        "plot_basemap_road_color": "#5E5850",
         "plot_scatter_edge_color": PAGE,
         "plot_swarm_edge_color": PAGE,
         "plot_gantt_dependency_color": DIM,
@@ -31687,7 +31742,7 @@ Examples:
 
 The supported basemap features.
 
-Passed as the `features` of the basemap chart: which of the bundled Natural Earth 1:110m outlines are drawn. The ocean is not a feature; it is the axes background the land sits on.
+Passed as the `features` of the basemap chart: which of the Natural Earth outlines are drawn. The ocean is not a feature; it is the axes background the land sits on. Every feature is drawn at every `BASEMAP_RESOLUTION` except the roads, which Natural Earth publishes at 1:10 million alone.
 
 Examples:
 
@@ -31697,20 +31752,22 @@ Examples:
 ("coastline", "land")
 ```
 
-| ATTRIBUTE   | DESCRIPTION                                                                                                                    |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `DEFAULT`   | The default features. Same as (BASEMAP_FEATURE.COASTLINE, BASEMAP_FEATURE.LAND). **TYPE:** `Tuple[str, str]`                   |
-| `COASTLINE` | The coastlines, as lines. Equals to "coastline". **TYPE:** `str`                                                               |
-| `LAND`      | The land, as a filled area. Equals to "land". **TYPE:** `str`                                                                  |
-| `COUNTRIES` | The land, one filled area per country, so the highlight setting can pick countries out. Equals to "countries". **TYPE:** `str` |
-| `BORDERS`   | The land borders between countries, as lines. Equals to "borders". **TYPE:** `str`                                             |
-| `LAKES`     | The large lakes, filled with the axes background. Equals to "lakes". **TYPE:** `str`                                           |
+| ATTRIBUTE   | DESCRIPTION                                                                                                                                                                                                        |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `DEFAULT`   | The default features. Same as (BASEMAP_FEATURE.COASTLINE, BASEMAP_FEATURE.LAND). **TYPE:** `Tuple[str, str]`                                                                                                       |
+| `COASTLINE` | The coastlines, as lines. Equals to "coastline". **TYPE:** `str`                                                                                                                                                   |
+| `LAND`      | The land, as a filled area. Equals to "land". **TYPE:** `str`                                                                                                                                                      |
+| `COUNTRIES` | The land, one filled area per country, so the highlight setting can pick countries out. Equals to "countries". **TYPE:** `str`                                                                                     |
+| `BORDERS`   | The land borders between countries, as lines. Equals to "borders". **TYPE:** `str`                                                                                                                                 |
+| `LAKES`     | The large lakes, filled with the axes background. Equals to "lakes". **TYPE:** `str`                                                                                                                               |
+| `RIVERS`    | The rivers and the centerlines of the lakes they run through, as lines. At 1:110 million only the largest are a few strokes across a continent; a country wants a finer scale. Equals to "rivers". **TYPE:** `str` |
+| `ROADS`     | The main roads, as lines; 1:10 million only, about 50 MB on first use. Natural Earth maps North America and Europe in more detail than the rest of the world. Equals to "roads". **TYPE:** `str`                   |
 
 ### datachart.constants.BASEMAP_RESOLUTION
 
 The supported basemap outline resolutions.
 
-Passed as the `resolution` of the basemap chart: the Natural Earth scale the outlines are drawn at. The coarsest ships with the package; the finer ones are downloaded the first time they are asked for and kept in a local cache, so they need the network once. The cache folder is `DATACHART_CACHE_DIR` when that environment variable is set, else `datachart` under `XDG_CACHE_HOME` or `~/.cache`.
+Passed as the `resolution` of the basemap chart: the Natural Earth scale the outlines are drawn at. Each feature is downloaded the first time it is asked for at a scale and kept in a local cache, so a map needs the network once and never again. The cache folder is `DATACHART_CACHE_DIR` when that environment variable is set, else `datachart` under `XDG_CACHE_HOME` or `~/.cache`; a machine without the network works from a copy of a warm one.
 
 Examples:
 
@@ -31720,12 +31777,12 @@ Examples:
 "110m"
 ```
 
-| ATTRIBUTE | DESCRIPTION                                                                                                |
-| --------- | ---------------------------------------------------------------------------------------------------------- |
-| `DEFAULT` | The default resolution. Same as BASEMAP_RESOLUTION.LOW. **TYPE:** `str`                                    |
-| `LOW`     | 1:110 million, bundled; a continent or a region. Equals to "110m". **TYPE:** `str`                         |
-| `MEDIUM`  | 1:50 million, about 5 MB on first use; a country. Equals to "50m". **TYPE:** `str`                         |
-| `HIGH`    | 1:10 million, about 28 MB on first use; a coast or a city's surroundings. Equals to "10m". **TYPE:** `str` |
+| ATTRIBUTE | DESCRIPTION                                                                                                                              |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `DEFAULT` | The default resolution. Same as BASEMAP_RESOLUTION.LOW. **TYPE:** `str`                                                                  |
+| `LOW`     | 1:110 million, under 1 MB on first use; a continent or a region. Equals to "110m". **TYPE:** `str`                                       |
+| `MEDIUM`  | 1:50 million, about 5 MB on first use; a country. Equals to "50m". **TYPE:** `str`                                                       |
+| `HIGH`    | 1:10 million, about 28 MB on first use, and 50 MB more for the roads; a coast or a city's surroundings. Equals to "10m". **TYPE:** `str` |
 
 # Typings Module
 
@@ -31766,17 +31823,17 @@ The records a chart's `data` takes and the keys its `style` accepts are document
 
 ### Relationships
 
-| Chart                                                                                                 | Shows                                                                        | Data                                                                                                                                                         | Style                                                                                                                                                |
-| ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [ScatterChart](https://eriknovak.github.io/datachart/dev/references/charts/scatterchart/index.md)     | One point per observation, placed by two numeric variables.                  | [`ScatterDataPointAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/scatterchart/#datachart.typings.ScatterDataPointAttrs)                 | [`ScatterStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/scatterchart/#datachart.typings.ScatterStyleAttrs)                 |
-| [Heatmap](https://eriknovak.github.io/datachart/dev/references/charts/heatmap/index.md)               | A two-dimensional matrix as colored cells.                                   | [`HeatmapDataAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/heatmap/#datachart.typings.HeatmapDataAttrs)                                | [`HeatmapStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/heatmap/#datachart.typings.HeatmapStyleAttrs)                      |
-| [ContourChart](https://eriknovak.github.io/datachart/dev/references/charts/contourchart/index.md)     | A surface sampled on a grid, as iso-lines or filled bands.                   | [`ContourDataAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/contourchart/#datachart.typings.ContourDataAttrs)                           | [`ContourStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/contourchart/#datachart.typings.ContourStyleAttrs)                 |
-| [HexbinChart](https://eriknovak.github.io/datachart/dev/references/charts/hexbinchart/index.md)       | Point density on the plane, as colored hexagons.                             | [`HexbinDataAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/hexbinchart/#datachart.typings.HexbinDataAttrs)                              | [`HexbinStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/hexbinchart/#datachart.typings.HexbinStyleAttrs)                    |
-| [ParallelCoords](https://eriknovak.github.io/datachart/dev/references/charts/parallelcoords/index.md) | Each record as a polyline across one axis per dimension.                     | [`ParallelCoordsDataPointAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/parallelcoords/#datachart.typings.ParallelCoordsDataPointAttrs) | [`ParallelCoordsStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/parallelcoords/#datachart.typings.ParallelCoordsStyleAttrs) |
-| [NetworkChart](https://eriknovak.github.io/datachart/dev/references/charts/networkchart/index.md)     | Nodes joined by edges, placed by a layout.                                   | [`NetworkSingleChartAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/networkchart/#datachart.typings.NetworkSingleChartAttrs)             | [`NetworkStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/networkchart/#datachart.typings.NetworkStyleAttrs)                 |
-| [ScatterMatrix](https://eriknovak.github.io/datachart/dev/references/charts/scattermatrix/index.md)   | A scatter chart for every pair of dimensions, distributions on the diagonal. | [`ScatterMatrixDataPointAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/scattermatrix/#datachart.typings.ScatterMatrixDataPointAttrs)    | [`StyleAttrs`](#datachart.typings.StyleAttrs)                                                                                                        |
-| [ImageChart](https://eriknovak.github.io/datachart/dev/references/charts/imagechart/index.md)         | A picture in data coordinates, under or over the other charts.               | [`ImageDataAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/imagechart/#datachart.typings.ImageDataAttrs)                                 | [`ImageStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/imagechart/#datachart.typings.ImageStyleAttrs)                       |
-| [BasemapChart](https://eriknovak.github.io/datachart/dev/references/charts/basemapchart/index.md)     | Coastlines, land, borders and lakes under a chart of longitude and latitude. | [`BasemapDataAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/basemapchart/#datachart.typings.BasemapDataAttrs)                           | [`BasemapStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/basemapchart/#datachart.typings.BasemapStyleAttrs)                 |
+| Chart                                                                                                 | Shows                                                                                       | Data                                                                                                                                                         | Style                                                                                                                                                |
+| ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [ScatterChart](https://eriknovak.github.io/datachart/dev/references/charts/scatterchart/index.md)     | One point per observation, placed by two numeric variables.                                 | [`ScatterDataPointAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/scatterchart/#datachart.typings.ScatterDataPointAttrs)                 | [`ScatterStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/scatterchart/#datachart.typings.ScatterStyleAttrs)                 |
+| [Heatmap](https://eriknovak.github.io/datachart/dev/references/charts/heatmap/index.md)               | A two-dimensional matrix as colored cells.                                                  | [`HeatmapDataAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/heatmap/#datachart.typings.HeatmapDataAttrs)                                | [`HeatmapStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/heatmap/#datachart.typings.HeatmapStyleAttrs)                      |
+| [ContourChart](https://eriknovak.github.io/datachart/dev/references/charts/contourchart/index.md)     | A surface sampled on a grid, as iso-lines or filled bands.                                  | [`ContourDataAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/contourchart/#datachart.typings.ContourDataAttrs)                           | [`ContourStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/contourchart/#datachart.typings.ContourStyleAttrs)                 |
+| [HexbinChart](https://eriknovak.github.io/datachart/dev/references/charts/hexbinchart/index.md)       | Point density on the plane, as colored hexagons.                                            | [`HexbinDataAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/hexbinchart/#datachart.typings.HexbinDataAttrs)                              | [`HexbinStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/hexbinchart/#datachart.typings.HexbinStyleAttrs)                    |
+| [ParallelCoords](https://eriknovak.github.io/datachart/dev/references/charts/parallelcoords/index.md) | Each record as a polyline across one axis per dimension.                                    | [`ParallelCoordsDataPointAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/parallelcoords/#datachart.typings.ParallelCoordsDataPointAttrs) | [`ParallelCoordsStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/parallelcoords/#datachart.typings.ParallelCoordsStyleAttrs) |
+| [NetworkChart](https://eriknovak.github.io/datachart/dev/references/charts/networkchart/index.md)     | Nodes joined by edges, placed by a layout.                                                  | [`NetworkSingleChartAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/networkchart/#datachart.typings.NetworkSingleChartAttrs)             | [`NetworkStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/networkchart/#datachart.typings.NetworkStyleAttrs)                 |
+| [ScatterMatrix](https://eriknovak.github.io/datachart/dev/references/charts/scattermatrix/index.md)   | A scatter chart for every pair of dimensions, distributions on the diagonal.                | [`ScatterMatrixDataPointAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/scattermatrix/#datachart.typings.ScatterMatrixDataPointAttrs)    | [`StyleAttrs`](#datachart.typings.StyleAttrs)                                                                                                        |
+| [ImageChart](https://eriknovak.github.io/datachart/dev/references/charts/imagechart/index.md)         | A picture in data coordinates, under or over the other charts.                              | [`ImageDataAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/imagechart/#datachart.typings.ImageDataAttrs)                                 | [`ImageStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/imagechart/#datachart.typings.ImageStyleAttrs)                       |
+| [BasemapChart](https://eriknovak.github.io/datachart/dev/references/charts/basemapchart/index.md)     | Coastlines, land, borders, lakes, rivers and roads under a chart of longitude and latitude. | [`BasemapDataAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/basemapchart/#datachart.typings.BasemapDataAttrs)                           | [`BasemapStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/basemapchart/#datachart.typings.BasemapStyleAttrs)                 |
 
 ### Flows
 
