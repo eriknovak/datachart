@@ -241,15 +241,11 @@ def HexbinChart(
         The figure containing the hexbin chart.
 
     """
-    if emphasis is not None:
-        raise ValueError(
-            "HexbinChart does not support `emphasis`: a hexbin chart is a single "
-            "colormapped layer with no series to mute or highlight."
-        )
-
     # Build the charts structure using shared utility
     charts = build_charts_structure(
+        "hexbinchart",
         data,
+        emphasis=emphasis,
         subtitle=subtitle,
         style=style,
         xticks=xticks,
@@ -265,7 +261,6 @@ def HexbinChart(
         vspans=vspans,
         hspans=hspans,
         texts=texts,
-        is_2d_data=True,
         gridsize=gridsize,
         reduce=reduce,
         mincnt=mincnt,

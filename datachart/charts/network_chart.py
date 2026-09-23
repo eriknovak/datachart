@@ -159,12 +159,6 @@ def NetworkChart(
             role), or `plot_network_edge_style` is a headed connector look.
 
     """
-    if emphasis is not None:
-        raise ValueError(
-            "NetworkChart does not support the `emphasis` argument: set the "
-            "`emphasis` key on the nodes to mute or highlight instead."
-        )
-
     datasets = data if isinstance(data, list) else [data]
     if not all(isinstance(d, dict) and "edges" in d for d in datasets):
         raise ValueError(
@@ -179,11 +173,12 @@ def NetworkChart(
         validate_network_records(nodes, dataset["edges"], resolved_layout)
 
     charts = build_charts_structure(
+        "networkchart",
         data,
+        emphasis=emphasis,
         subtitle=subtitle,
         style=style,
         texts=texts,
-        is_2d_data=True,
     )
 
     # Figure-level settings; None values resolve to defaults downstream

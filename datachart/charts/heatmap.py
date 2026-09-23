@@ -170,13 +170,6 @@ def Heatmap(
         The figure containing the heatmap.
 
     """
-    if emphasis is not None:
-        raise ValueError(
-            "Heatmap does not support `emphasis`: a heatmap has no series to "
-            "mute or highlight. Set the `emphasis` grid on `data` for per-cell "
-            "roles instead."
-        )
-
     if not all(
         isinstance(grid, dict) for grid in (data if isinstance(data, list) else [data])
     ):
@@ -186,7 +179,9 @@ def Heatmap(
         )
 
     charts = build_charts_structure(
+        "heatmap",
         data,
+        emphasis=emphasis,
         subtitle=subtitle,
         style=style,
         xticks=xticks,
@@ -195,7 +190,6 @@ def Heatmap(
         yticks=yticks,
         yticklabels=yticklabels,
         ytickrotate=ytickrotate,
-        is_2d_data=True,
         norm=norm,
         vmin=vmin,
         vmax=vmax,

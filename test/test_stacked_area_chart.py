@@ -14,9 +14,9 @@ from datachart.config import config
 from datachart.constants import STACKED_AREA_BASELINE, THEME
 from datachart.utils import Panel, Grid
 from datachart.utils._internal.config_helpers import get_stackedarea_style
+from datachart.utils._internal.chart_kinds import build_layers
 from datachart.utils._internal.layers import (
     MarkClipBox,
-    build_layers,
     stack_first_line,
     _stack_slots,
 )

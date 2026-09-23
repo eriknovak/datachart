@@ -36,57 +36,17 @@ from ._internal.config_helpers import (
     get_legend_panel_settings,
     get_text_style,
 )
+from ._internal.chart_kinds import CHART_KINDS
 from ._internal.figures import new_figure
 from ._internal.layers import (
     Panel as _PanelSeam,
     DumbbellLayer,
     LayerGroup,
-    LineLayer,
-    BarLayer,
-    ScatterLayer,
-    HistogramLayer,
-    BoxLayer,
-    ViolinLayer,
-    ContourLayer,
-    HexbinLayer,
-    ImageLayer,
-    BasemapLayer,
     StackedAreaLayer,
-    ParallelCoordsLayer,
-    RadialLayer,
-    GroupLayer,
     TextLayer,
     DRAW_ZORDER,
     draw_zorder_key,
     value_axis_grid,
-)
-
-# figures whose layer owns its axes: no shared coordinate space to overlay
-# (ADR 0023, ADR 0026, ADR 0028, ADR 0029, ADR 0044)
-BARE_FIGURES = {
-    "sankeychart": "Sankey",
-    "treemap": "treemap",
-    "networkchart": "network",
-    "calendarheatmap": "calendar heatmap",
-    "heatmap": "heatmap",
-}
-
-OVERLAYABLE_LAYERS = (
-    LineLayer,
-    BarLayer,
-    ScatterLayer,
-    HistogramLayer,
-    BoxLayer,
-    ViolinLayer,
-    ContourLayer,
-    HexbinLayer,
-    ImageLayer,
-    BasemapLayer,
-    StackedAreaLayer,
-    ParallelCoordsLayer,
-    RadialLayer,
-    GroupLayer,
-    TextLayer,
 )
 
 
@@ -116,23 +76,12 @@ def _extract_groups(figure: plt.Figure, index: int) -> Tuple[_PanelSeam, list]:
         raise ValueError(
             f"Figure at index {index} is a Grid figure; grid figures cannot be overlaid"
         )
-    if metadata.get("type") == "ganttchart":
-        # a horizontal panel's twin is a second x, off the task rows (ADR 0049)
+    # an overlay figure is no front and has no row; it always overlays
+    kind = CHART_KINDS.get(metadata["type"])
+    if kind is not None and not kind.overlayable:
         raise ValueError(
-            f"Figure at index {index} is a gantt figure; "
-            "gantt figures cannot be overlaid. Use `Grid` instead."
-        )
-    if metadata.get("type") == "pyramidchart":
-        # unmirrored data on a mirrored axis would silently mangle (ADR 0017)
-        raise ValueError(
-            f"Figure at index {index} is a pyramid figure; "
-            "pyramid figures cannot be overlaid"
-        )
-    if metadata.get("type") in BARE_FIGURES:
-        name = BARE_FIGURES[metadata["type"]]
-        raise ValueError(
-            f"Figure at index {index} is a {name} figure; "
-            f"{name} figures cannot be overlaid. Use `Grid` instead."
+            f"Figure at index {index} is a {kind.label} figure; "
+            f"{kind.label} figures cannot be overlaid. Use `Grid` instead."
         )
     panel = metadata.get("panel")
     if panel is None:
@@ -140,7 +89,7 @@ def _extract_groups(figure: plt.Figure, index: int) -> Tuple[_PanelSeam, list]:
 
     groups, skipped = [], False
     for group in panel.groups:
-        supported = [l for l in group.layers if isinstance(l, OVERLAYABLE_LAYERS)]
+        supported = [l for l in group.layers if l.overlayable]
         skipped = skipped or len(supported) < len(group.layers)
         if supported:
             groups.append(

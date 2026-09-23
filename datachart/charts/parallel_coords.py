@@ -120,6 +120,7 @@ def ParallelCoords(
     """
     # Build the charts structure using shared utility
     charts = build_charts_structure(
+        "parallelcoords",
         data,
         subtitle=subtitle,
         emphasis=emphasis,

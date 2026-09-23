@@ -245,6 +245,7 @@ def RaincloudPlot(
     validate_bandwidth(bandwidth)
 
     charts = build_charts_structure(
+        "raincloudplot",
         data,
         subtitle=subtitle,
         emphasis=emphasis,

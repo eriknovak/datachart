@@ -213,6 +213,7 @@ def DumbbellChart(
         show_legend = start_name is not None or end_name is not None
 
     charts = build_charts_structure(
+        "dumbbellchart",
         data,
         subtitle=subtitle,
         style=style,

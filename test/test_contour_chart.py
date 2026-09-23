@@ -20,7 +20,8 @@ from datachart.utils._internal.config_helpers import (
     get_contour_style,
     get_contour_label_style,
 )
-from datachart.utils._internal.layers import build_layers, contour_levels
+from datachart.utils._internal.chart_kinds import build_layers
+from datachart.utils._internal.layers import contour_levels
 
 
 def surface(n=40, lo=-5, hi=5):

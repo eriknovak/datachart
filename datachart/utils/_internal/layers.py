@@ -94,7 +94,6 @@ from .validate import (
     validate_line_curve,
     validate_rank_by,
     validate_emphasis_rule,
-    validate_date_period,
     validate_dumbbell_show_values,
     validate_dumbbell_sort_by,
     validate_marker_pair,
@@ -148,14 +147,12 @@ from .config_helpers import (
     get_sankey_style,
     get_treemap_style,
     get_network_style,
-    get_grid_style,
     get_line_style,
     get_bar_style,
     get_gantt_style,
     get_dumbbell_style,
     get_hist_style,
     get_kde_style,
-    get_legend_panel_settings,
     expand_legend_location,
     get_vline_style,
     get_hline_style,
@@ -2158,7 +2155,7 @@ def _oriented(ax: plt.Axes, transpose: bool) -> tuple:
     )
 
 
-def _resolve_show_values(settings: dict) -> bool:
+def resolve_show_values(settings: dict) -> bool:
     """`show_values` as set, else the theme default for a front that takes it (ADR 0033)."""
 
     value = settings.get("show_values")
@@ -2181,6 +2178,8 @@ class Layer:
     projection: str = "cartesian"
     # a bare layer owns its axes: fixed limits, axis off, no panel furniture
     bare: bool = False
+    # `Panel` can carry the layer into another figure's coordinate space
+    overlayable: bool = True
     # value labels sit past the mark on the value axis and need headroom there
     labels_past_mark: bool = False
     # value labels also sit below the value range, so the low end needs room
@@ -2280,7 +2279,7 @@ class Layer:
         placement differs per geometry.
         """
 
-        self.show_values = _resolve_show_values(self.settings)
+        self.show_values = resolve_show_values(self.settings)
         value_format = self.settings.get("value_format")
         self.value_format = (
             DEFAULT_VALUE_LABEL_FORMAT if value_format is None else value_format
@@ -2288,7 +2287,7 @@ class Layer:
         self.value_step = validate_value_step(self.settings.get("value_step"))
         style = get_value_label_style(self.style)
         self.value_padding = style["padding"]
-        self.value_font = _value_label_font(style)
+        self.value_font = value_label_font(style)
 
     def _label_bars(self, ax, bars, stacked: bool, **bar_label_kwargs) -> None:
         """Label a bar container past each bar's edge; inside it when stacked.
@@ -4286,6 +4285,8 @@ class KdeLayer(Layer):
     The scatter matrix draws one per hue group on its diagonal (ADR 0051);
     `kde_xlim` pins the evaluation grid to the column's shared limits.
     """
+
+    overlayable = False
 
     kind = "kde"
 
@@ -6480,6 +6481,7 @@ def _luminance(rgba) -> float:
 class HeatmapLayer(Layer):
     ticks_at_axis_ends = False
     kind = "heatmap"
+    overlayable = False
     # the theme keys the cells, values, and borders read
     style_prefix = "plot_heatmap"
 
@@ -6839,7 +6841,7 @@ class CalendarHeatmapLayer(HeatmapLayer):
     def _resolve_cell_values(self) -> None:
         """The shared `show_values` and `value_format` vocabulary (ADR 0033)."""
 
-        self.show_cell_values = _resolve_show_values(self.settings)
+        self.show_cell_values = resolve_show_values(self.settings)
         value_format = self.settings.get("value_format")
         self.value_format = (
             DEFAULT_VALUE_FORMAT if value_format is None else value_format
@@ -8800,7 +8802,7 @@ def _step_label(low, high) -> str:
     return " – ".join(f"{float(f'{value:.3g}'):g}" for value in (low, high))
 
 
-def _value_label_font(style: dict) -> dict:
+def value_label_font(style: dict) -> dict:
     """The text kwargs of a value label from its resolved `plot_value_*` style."""
 
     font = {
@@ -8968,6 +8970,8 @@ class SankeyLayer(Layer):
     The layer owns its axes: a fixed 0–1 data space with the axis off, so the
     panel applies no furniture, scales, or limits around it.
     """
+
+    overlayable = False
 
     kind = "sankey"
     bare = True
@@ -9333,6 +9337,8 @@ class TreemapLayer(Layer):
     fitting read the axes size at draw time, so tiles are squarified in the
     axes' own aspect wherever the layer is drawn.
     """
+
+    overlayable = False
 
     kind = "treemap"
     bare = True
@@ -9957,6 +9963,8 @@ class NetworkLayer(PointLabelMixin, Layer):
     keeps the picture.
     """
 
+    overlayable = False
+
     kind = "network"
     bare = True
 
@@ -10397,33 +10405,6 @@ class NetworkLayer(PointLabelMixin, Layer):
         return boxes
 
 
-LAYER_TYPES = {
-    "linechart": LineLayer,
-    "barchart": BarLayer,
-    # a pyramid is the bar seam under mirrored panel furniture (ADR 0017)
-    "pyramidchart": BarLayer,
-    "histogram": HistogramLayer,
-    "kde": KdeLayer,
-    "scatterchart": ScatterLayer,
-    "boxplot": BoxLayer,
-    "swarmplot": SwarmLayer,
-    "violinplot": ViolinLayer,
-    "ridgelineplot": RidgelineLayer,
-    "heatmap": HeatmapLayer,
-    "contourchart": ContourLayer,
-    "hexbinchart": HexbinLayer,
-    "stackedareachart": StackedAreaLayer,
-    "bumpchart": BumpLayer,
-    "sankeychart": SankeyLayer,
-    "treemap": TreemapLayer,
-    "networkchart": NetworkLayer,
-    "calendarheatmap": CalendarHeatmapLayer,
-    "ganttchart": GanttLayer,
-    "dumbbellchart": DumbbellLayer,
-    "imagechart": ImageLayer,
-    "basemapchart": BasemapLayer,
-}
-
 RADIAL_LAYER_TYPES = {
     RADIAL_TYPE.LINE: RadialLineLayer,
     RADIAL_TYPE.BAR: RadialBarLayer,
@@ -10480,14 +10461,17 @@ def _bar_record_values(charts: List[dict], magnitude: bool) -> list:
     return columns
 
 
-def _sort_bar_charts(charts: List[dict], sort, sort_by, magnitude: bool) -> List[dict]:
+def sort_bar_charts(charts: List[dict], settings: dict) -> List[dict]:
     """The charts with their records in category order (ADR 0042).
 
     One order serves every chart: categories sort by their total across the
     charts, or by the value in the one chart `sort_by` names by subtitle;
-    categories that chart lacks sort last. Ties keep input order.
+    categories that chart lacks sort last. Ties keep input order. A pyramid's
+    negated left side sorts by magnitude.
     """
 
+    sort, sort_by = validate_sort(settings.get("sort")), settings.get("sort_by")
+    magnitude = bool(settings.get("pyramid"))
     validate_sort_by(sort, sort_by, [chart.get("subtitle") for chart in charts])
     if sort is None:
         return charts
@@ -10584,7 +10568,7 @@ def _aligned_roles(chart: dict, n: int) -> Optional[list]:
     return roles
 
 
-def _bar_units(charts: List[dict], settings: dict, by) -> tuple:
+def bar_units(charts: List[dict], settings: dict, by) -> tuple:
     """One unit per drawn bar record, reading its own `y` (ADR 0042).
 
     A pyramid's negated left side reads as magnitudes.
@@ -10607,7 +10591,7 @@ def _bar_units(charts: List[dict], settings: dict, by) -> tuple:
     return filled, units
 
 
-def _gantt_units(charts: List[dict], settings: dict, by) -> tuple:
+def gantt_units(charts: List[dict], settings: dict, by) -> tuple:
     """One unit per task record, reading its duration in days (ADR 0049)."""
 
     filled, units = [], []
@@ -10624,7 +10608,7 @@ def _gantt_units(charts: List[dict], settings: dict, by) -> tuple:
     return filled, units
 
 
-def _dumbbell_units(charts: List[dict], settings: dict, by) -> tuple:
+def dumbbell_units(charts: List[dict], settings: dict, by) -> tuple:
     """One unit per dumbbell record, reading its delta (ADR 0050)."""
 
     filled, units = [], []
@@ -10635,7 +10619,7 @@ def _dumbbell_units(charts: List[dict], settings: dict, by) -> tuple:
     return filled, units
 
 
-def _series_units(column: str) -> Callable:
+def series_units(column: str) -> Callable:
     """The unit builder of a per-series front: each chart, by its `column`."""
 
     def units(charts: List[dict], settings: dict, by) -> tuple:
@@ -10651,7 +10635,7 @@ def _series_units(column: str) -> Callable:
     return units
 
 
-def _group_units(charts: List[dict], settings: dict, by) -> tuple:
+def group_units(charts: List[dict], settings: dict, by) -> tuple:
     """One unit per group label of each chart, by a summary of its values."""
 
     filled, units = [dict(chart) for chart in charts], []
@@ -10682,7 +10666,7 @@ def _treemap_record_units(record: dict, inherited, units: list) -> dict:
     return record
 
 
-def _treemap_units(charts: List[dict], settings: dict, by) -> tuple:
+def treemap_units(charts: List[dict], settings: dict, by) -> tuple:
     """One unit per leaf record, by its `value`; groups keep explicit roles."""
 
     filled, units = [], []
@@ -10693,7 +10677,7 @@ def _treemap_units(charts: List[dict], settings: dict, by) -> tuple:
     return filled, units
 
 
-def _network_units(charts: List[dict], settings: dict, by) -> tuple:
+def network_units(charts: List[dict], settings: dict, by) -> tuple:
     """One unit per node, by its `size`; a node without one raises."""
 
     filled, units = [], []
@@ -10714,7 +10698,7 @@ def _network_units(charts: List[dict], settings: dict, by) -> tuple:
     return filled, units
 
 
-def _parallel_units(charts: List[dict], settings: dict, by) -> tuple:
+def parallel_units(charts: List[dict], settings: dict, by) -> tuple:
     """One unit per data row, by its numeric `hue` value."""
 
     filled, units = [dict(chart) for chart in charts], []
@@ -10739,7 +10723,7 @@ def _parallel_units(charts: List[dict], settings: dict, by) -> tuple:
     return filled, units
 
 
-def _heatmap_units(charts: List[dict], settings: dict, by) -> tuple:
+def heatmap_units(charts: List[dict], settings: dict, by) -> tuple:
     """One unit per cell, by its value; a blank cell never matches."""
 
     filled, units = [], []
@@ -10755,125 +10739,6 @@ def _heatmap_units(charts: List[dict], settings: dict, by) -> tuple:
                     units.append((value, _fill_role(roles[i], j)))
         filled.append({**chart, "data": {**chart["data"], "emphasis": roles}})
     return filled, units
-
-
-# per front: a rule's unit builder and default `by` (ADR 0045)
-EMPHASIS_RULE_UNITS = {
-    "barchart": (_bar_units, None),
-    "pyramidchart": (_bar_units, None),
-    "radialchart": (_bar_units, None),
-    "treemap": (_treemap_units, None),
-    "networkchart": (_network_units, None),
-    "parallelcoords": (_parallel_units, None),
-    "heatmap": (_heatmap_units, None),
-    "boxplot": (_group_units, "median"),
-    "violinplot": (_group_units, "median"),
-    "swarmplot": (_group_units, "median"),
-    "raincloudplot": (_group_units, "median"),
-    "ridgelineplot": (_group_units, "median"),
-    "linechart": (_series_units("y"), "mean"),
-    "scatterchart": (_series_units("y"), "mean"),
-    "stackedareachart": (_series_units("y"), "mean"),
-    "bumpchart": (_series_units("y"), "mean"),
-    "ganttchart": (_gantt_units, None),
-    "dumbbellchart": (_dumbbell_units, None),
-    "histogram": (_series_units("x"), "mean"),
-    "contourchart": (_series_units("z"), "mean"),
-}
-
-
-def apply_emphasis_rule(chart_type: str, charts: List[dict], settings: dict) -> list:
-    """The charts with the rule's role written on each unit that set none.
-
-    The rule reads every unit of the charts as one pool, so a count picks
-    units across the series and subplots; an explicit role wins.
-    """
-
-    units_of, by = EMPHASIS_RULE_UNITS[chart_type]
-    rule = validate_emphasis_rule(settings.get("emphasis_rule"), by)
-    if rule is None:
-        return charts
-    if chart_type == "bumpchart":
-        # a bump chart reads ranks, best when lowest: `top` picks them (ADR 0046)
-        rule = ({"top": "bottom", "bottom": "top"}.get(rule[0], rule[0]),) + rule[1:]
-    charts, units = units_of(charts, settings, rule[2])
-    roles = emphasis_rule_roles(rule, [value for value, _ in units])
-    for (_, fill), role in zip(units, roles):
-        fill(role)
-    return charts
-
-
-# the fronts whose records carry a value per category and sort by it
-BAR_RECORD_CHARTS = ("barchart", "pyramidchart")
-
-
-def build_layers(chart_type: str, charts: List[dict], settings: dict) -> List[Layer]:
-    """Build the layers for a chart front; style resolution happens here."""
-
-    visual = settings.get("radial_type") or RADIAL_TYPE.LINE
-    bar_records = chart_type in BAR_RECORD_CHARTS or (
-        chart_type == "radialchart" and visual == RADIAL_TYPE.BAR
-    )
-    if chart_type == "bumpchart":
-        # the rule reads the ranks, so they come first
-        charts = rank_bump_charts(charts, settings)
-    if chart_type in EMPHASIS_RULE_UNITS and (
-        chart_type != "radialchart" or bar_records
-    ):
-        # the rule breaks ties on input order, so it runs before the sort
-        charts = apply_emphasis_rule(chart_type, charts, settings)
-    if chart_type == "ganttchart":
-        charts = sort_gantt_charts(charts, settings)
-    if chart_type == "dumbbellchart":
-        charts = sort_dumbbell_charts(charts, settings)
-    if bar_records:
-        charts = _sort_bar_charts(
-            charts,
-            validate_sort(settings.get("sort")),
-            settings.get("sort_by"),
-            bool(settings.get("pyramid")),
-        )
-
-    if chart_type == "parallelcoords":
-        return [ParallelCoordsLayer(list(charts), settings)]
-
-    if chart_type == "radialchart":
-        if visual not in RADIAL_LAYER_TYPES:
-            raise ValueError(
-                f"Invalid radial `type` value {visual!r}. "
-                f"Must be one of {sorted(RADIAL_LAYER_TYPES)}."
-            )
-        layer_cls = RADIAL_LAYER_TYPES[visual]
-        return [layer_cls(chart, settings) for chart in charts]
-
-    if chart_type == "raincloudplot":
-        return [
-            layer
-            for chart in charts
-            for layer in build_raincloud_layers(chart, settings)
-        ]
-
-    layer_cls = LAYER_TYPES[chart_type]
-    layers = [layer_cls(chart, settings) for chart in charts]
-
-    if chart_type == "ridgelineplot" and len(layers) > 1:
-        # one grid range for every subplot, like the histogram's shared bins
-        ranges = [r for r in (layer.padded_range() for layer in layers) if r]
-        if ranges:
-            shared = (min(r[0] for r in ranges), max(r[1] for r in ranges))
-            for layer in layers:
-                layer.shared_range = shared
-
-    if (
-        chart_type == "linechart"
-        and settings.get("show_yerr")
-        and settings.get("show_area")
-    ):
-        warnings.warn(
-            "Both the `show_yerr` and `show_area` will be used. "
-            + "Only one of them should be True."
-        )
-    return layers
 
 
 def build_raincloud_layers(chart: dict, settings: dict) -> List[Layer]:
@@ -13027,16 +12892,6 @@ class Panel:
 # ================================================
 
 
-GROUP_CHART_TYPES = (
-    "boxplot",
-    "dumbbellchart",
-    "violinplot",
-    "swarmplot",
-    "raincloudplot",
-    "ridgelineplot",
-)
-
-
 def value_axis_grid(show_grid, horizontal: bool):
     """A theme's one-axis grid default, moved onto a horizontal value axis.
 
@@ -13047,118 +12902,3 @@ def value_axis_grid(show_grid, horizontal: bool):
     if not horizontal:
         return show_grid
     return {"x": "y", "y": "x"}.get(show_grid, show_grid)
-
-
-def build_chart_panel_settings(
-    chart_type: str, settings: dict, mode: str, first_style: dict
-) -> dict:
-    """Resolve panel-level settings for a chart front at build time.
-
-    Modes: "single" (all layers on the figure's one axes), "subplot" (one layer
-    per axes), "composition" (the metadata panel used by grids).
-    """
-
-    show_grid = settings.get("show_grid")
-    # a polar panel draws only the set an explicit value names (ADR 0015)
-    show_grid_explicit = show_grid is not None
-    # rasters (a heatmap, hexagons, filled contour bands) cover the grid, and a
-    # bump chart's ranks read from the lines and labels: no grid unless asked
-    gridless = chart_type in (
-        "heatmap",
-        "calendarheatmap",
-        "hexbinchart",
-        "bumpchart",
-    ) or (chart_type == "contourchart" and settings.get("filled"))
-    if show_grid is None and not gridless:
-        show_grid = config.get("chart_default_show_grid")
-        if chart_type == "dumbbellchart":
-            orientation = settings.get("orientation") or DEFAULT_ORIENTATION
-            show_grid = value_axis_grid(
-                show_grid, orientation == ORIENTATION.HORIZONTAL
-            )
-
-    # the seam's scale keys are literal; group fronts mean the value axis
-    scalex, scaley = settings.get("scalex"), settings.get("scaley")
-    if (
-        chart_type in GROUP_CHART_TYPES
-        and settings.get("orientation") == ORIENTATION.HORIZONTAL
-    ):
-        scalex, scaley = scaley, scalex
-
-    panel_settings = {
-        "furniture": Panel.snapshot_furniture(),
-        "scalex": scalex,
-        "scaley": scaley,
-        # horizontal bars and histograms take their scale keys literally
-        "literal_scale_keys": chart_type not in GROUP_CHART_TYPES,
-        "show_grid": show_grid,
-        "show_grid_explicit": show_grid_explicit,
-        "grid_style": get_grid_style(first_style),
-        "hatch_cycle": config.get("plot_hatch_cycle"),
-        "linestyle_cycle": config.get("plot_linestyle_cycle"),
-        "marker_cycle": config.get("plot_marker_cycle"),
-        "xmin": settings.get("xmin"),
-        "xmax": settings.get("xmax"),
-        "ymin": settings.get("ymin"),
-        "ymax": settings.get("ymax"),
-        "xticks_format": settings.get("xticks_format"),
-        "date_period": validate_date_period(settings.get("period")),
-        "yticks_format": settings.get("yticks_format"),
-        "aspect_ratio": (
-            ASPECT_RATIO.AUTO
-            if settings.get("aspect_ratio") is None
-            else settings["aspect_ratio"]
-        ),
-        **get_legend_panel_settings(settings.get("legend")),
-        # histograms stack by default; bars group (ADR 0014)
-        "bar_mode": settings.get("bar_mode")
-        or ("stack" if chart_type == "histogram" else "group"),
-        # the caller's own mode, unresolved, for a panel to adopt (ADR 0005)
-        "source_bar_mode": settings.get("bar_mode"),
-        "tighten_xlim": chart_type in ("linechart", "stackedareachart", "bumpchart"),
-        # validated here so a bad value fails at the front, like the emphasis roles
-        "baseline": validate_baseline(settings.get("baseline")),
-        # radial furniture; only polar panels read these
-        "startangle": settings.get("startangle"),
-        "direction": settings.get("direction"),
-        "innerradius": settings.get("innerradius"),
-        "show_border": settings.get("show_border"),
-        "show_values": _resolve_show_values(settings),
-        "show_tip_labels": settings.get("show_tip_labels"),
-        "value_format": settings.get("value_format"),
-        # the tip texts set their own family, rotated along the spoke
-        "tip_value_style": {
-            k: v
-            for k, v in _value_label_font(get_value_label_style(first_style)).items()
-            if k != "family"
-        },
-    }
-
-    if chart_type == "pyramidchart":
-        # the mirror is panel furniture (ADR 0017): overlay slots give both
-        # sides full width at offset zero, the panel owns limits and ticks
-        panel_settings["pyramid"] = True
-        panel_settings["bar_mode"] = "overlay"
-        panel_settings["pyramid_xmax"] = settings.get("xmax")
-        panel_settings["xmax"] = None
-        panel_settings["pyramid_xticks"] = settings.get("xticks")
-        panel_settings["pyramid_xticklabels"] = settings.get("xticklabels")
-        panel_settings["pyramid_xtickrotate"] = settings.get("xtickrotate")
-
-    if mode == "subplot":
-        panel_settings["show_legend"] = False
-        panel_settings["bar_slotting"] = False
-        panel_settings["bar_ticks"] = "subplot"
-    else:
-        panel_settings["show_legend"] = settings.get("show_legend")
-        panel_settings["bar_ticks"] = "group"
-
-    if mode == "composition":
-        panel_settings["hide_ticklabels"] = settings.get("hide_ticklabels")
-        panel_settings["marks_on_twin"] = settings.get("marks_on_twin")
-        panel_settings["hide_ticks"] = settings.get("hide_ticks")
-        panel_settings["xlabel"] = settings.get("xlabel")
-        panel_settings["ylabel"] = settings.get("ylabel")
-        panel_settings["label_styles"] = Panel.snapshot_label_styles()
-
-    return panel_settings

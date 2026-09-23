@@ -147,12 +147,6 @@ def CalendarHeatmap(
             [`CALENDAR_WEEKDAY`][datachart.constants.CALENDAR_WEEKDAY] member.
 
     """
-    if emphasis is not None:
-        raise ValueError(
-            "CalendarHeatmap does not support `emphasis`: a calendar is a single "
-            "raster layer with no series to mute or highlight."
-        )
-
     datasets = data if isinstance(data, list) else [data]
     if not all(isinstance(d, dict) and "date" in d and "value" in d for d in datasets):
         raise ValueError(
@@ -161,10 +155,11 @@ def CalendarHeatmap(
         )
 
     charts = build_charts_structure(
+        "calendarheatmap",
         data,
+        emphasis=emphasis,
         subtitle=subtitle,
         style=style,
-        is_2d_data=True,
         norm=norm,
         vmin=vmin,
         vmax=vmax,

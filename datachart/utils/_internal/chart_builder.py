@@ -5,6 +5,8 @@ This module provides helper functions to reduce boilerplate in chart definitions
 
 from typing import Any, Dict, List, Union
 
+from .chart_kinds import chart_kind
+
 # extra attrs whose single value is itself a list, like the tick positions
 LIST_TYPE_EXTRA_ATTRS = {"dimensions"}
 
@@ -264,6 +266,7 @@ def build_chart_dict_single(
 
 
 def build_charts_structure(
+    chart_type: str,
     data: Any,
     *,
     subtitle: Any = None,
@@ -281,14 +284,15 @@ def build_charts_structure(
     vspans: Any = None,
     hspans: Any = None,
     texts: Any = None,
-    is_2d_data: bool = False,
     **extra_attrs: Any,
 ) -> Union[Dict[str, Any], List[Dict[str, Any]]]:
     """Build the charts structure for internal API.
 
-    This handles both single-chart and multi-chart data formats.
+    This handles both single-chart and multi-chart data formats; the front's
+    `ChartKind` row says which shape one chart's data takes.
 
     Args:
+        chart_type: The chart type whose row the data is read against.
         data: The chart data (single list or list of lists).
         subtitle: The subtitle(s).
         style: The style(s).
@@ -305,17 +309,23 @@ def build_charts_structure(
         vspans: The vertical reference bands.
         hspans: The horizontal reference bands.
         texts: The text annotations.
-        is_2d_data: If True, data for a single chart is a grid dict (heatmap
-            or contour `{x, y, z}`). Multi-chart detection checks for a list
-            of those instead.
         **extra_attrs: Extra chart-specific attributes.
 
     Returns:
         Either a single chart dict or a list of chart dicts.
+
+    Raises:
+        ValueError: If the chart type has no row, or a parameter the row
+            rejects is set.
     """
+    kind = chart_kind(chart_type)
+    for name, reason in kind.rejects.items():
+        if extra_attrs.get(name) is not None:
+            raise ValueError(reason)
+
     # Detect if data is for multiple charts
-    if is_2d_data:
-        # one 2D chart is a grid dict; several are a list of them
+    if kind.dict_data:
+        # one chart is a dict (a grid, links, a tree); several are a list of them
         is_multi_chart = (
             isinstance(data, list) and len(data) > 0 and isinstance(data[0], dict)
         )

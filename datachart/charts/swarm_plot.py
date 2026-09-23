@@ -232,6 +232,7 @@ def SwarmPlot(
 
     """
     charts = build_charts_structure(
+        "swarmplot",
         data,
         subtitle=subtitle,
         emphasis=emphasis,

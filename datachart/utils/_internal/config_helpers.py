@@ -7,7 +7,6 @@ import matplotlib.font_manager as font_manager
 import matplotlib.pyplot as plt
 
 from ...config import config, Config
-from ...config.charts import CHART_CONFIGS
 from ...constants import ARROW_STYLE, COLORBAR_LOCATION, LEGEND_LOCATION, ORIENTATION
 from ...themes._base import canonical_style
 from .fonts import FACES, ensure_face, font_available
@@ -69,11 +68,12 @@ def create_config_dict(
 
 
 def get_subplot_config(
-    chart_type: str, subplots: bool, n_charts: int = 1, max_cols: int = 1
+    kind, subplots: bool, n_charts: int = 1, max_cols: int = 1
 ) -> Dict[str, int]:
     """Calculate the configuration for subplots in a figure.
 
     Args:
+        kind: The front's `ChartKind` row, read for its multiplot and subplot rules.
         subplots: Whether to show subplots.
         n_charts: The number of charts.
         max_cols: The maximum number of columns.
@@ -86,14 +86,13 @@ def get_subplot_config(
     nrows = 1
     ncols = 1
 
-    chart_config = CHART_CONFIGS[chart_type]
-    if subplots and not chart_config["subplots"]:
+    if subplots and not kind.subplots:
         warnings.warn(
-            f"Chart type '{chart_type}' does not support subplots. Setting subplots to False..."
+            f"Chart type '{kind.name}' does not support subplots. Setting subplots to False..."
         )
         subplots = False
 
-    if subplots or not chart_config["multiplot"]:
+    if subplots or not kind.multiplot:
         if not isinstance(n_charts, int):
             raise TypeError("The number of charts is not an integer.")
         if n_charts <= 0:

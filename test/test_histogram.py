@@ -10,7 +10,7 @@ from datachart.charts import Histogram
 from datachart.config import config
 from datachart.constants import HISTOGRAM_TYPE, ORIENTATION, SCALE
 from datachart.utils import Panel
-from datachart.utils._internal.layers import build_chart_panel_settings
+from datachart.utils._internal.chart_kinds import build_chart_panel_settings
 
 # deterministic series: combined range 0.5-2.5, num_bins=3 puts the values
 # 0.5 / 1.5 / 2.5 into bins 0 / 1 / 2 with counts A=[4,2,0], B=[1,0,3]

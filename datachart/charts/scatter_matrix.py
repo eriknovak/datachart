@@ -20,8 +20,8 @@ from ..utils._internal.layers import (
     LayerGroup,
     Panel,
     TextLayer,
-    build_chart_panel_settings,
 )
+from ..utils._internal.chart_kinds import build_chart_panel_settings
 from ..utils._internal.plot_engine import composition_panel
 from ..utils._internal.validate import validate_diagonal
 from ..typings import (
@@ -187,7 +187,7 @@ def _scatter_panel(x, y, groups, style, settings) -> Panel:
             [{"x": float(a), "y": float(b)} for a, b in zip(x[keep], y[keep])]
         )
     charts = build_charts_structure(
-        series, subtitle=[label for label, _ in groups], style=style
+        "scatterchart", series, subtitle=[label for label, _ in groups], style=style
     )
     return composition_panel("scatterchart", charts, settings)
 
@@ -197,10 +197,10 @@ def _diagonal_panel(values, groups, diagonal, style, settings) -> Panel:
     for _, mask in groups:
         keep = mask & np.isfinite(values)
         series.append([{"x": float(v)} for v in values[keep]])
-    charts = build_charts_structure(
-        series, subtitle=[label for label, _ in groups], style=style
-    )
     chart_type = "kde" if diagonal == SCATTER_MATRIX_DIAGONAL.KDE else "histogram"
+    charts = build_charts_structure(
+        chart_type, series, subtitle=[label for label, _ in groups], style=style
+    )
     return composition_panel(chart_type, charts, settings)
 
 

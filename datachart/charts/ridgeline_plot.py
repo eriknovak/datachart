@@ -256,6 +256,7 @@ def RidgelinePlot(
     validate_bandwidth(bandwidth)
 
     charts = build_charts_structure(
+        "ridgelineplot",
         data,
         subtitle=subtitle,
         emphasis=emphasis,

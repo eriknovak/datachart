@@ -21,8 +21,8 @@ from datachart.utils._internal.layers import (
     RAINCLOUD_CLOUD_WIDTH,
     RAINCLOUD_RAIN_OFFSET,
     RAINCLOUD_RAIN_SPREAD,
-    build_layers,
 )
+from datachart.utils._internal.chart_kinds import build_layers
 
 
 def group_data(seed=3, n=40):

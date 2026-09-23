@@ -242,6 +242,7 @@ def BarChart(
     """
     # Build the charts structure using shared utility
     charts = build_charts_structure(
+        "barchart",
         data,
         subtitle=subtitle,
         emphasis=emphasis,

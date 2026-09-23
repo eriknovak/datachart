@@ -309,6 +309,7 @@ def ScatterChart(
     # Build the charts structure using shared utility
     validate_point_labels(label, show_values)
     charts = build_charts_structure(
+        "scatterchart",
         data,
         subtitle=subtitle,
         emphasis=emphasis,

@@ -80,6 +80,7 @@ class TestTextsParameter(unittest.TestCase):
 
     def test_builder_list_of_lists_indexes_per_chart(self):
         charts = build_charts_structure(
+            "linechart",
             [LINE1, LINE2],
             texts=[
                 [NOTE, {"text": "b", "x": 1, "y": 1}],
@@ -91,7 +92,7 @@ class TestTextsParameter(unittest.TestCase):
 
     def test_builder_single_chart_passthrough(self):
         charts = build_charts_structure(
-            LINE1, texts=[NOTE, {"text": "b", "x": 1, "y": 1}]
+            "linechart", LINE1, texts=[NOTE, {"text": "b", "x": 1, "y": 1}]
         )
         self.assertEqual(len(charts["texts"]), 2)
 

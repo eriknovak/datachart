@@ -110,10 +110,10 @@ def ImageChart(
     validate_draw_position(position)
 
     charts = build_charts_structure(
+        "imagechart",
         data,
         subtitle=subtitle,
         style=style,
-        is_2d_data=True,
     )
 
     # Figure-level settings; None values resolve to defaults downstream

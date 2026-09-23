@@ -14,15 +14,14 @@ import matplotlib.pyplot as plt
 
 from .config_helpers import get_subplot_config, configure_labels
 from .figures import new_figure
-from .layers import (
-    Layer,
-    Panel,
-    LayerGroup,
-    build_layers,
-    group_from_chart,
-    layers_per_chart,
+from .chart_kinds import (
+    ChartKind,
     build_chart_panel_settings,
+    build_layers,
+    chart_kind,
 )
+from .layers import Layer, Panel, LayerGroup, group_from_chart, layers_per_chart
+from .validate import validate_single_dataset
 from ...constants import COLORBAR_LOCATION, FIG_SIZE, ORIENTATION
 
 # ================================================
@@ -33,14 +32,14 @@ from ...constants import COLORBAR_LOCATION, FIG_SIZE, ORIENTATION
 SUBPLOT_FURNITURE_KEYS = ("title", "xlabel", "ylabel", "sharex", "sharey")
 
 
-def single_plot_axes_labels(chart_type: str, layers: List[Layer]) -> tuple:
+def single_plot_axes_labels(kind: ChartKind, layers: List[Layer]) -> tuple:
     """The axis labels a single plot carries on its axes, not the figure.
 
     A figure-level label sits at the figure edge: far from a polar circle,
     and past a left or bottom colorbar, where it reads as the bar's caption.
     """
 
-    if chart_type == "radialchart":
+    if kind.projection == "polar":
         return ("xlabel", "ylabel")
     edges = {layer.colorbar_edge for layer in layers}
     return tuple(
@@ -109,13 +108,16 @@ def render_chart(
         raise ValueError("Parameter `charts` is not correctly structured")
 
     charts = charts if isinstance(charts, list) else [charts]
+    kind = chart_kind(chart_type)
+    if kind.single_dataset:
+        validate_single_dataset(charts, kind.label, settings.get("subplots"))
 
     # build the layers; style is resolved against the config here, once
     layers = build_layers(chart_type, charts, settings)
 
     max_cols = settings.get("max_cols")
     subplot_config = get_subplot_config(
-        chart_type,
+        kind,
         settings.get("subplots"),
         n_charts=len(charts),
         max_cols=4 if max_cols is None else max_cols,
@@ -128,7 +130,9 @@ def render_chart(
         sharex=False if sharex is None else sharex,
         sharey=False if sharey is None else sharey,
         squeeze=False,
-        subplot_kw=({"projection": "polar"} if chart_type == "radialchart" else None),
+        subplot_kw=(
+            None if kind.projection is None else {"projection": kind.projection}
+        ),
         **subplot_config,
     )
 
@@ -140,7 +144,7 @@ def render_chart(
 
     # square polar axes leave slack in wide grid slots; anchor the outer
     # rows/columns toward the center so the circles read as one figure
-    if chart_type == "radialchart" and not is_single_plot:
+    if kind.projection == "polar" and not is_single_plot:
         nrows, ncols = subplot_config["nrows"], subplot_config["ncols"]
         for idx, ax in enumerate(axes):
             row, col = divmod(idx, ncols)
@@ -158,25 +162,24 @@ def render_chart(
         panel_settings = build_chart_panel_settings(
             chart_type, settings, "single", first_style
         )
-        axes_labels = single_plot_axes_labels(chart_type, layers)
+        axes_labels = single_plot_axes_labels(kind, layers)
         for key in axes_labels:
             panel_settings[key] = settings.get(key)
         panel_settings["label_styles"] = Panel.snapshot_label_styles()
         panel = Panel([group_from_chart(layers, settings)], panel_settings)
         panel.render(axes[0])
     else:
-        if settings.get("show_legend") and chart_type != "heatmap":
+        if settings.get("show_legend") and kind.warns_subplot_legend:
             warnings.warn("The `show_legend` flag will be ignored for multi-subplots.")
 
-        # histograms share bin edges across all subplots
         hist_bins = None
-        if chart_type == "histogram":
+        if kind.shared_bins:
             hist_bins = LayerGroup(
                 layers, num_bins=settings.get("num_bins")
             ).hist_bins()
 
         is_horizontal_bar = (
-            chart_type == "barchart"
+            kind.swaps_horizontal_labels
             and settings.get("orientation") == ORIENTATION.HORIZONTAL
         )
 
