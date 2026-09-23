@@ -104,15 +104,24 @@ always draw over it.
 _Avoid_: raster (for this), fill layer
 
 **Chart front**:
-A public chart function (`LineChart`, `BarChart`, …) — a thin front that validates
-input and hands the engine an explicit charts structure and settings dict; it does
-not draw, and its signature is the allowlist of what the chart supports.
-_Avoid_: chart class, chart type (for the function), attrs dict
+A public chart function (`LineChart`, `BarChart`, …) — its signature is the
+allowlist of what the chart supports, its body is any check on what it names
+and one engine call with its arguments; it builds no charts structure, no
+settings dict, and does not draw.
+_Avoid_: chart class, chart type (for the function), attrs dict, forwarding dict
+
+**Key split**:
+How the engine sorts a front's arguments: sixteen shared per-chart keys plus
+the row's `chart_keys` are indexed against the charts; a row's `figure_keys`
+pulls a shared key back to the figure (the pyramid's mirrored `xticks`); every
+other argument is a figure setting by complement. Declared on the chart kind,
+performed once in the engine, never re-decided in a front.
+_Avoid_: forwarding, per-chart dict / settings dict (for the mechanism)
 
 **Chart kind**:
 The one record of what a chart front *is* — its layer class, record shape,
 projection, group / bare / gridless flags, emphasis unit, multiplot and subplot
-rules, accepted reference marks, rejected parameters — held as a frozen
+rules, rejected parameters, key split, legend default — held as a frozen
 `ChartKind` row in one table and read through one accessor. The engine,
 builder, and composition branch on the row, never on the chart-type string;
 a front with no row fails before drawing.

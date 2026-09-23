@@ -1,5 +1,6 @@
 ---
 status: accepted
+amended-by: [0066]
 ---
 
 # Chart fronts pass explicit settings; the attrs dict is retired
