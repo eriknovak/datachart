@@ -56,7 +56,7 @@ def DumbbellChart(
     xmax: Optional[Union[int, float]] = None,
     ymin: Optional[Union[int, float]] = None,
     ymax: Optional[Union[int, float]] = None,
-    orientation: Optional[Union[ORIENTATION, str]] = ORIENTATION.HORIZONTAL,
+    orientation: Optional[Union[ORIENTATION, str]] = None,
     scaley: Optional[Union[SCALE, str]] = None,
     subplots: Optional[bool] = None,
     max_cols: Optional[int] = None,
@@ -80,13 +80,55 @@ def DumbbellChart(
     ] = None,
     xtickrotate: Optional[Union[int, List[Optional[int]]]] = None,
     ytickrotate: Optional[Union[int, List[Optional[int]]]] = None,
-    vlines: Optional[Union[VLineSettingAttrs, List[VLineSettingAttrs]]] = None,
-    hlines: Optional[Union[HLineSettingAttrs, List[HLineSettingAttrs]]] = None,
-    dlines: Optional[Union[DLineSettingAttrs, List[DLineSettingAttrs]]] = None,
-    brackets: Optional[Union[BracketSettingAttrs, List[BracketSettingAttrs]]] = None,
-    vspans: Optional[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]] = None,
-    hspans: Optional[Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]] = None,
-    texts: Optional[Union[TextSettingAttrs, List[TextSettingAttrs]]] = None,
+    vlines: Optional[
+        Union[
+            VLineSettingAttrs,
+            List[VLineSettingAttrs],
+            List[Union[VLineSettingAttrs, List[VLineSettingAttrs], None]],
+        ]
+    ] = None,
+    hlines: Optional[
+        Union[
+            HLineSettingAttrs,
+            List[HLineSettingAttrs],
+            List[Union[HLineSettingAttrs, List[HLineSettingAttrs], None]],
+        ]
+    ] = None,
+    dlines: Optional[
+        Union[
+            DLineSettingAttrs,
+            List[DLineSettingAttrs],
+            List[Union[DLineSettingAttrs, List[DLineSettingAttrs], None]],
+        ]
+    ] = None,
+    brackets: Optional[
+        Union[
+            BracketSettingAttrs,
+            List[BracketSettingAttrs],
+            List[Union[BracketSettingAttrs, List[BracketSettingAttrs], None]],
+        ]
+    ] = None,
+    vspans: Optional[
+        Union[
+            VSpanSettingAttrs,
+            List[VSpanSettingAttrs],
+            List[Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]],
+        ]
+    ] = None,
+    hspans: Optional[
+        Union[
+            HSpanSettingAttrs,
+            List[HSpanSettingAttrs],
+            List[Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]],
+        ]
+    ] = None,
+    texts: Optional[
+        Union[
+            TextSettingAttrs,
+            List[TextSettingAttrs],
+            List[Union[TextSettingAttrs, List[TextSettingAttrs], None]],
+        ]
+    ] = None,
 ) -> plt.Figure:
     """Creates the dumbbell chart.
 

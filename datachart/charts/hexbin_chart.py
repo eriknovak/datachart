@@ -50,7 +50,7 @@ def HexbinChart(
     show_legend: Optional[bool] = None,
     legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
-    show_colorbars: bool = True,
+    show_colorbars: Optional[bool] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     scalex: Optional[Union[SCALE, str]] = None,
     scaley: Optional[Union[SCALE, str]] = None,

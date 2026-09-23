@@ -55,7 +55,7 @@ def RidgelinePlot(
     legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
-    orientation: Optional[Union[ORIENTATION, str]] = ORIENTATION.HORIZONTAL,
+    orientation: Optional[Union[ORIENTATION, str]] = None,
     scaley: Optional[Union[SCALE, str]] = None,
     subplots: Optional[bool] = None,
     max_cols: Optional[int] = None,

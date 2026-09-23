@@ -54,7 +54,7 @@ def Histogram(
     show_values: Optional[bool] = None,
     value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
-    orientation: Optional[Union[ORIENTATION, str]] = ORIENTATION.VERTICAL,
+    orientation: Optional[Union[ORIENTATION, str]] = None,
     bar_mode: Optional[Union[BAR_MODE, str]] = None,
     num_bins: Optional[int] = None,
     scalex: Optional[Union[SCALE, str]] = None,

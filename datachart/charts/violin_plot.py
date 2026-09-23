@@ -58,7 +58,7 @@ def ViolinPlot(
     show_values: Optional[bool] = None,
     value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
-    orientation: Optional[Union[ORIENTATION, str]] = ORIENTATION.VERTICAL,
+    orientation: Optional[Union[ORIENTATION, str]] = None,
     sort: Optional[Union[SORT, str]] = None,
     scaley: Optional[Union[SCALE, str]] = None,
     subplots: Optional[bool] = None,

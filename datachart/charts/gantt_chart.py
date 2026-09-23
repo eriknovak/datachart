@@ -65,12 +65,30 @@ def GanttChart(
     emphasis: Optional[Union[EMPHASIS, str, List[Optional[str]]]] = None,
     emphasis_rule: Optional[EmphasisRuleAttrs] = None,
     style: Optional[Union[GanttStyleAttrs, List[Optional[GanttStyleAttrs]]]] = None,
-    xtickrotate: Optional[int] = None,
-    ytickrotate: Optional[int] = None,
+    xtickrotate: Optional[Union[int, List[Optional[int]]]] = None,
+    ytickrotate: Optional[Union[int, List[Optional[int]]]] = None,
     xticks_format: Optional[Union[DATE_FORMAT, str]] = None,
-    vlines: Optional[Union[VLineSettingAttrs, List[VLineSettingAttrs]]] = None,
-    vspans: Optional[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]] = None,
-    texts: Optional[Union[TextSettingAttrs, List[TextSettingAttrs]]] = None,
+    vlines: Optional[
+        Union[
+            VLineSettingAttrs,
+            List[VLineSettingAttrs],
+            List[Union[VLineSettingAttrs, List[VLineSettingAttrs], None]],
+        ]
+    ] = None,
+    vspans: Optional[
+        Union[
+            VSpanSettingAttrs,
+            List[VSpanSettingAttrs],
+            List[Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]],
+        ]
+    ] = None,
+    texts: Optional[
+        Union[
+            TextSettingAttrs,
+            List[TextSettingAttrs],
+            List[Union[TextSettingAttrs, List[TextSettingAttrs], None]],
+        ]
+    ] = None,
 ) -> plt.Figure:
     """Creates the gantt chart.
 

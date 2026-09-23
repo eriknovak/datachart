@@ -53,18 +53,62 @@ def PyramidChart(
     xticks: Optional[List[Union[int, float]]] = None,
     xticklabels: Optional[List[str]] = None,
     xtickrotate: Optional[int] = None,
-    yticks: Optional[List[Union[int, float]]] = None,
-    yticklabels: Optional[List[str]] = None,
-    ytickrotate: Optional[int] = None,
+    yticks: Optional[
+        Union[List[Union[int, float]], List[List[Union[int, float]]]]
+    ] = None,
+    yticklabels: Optional[Union[List[str], List[List[str]]]] = None,
+    ytickrotate: Optional[Union[int, List[Optional[int]]]] = None,
     xticks_format: Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]] = None,
     yticks_format: Optional[Union[VALUE_FORMAT, DATE_FORMAT, str]] = None,
-    vlines: Optional[Union[VLineSettingAttrs, List[VLineSettingAttrs]]] = None,
-    hlines: Optional[Union[HLineSettingAttrs, List[HLineSettingAttrs]]] = None,
-    dlines: Optional[Union[DLineSettingAttrs, List[DLineSettingAttrs]]] = None,
-    brackets: Optional[Union[BracketSettingAttrs, List[BracketSettingAttrs]]] = None,
-    vspans: Optional[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]] = None,
-    hspans: Optional[Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]] = None,
-    texts: Optional[Union[TextSettingAttrs, List[TextSettingAttrs]]] = None,
+    vlines: Optional[
+        Union[
+            VLineSettingAttrs,
+            List[VLineSettingAttrs],
+            List[Union[VLineSettingAttrs, List[VLineSettingAttrs], None]],
+        ]
+    ] = None,
+    hlines: Optional[
+        Union[
+            HLineSettingAttrs,
+            List[HLineSettingAttrs],
+            List[Union[HLineSettingAttrs, List[HLineSettingAttrs], None]],
+        ]
+    ] = None,
+    dlines: Optional[
+        Union[
+            DLineSettingAttrs,
+            List[DLineSettingAttrs],
+            List[Union[DLineSettingAttrs, List[DLineSettingAttrs], None]],
+        ]
+    ] = None,
+    brackets: Optional[
+        Union[
+            BracketSettingAttrs,
+            List[BracketSettingAttrs],
+            List[Union[BracketSettingAttrs, List[BracketSettingAttrs], None]],
+        ]
+    ] = None,
+    vspans: Optional[
+        Union[
+            VSpanSettingAttrs,
+            List[VSpanSettingAttrs],
+            List[Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]],
+        ]
+    ] = None,
+    hspans: Optional[
+        Union[
+            HSpanSettingAttrs,
+            List[HSpanSettingAttrs],
+            List[Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]],
+        ]
+    ] = None,
+    texts: Optional[
+        Union[
+            TextSettingAttrs,
+            List[TextSettingAttrs],
+            List[Union[TextSettingAttrs, List[TextSettingAttrs], None]],
+        ]
+    ] = None,
     label: Optional[Union[str, List[Optional[str]]]] = None,
     y: Optional[Union[str, List[Optional[str]]]] = None,
     yerr: Optional[Union[str, List[Optional[str]]]] = None,
