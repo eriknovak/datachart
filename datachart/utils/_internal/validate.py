@@ -1331,6 +1331,28 @@ def validate_basemap_resolution(resolution) -> str:
     return resolution
 
 
+def validate_basemap_company(non_numeric_kinds, horizontal) -> None:
+    """Raise when a basemap shares a panel with a chart that has no longitude.
+
+    Args:
+        non_numeric_kinds: The kinds of the panel's data layers whose x is
+            categorical, a date, or its own axes.
+        horizontal: Whether the panel is horizontal, x and y swapped.
+    """
+
+    if horizontal or non_numeric_kinds:
+        culprit = (
+            "a horizontal chart"
+            if horizontal
+            else f"a {non_numeric_kinds[0]!r} chart whose x is not a number"
+        )
+        raise ValueError(
+            "A basemap draws longitude on x and latitude on y, so every chart "
+            f"it shares a panel with must too; this panel holds {culprit}. "
+            "Compose the two side by side with `Grid` instead."
+        )
+
+
 def validate_basemap_features(features) -> tuple:
     """The features as a tuple of names; None means coastline and land."""
 

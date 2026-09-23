@@ -103,6 +103,7 @@ from .validate import (
     validate_gantt_sort_by,
     BASEMAP_FEATURES,
     BASEMAP_FILLED,
+    validate_basemap_company,
     validate_basemap_features,
     validate_basemap_geometry,
     validate_basemap_highlight,
@@ -11466,6 +11467,15 @@ class Panel:
             ("ridge", "ridgeline plot"),
         ):
             validate_single_dataset([l for l in self.layers if l.kind == kind], name)
+        if any(isinstance(l, BasemapLayer) for l in self.layers):
+            validate_basemap_company(
+                [
+                    l.kind
+                    for l in self.layers
+                    if l.takes_color and l.x_kind() != AXIS_NUMERIC
+                ],
+                self.horizontal,
+            )
 
         horizontal = self.horizontal
         polar = self.projection == "polar"

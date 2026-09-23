@@ -8,6 +8,7 @@ import os
 import tempfile
 import unittest
 import warnings
+from datetime import date
 from unittest import mock
 
 import numpy as np
@@ -19,12 +20,20 @@ from matplotlib.collections import LineCollection, PatchCollection
 from matplotlib.patches import PathPatch
 
 from datachart.charts import (
+    BarChart,
     BasemapChart,
+    BoxPlot,
     ContourChart,
+    DumbbellChart,
+    Histogram,
     HexbinChart,
     ImageChart,
     LineChart,
+    ParallelCoords,
+    RidgelinePlot,
     ScatterChart,
+    SwarmPlot,
+    ViolinPlot,
 )
 from datachart.config import config
 from datachart.constants import (
@@ -575,6 +584,37 @@ class TestComposedWithGeographicCharts(unittest.TestCase):
             ]
         )
         self.assertGreaterEqual(len(figure.axes), 2)
+
+
+class TestRefusedBesideNonGeographicCharts(unittest.TestCase):
+    """A chart with categories or dates on an axis has no longitude to map."""
+
+    def tearDown(self):
+        plt.close("all")
+
+    def test_categorical_date_and_horizontal_panels_raise(self):
+        values = [{"label": "a", "value": v} for v in (1.0, 2.0, 3.0)]
+        figures = {
+            "bar": BarChart([{"label": "A", "y": 3}, {"label": "B", "y": 5}]),
+            "box": BoxPlot(values),
+            "violin": ViolinPlot(values),
+            "swarm": SwarmPlot(values),
+            "ridgeline": RidgelinePlot(values),
+            "dumbbell": DumbbellChart([{"label": "A", "start": 1, "end": 3}]),
+            "dates": LineChart([{"x": date(2023, 1, d), "y": d} for d in range(1, 10)]),
+            "parallel": ParallelCoords([{"a": 1, "b": 2}, {"a": 2, "b": 1}]),
+        }
+        for name, figure in figures.items():
+            with self.subTest(chart=name):
+                with self.assertRaisesRegex(ValueError, "longitude"):
+                    Panel([BasemapChart(), figure])
+
+    def test_numeric_charts_still_compose(self):
+        for figure in (
+            ScatterChart(points()),
+            Histogram([{"x": v} for v in (36.0, 37.0, 37.5, 38.0)]),
+        ):
+            Panel([BasemapChart(), figure])
 
 
 class TestGeographicAspect(unittest.TestCase):

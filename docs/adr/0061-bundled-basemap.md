@@ -60,6 +60,12 @@ smaller file.
   that it belongs in the library. It is a value of the `aspect_ratio` setting
   the fronts already take, not a second `aspect` parameter beside it, and
   `Panel` takes the setting too so a composed map can ask for it.
+- **Only charts of numbers share a panel with it.** A chart with categories
+  or dates on x, its own axes (parallel coordinates) or a horizontal
+  orientation has no longitude to put the map on, and composing one used to
+  draw a meaningless slice of land. `Panel` raises one `ValueError` instead.
+  A numeric chart that is not geographic (a histogram) cannot be told apart
+  from a map and still composes.
 - **Beside data, the basemap has no say over the limits.** A world of
   outlines under a regional hexbin would otherwise zoom the hexbin out to the
   globe. Alone, it frames its own outlines exactly.

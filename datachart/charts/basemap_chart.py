@@ -55,7 +55,9 @@ def BasemapChart(
     ones listed take the highlight color, the rest stay the land's grey. `position` decides where
     it sits in the draw order, under the gridlines and every mark by
     default. Composed with other charts it leaves the axis limits to their
-    data; alone it frames its own outlines. `aspect_ratio="geographic"`
+    data; alone it frames its own outlines. `Panel` refuses to compose it
+    with a chart that has categories or dates on an axis, or is horizontal,
+    since that chart has no longitude to draw the map at. `aspect_ratio="geographic"`
     narrows each degree of longitude by the cosine of the middle latitude,
     so a region keeps its proportions.
 
