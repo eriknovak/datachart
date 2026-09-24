@@ -9,8 +9,8 @@ The density profile of each group's distribution. The [Violin Plot guide](https:
 ```
 ViolinPlot(
     data: (
-        list[ViolinDataPointAttrs]
-        | list[list[ViolinDataPointAttrs]]
+        list[ViolinRecordAttrs]
+        | list[list[ViolinRecordAttrs]]
     ),
     *,
     title: str | None = None,
@@ -161,7 +161,7 @@ Examples:
 
 | PARAMETER       | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `data`          | The data points for the violin plot(s). Can be a single list of data points for one chart, or a list of lists for subplots (requires subplots=True). Each data point should have a label (category) and value (numeric). **TYPE:** \`list[ViolinDataPointAttrs]                                                                                                                                                                     |
+| `data`          | The data points for the violin plot(s). Can be a single list of data points for one chart, or a list of lists for subplots (requires subplots=True). Each data point should have a label (category) and value (numeric). **TYPE:** \`list[ViolinRecordAttrs]                                                                                                                                                                        |
 | `title`         | The title of the chart. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                             |
 | `xlabel`        | The x-axis label. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `ylabel`        | The y-axis label. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                                   |
@@ -214,13 +214,13 @@ Examples:
 
 ## Data
 
-Each record in `data` is a [`ViolinDataPointAttrs`](#datachart.typings.ViolinDataPointAttrs); the `label` and `value` parameters rename its keys.
+Each record in `data` is a [`ViolinRecordAttrs`](#datachart.typings.ViolinRecordAttrs); the `label` and `value` parameters rename its keys.
 
-### datachart.typings.ViolinDataPointAttrs
+### datachart.typings.ViolinRecordAttrs
 
 Bases: `TypedDict`
 
-The data point attributes for the violin plot.
+One record of the violin plot.
 
 | ATTRIBUTE | DESCRIPTION                         |
 | --------- | ----------------------------------- |

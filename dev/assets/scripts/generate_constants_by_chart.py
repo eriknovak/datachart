@@ -132,6 +132,7 @@ SHARED = {
     "ThemeDefaultAttrs",
     "SketchStyleAttrs",
     "InkStyleAttrs",
+    "OverlayStyleAttrs",
 }
 # shared style groups a chart's `style` reads, keyed by the parameter that
 # switches the feature on; heatmaps print cell values through their own font
@@ -251,8 +252,8 @@ def chart_base(name):
 
 def typing_prefix(name):
     return re.sub(
-        r"(SingleChartAttrs|DataPointAttrs|DataAttrs|RecordAttrs|TaskAttrs"
-        r"|LinkAttrs|NodeAttrs|EdgeAttrs|StyleAttrs)$",
+        r"(Link|Node|Edge|Task)?"
+        r"(SingleChartAttrs|RecordAttrs|DataAttrs|StyleAttrs)$",
         "",
         name,
     )
@@ -491,14 +492,8 @@ def chart_page(n):
 for n in ORDER:
     (REFS / "charts" / f"{slug(n)}.md").write_text(chart_page(n))
 # every public typing is documented exactly once: shared ones on the typings
-# page, the rest on the page of the chart they are named after; the per-chart
-# `*SingleChartAttrs` a front builds internally are not user input (ADR 0053)
-INTERNAL = {
-    t
-    for t in TYPINGS
-    if t.endswith("SingleChartAttrs") and not any(t in DATA[n] for n in ORDER)
-}
-unrendered = TYPINGS - SHARED - INTERNAL - set(RENDERED)
+# page, the rest on the page of the chart they are named after
+unrendered = TYPINGS - SHARED - set(RENDERED)
 assert not unrendered, f"typings on no page: {sorted(unrendered)}"
 twice = {t for t in RENDERED if RENDERED.count(t) > 1}
 assert not set(RENDERED) & SHARED, sorted(set(RENDERED) & SHARED)

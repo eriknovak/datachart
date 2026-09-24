@@ -9,8 +9,8 @@ One density ridge per group, stacked and partly overlapping. The [Ridgeline Plot
 ```
 RidgelinePlot(
     data: (
-        list[RidgelineDataPointAttrs]
-        | list[list[RidgelineDataPointAttrs]]
+        list[RidgelineRecordAttrs]
+        | list[list[RidgelineRecordAttrs]]
     ),
     *,
     title: str | None = None,
@@ -163,7 +163,7 @@ Examples:
 
 | PARAMETER       | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `data`          | The data points for the ridgeline plot(s). Can be a single list of data points for one chart, or a list of lists for multiple charts/subplots. Each data point should have a label (category) and value (numeric). **TYPE:** \`list[RidgelineDataPointAttrs]                                                                                                                                                                        |
+| `data`          | The data points for the ridgeline plot(s). Can be a single list of data points for one chart, or a list of lists for multiple charts/subplots. Each data point should have a label (category) and value (numeric). **TYPE:** \`list[RidgelineRecordAttrs]                                                                                                                                                                           |
 | `title`         | The title of the chart. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                             |
 | `xlabel`        | The x-axis label. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `ylabel`        | The y-axis label. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                                   |
@@ -222,13 +222,13 @@ Examples:
 
 ## Data
 
-Each record in `data` is a [`RidgelineDataPointAttrs`](#datachart.typings.RidgelineDataPointAttrs); the `label` and `value` parameters rename its keys.
+Each record in `data` is a [`RidgelineRecordAttrs`](#datachart.typings.RidgelineRecordAttrs); the `label` and `value` parameters rename its keys.
 
-### datachart.typings.RidgelineDataPointAttrs
+### datachart.typings.RidgelineRecordAttrs
 
 Bases: `TypedDict`
 
-The data point attributes for the ridgeline plot.
+One record of the ridgeline plot.
 
 | ATTRIBUTE | DESCRIPTION                                              |
 | --------- | -------------------------------------------------------- |

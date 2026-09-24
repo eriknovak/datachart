@@ -8,10 +8,7 @@ Median, quartiles, whiskers, and outliers per group. The [Box Plot guide](https:
 
 ```
 BoxPlot(
-    data: (
-        list[BoxDataPointAttrs]
-        | list[list[BoxDataPointAttrs]]
-    ),
+    data: list[BoxRecordAttrs] | list[list[BoxRecordAttrs]],
     *,
     title: str | None = None,
     xlabel: str | None = None,
@@ -158,7 +155,7 @@ Examples:
 
 | PARAMETER       | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `data`          | The data points for the box plot(s). Can be a single list of data points for one chart, or a list of lists for subplots (requires subplots=True). Each data point should have a label (category) and value (numeric). **TYPE:** \`list[BoxDataPointAttrs]                                                                                                                                                                           |
+| `data`          | The data points for the box plot(s). Can be a single list of data points for one chart, or a list of lists for subplots (requires subplots=True). Each data point should have a label (category) and value (numeric). **TYPE:** \`list[BoxRecordAttrs]                                                                                                                                                                              |
 | `title`         | The title of the chart. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                             |
 | `xlabel`        | The x-axis label. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `ylabel`        | The y-axis label. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                                   |
@@ -210,13 +207,13 @@ Examples:
 
 ## Data
 
-Each record in `data` is a [`BoxDataPointAttrs`](#datachart.typings.BoxDataPointAttrs); the `label` and `value` parameters rename its keys.
+Each record in `data` is a [`BoxRecordAttrs`](#datachart.typings.BoxRecordAttrs); the `label` and `value` parameters rename its keys.
 
-### datachart.typings.BoxDataPointAttrs
+### datachart.typings.BoxRecordAttrs
 
 Bases: `TypedDict`
 
-The data point attributes for the box plot.
+One record of the box plot.
 
 | ATTRIBUTE | DESCRIPTION                         |
 | --------- | ----------------------------------- |
@@ -249,8 +246,6 @@ The typing for the box plot style.
 | `plot_box_whisker_linewidth`  | The whisker line width. **TYPE:** \`int               |
 | `plot_box_cap_color`          | The cap line color. **TYPE:** \`str                   |
 | `plot_box_cap_linewidth`      | The cap line width. **TYPE:** \`int                   |
-| `plot_xticks_label_rotate`    | The label rotation of the xticks. **TYPE:** \`int     |
-| `plot_yticks_label_rotate`    | The label rotation of the yticks. **TYPE:** \`int     |
 | `plot_box_hatch`              | The hatch pattern of the box. **TYPE:** \`HATCH_STYLE |
 
 ## Constants

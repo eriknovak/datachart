@@ -9,8 +9,8 @@ Every observation as a point, spread within its group. The [Swarm Plot guide](ht
 ```
 SwarmPlot(
     data: (
-        list[SwarmDataPointAttrs]
-        | list[list[SwarmDataPointAttrs]]
+        list[SwarmRecordAttrs]
+        | list[list[SwarmRecordAttrs]]
     ),
     *,
     title: str | None = None,
@@ -159,7 +159,7 @@ Examples:
 
 | PARAMETER       | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `data`          | The data points for the swarm plot(s). Can be a single list of data points for one chart, or a list of lists for multiple charts. Each data point should have a label (category) and value (numeric), and may carry its own emphasis role, which wins over its group's. **TYPE:** \`list[SwarmDataPointAttrs]                                                                                                                       |
+| `data`          | The data points for the swarm plot(s). Can be a single list of data points for one chart, or a list of lists for multiple charts. Each data point should have a label (category) and value (numeric), and may carry its own emphasis role, which wins over its group's. **TYPE:** \`list[SwarmRecordAttrs]                                                                                                                          |
 | `title`         | The title of the chart. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                             |
 | `xlabel`        | The x-axis label. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `ylabel`        | The y-axis label. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                                   |
@@ -210,13 +210,13 @@ Examples:
 
 ## Data
 
-Each record in `data` is a [`SwarmDataPointAttrs`](#datachart.typings.SwarmDataPointAttrs); the `emphasis`, `label` and `value` parameters rename its keys.
+Each record in `data` is a [`SwarmRecordAttrs`](#datachart.typings.SwarmRecordAttrs); the `emphasis`, `label` and `value` parameters rename its keys.
 
-### datachart.typings.SwarmDataPointAttrs
+### datachart.typings.SwarmRecordAttrs
 
 Bases: `TypedDict`
 
-The data point attributes for the swarm plot.
+One record of the swarm plot.
 
 | ATTRIBUTE  | DESCRIPTION                                                                                                                                     |
 | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |

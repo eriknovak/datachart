@@ -4354,7 +4354,7 @@
 
 </h3>
 <div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">PyramidChart</span><span class="p">(</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">data</span><span class="p">:</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.BarDataPointAttrs&lt;/span&gt;" href="../barchart/#datachart.typings.BarDataPointAttrs">BarDataPointAttrs</a></span><span class="p">]],</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">data</span><span class="p">:</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.BarRecordAttrs&lt;/span&gt;" href="../barchart/#datachart.typings.BarRecordAttrs">BarRecordAttrs</a></span><span class="p">]],</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">*</span><span class="p">,</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">title</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">xlabel</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -4520,7 +4520,7 @@ chart mirrors the left side itself.</p>
               <p>
                   <span class="doc-param-annotation">
                     <b>TYPE:</b>
-                      <code><span title="list">list</span>[<span title="list">list</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.BarDataPointAttrs&lt;/span&gt;" href="../barchart/#datachart.typings.BarDataPointAttrs">BarDataPointAttrs</a>]]</code>
+                      <code><span title="list">list</span>[<span title="list">list</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.BarRecordAttrs&lt;/span&gt;" href="../barchart/#datachart.typings.BarRecordAttrs">BarRecordAttrs</a>]]</code>
                   </span>
               </p>
             </td>
@@ -5278,7 +5278,7 @@ categories, with an optional text such as a p-value.</p>
     </div>
 
 </div><h2 id="data">Data</h2>
-<p>Each record in <code>data</code> is a <a href="../barchart/#datachart.typings.BarDataPointAttrs"><code>BarDataPointAttrs</code></a>; the <code>label</code>, <code>y</code> and <code>yerr</code> parameters rename its keys.</p>
+<p>Each record in <code>data</code> is a <a href="../barchart/#datachart.typings.BarRecordAttrs"><code>BarRecordAttrs</code></a>; the <code>label</code>, <code>y</code> and <code>yerr</code> parameters rename its keys.</p>
 <h2 id="style">Style</h2>
 <p><code>style</code> takes the keys of <a href="../barchart/#datachart.typings.BarStyleAttrs"><code>BarStyleAttrs</code></a>. The chart also reads the shared groups it draws: value labels (<a href="../../typings/#datachart.typings.ValueLabelStyleAttrs"><code>ValueLabelStyleAttrs</code></a>), reference lines (<a href="../../typings/#datachart.typings.VLineStyleAttrs"><code>VLineStyleAttrs</code></a>, <a href="../../typings/#datachart.typings.HLineStyleAttrs"><code>HLineStyleAttrs</code></a> and <a href="../../typings/#datachart.typings.DLineStyleAttrs"><code>DLineStyleAttrs</code></a>), pairwise brackets (<a href="../../typings/#datachart.typings.BracketStyleAttrs"><code>BracketStyleAttrs</code></a>), reference bands (<a href="../../typings/#datachart.typings.VSpanStyleAttrs"><code>VSpanStyleAttrs</code></a> and <a href="../../typings/#datachart.typings.HSpanStyleAttrs"><code>HSpanStyleAttrs</code></a>) and text annotations (<a href="../../typings/#datachart.typings.TextStyleAttrs"><code>TextStyleAttrs</code></a>). Every key falls back to the theme, so the same keys set the default look through <a href="../../config/"><code>config</code></a>.</p>
 <h2 id="constants">Constants</h2>

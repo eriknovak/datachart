@@ -9,8 +9,7 @@ Parts of a total along an ordered axis, filled on top of each other. The [Stacke
 ```
 StackedAreaChart(
     data: (
-        list[LineDataPointAttrs]
-        | list[list[LineDataPointAttrs]]
+        list[LineRecordAttrs] | list[list[LineRecordAttrs]]
     ),
     *,
     baseline: STACKED_AREA_BASELINE | str | None = None,
@@ -158,7 +157,7 @@ Examples:
 
 | PARAMETER       | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `data`          | The data points for the stacked series. A single list of points draws one band; a list of lists draws one band per series, the first at the bottom. Every series must hold the same x values in the same order. **TYPE:** \`list[LineDataPointAttrs]                                                                                                                                                                         |
+| `data`          | The data points for the stacked series. A single list of points draws one band; a list of lists draws one band per series, the first at the bottom. Every series must hold the same x values in the same order. **TYPE:** \`list[LineRecordAttrs]                                                                                                                                                                            |
 | `baseline`      | Where the first series starts: "zero" (default), "percent" (each x normalised to 100), "sym" (centred on zero), "wiggle" or "weighted_wiggle" (streamgraph baselines). See STACKED_AREA_BASELINE. **TYPE:** \`STACKED_AREA_BASELINE                                                                                                                                                                                          |
 | `title`         | The title of the chart. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                      |
 | `xlabel`        | The x-axis label. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                            |
@@ -213,7 +212,7 @@ Examples:
 
 ## Data
 
-Each record in `data` is a [`LineDataPointAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/linechart/#datachart.typings.LineDataPointAttrs); the `x` and `y` parameters rename its keys.
+Each record in `data` is a [`LineRecordAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/linechart/#datachart.typings.LineRecordAttrs); the `x` and `y` parameters rename its keys.
 
 ## Style
 

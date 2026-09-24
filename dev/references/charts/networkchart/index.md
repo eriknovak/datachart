@@ -101,7 +101,7 @@ Examples:
 
 ## Data
 
-`data` is one [`NetworkSingleChartAttrs`](#datachart.typings.NetworkSingleChartAttrs), or a list of them for subplots, with [`NetworkNodeAttrs`](#datachart.typings.NetworkNodeAttrs) and [`NetworkEdgeAttrs`](#datachart.typings.NetworkEdgeAttrs) inside.
+`data` is one [`NetworkSingleChartAttrs`](#datachart.typings.NetworkSingleChartAttrs), or a list of them for subplots, with [`NetworkNodeRecordAttrs`](#datachart.typings.NetworkNodeRecordAttrs) and [`NetworkEdgeRecordAttrs`](#datachart.typings.NetworkEdgeRecordAttrs) inside.
 
 ### datachart.typings.NetworkSingleChartAttrs
 
@@ -109,15 +109,15 @@ Bases: `TypedDict`
 
 The single chart attributes for the network chart.
 
-| ATTRIBUTE  | DESCRIPTION                                                                         |
-| ---------- | ----------------------------------------------------------------------------------- |
-| `nodes`    | The nodes; inferred from the edges when omitted. **TYPE:** \`list[NetworkNodeAttrs] |
-| `edges`    | The edges. **TYPE:** `list[NetworkEdgeAttrs]`                                       |
-| `subtitle` | The subtitle of the chart. **TYPE:** \`str                                          |
-| `style`    | The style of the chart. **TYPE:** \`NetworkStyleAttrs                               |
-| `texts`    | The text annotations to be drawn. **TYPE:** \`TextSettingAttrs                      |
+| ATTRIBUTE  | DESCRIPTION                                                                               |
+| ---------- | ----------------------------------------------------------------------------------------- |
+| `nodes`    | The nodes; inferred from the edges when omitted. **TYPE:** \`list[NetworkNodeRecordAttrs] |
+| `edges`    | The edges. **TYPE:** `list[NetworkEdgeRecordAttrs]`                                       |
+| `subtitle` | The subtitle of the chart. **TYPE:** \`str                                                |
+| `style`    | The style of the chart. **TYPE:** \`NetworkStyleAttrs                                     |
+| `texts`    | The text annotations to be drawn. **TYPE:** \`TextSettingAttrs                            |
 
-### datachart.typings.NetworkNodeAttrs
+### datachart.typings.NetworkNodeRecordAttrs
 
 Bases: `TypedDict`
 
@@ -133,7 +133,7 @@ The node record attributes for the network chart.
 | `x`        | The node's horizontal position in the 0–1 layout space; NETWORK_LAYOUT.FIXED only. **TYPE:** \`float |
 | `y`        | The node's vertical position in the 0–1 layout space; NETWORK_LAYOUT.FIXED only. **TYPE:** \`float   |
 
-### datachart.typings.NetworkEdgeAttrs
+### datachart.typings.NetworkEdgeRecordAttrs
 
 Bases: `TypedDict`
 

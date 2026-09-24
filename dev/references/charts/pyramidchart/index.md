@@ -8,7 +8,7 @@ Two series as horizontal bars mirrored around a shared category axis. The [Pyram
 
 ```
 PyramidChart(
-    data: list[list[BarDataPointAttrs]],
+    data: list[list[BarRecordAttrs]],
     *,
     title: str | None = None,
     xlabel: str | None = None,
@@ -148,7 +148,7 @@ Examples:
 
 | PARAMETER       | DESCRIPTION                                                                                                                                                                                                                                                                                   |
 | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `data`          | Exactly two lists of data points — the first is the left side, the second the right. Values are positive for both sides; the chart mirrors the left side itself. **TYPE:** `list[list[BarDataPointAttrs]]`                                                                                    |
+| `data`          | Exactly two lists of data points — the first is the left side, the second the right. Values are positive for both sides; the chart mirrors the left side itself. **TYPE:** `list[list[BarRecordAttrs]]`                                                                                       |
 | `title`         | The title of the chart. **TYPE:** \`str                                                                                                                                                                                                                                                       |
 | `xlabel`        | The label of the horizontal value axis. **TYPE:** \`str                                                                                                                                                                                                                                       |
 | `ylabel`        | The label of the vertical category axis. **TYPE:** \`str                                                                                                                                                                                                                                      |
@@ -191,7 +191,7 @@ Examples:
 
 ## Data
 
-Each record in `data` is a [`BarDataPointAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/barchart/#datachart.typings.BarDataPointAttrs); the `label`, `y` and `yerr` parameters rename its keys.
+Each record in `data` is a [`BarRecordAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/barchart/#datachart.typings.BarRecordAttrs); the `label`, `y` and `yerr` parameters rename its keys.
 
 ## Style
 

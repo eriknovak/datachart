@@ -9,8 +9,7 @@ A value along an ordered axis, one line per series. The [Line Chart guide](https
 ```
 LineChart(
     data: (
-        list[LineDataPointAttrs]
-        | list[list[LineDataPointAttrs]]
+        list[LineRecordAttrs] | list[list[LineRecordAttrs]]
     ),
     *,
     title: str | None = None,
@@ -160,7 +159,7 @@ Examples:
 
 | PARAMETER       | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                             |
 | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `data`          | The data points for the line chart(s). Can be a single list of data points for one chart, or a list of lists for multiple charts/subplots. **TYPE:** \`list[LineDataPointAttrs]                                                                                                                                                                                                                                         |
+| `data`          | The data points for the line chart(s). Can be a single list of data points for one chart, or a list of lists for multiple charts/subplots. **TYPE:** \`list[LineRecordAttrs]                                                                                                                                                                                                                                            |
 | `title`         | The title of the chart. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                 |
 | `xlabel`        | The x-axis label. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                       |
 | `ylabel`        | The y-axis label. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                       |
@@ -213,13 +212,13 @@ Examples:
 
 ## Data
 
-Each record in `data` is a [`LineDataPointAttrs`](#datachart.typings.LineDataPointAttrs); the `x`, `y` and `yerr` parameters rename its keys.
+Each record in `data` is a [`LineRecordAttrs`](#datachart.typings.LineRecordAttrs); the `x`, `y` and `yerr` parameters rename its keys.
 
-### datachart.typings.LineDataPointAttrs
+### datachart.typings.LineRecordAttrs
 
 Bases: `TypedDict`
 
-The data point attributes for the line chart.
+One record of the line chart.
 
 | ATTRIBUTE | DESCRIPTION                             |
 | --------- | --------------------------------------- |
@@ -237,17 +236,15 @@ Bases: `TypedDict`
 
 The typing for the line chart style.
 
-| ATTRIBUTE                  | DESCRIPTION                                                         |
-| -------------------------- | ------------------------------------------------------------------- |
-| `plot_line_color`          | The line color. **TYPE:** \`str                                     |
-| `plot_line_alpha`          | The alpha value of the line. **TYPE:** \`float                      |
-| `plot_line_style`          | The line style. **TYPE:** \`LINE_STYLE                              |
-| `plot_line_marker`         | The line marker. **TYPE:** \`LINE_MARKER                            |
-| `plot_line_width`          | The line width. **TYPE:** \`int                                     |
-| `plot_line_drawstyle`      | The line draw style. **TYPE:** \`LINE_DRAW_STYLE                    |
-| `plot_line_zorder`         | The zorder of the line. **TYPE:** \`int                             |
-| `plot_xticks_label_rotate` | The label rotation of the xticks in the line chart. **TYPE:** \`int |
-| `plot_yticks_label_rotate` | The label rotation of the yticks in the line chart. **TYPE:** \`int |
+| ATTRIBUTE             | DESCRIPTION                                      |
+| --------------------- | ------------------------------------------------ |
+| `plot_line_color`     | The line color. **TYPE:** \`str                  |
+| `plot_line_alpha`     | The alpha value of the line. **TYPE:** \`float   |
+| `plot_line_style`     | The line style. **TYPE:** \`LINE_STYLE           |
+| `plot_line_marker`    | The line marker. **TYPE:** \`LINE_MARKER         |
+| `plot_line_width`     | The line width. **TYPE:** \`int                  |
+| `plot_line_drawstyle` | The line draw style. **TYPE:** \`LINE_DRAW_STYLE |
+| `plot_line_zorder`    | The zorder of the line. **TYPE:** \`int          |
 
 ## Constants
 

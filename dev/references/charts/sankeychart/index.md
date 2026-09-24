@@ -86,7 +86,7 @@ Examples:
 
 ## Data
 
-`data` is one [`SankeySingleChartAttrs`](#datachart.typings.SankeySingleChartAttrs), or a list of them for subplots, with [`SankeyLinkAttrs`](#datachart.typings.SankeyLinkAttrs) inside.
+`data` is one [`SankeySingleChartAttrs`](#datachart.typings.SankeySingleChartAttrs), or a list of them for subplots, with [`SankeyLinkRecordAttrs`](#datachart.typings.SankeyLinkRecordAttrs) inside.
 
 ### datachart.typings.SankeySingleChartAttrs
 
@@ -94,14 +94,14 @@ Bases: `TypedDict`
 
 The single chart attributes for the Sankey chart.
 
-| ATTRIBUTE  | DESCRIPTION                                                                      |
-| ---------- | -------------------------------------------------------------------------------- |
-| `links`    | The flows; a node is the string that names it. **TYPE:** `list[SankeyLinkAttrs]` |
-| `subtitle` | The subtitle of the chart. **TYPE:** \`str                                       |
-| `style`    | The style of the chart. **TYPE:** \`SankeyStyleAttrs                             |
-| `texts`    | The text annotations to be drawn. **TYPE:** \`TextSettingAttrs                   |
+| ATTRIBUTE  | DESCRIPTION                                                                            |
+| ---------- | -------------------------------------------------------------------------------------- |
+| `links`    | The flows; a node is the string that names it. **TYPE:** `list[SankeyLinkRecordAttrs]` |
+| `subtitle` | The subtitle of the chart. **TYPE:** \`str                                             |
+| `style`    | The style of the chart. **TYPE:** \`SankeyStyleAttrs                                   |
+| `texts`    | The text annotations to be drawn. **TYPE:** \`TextSettingAttrs                         |
 
-### datachart.typings.SankeyLinkAttrs
+### datachart.typings.SankeyLinkRecordAttrs
 
 Bases: `TypedDict`
 

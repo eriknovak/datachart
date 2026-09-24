@@ -8,7 +8,10 @@ A schedule: one bar per task from its start to its end over a date axis. The [Ga
 
 ```
 GanttChart(
-    data: list[GanttTaskAttrs] | list[list[GanttTaskAttrs]],
+    data: (
+        list[GanttTaskRecordAttrs]
+        | list[list[GanttTaskRecordAttrs]]
+    ),
     *,
     title: str | None = None,
     xlabel: str | None = None,
@@ -108,7 +111,7 @@ Examples:
 
 | PARAMETER            | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                  |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `data`               | The task records of the schedule: a list of {task, start, end} dicts with optional group, progress, depends_on, and emphasis keys. start and end are date, datetime, numpy.datetime64, or pandas Timestamp objects; date strings are never parsed. A list of such lists draws one schedule per subplot. See GanttTaskAttrs. **TYPE:** \`list[GanttTaskAttrs]                                                 |
+| `data`               | The task records of the schedule: a list of {task, start, end} dicts with optional group, progress, depends_on, and emphasis keys. start and end are date, datetime, numpy.datetime64, or pandas Timestamp objects; date strings are never parsed. A list of such lists draws one schedule per subplot. See GanttTaskRecordAttrs. **TYPE:** \`list[GanttTaskRecordAttrs]                                     |
 | `title`              | The title of the chart. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                      |
 | `xlabel`             | The label of the horizontal date axis. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                       |
 | `ylabel`             | The label of the vertical task axis. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                         |
@@ -153,9 +156,9 @@ Examples:
 
 ## Data
 
-Each record in `data` is a [`GanttTaskAttrs`](#datachart.typings.GanttTaskAttrs); the `emphasis`, `task`, `start`, `end`, `group`, `progress` and `depends_on` parameters rename its keys.
+Each record in `data` is a [`GanttTaskRecordAttrs`](#datachart.typings.GanttTaskRecordAttrs); the `emphasis`, `task`, `start`, `end`, `group`, `progress` and `depends_on` parameters rename its keys.
 
-### datachart.typings.GanttTaskAttrs
+### datachart.typings.GanttTaskRecordAttrs
 
 Bases: `TypedDict`
 

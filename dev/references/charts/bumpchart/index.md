@@ -9,8 +9,7 @@ Rank over time, one line per series. The [Bump Chart guide](https://eriknovak.gi
 ```
 BumpChart(
     data: (
-        list[LineDataPointAttrs]
-        | list[list[LineDataPointAttrs]]
+        list[LineRecordAttrs] | list[list[LineRecordAttrs]]
     ),
     *,
     rank_by: BUMP_RANK | str | None = None,
@@ -152,7 +151,7 @@ Examples:
 
 | PARAMETER        | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                      |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `data`           | The data points of the series. Can be a single list of data points for one series, or a list of lists for several. **TYPE:** \`list[LineDataPointAttrs]                                                                                                                                                                                                                                          |
+| `data`           | The data points of the series. Can be a single list of data points for one series, or a list of lists for several. **TYPE:** \`list[LineRecordAttrs]                                                                                                                                                                                                                                             |
 | `rank_by`        | How y becomes a rank, a BUMP_RANK member: VALUE_DESCENDING (default) ranks the highest value first at each period, VALUE_ASCENDING the lowest, and GIVEN reads y as the rank (a positive integer). Ranking reads the series present at a period; a series without a point there leaves a gap. Ties keep input order. **TYPE:** \`BUMP_RANK                                                       |
 | `title`          | The title of the chart. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                          |
 | `xlabel`         | The x-axis label. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                |
@@ -202,7 +201,7 @@ Examples:
 
 ## Data
 
-Each record in `data` is a [`LineDataPointAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/linechart/#datachart.typings.LineDataPointAttrs); the `x` and `y` parameters rename its keys.
+Each record in `data` is a [`LineRecordAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/linechart/#datachart.typings.LineRecordAttrs); the `x` and `y` parameters rename its keys.
 
 ## Style
 

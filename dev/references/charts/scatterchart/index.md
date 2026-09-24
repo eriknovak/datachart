@@ -9,8 +9,8 @@ One point per observation, placed by two numeric variables. The [Scatter Chart g
 ```
 ScatterChart(
     data: (
-        list[ScatterDataPointAttrs]
-        | list[list[ScatterDataPointAttrs]]
+        list[ScatterRecordAttrs]
+        | list[list[ScatterRecordAttrs]]
     ),
     *,
     title: str | None = None,
@@ -216,7 +216,7 @@ Examples:
 
 | PARAMETER          | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `data`             | The data points for the scatter chart(s). Can be a single list of data points for one chart, or a list of lists for multiple charts/subplots. A point may carry its own emphasis role, which wins over its chart's. **TYPE:** \`list[ScatterDataPointAttrs]                                                                                                                                                                  |
+| `data`             | The data points for the scatter chart(s). Can be a single list of data points for one chart, or a list of lists for multiple charts/subplots. A point may carry its own emphasis role, which wins over its chart's. **TYPE:** \`list[ScatterRecordAttrs]                                                                                                                                                                     |
 | `title`            | The title of the chart. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                      |
 | `xlabel`           | The x-axis label. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                            |
 | `ylabel`           | The y-axis label. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                            |
@@ -279,13 +279,13 @@ Examples:
 
 ## Data
 
-Each record in `data` is a [`ScatterDataPointAttrs`](#datachart.typings.ScatterDataPointAttrs); the `emphasis`, `x`, `y`, `size`, `hue`, `annotation`, `xerr` and `yerr` parameters rename its keys.
+Each record in `data` is a [`ScatterRecordAttrs`](#datachart.typings.ScatterRecordAttrs); the `emphasis`, `x`, `y`, `size`, `hue`, `annotation`, `xerr` and `yerr` parameters rename its keys.
 
-### datachart.typings.ScatterDataPointAttrs
+### datachart.typings.ScatterRecordAttrs
 
 Bases: `TypedDict`
 
-The data point attributes for the scatter chart.
+One record of the scatter chart.
 
 | ATTRIBUTE    | DESCRIPTION                                                                                                                                                           |
 | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

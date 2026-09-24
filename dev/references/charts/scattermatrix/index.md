@@ -10,7 +10,7 @@ A scatter chart for every pair of dimensions, distributions on the diagonal. The
 ScatterMatrix(
     data: (
         dict[str, list[Any]]
-        | list[ScatterMatrixDataPointAttrs]
+        | list[ScatterMatrixRecordAttrs]
     ),
     *,
     dimensions: list[str] | None = None,
@@ -92,9 +92,9 @@ Examples:
 
 ## Data
 
-Each record in `data` is a [`ScatterMatrixDataPointAttrs`](#datachart.typings.ScatterMatrixDataPointAttrs); the `hue` parameter renames its keys.
+Each record in `data` is a [`ScatterMatrixRecordAttrs`](#datachart.typings.ScatterMatrixRecordAttrs); the `hue` parameter renames its keys.
 
-### datachart.typings.ScatterMatrixDataPointAttrs
+### datachart.typings.ScatterMatrixRecordAttrs
 
 Bases: `TypedDict`
 

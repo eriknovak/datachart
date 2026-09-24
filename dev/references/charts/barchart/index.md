@@ -8,10 +8,7 @@ A value per category as bars; series grouped, stacked, or overlaid. The [Bar Cha
 
 ```
 BarChart(
-    data: (
-        list[BarDataPointAttrs]
-        | list[list[BarDataPointAttrs]]
-    ),
+    data: list[BarRecordAttrs] | list[list[BarRecordAttrs]],
     *,
     title: str | None = None,
     xlabel: str | None = None,
@@ -160,7 +157,7 @@ Examples:
 
 | PARAMETER       | DESCRIPTION                                                                                                                                                                                                                                                                                                     |
 | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `data`          | The data points for the bar chart(s). Can be a single list of data points for one chart, or a list of lists for multiple charts/subplots. **TYPE:** \`list[BarDataPointAttrs]                                                                                                                                   |
+| `data`          | The data points for the bar chart(s). Can be a single list of data points for one chart, or a list of lists for multiple charts/subplots. **TYPE:** \`list[BarRecordAttrs]                                                                                                                                      |
 | `title`         | The title of the chart. **TYPE:** \`str                                                                                                                                                                                                                                                                         |
 | `xlabel`        | The x-axis label. **TYPE:** \`str                                                                                                                                                                                                                                                                               |
 | `ylabel`        | The y-axis label. **TYPE:** \`str                                                                                                                                                                                                                                                                               |
@@ -215,13 +212,13 @@ Examples:
 
 ## Data
 
-Each record in `data` is a [`BarDataPointAttrs`](#datachart.typings.BarDataPointAttrs); the `emphasis`, `label`, `y` and `yerr` parameters rename its keys.
+Each record in `data` is a [`BarRecordAttrs`](#datachart.typings.BarRecordAttrs); the `emphasis`, `label`, `y` and `yerr` parameters rename its keys.
 
-### datachart.typings.BarDataPointAttrs
+### datachart.typings.BarRecordAttrs
 
 Bases: `TypedDict`
 
-The data point attributes for the bar chart.
+One record of the bar chart.
 
 | ATTRIBUTE  | DESCRIPTION                                                                                                          |
 | ---------- | -------------------------------------------------------------------------------------------------------------------- |
@@ -240,21 +237,16 @@ Bases: `TypedDict`
 
 The typing for the bar chart style.
 
-| ATTRIBUTE                  | DESCRIPTION                                                        |
-| -------------------------- | ------------------------------------------------------------------ |
-| `plot_bar_color`           | The bar color. **TYPE:** \`str                                     |
-| `plot_bar_alpha`           | The alpha value of the bar. **TYPE:** \`float                      |
-| `plot_bar_width`           | The width of the bar. **TYPE:** \`int                              |
-| `plot_bar_zorder`          | The zorder of the bar. **TYPE:** \`int                             |
-| `plot_bar_hatch`           | The hatch style of the bar. **TYPE:** \`HATCH_STYLE                |
-| `plot_bar_edge_width`      | The edge width of the bar. **TYPE:** \`int                         |
-| `plot_bar_edge_color`      | The edge color of the bar. **TYPE:** \`str                         |
-| `plot_bar_error_color`     | The color of the error line of the bar. **TYPE:** \`str            |
-| `plot_bar_value_fontsize`  | Alias of plot_value_fontsize. **TYPE:** \`int                      |
-| `plot_bar_value_color`     | Alias of plot_value_color. **TYPE:** \`str                         |
-| `plot_bar_value_padding`   | Alias of plot_value_padding. **TYPE:** \`int                       |
-| `plot_xticks_label_rotate` | The label rotation of the xticks in the bar chart. **TYPE:** \`int |
-| `plot_yticks_label_rotate` | The label rotation of the yticks in the bar chart. **TYPE:** \`int |
+| ATTRIBUTE              | DESCRIPTION                                             |
+| ---------------------- | ------------------------------------------------------- |
+| `plot_bar_color`       | The bar color. **TYPE:** \`str                          |
+| `plot_bar_alpha`       | The alpha value of the bar. **TYPE:** \`float           |
+| `plot_bar_width`       | The width of the bar. **TYPE:** \`int                   |
+| `plot_bar_zorder`      | The zorder of the bar. **TYPE:** \`int                  |
+| `plot_bar_hatch`       | The hatch style of the bar. **TYPE:** \`HATCH_STYLE     |
+| `plot_bar_edge_width`  | The edge width of the bar. **TYPE:** \`int              |
+| `plot_bar_edge_color`  | The edge color of the bar. **TYPE:** \`str              |
+| `plot_bar_error_color` | The color of the error line of the bar. **TYPE:** \`str |
 
 ## Constants
 

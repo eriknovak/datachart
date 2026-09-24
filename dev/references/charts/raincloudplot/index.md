@@ -9,8 +9,8 @@ A half violin, the raw points, and a box per group. The [Raincloud Plot guide](h
 ```
 RaincloudPlot(
     data: (
-        list[RaincloudDataPointAttrs]
-        | list[list[RaincloudDataPointAttrs]]
+        list[RaincloudRecordAttrs]
+        | list[list[RaincloudRecordAttrs]]
     ),
     *,
     title: str | None = None,
@@ -161,7 +161,7 @@ Examples:
 
 | PARAMETER       | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `data`          | The data points for the raincloud plot(s). Can be a single list of data points for one chart, or a list of lists for multiple charts (drawn as subplots). Each data point should have a label (category) and value (numeric). **TYPE:** \`list[RaincloudDataPointAttrs]                                                                                                                                                             |
+| `data`          | The data points for the raincloud plot(s). Can be a single list of data points for one chart, or a list of lists for multiple charts (drawn as subplots). Each data point should have a label (category) and value (numeric). **TYPE:** \`list[RaincloudRecordAttrs]                                                                                                                                                                |
 | `title`         | The title of the chart. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                             |
 | `xlabel`        | The x-axis label. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `ylabel`        | The y-axis label. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                                   |
@@ -214,13 +214,13 @@ Examples:
 
 ## Data
 
-Each record in `data` is a [`RaincloudDataPointAttrs`](#datachart.typings.RaincloudDataPointAttrs); the `label` and `value` parameters rename its keys.
+Each record in `data` is a [`RaincloudRecordAttrs`](#datachart.typings.RaincloudRecordAttrs); the `label` and `value` parameters rename its keys.
 
-### datachart.typings.RaincloudDataPointAttrs
+### datachart.typings.RaincloudRecordAttrs
 
 Bases: `TypedDict`
 
-The data point attributes for the raincloud plot.
+One record of the raincloud plot.
 
 | ATTRIBUTE | DESCRIPTION                         |
 | --------- | ----------------------------------- |

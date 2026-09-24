@@ -9,8 +9,8 @@ Each record as a polyline across one axis per dimension. The [Parallel Coordinat
 ```
 ParallelCoords(
     data: (
-        list[ParallelCoordsDataPointAttrs]
-        | list[list[ParallelCoordsDataPointAttrs]]
+        list[ParallelCoordsRecordAttrs]
+        | list[list[ParallelCoordsRecordAttrs]]
     ),
     *,
     title: str | None = None,
@@ -68,7 +68,7 @@ Examples:
 
 | PARAMETER         | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                               |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `data`            | The data points for the chart. Each data point is a dictionary where keys are dimension names and values are numeric or string values. Can optionally include a hue key for categorical coloring. **TYPE:** \`list[ParallelCoordsDataPointAttrs]                                                                                                                                                                          |
+| `data`            | The data points for the chart. Each data point is a dictionary where keys are dimension names and values are numeric or string values. Can optionally include a hue key for categorical coloring. **TYPE:** \`list[ParallelCoordsRecordAttrs]                                                                                                                                                                             |
 | `title`           | The title of the chart. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                   |
 | `xlabel`          | The x-axis label. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                         |
 | `ylabel`          | The y-axis label. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                         |
@@ -92,13 +92,13 @@ Examples:
 
 ## Data
 
-Each record in `data` is a [`ParallelCoordsDataPointAttrs`](#datachart.typings.ParallelCoordsDataPointAttrs); the `hue` parameter renames its keys.
+Each record in `data` is a [`ParallelCoordsRecordAttrs`](#datachart.typings.ParallelCoordsRecordAttrs); the `hue` parameter renames its keys.
 
-### datachart.typings.ParallelCoordsDataPointAttrs
+### datachart.typings.ParallelCoordsRecordAttrs
 
 Bases: `TypedDict`
 
-The data point attributes for the parallel coordinates chart.
+One record of the parallel coordinates chart.
 
 A dictionary where keys are dimension names and values are numeric values. Can optionally include a 'hue' key for categorical coloring.
 

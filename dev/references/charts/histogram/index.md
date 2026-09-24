@@ -9,8 +9,7 @@ The distribution of one numeric variable, binned. The [Histogram guide](https://
 ```
 Histogram(
     data: (
-        list[HistDataPointAttrs]
-        | list[list[HistDataPointAttrs]]
+        list[HistRecordAttrs] | list[list[HistRecordAttrs]]
     ),
     *,
     title: str | None = None,
@@ -152,7 +151,7 @@ Examples:
 
 | PARAMETER         | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `data`            | The data points for the histogram(s). Can be a single list of data points for one chart, or a list of lists for multiple charts/subplots. **TYPE:** \`list[HistDataPointAttrs]                                                                                                                                                                                                                                                         |
+| `data`            | The data points for the histogram(s). Can be a single list of data points for one chart, or a list of lists for multiple charts/subplots. **TYPE:** \`list[HistRecordAttrs]                                                                                                                                                                                                                                                            |
 | `title`           | The title of the chart. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                                |
 | `xlabel`          | The x-axis label. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                                      |
 | `ylabel`          | The y-axis label. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                                      |
@@ -203,13 +202,13 @@ Examples:
 
 ## Data
 
-Each record in `data` is a [`HistDataPointAttrs`](#datachart.typings.HistDataPointAttrs); the `x` parameter renames its keys.
+Each record in `data` is a [`HistRecordAttrs`](#datachart.typings.HistRecordAttrs); the `x` parameter renames its keys.
 
-### datachart.typings.HistDataPointAttrs
+### datachart.typings.HistRecordAttrs
 
 Bases: `TypedDict`
 
-The data point attributes for the histogram chart.
+One record of the histogram chart.
 
 | ATTRIBUTE | DESCRIPTION                       |
 | --------- | --------------------------------- |
@@ -225,19 +224,17 @@ Bases: `TypedDict`
 
 The typing for the histogram chart style.
 
-| ATTRIBUTE                  | DESCRIPTION                                                              |
-| -------------------------- | ------------------------------------------------------------------------ |
-| `plot_hist_color`          | The color of the histogram. **TYPE:** \`str                              |
-| `plot_hist_alpha`          | The alpha value of the histogram. **TYPE:** \`float                      |
-| `plot_hist_zorder`         | The zorder of the histogram. **TYPE:** \`int                             |
-| `plot_hist_fill`           | The fill of the histogram. **TYPE:** \`str                               |
-| `plot_hist_hatch`          | The hatch style in the histogram. **TYPE:** \`HATCH_STYLE                |
-| `plot_hist_type`           | The type of the histogram. **TYPE:** \`HISTOGRAM_TYPE                    |
-| `plot_hist_align`          | The alignment of the histogram. **TYPE:** \`str                          |
-| `plot_hist_edge_width`     | The edge width of the histogram. **TYPE:** \`int                         |
-| `plot_hist_edge_color`     | The edge color of the histogram. **TYPE:** \`str                         |
-| `plot_xticks_label_rotate` | The label rotation of the xticks in the histogram chart. **TYPE:** \`int |
-| `plot_yticks_label_rotate` | The label rotation of the yticks in the histogram chart. **TYPE:** \`int |
+| ATTRIBUTE              | DESCRIPTION                                               |
+| ---------------------- | --------------------------------------------------------- |
+| `plot_hist_color`      | The color of the histogram. **TYPE:** \`str               |
+| `plot_hist_alpha`      | The alpha value of the histogram. **TYPE:** \`float       |
+| `plot_hist_zorder`     | The zorder of the histogram. **TYPE:** \`int              |
+| `plot_hist_fill`       | The fill of the histogram. **TYPE:** \`str                |
+| `plot_hist_hatch`      | The hatch style in the histogram. **TYPE:** \`HATCH_STYLE |
+| `plot_hist_type`       | The type of the histogram. **TYPE:** \`HISTOGRAM_TYPE     |
+| `plot_hist_align`      | The alignment of the histogram. **TYPE:** \`str           |
+| `plot_hist_edge_width` | The edge width of the histogram. **TYPE:** \`int          |
+| `plot_hist_edge_color` | The edge color of the histogram. **TYPE:** \`str          |
 
 ## Constants
 
