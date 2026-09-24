@@ -81,7 +81,7 @@ Examples:
 >>> from datachart.constants import THEME
 >>> from datachart.config import config
 >>> config.set_theme(THEME.DEFAULT)
->>> config.get("theme")
+>>> config.theme
 'default'
 ```
 
@@ -130,7 +130,7 @@ Examples:
 ```
 >>> from datachart.config import config
 >>> config.reset_config()
->>> config.get("theme")
+>>> config.theme
 'default'
 ```
 
@@ -318,7 +318,7 @@ Examples:
 ```
 >>> from datachart.config import config
 >>> config["font_general_color"]
-'#FFFFFF'
+'#000000'
 ```
 
 | PARAMETER | DESCRIPTION                                |
@@ -344,7 +344,7 @@ Examples:
 ```
 >>> from datachart.config import config
 >>> config.get("font_general_color")
-'#FFFFFF'
+'#000000'
 ```
 
 | PARAMETER | DESCRIPTION                                                                                             |

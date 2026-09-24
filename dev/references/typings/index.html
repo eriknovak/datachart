@@ -9273,6 +9273,9 @@ keeps matplotlib's.</p>
 
 
         <p>The typing for theme-driven defaults and cycles.</p>
+<p>A theme default for a front parameter is <code>chart_default_&lt;parameter&gt;</code> when
+several fronts take the parameter, <code>chart_default_&lt;chart&gt;_&lt;parameter&gt;</code>
+when one front owns it.</p>
 
 
 <table>
@@ -9316,7 +9319,38 @@ call leaves it unset. <code>None</code> means the theme has no opinion.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="datachart.typings.ThemeDefaultAttrs.chart_default_node_label_position">chart_default_node_label_position</span></code></td>
+            <td><code><span title="datachart.typings.ThemeDefaultAttrs.chart_default_calendar_heatmap_week_start">chart_default_calendar_heatmap_week_start</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The theme default for the calendar heatmap's <code>week_start</code>, the
+weekday in the top row of every week.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.CALENDAR_WEEKDAY&lt;/span&gt;" href="../constants/#datachart.constants.CALENDAR_WEEKDAY">CALENDAR_WEEKDAY</a> | <span title="str">str</span> | None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.ThemeDefaultAttrs.chart_default_ridgeline_overlap">chart_default_ridgeline_overlap</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The theme default
+for the ridgeline plot's <code>overlap</code>, how far a peak rises into the
+row above, in <code>[0, 1]</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="float">float</span> | None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.ThemeDefaultAttrs.chart_default_network_label_position">chart_default_network_label_position</span></code></td>
             <td class="doc-attribute-details">
               <div class="doc-md-description">
                 <p>The theme default for the network chart's <code>label_position</code>, applied

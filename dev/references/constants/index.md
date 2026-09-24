@@ -69,28 +69,28 @@ Each class and what reads it: a chart parameter, a style attribute, or the confi
 
 **Chart-Specific Constants**
 
-| CLASS                     | DESCRIPTION                                                                             |
-| ------------------------- | --------------------------------------------------------------------------------------- |
-| `STACKED_AREA_BASELINE`   | baseline of StackedAreaChart.                                                           |
-| `BUMP_RANK`               | rank_by of BumpChart.                                                                   |
-| `BUMP_LABEL_POSITION`     | label_position of BumpChart.                                                            |
-| `RADIAL_TYPE`             | mark of RadialChart.                                                                    |
-| `RADIAL_DIRECTION`        | direction of RadialChart.                                                               |
-| `CALENDAR_WEEKDAY`        | week_start of CalendarHeatmap; the plot_calendar_heatmap_week_start style attribute.    |
-| `GANTT_DATE_PERIOD`       | period of GanttChart.                                                                   |
-| `GANTT_VALUE`             | value_kind of GanttChart.                                                               |
-| `GANTT_SORT_KEY`          | sort_by of GanttChart.                                                                  |
-| `GANTT_ARROW_ENTRY`       | The plot_gantt_dependency_entry style attribute.                                        |
-| `DUMBBELL_VALUE`          | value_kind of DumbbellChart.                                                            |
-| `DUMBBELL_SORT_KEY`       | sort_by of DumbbellChart.                                                               |
-| `RIDGELINE_SCALE`         | ridge_scale of RidgelinePlot.                                                           |
-| `CONTOUR_LEVELS`          | levels of ContourChart.                                                                 |
-| `HEXBIN_REDUCE`           | reduce of HexbinChart.                                                                  |
-| `NETWORK_LAYOUT`          | layout of NetworkChart.                                                                 |
-| `NETWORK_LABEL_POSITION`  | label_position of NetworkChart; the chart_default_node_label_position config attribute. |
-| `SCATTER_MATRIX_DIAGONAL` | diagonal of ScatterMatrix.                                                              |
-| `BASEMAP_FEATURE`         | data of BasemapChart; the feature of its geometry.                                      |
-| `BASEMAP_RESOLUTION`      | resolution of BasemapChart.                                                             |
+| CLASS                     | DESCRIPTION                                                                                    |
+| ------------------------- | ---------------------------------------------------------------------------------------------- |
+| `STACKED_AREA_BASELINE`   | baseline of StackedAreaChart.                                                                  |
+| `BUMP_RANK`               | rank_by of BumpChart.                                                                          |
+| `BUMP_LABEL_POSITION`     | label_position of BumpChart.                                                                   |
+| `RADIAL_TYPE`             | mark of RadialChart.                                                                           |
+| `RADIAL_DIRECTION`        | direction of RadialChart.                                                                      |
+| `CALENDAR_WEEKDAY`        | week_start of CalendarHeatmap; the chart_default_calendar_heatmap_week_start config attribute. |
+| `GANTT_DATE_PERIOD`       | period of GanttChart.                                                                          |
+| `GANTT_VALUE`             | value_kind of GanttChart.                                                                      |
+| `GANTT_SORT_KEY`          | sort_by of GanttChart.                                                                         |
+| `GANTT_ARROW_ENTRY`       | The plot_gantt_dependency_entry style attribute.                                               |
+| `DUMBBELL_VALUE`          | value_kind of DumbbellChart.                                                                   |
+| `DUMBBELL_SORT_KEY`       | sort_by of DumbbellChart.                                                                      |
+| `RIDGELINE_SCALE`         | ridge_scale of RidgelinePlot.                                                                  |
+| `CONTOUR_LEVELS`          | levels of ContourChart.                                                                        |
+| `HEXBIN_REDUCE`           | reduce of HexbinChart.                                                                         |
+| `NETWORK_LAYOUT`          | layout of NetworkChart.                                                                        |
+| `NETWORK_LABEL_POSITION`  | label_position of NetworkChart; the chart_default_network_label_position config attribute.     |
+| `SCATTER_MATRIX_DIAGONAL` | diagonal of ScatterMatrix.                                                                     |
+| `BASEMAP_FEATURE`         | data of BasemapChart; the feature of its geometry.                                             |
+| `BASEMAP_RESOLUTION`      | resolution of BasemapChart.                                                                    |
 
 Deprecated names, removed in the next release: `SCALE` (now `AXIS_SCALE`), `NORMALIZE` (now `COLOR_NORM`), `LINE_MARKER.NONE` (now `NO_MARKER`), `LINE_STYLE.NONE` (now `NO_LINE`), and `SCATTER_MATRIX_DIAGONAL.NONE` (now `BLANK`).
 
@@ -1110,7 +1110,7 @@ Bases: `Domain`
 
 The supported week start days.
 
-Passed as the `week_start` setting of the calendar heatmap: the weekday drawn in the top row of every week column. The theme's `plot_calendar_heatmap_week_start` supplies the default.
+Passed as the `week_start` setting of the calendar heatmap: the weekday drawn in the top row of every week column. The theme's `chart_default_calendar_heatmap_week_start` supplies the default.
 
 Examples:
 

@@ -5365,7 +5365,7 @@ config.theme
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Beyond style, a theme carries defaults for chart settings (<a href="../../../references/typings/#datachart.typings.ThemeDefaultAttrs">ThemeDefaultAttrs</a>): <code>chart_default_show_grid</code> supplies the grid when a chart call leaves <code>show_grid</code> unset (every predefined theme but <a href="../theme-gallery/#sketch"><code>SKETCH</code></a> and <a href="../theme-gallery/#quill"><code>QUILL</code></a> ships a muted <code>"y"</code> grid), <code>chart_default_show_values</code> does the same for value labels (no predefined theme turns them on), and the <code>plot_hatch_cycle</code>, <code>plot_linestyle_cycle</code>, and <code>plot_marker_cycle</code> attributes tell series apart by pattern where a theme ships them (<a href="../theme-gallery/#hatch"><code>HATCH</code></a> and <a href="../theme-gallery/#quill"><code>QUILL</code></a>). A setting given in the chart call always wins over the theme default.</p>
+<p>Beyond style, a theme carries defaults for chart settings (<a href="../../../references/typings/#datachart.typings.ThemeDefaultAttrs">ThemeDefaultAttrs</a>): <code>chart_default_show_grid</code> supplies the grid when a chart call leaves <code>show_grid</code> unset (every predefined theme but <a href="../theme-gallery/#sketch"><code>SKETCH</code></a> and <a href="../theme-gallery/#quill"><code>QUILL</code></a> ships a muted <code>"y"</code> grid), <code>chart_default_show_values</code> does the same for value labels (no predefined theme turns them on), a setting one chart owns takes that chart's name (<code>chart_default_calendar_heatmap_week_start</code>, <code>chart_default_ridgeline_overlap</code>, <code>chart_default_network_label_position</code>), and the <code>plot_hatch_cycle</code>, <code>plot_linestyle_cycle</code>, and <code>plot_marker_cycle</code> attributes tell series apart by pattern where a theme ships them (<a href="../theme-gallery/#hatch"><code>HATCH</code></a> and <a href="../theme-gallery/#quill"><code>QUILL</code></a>). A setting given in the chart call always wins over the theme default.</p>
 </div>
 </div>
 </div>
@@ -5418,7 +5418,7 @@ config.theme
 </tr>
 <tr>
 <td style="text-align:left"><code>chart_default_*</code>, <code>plot_*_cycle</code></td>
-<td style="text-align:left">The chart-setting defaults above</td>
+<td style="text-align:left">The chart-setting defaults above: <code>chart_default_&lt;setting&gt;</code>, or <code>chart_default_&lt;chart&gt;_&lt;setting&gt;</code> for a setting one chart owns</td>
 <td style="text-align:left"><a href="../../../references/typings/#datachart.typings.ThemeDefaultAttrs">ThemeDefaultAttrs</a></td>
 </tr>
 </tbody>

@@ -135,7 +135,7 @@ RidgelinePlot(
 
 ### Row overlap
 
-Ridges that overlap save space and make the shift from row to row easy to follow; too much overlap hides the rows behind. `overlap` sets how far each ridge rises into the row above, between 0 and 1: a ridge's peak stands `1 + overlap` rows above its tick, so `0` makes the peaks just touch the next row and `1` sends them a whole row further. Without it the theme's `plot_ridgeline_overlap` applies (`0.5` in the predefined themes); values outside `[0, 1]` raise a `ValueError`. Side by side, the flat version is easier to read row by row, and the overlapping one shows the seasonal sweep better.
+Ridges that overlap save space and make the shift from row to row easy to follow; too much overlap hides the rows behind. `overlap` sets how far each ridge rises into the row above, between 0 and 1: a ridge's peak stands `1 + overlap` rows above its tick, so `0` makes the peaks just touch the next row and `1` sends them a whole row further. Without it the theme's `chart_default_ridgeline_overlap` applies (`0.5` in the predefined themes); values outside `[0, 1]` raise a `ValueError`. Side by side, the flat version is easier to read row by row, and the overlapping one shows the seasonal sweep better.
 
 ```
 from datachart.utils import Grid

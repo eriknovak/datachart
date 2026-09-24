@@ -88,7 +88,7 @@ CalendarHeatmap(
 
 ### Week start
 
-Whether the weekend sits at the bottom of the calendar or wraps around it depends on the day the week starts on. The weeks run from Monday to Sunday by default, which keeps Saturday and Sunday together in the bottom two rows; `week_start` with [CALENDAR_WEEKDAY.SUNDAY](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.CALENDAR_WEEKDAY) starts them on Sunday, as American calendars and the GitHub contributions graph do, and the weekend splits into the top and bottom rows. The default comes from the theme's `plot_calendar_heatmap_week_start` attribute, so it can be set once for every chart through the [config](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md).
+Whether the weekend sits at the bottom of the calendar or wraps around it depends on the day the week starts on. The weeks run from Monday to Sunday by default, which keeps Saturday and Sunday together in the bottom two rows; `week_start` with [CALENDAR_WEEKDAY.SUNDAY](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.CALENDAR_WEEKDAY) starts them on Sunday, as American calendars and the GitHub contributions graph do, and the weekend splits into the top and bottom rows. The default comes from the theme's `chart_default_calendar_heatmap_week_start` attribute, so it can be set once for every chart through the [config](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md).
 
 ```
 from datachart.constants import CALENDAR_WEEKDAY

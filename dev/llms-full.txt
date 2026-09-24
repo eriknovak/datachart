@@ -5830,7 +5830,7 @@ CalendarHeatmap(
 
 ### Week start
 
-Whether the weekend sits at the bottom of the calendar or wraps around it depends on the day the week starts on. The weeks run from Monday to Sunday by default, which keeps Saturday and Sunday together in the bottom two rows; `week_start` with [CALENDAR_WEEKDAY.SUNDAY](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.CALENDAR_WEEKDAY) starts them on Sunday, as American calendars and the GitHub contributions graph do, and the weekend splits into the top and bottom rows. The default comes from the theme's `plot_calendar_heatmap_week_start` attribute, so it can be set once for every chart through the [config](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md).
+Whether the weekend sits at the bottom of the calendar or wraps around it depends on the day the week starts on. The weeks run from Monday to Sunday by default, which keeps Saturday and Sunday together in the bottom two rows; `week_start` with [CALENDAR_WEEKDAY.SUNDAY](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.CALENDAR_WEEKDAY) starts them on Sunday, as American calendars and the GitHub contributions graph do, and the weekend splits into the top and bottom rows. The default comes from the theme's `chart_default_calendar_heatmap_week_start` attribute, so it can be set once for every chart through the [config](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md).
 
 ```
 from datachart.constants import CALENDAR_WEEKDAY
@@ -9960,7 +9960,7 @@ RidgelinePlot(
 
 ### Row overlap
 
-Ridges that overlap save space and make the shift from row to row easy to follow; too much overlap hides the rows behind. `overlap` sets how far each ridge rises into the row above, between 0 and 1: a ridge's peak stands `1 + overlap` rows above its tick, so `0` makes the peaks just touch the next row and `1` sends them a whole row further. Without it the theme's `plot_ridgeline_overlap` applies (`0.5` in the predefined themes); values outside `[0, 1]` raise a `ValueError`. Side by side, the flat version is easier to read row by row, and the overlapping one shows the seasonal sweep better.
+Ridges that overlap save space and make the shift from row to row easy to follow; too much overlap hides the rows behind. `overlap` sets how far each ridge rises into the row above, between 0 and 1: a ridge's peak stands `1 + overlap` rows above its tick, so `0` makes the peaks just touch the next row and `1` sends them a whole row further. Without it the theme's `chart_default_ridgeline_overlap` applies (`0.5` in the predefined themes); values outside `[0, 1]` raise a `ValueError`. Side by side, the flat version is easier to read row by row, and the overlapping one shows the seasonal sweep better.
 
 ```
 from datachart.utils import Grid
@@ -18248,7 +18248,7 @@ config.reset_config()
 config.theme
 ```
 
-Beyond style, a theme carries defaults for chart settings ([ThemeDefaultAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ThemeDefaultAttrs)): `chart_default_show_grid` supplies the grid when a chart call leaves `show_grid` unset (every predefined theme but [`SKETCH`](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/#sketch) and [`QUILL`](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/#quill) ships a muted `"y"` grid), `chart_default_show_values` does the same for value labels (no predefined theme turns them on), and the `plot_hatch_cycle`, `plot_linestyle_cycle`, and `plot_marker_cycle` attributes tell series apart by pattern where a theme ships them ([`HATCH`](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/#hatch) and [`QUILL`](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/#quill)). A setting given in the chart call always wins over the theme default.
+Beyond style, a theme carries defaults for chart settings ([ThemeDefaultAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ThemeDefaultAttrs)): `chart_default_show_grid` supplies the grid when a chart call leaves `show_grid` unset (every predefined theme but [`SKETCH`](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/#sketch) and [`QUILL`](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/#quill) ships a muted `"y"` grid), `chart_default_show_values` does the same for value labels (no predefined theme turns them on), a setting one chart owns takes that chart's name (`chart_default_calendar_heatmap_week_start`, `chart_default_ridgeline_overlap`, `chart_default_network_label_position`), and the `plot_hatch_cycle`, `plot_linestyle_cycle`, and `plot_marker_cycle` attributes tell series apart by pattern where a theme ships them ([`HATCH`](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/#hatch) and [`QUILL`](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/#quill)). A setting given in the chart call always wins over the theme default.
 
 ## What a Theme Controls
 
@@ -18262,7 +18262,7 @@ The attribute names are the keys of the live configuration, grouped by prefix; t
 | `plot_grid_*`, `plot_legend_*`, `plot_text_*`, `plot_value_*` | The furniture every chart shares: grid lines, legend, annotations, value labels                                                                                 | [GridStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.GridStyleAttrs), [LegendStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.LegendStyleAttrs), [TextStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.TextStyleAttrs), [ValueLabelStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ValueLabelStyleAttrs) |
 | `plot_<chart>_*`                                              | One group per chart type: `plot_line_*`, `plot_bar_*`, `plot_heatmap_*`, and so on                                                                              | The chart's guide, under "Customize"                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `overlay_*`                                                   | How a [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) combines charts: the twin-axis threshold, drawing order, bar mode | [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/#panel-configuration)                                                                                                                                                                                                                                                                                                                                                                                    |
-| `chart_default_*`, `plot_*_cycle`                             | The chart-setting defaults above                                                                                                                                | [ThemeDefaultAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ThemeDefaultAttrs)                                                                                                                                                                                                                                                                                                                                                                 |
+| `chart_default_*`, `plot_*_cycle`                             | The chart-setting defaults above: `chart_default_<setting>`, or `chart_default_<chart>_<setting>` for a setting one chart owns                                  | [ThemeDefaultAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ThemeDefaultAttrs)                                                                                                                                                                                                                                                                                                                                                                 |
 
 Two themes add groups of their own: [`SKETCH`](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/#sketch) the path wobble and halo of its hand-drawn look ([SketchStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.SketchStyleAttrs)), [`QUILL`](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/#quill) the pen strokes and etched fills of its ink look ([InkStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.InkStyleAttrs)).
 
@@ -23937,7 +23937,7 @@ Examples:
 | `subtitle`            | The subtitle(s) for individual datasets. A dataset that spans several years names each calendar by its year, after the subtitle when one is given. **TYPE:** \`str                                                                                                                                                                                                                                                               |
 | `emphasis`            | Not supported: a calendar is a single raster layer with no series to mute or highlight. Passing a value raises ValueError. **TYPE:** `None` **DEFAULT:** `None`                                                                                                                                                                                                                                                                  |
 | `year`                | The one year to draw, colored over its own values. Without it every year the dates span is drawn, one calendar per year in year order, sharing one value range so the colors compare across years. **TYPE:** \`int                                                                                                                                                                                                               |
-| `week_start`          | The weekday of the top row: CALENDAR_WEEKDAY.MONDAY or CALENDAR_WEEKDAY.SUNDAY. Defaults to the theme's plot_calendar_heatmap_week_start. **TYPE:** \`CALENDAR_WEEKDAY                                                                                                                                                                                                                                                           |
+| `week_start`          | The weekday of the top row: CALENDAR_WEEKDAY.MONDAY or CALENDAR_WEEKDAY.SUNDAY. Defaults to the theme's chart_default_calendar_heatmap_week_start. **TYPE:** \`CALENDAR_WEEKDAY                                                                                                                                                                                                                                                  |
 | `show_month_labels`   | Whether to label the months along the bottom axis, each over the middle of its weeks. Defaults to True. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                         |
 | `show_weekday_labels` | Whether to label every other weekday along the left axis. Defaults to True. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                     |
 | `figsize`             | The size of the figure. Defaults to the default width at a short height per row of calendars, the shape a calendar fills. **TYPE:** \`FIG_SIZE                                                                                                                                                                                                                                                                                   |
@@ -24000,7 +24000,6 @@ The typing for the calendar heatmap style.
 | `plot_calendar_heatmap_edge_color`       | The color of the borders drawn between the day cells. **TYPE:** \`str                                                                         |
 | `plot_calendar_heatmap_month_line_width` | The width of the separators drawn between months (0 draws none). **TYPE:** \`int                                                              |
 | `plot_calendar_heatmap_month_line_color` | The color of the separators drawn between months; None takes the heatmap frame color. **TYPE:** \`str                                         |
-| `plot_calendar_heatmap_week_start`       | The weekday in the top row of every week, the default of week_start. **TYPE:** \`CALENDAR_WEEKDAY                                             |
 
 ## Constants
 
@@ -26119,7 +26118,7 @@ Examples:
 | `label`         | The key name in data for label/category values (default: "label"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                  |
 | `value`         | The key name in data for numeric values (default: "value"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                         |
 | `bandwidth`     | The KDE bandwidth: None or "scott" (Scott's rule), "silverman", or a scalar factor. See BANDWIDTH. **TYPE:** \`BANDWIDTH                                                                                                                                                                                                                                                                                                            |
-| `overlap`       | How far a ridge's peak rises into the row above, in \[0, 1\]: a ridge rises from its tick and its peak stands 1 + overlap rows above it, so 0 makes rows touch. None takes the theme's plot_ridgeline_overlap. **TYPE:** \`float                                                                                                                                                                                                    |
+| `overlap`       | How far a ridge's peak rises into the row above, in \[0, 1\]: a ridge rises from its tick and its peak stands 1 + overlap rows above it, so 0 makes rows touch. None takes the theme's chart_default_ridgeline_overlap. **TYPE:** \`float                                                                                                                                                                                           |
 | `ridge_scale`   | "per_row" (default) scales every ridge to the same peak so shapes compare; "common" keeps one density scale so heights compare. See RIDGELINE_SCALE. **TYPE:** \`RIDGELINE_SCALE                                                                                                                                                                                                                                                    |
 | `inner`         | The marks drawn inside each ridge, up to its height: "median" (one line), "quartiles" (dashed median, dotted Q1/Q3), or None. See VIOLIN_INNER; "box" is not supported. **TYPE:** \`VIOLIN_INNER                                                                                                                                                                                                                                    |
 | `fill`          | Whether to fill each ridge. **TYPE:** `bool` **DEFAULT:** `True`                                                                                                                                                                                                                                                                                                                                                                    |
@@ -26166,7 +26165,6 @@ The typing for the ridgeline plot style.
 | `plot_ridgeline_alpha`           | The alpha value of the ridge fill. **TYPE:** \`float                      |
 | `plot_ridgeline_linewidth`       | The line width of the ridge outline. **TYPE:** \`int                      |
 | `plot_ridgeline_edgecolor`       | The color of the ridge outline; defaults to the fill. **TYPE:** \`str     |
-| `plot_ridgeline_overlap`         | How far a peak rises into the row above, in [0, 1]. **TYPE:** \`float     |
 | `plot_ridgeline_inner_color`     | The color of the inner marks; defaults to the font color. **TYPE:** \`str |
 | `plot_ridgeline_inner_linewidth` | The line width of the inner marks. **TYPE:** \`int                        |
 | `plot_ridgeline_hatch`           | The hatch pattern of the ridge fill. **TYPE:** \`HATCH_STYLE              |
@@ -27587,7 +27585,7 @@ Examples:
 | `layout`         | How the nodes are placed: a NETWORK_LAYOUT constant (default NETWORK_LAYOUT.SPRING); on a disconnected network, SPRING and WEIGHTED place each connected part on its own, side by side, with the unlinked nodes on a ring around them. WEIGHTED lets each edge's weight set how hard it pulls its nodes together; GROUPED clusters the nodes by group, arranges the clusters by the summed weight of the edges between them, and marks each with a disc in the group color (plot_network_group_alpha). FIXED reads each node's x/y, each between 0 and 1, and draws that space inside the margin the other layouts keep. The three spring layouts cost the square of the node count; past about 1,000 nodes prefer CIRCULAR or FIXED. **TYPE:** \`NETWORK_LAYOUT |
 | `directed`       | Whether the edges end in an arrowhead at the target. When False (the default), an edge and its reverse draw as one line. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | `seed`           | The seed of the spring layouts (default 0); another seed gives another arrangement of the same data. **TYPE:** \`int                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| `label_position` | Where the node names print: a NETWORK_LABEL_POSITION constant (default NETWORK_LABEL_POSITION.CENTER, or the theme's chart_default_node_label_position). **TYPE:** \`NETWORK_LABEL_POSITION                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `label_position` | Where the node names print: a NETWORK_LABEL_POSITION constant (default NETWORK_LABEL_POSITION.CENTER, or the theme's chart_default_network_label_position). **TYPE:** \`NETWORK_LABEL_POSITION                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `show_values`    | Whether to write each edge's weight at its midpoint. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | `value_format`   | The format of the edge values: a VALUE_FORMAT constant (default VALUE_FORMAT.DEFAULT) or any "{x:.1f}", "{:.1f}%", or "%g" style string. **TYPE:** \`VALUE_FORMAT                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | `show_legend`    | Whether to list the node groups in a legend. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
@@ -29693,7 +29691,7 @@ Examples:
 >>> from datachart.constants import THEME
 >>> from datachart.config import config
 >>> config.set_theme(THEME.DEFAULT)
->>> config.get("theme")
+>>> config.theme
 'default'
 ```
 
@@ -29742,7 +29740,7 @@ Examples:
 ```
 >>> from datachart.config import config
 >>> config.reset_config()
->>> config.get("theme")
+>>> config.theme
 'default'
 ```
 
@@ -29930,7 +29928,7 @@ Examples:
 ```
 >>> from datachart.config import config
 >>> config["font_general_color"]
-'#FFFFFF'
+'#000000'
 ```
 
 | PARAMETER | DESCRIPTION                                |
@@ -29956,7 +29954,7 @@ Examples:
 ```
 >>> from datachart.config import config
 >>> config.get("font_general_color")
-'#FFFFFF'
+'#000000'
 ```
 
 | PARAMETER | DESCRIPTION                                                                                             |
@@ -30690,7 +30688,7 @@ QUILL_THEME: StyleAttrs = make_theme(
         "axes_ticks_length": 5,
         "axes_ticks_label_size": 9,
         "chart_default_show_grid": None,
-        "chart_default_node_label_position": NETWORK_LABEL_POSITION.ABOVE,
+        "chart_default_network_label_position": NETWORK_LABEL_POSITION.ABOVE,
         "plot_hatch_cycle": ["/", ".", "\\", "x", "-", "|"],
         "plot_linestyle_cycle": [
             "-",
@@ -30944,28 +30942,28 @@ Each class and what reads it: a chart parameter, a style attribute, or the confi
 
 **Chart-Specific Constants**
 
-| CLASS                     | DESCRIPTION                                                                             |
-| ------------------------- | --------------------------------------------------------------------------------------- |
-| `STACKED_AREA_BASELINE`   | baseline of StackedAreaChart.                                                           |
-| `BUMP_RANK`               | rank_by of BumpChart.                                                                   |
-| `BUMP_LABEL_POSITION`     | label_position of BumpChart.                                                            |
-| `RADIAL_TYPE`             | mark of RadialChart.                                                                    |
-| `RADIAL_DIRECTION`        | direction of RadialChart.                                                               |
-| `CALENDAR_WEEKDAY`        | week_start of CalendarHeatmap; the plot_calendar_heatmap_week_start style attribute.    |
-| `GANTT_DATE_PERIOD`       | period of GanttChart.                                                                   |
-| `GANTT_VALUE`             | value_kind of GanttChart.                                                               |
-| `GANTT_SORT_KEY`          | sort_by of GanttChart.                                                                  |
-| `GANTT_ARROW_ENTRY`       | The plot_gantt_dependency_entry style attribute.                                        |
-| `DUMBBELL_VALUE`          | value_kind of DumbbellChart.                                                            |
-| `DUMBBELL_SORT_KEY`       | sort_by of DumbbellChart.                                                               |
-| `RIDGELINE_SCALE`         | ridge_scale of RidgelinePlot.                                                           |
-| `CONTOUR_LEVELS`          | levels of ContourChart.                                                                 |
-| `HEXBIN_REDUCE`           | reduce of HexbinChart.                                                                  |
-| `NETWORK_LAYOUT`          | layout of NetworkChart.                                                                 |
-| `NETWORK_LABEL_POSITION`  | label_position of NetworkChart; the chart_default_node_label_position config attribute. |
-| `SCATTER_MATRIX_DIAGONAL` | diagonal of ScatterMatrix.                                                              |
-| `BASEMAP_FEATURE`         | data of BasemapChart; the feature of its geometry.                                      |
-| `BASEMAP_RESOLUTION`      | resolution of BasemapChart.                                                             |
+| CLASS                     | DESCRIPTION                                                                                    |
+| ------------------------- | ---------------------------------------------------------------------------------------------- |
+| `STACKED_AREA_BASELINE`   | baseline of StackedAreaChart.                                                                  |
+| `BUMP_RANK`               | rank_by of BumpChart.                                                                          |
+| `BUMP_LABEL_POSITION`     | label_position of BumpChart.                                                                   |
+| `RADIAL_TYPE`             | mark of RadialChart.                                                                           |
+| `RADIAL_DIRECTION`        | direction of RadialChart.                                                                      |
+| `CALENDAR_WEEKDAY`        | week_start of CalendarHeatmap; the chart_default_calendar_heatmap_week_start config attribute. |
+| `GANTT_DATE_PERIOD`       | period of GanttChart.                                                                          |
+| `GANTT_VALUE`             | value_kind of GanttChart.                                                                      |
+| `GANTT_SORT_KEY`          | sort_by of GanttChart.                                                                         |
+| `GANTT_ARROW_ENTRY`       | The plot_gantt_dependency_entry style attribute.                                               |
+| `DUMBBELL_VALUE`          | value_kind of DumbbellChart.                                                                   |
+| `DUMBBELL_SORT_KEY`       | sort_by of DumbbellChart.                                                                      |
+| `RIDGELINE_SCALE`         | ridge_scale of RidgelinePlot.                                                                  |
+| `CONTOUR_LEVELS`          | levels of ContourChart.                                                                        |
+| `HEXBIN_REDUCE`           | reduce of HexbinChart.                                                                         |
+| `NETWORK_LAYOUT`          | layout of NetworkChart.                                                                        |
+| `NETWORK_LABEL_POSITION`  | label_position of NetworkChart; the chart_default_network_label_position config attribute.     |
+| `SCATTER_MATRIX_DIAGONAL` | diagonal of ScatterMatrix.                                                                     |
+| `BASEMAP_FEATURE`         | data of BasemapChart; the feature of its geometry.                                             |
+| `BASEMAP_RESOLUTION`      | resolution of BasemapChart.                                                                    |
 
 Deprecated names, removed in the next release: `SCALE` (now `AXIS_SCALE`), `NORMALIZE` (now `COLOR_NORM`), `LINE_MARKER.NONE` (now `NO_MARKER`), `LINE_STYLE.NONE` (now `NO_LINE`), and `SCATTER_MATRIX_DIAGONAL.NONE` (now `BLANK`).
 
@@ -31985,7 +31983,7 @@ Bases: `Domain`
 
 The supported week start days.
 
-Passed as the `week_start` setting of the calendar heatmap: the weekday drawn in the top row of every week column. The theme's `plot_calendar_heatmap_week_start` supplies the default.
+Passed as the `week_start` setting of the calendar heatmap: the weekday drawn in the top row of every week column. The theme's `chart_default_calendar_heatmap_week_start` supplies the default.
 
 Examples:
 
@@ -32865,14 +32863,18 @@ Bases: `TypedDict`
 
 The typing for theme-driven defaults and cycles.
 
-| ATTRIBUTE                           | DESCRIPTION                                                                                                                                                                                                                                                                           |
-| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `chart_default_show_grid`           | The theme default for show_grid, applied when a chart call leaves it unset. Never applies to heatmaps. None means the theme has no opinion. **TYPE:** \`SHOW_GRID                                                                                                                     |
-| `chart_default_show_values`         | The theme default for show_values, applied to every chart that takes it when the chart call leaves it unset. None means the theme has no opinion. **TYPE:** \`bool                                                                                                                    |
-| `chart_default_node_label_position` | The theme default for the network chart's label_position, applied when the chart call leaves it unset. None means the theme has no opinion. **TYPE:** \`NETWORK_LABEL_POSITION                                                                                                        |
-| `plot_hatch_cycle`                  | The hatch patterns assigned per bar/histogram series, parallel to the color cycle; with plot_etch on, line area fills and stacked areas take them too. An explicit per-chart hatch style wins. None disables the cycle. **TYPE:** \`list[str]                                         |
-| `plot_linestyle_cycle`              | The line styles assigned per line, bump and radial line series, parallel to the color cycle. An explicit per-chart line style wins. None disables the cycle. **TYPE:** \`list\[LINE_STYLE                                                                                             |
-| `plot_marker_cycle`                 | The markers assigned per scatter and radial scatter series, parallel to the color cycle, and per network node group: a marker, or {"marker": ..., "hollow": True} to draw it as an outline. An explicit per-chart marker wins. None disables the cycle. **TYPE:** \`list\[LINE_MARKER |
+A theme default for a front parameter is `chart_default_<parameter>` when several fronts take the parameter, `chart_default_<chart>_<parameter>` when one front owns it.
+
+| ATTRIBUTE                                   | DESCRIPTION                                                                                                                                                                                                                                                                           |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `chart_default_show_grid`                   | The theme default for show_grid, applied when a chart call leaves it unset. Never applies to heatmaps. None means the theme has no opinion. **TYPE:** \`SHOW_GRID                                                                                                                     |
+| `chart_default_show_values`                 | The theme default for show_values, applied to every chart that takes it when the chart call leaves it unset. None means the theme has no opinion. **TYPE:** \`bool                                                                                                                    |
+| `chart_default_calendar_heatmap_week_start` | The theme default for the calendar heatmap's week_start, the weekday in the top row of every week. **TYPE:** \`CALENDAR_WEEKDAY                                                                                                                                                       |
+| `chart_default_ridgeline_overlap`           | The theme default for the ridgeline plot's overlap, how far a peak rises into the row above, in [0, 1]. **TYPE:** \`float                                                                                                                                                             |
+| `chart_default_network_label_position`      | The theme default for the network chart's label_position, applied when the chart call leaves it unset. None means the theme has no opinion. **TYPE:** \`NETWORK_LABEL_POSITION                                                                                                        |
+| `plot_hatch_cycle`                          | The hatch patterns assigned per bar/histogram series, parallel to the color cycle; with plot_etch on, line area fills and stacked areas take them too. An explicit per-chart hatch style wins. None disables the cycle. **TYPE:** \`list[str]                                         |
+| `plot_linestyle_cycle`                      | The line styles assigned per line, bump and radial line series, parallel to the color cycle. An explicit per-chart line style wins. None disables the cycle. **TYPE:** \`list\[LINE_STYLE                                                                                             |
+| `plot_marker_cycle`                         | The markers assigned per scatter and radial scatter series, parallel to the color cycle, and per network node group: a marker, or {"marker": ..., "hollow": True} to draw it as an outline. An explicit per-chart marker wins. None disables the cycle. **TYPE:** \`list\[LINE_MARKER |
 
 ### datachart.typings.SketchStyleAttrs
 
