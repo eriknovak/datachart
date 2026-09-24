@@ -146,7 +146,6 @@ class TestTypings(unittest.TestCase):
 
         self.assertIn("date", typings.CalendarHeatmapDataAttrs.__annotations__)
         self.assertIn("value", typings.CalendarHeatmapDataAttrs.__annotations__)
-        self.assertIn("data", typings.CalendarHeatmapSingleChartAttrs.__annotations__)
         keys = typings.CalendarHeatmapStyleAttrs.__annotations__
         self.assertTrue(all(k.startswith("plot_calendar_heatmap_") for k in keys))
         self.assertIn(

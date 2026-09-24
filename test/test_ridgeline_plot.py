@@ -330,7 +330,7 @@ class TestRidgelineDeclarations(unittest.TestCase):
         )
         for key in RIDGELINE_KEYS:
             self.assertIn(key, typings.StyleAttrs.__annotations__)
-        self.assertIn("value", typings.RidgelineDataPointAttrs.__annotations__)
+        self.assertIn("value", typings.RidgelineRecordAttrs.__annotations__)
         self.assertIn("RidgelinePlot", charts.__all__)
         self.assertEqual(
             (RIDGELINE_SCALE.PER_ROW, RIDGELINE_SCALE.COMMON), ("per_row", "common")
