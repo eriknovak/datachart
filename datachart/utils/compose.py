@@ -6,15 +6,16 @@ figures into one coordinate space, `Grid` arranges them in rows and columns.
 seam, so they survive both compositions.
 
 Methods:
-    Panel(charts, title, xlabel, ylabel_left, ylabel_right, figsize, show_legend, legend, ...):
+    Panel(charts, title, xlabel, ylabel_left, ylabel_right, figsize, show_legend, legend, ..., emphasis_rule):
         Overlays rendered chart figures on a single plot with optional dual y-axes.
-    Grid(charts, title, xlabel, ylabel, max_cols, figsize, sharex, sharey):
+    Grid(charts, title, xlabel, ylabel, max_cols, figsize, sharex, sharey, show_legend, legend, ...):
         Arranges rendered chart figures in a grid; nested rows define the layout.
     Annotate(figure, texts):
         Returns a new figure with text annotations added to a rendered figure.
 
 """
 
+import copy
 import math
 import warnings
 from typing import List, Dict, Optional, Tuple, Union, Any
@@ -24,7 +25,7 @@ from matplotlib.gridspec import GridSpec
 
 from ..config import config
 from ..constants import ASPECT_RATIO, BAR_MODE, FIG_SIZE, AXIS_SCALE, SHOW_GRID
-from ..typings import LegendSettingAttrs, TextSettingAttrs
+from ..typings import EmphasisRuleAttrs, LegendSettingAttrs, TextSettingAttrs
 from .figure import (
     _grid_from_dicts,
     _figure_grid_layout_impl,
@@ -46,8 +47,11 @@ from ._internal.layers import (
     TextLayer,
     DRAW_ZORDER,
     draw_zorder_key,
+    emphasis_rule_roles,
     value_axis_grid,
+    _rule_summary,
 )
+from ._internal.validate import validate_emphasis_rule
 
 
 def _extract_groups(figure: plt.Figure, index: int) -> Tuple[_PanelSeam, list]:
@@ -140,6 +144,37 @@ def _source_scales(source: _PanelSeam, group: LayerGroup) -> Dict[str, Any]:
     }
 
 
+def _apply_emphasis_rule(groups: List[LayerGroup], rule) -> List[LayerGroup]:
+    """The groups with the rule's role on each layer that carries none.
+
+    One unit per layer that plots raw values, as on a series front; a layer
+    with a role of its own — its figure's or its records' — keeps it. The
+    layers are copied, so the source figures keep their own roles.
+    """
+
+    rule = validate_emphasis_rule(rule, "mean")
+    if rule is None:
+        return groups
+    groups = [copy.copy(group) for group in groups]
+    units = []
+    for group in groups:
+        group.layers = list(group.layers)
+        for i, layer in enumerate(group.layers):
+            values = layer.value_data()
+            if (
+                values is None
+                or group.layer_role(layer) is not None
+                or any(role is not None for role in layer.record_roles)
+            ):
+                continue
+            units.append((group, i, _rule_summary(values, rule[2], "value")))
+    roles = emphasis_rule_roles(rule, [value for _, _, value in units])
+    for (group, i, _), role in zip(units, roles):
+        group.layers[i] = copy.copy(group.layers[i])
+        group.layers[i].emphasis = role
+    return groups
+
+
 def Panel(
     charts: List[Union[plt.Figure, Dict[str, Any]]],
     *,
@@ -148,14 +183,14 @@ def Panel(
     ylabel_left: Optional[str] = None,
     ylabel_right: Optional[str] = None,
     figsize: Optional[Union[FIG_SIZE, Tuple[float, float]]] = None,
-    show_legend: Optional[bool] = False,
+    show_legend: Optional[bool] = None,
     legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
     auto_secondary_axis: Optional[float] = None,
     xmin: Optional[float] = None,
     xmax: Optional[float] = None,
-    ymin: Optional[float] = None,
-    ymax: Optional[float] = None,
+    ymin: Optional[Union[int, float]] = None,
+    ymax: Optional[Union[int, float]] = None,
     ymin_right: Optional[float] = None,
     ymax_right: Optional[float] = None,
     scalex: Optional[Union[AXIS_SCALE, str]] = None,
@@ -163,6 +198,7 @@ def Panel(
     scaley_right: Optional[Union[AXIS_SCALE, str]] = None,
     bar_mode: Optional[Union[BAR_MODE, str]] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
+    emphasis_rule: Optional[EmphasisRuleAttrs] = None,
 ) -> plt.Figure:
     """Overlay rendered chart figures in one coordinate space.
 
@@ -299,6 +335,14 @@ def Panel(
         aspect_ratio: The aspect ratio of the axes box; `"geographic"` keeps a
             map of longitude against latitude at true proportions. Default:
             `"auto"`. See [`ASPECT_RATIO`][datachart.constants.ASPECT_RATIO].
+        emphasis_rule: A rule that highlights the composed series matching it
+            and mutes the rest: `{"above": v}` or `{"below": v}` (strict),
+            `{"between": (lo, hi)}` (inclusive), `{"top": n}` or `{"bottom": n}`,
+            read against a summary of each series' own value-axis values, chosen
+            by `by`: `"mean"` (default), `"median"`, `"min"`, `"max"`, or `"sum"`.
+            A figure's `"emphasis"` role or a role its records carry wins, and a
+            count ranks across every composed series. See
+            [`EmphasisRuleAttrs`][datachart.typings.EmphasisRuleAttrs].
 
     Returns:
         A matplotlib Figure containing the overlaid charts.
@@ -347,6 +391,8 @@ def Panel(
                     **_source_scales(source, group),
                 )
             )
+
+    groups = _apply_emphasis_rule(groups, emphasis_rule)
 
     source_settings = [
         item["figure"]._chart_metadata["panel"].settings for item in items
@@ -651,9 +697,8 @@ def _grid_from_rows(
     title: Optional[str],
     xlabel: Optional[str],
     ylabel: Optional[str],
-    figsize: Optional[Tuple[float, float]],
-    sharex: bool,
-    sharey: bool,
+    figsize: Optional[Union[FIG_SIZE, Tuple[float, float]]],
+    **furniture: Any,
 ) -> plt.Figure:
     """Turn nested rows into layout specs: colspans via the LCM of row lengths."""
     widths = []
@@ -694,8 +739,7 @@ def _grid_from_rows(
         ylabel=ylabel,
         layout_specs=specs,
         figsize=figsize,
-        sharex=sharex,
-        sharey=sharey,
+        **furniture,
     )
 
 
@@ -708,10 +752,18 @@ def Grid(
     title: Optional[str] = None,
     xlabel: Optional[str] = None,
     ylabel: Optional[str] = None,
-    max_cols: int = 4,
-    figsize: Optional[Tuple[float, float]] = None,
-    sharex: bool = False,
-    sharey: bool = False,
+    max_cols: Optional[int] = None,
+    figsize: Optional[Union[FIG_SIZE, Tuple[float, float]]] = None,
+    sharex: Optional[bool] = None,
+    sharey: Optional[bool] = None,
+    show_legend: Optional[bool] = None,
+    legend: Optional[LegendSettingAttrs] = None,
+    show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
+    xmin: Optional[float] = None,
+    xmax: Optional[float] = None,
+    ymin: Optional[Union[int, float]] = None,
+    ymax: Optional[Union[int, float]] = None,
+    aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
 ) -> plt.Figure:
     """Arrange rendered chart figures in a grid.
 
@@ -727,6 +779,11 @@ def Grid(
     sharex/sharey among its own cells; the outer grid's sharex/sharey applies
     only to its top-level cells. Panel figures also nest in a cell; the
     reverse — a Grid figure inside a Panel — stays an error.
+
+    The grid's title, axis labels and legend are drawn once for the whole
+    figure. Its limits, `show_grid` and `aspect_ratio` apply to every cell,
+    nested grids included; one left unset keeps what each cell's chart was
+    built with.
 
     Examples:
         >>> from datachart.charts import LineChart, BarChart, ScatterChart
@@ -773,10 +830,29 @@ def Grid(
         ylabel: Optional y-axis label for the whole grid, drawn once to the
             left of every cell. A nested grid keeps its own beside its cell.
         max_cols: Maximum number of columns for the flat-list automatic grid.
+            Default: 4.
         figsize: Size of the combined figure (width, height) in inches.
             If None, calculated from the first figure's size.
         sharex: Whether to share the x-axis across all subplots.
         sharey: Whether to share the y-axis across all subplots.
+        show_legend: Whether to show one legend for the whole grid, with the
+            entries of the first cell that has any. A cell's own legend stays.
+        legend: The per-figure legend setting: title, location, column count
+            and alignment; each field falls back to the theme. The location
+            picks the grid edge the legend sits on: an outside location its
+            edge, `"upper center"` the top, `"lower center"` the bottom,
+            `"center left"` the left, and any other the right. See
+            [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
+        show_grid: Which grid lines every cell shows (e.g., "both", "x", "y");
+            `False` draws none. Default: each cell's own.
+        xmin: Minimum value for the x-axis limits of every cell.
+        xmax: Maximum value for the x-axis limits of every cell.
+        ymin: Minimum value for the y-axis limits of every cell.
+        ymax: Maximum value for the y-axis limits of every cell.
+        aspect_ratio: The aspect ratio of every cell's axes box; `"geographic"`
+            keeps a map of longitude against latitude at true proportions.
+            Default: each cell's own. See
+            [`ASPECT_RATIO`][datachart.constants.ASPECT_RATIO].
 
     Returns:
         A new matplotlib Figure containing all charts in a grid layout.
@@ -785,8 +861,21 @@ def Grid(
         ValueError: If charts is empty, rows are mixed with flat items, a cell
             is invalid, or a figure cannot be composed (missing metadata).
     """
+    check_domains(locals(), {})
     if not charts:
         raise ValueError("At least one chart is required")
+    furniture = {
+        "sharex": sharex,
+        "sharey": sharey,
+        "show_legend": show_legend,
+        "legend": legend,
+        "show_grid": show_grid,
+        "xmin": xmin,
+        "xmax": xmax,
+        "ymin": ymin,
+        "ymax": ymax,
+        "aspect_ratio": aspect_ratio,
+    }
 
     if any(isinstance(item, (list, tuple)) for item in charts):
         if not all(isinstance(item, (list, tuple)) for item in charts):
@@ -800,8 +889,7 @@ def Grid(
             xlabel=xlabel,
             ylabel=ylabel,
             figsize=figsize,
-            sharex=sharex,
-            sharey=sharey,
+            **furniture,
         )
 
     items = []
@@ -820,6 +908,5 @@ def Grid(
         ylabel=ylabel,
         max_cols=max_cols,
         figsize=figsize,
-        sharex=sharex,
-        sharey=sharey,
+        **furniture,
     )

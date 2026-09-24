@@ -6,15 +6,16 @@ import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 
 from ..config import config
-from ..utils.figure import _align_axes_columns, _apply_figure_labels, _render_grid_node
+from ..utils.figure import (
+    _align_axes_columns,
+    _apply_figure_labels,
+    _render_grid_node,
+    node_legend,
+)
 from ..utils.stats import correlation
 from ..utils._internal.chart_builder import build_charts_structure
 from ..utils._internal.colors import create_color_cycle
-from ..utils._internal.config_helpers import (
-    get_legend_style,
-    get_scatter_matrix_style,
-    resolve_font_family,
-)
+from ..utils._internal.config_helpers import get_scatter_matrix_style
 from ..utils._internal.figures import new_figure
 from ..utils._internal.layers import (
     LayerGroup,
@@ -452,25 +453,16 @@ def ScatterMatrix(
     donors += [k for k, kind in enumerate(kinds) if kind == "diagonal"]
     legend_cell = donors[0] if donors else None
 
-    node_legend = None
+    matrix_legend = None
     if show_legend and hue is not None and legend_cell is not None:
-        legend_style = {
-            k: v
-            for k, v in get_legend_style(legend).items()
-            if k not in ("loc", "bbox_to_anchor")
-        }
+        legend_style: Dict[str, Any] = {}
         # the hue column names the groups; the theme's generic title does not
         if legend.get("title") is None:
             legend_style["title"] = hue
         # a row lays the groups side by side
         if edge in ROW_EDGES and legend.get("ncols") is None:
             legend_style["ncols"] = len(groups)
-        node_legend = {
-            "cell": legend_cell,
-            "edge": edge,
-            "style": legend_style,
-            "family": resolve_font_family(),
-        }
+        matrix_legend = node_legend(legend, edge, legend_cell, **legend_style)
 
     node = {
         "type": "grid",
@@ -481,15 +473,15 @@ def ScatterMatrix(
         "ylabel": None,
         "sharex": "col" if sharex else False,
         "sharey": "row" if sharey else False,
-        "legend": node_legend,
+        "legend": matrix_legend,
         # cells stay square whatever figure or grid cell holds the matrix
         "box_aspect": 1,
     }
 
     size = n - trim
     if figsize is None:
-        in_row = node_legend is not None and edge in ROW_EDGES
-        column = LEGEND_WIDTH if node_legend and not in_row else 0
+        in_row = matrix_legend is not None and edge in ROW_EDGES
+        column = LEGEND_WIDTH if matrix_legend and not in_row else 0
         row = LEGEND_HEIGHT if in_row else 0
         # a wide matrix shrinks its cells to fit a full-width page figure
         cell = min(CELL_SIZE, (FIG_SIZE.FULL_MEDIUM[0] - column) / size)

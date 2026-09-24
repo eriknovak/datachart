@@ -47,3 +47,12 @@ The parameters that accept a constant, with the class in [datachart.constants](.
 | `value_format` | [`VALUE_FORMAT`](../constants.md#datachart.constants.VALUE_FORMAT) |
 | `yticks_format` | [`VALUE_FORMAT`](../constants.md#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](../constants.md#datachart.constants.DATE_FORMAT) |
 | `colorbar={"location": ..., "format": ..., "orientation": ...}` | [`COLORBAR_LOCATION`](../constants.md#datachart.constants.COLORBAR_LOCATION), [`VALUE_FORMAT`](../constants.md#datachart.constants.VALUE_FORMAT), [`ORIENTATION`](../constants.md#datachart.constants.ORIENTATION) |
+
+## Composition
+
+Whether the figure composes with each composition function.
+
+| Function | Composes |
+| :-- | :-- |
+| [`Grid`](../utils/index.md#datachart.utils.Grid) | yes |
+| [`Panel`](../utils/index.md#datachart.utils.Panel) | yes |

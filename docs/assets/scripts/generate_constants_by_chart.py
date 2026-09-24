@@ -22,7 +22,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3]))
 import datachart.charts as ch
 import datachart.constants as K
 import datachart.typings as T
-from datachart.utils._internal.chart_kinds import SHARED_PARAMETERS
+from datachart.utils._internal.chart_kinds import CHART_KINDS, SHARED_PARAMETERS
 
 CLASSES = {n for n in dir(K) if n.isupper() and inspect.isclass(getattr(K, n))}
 TYPINGS = {n for n in dir(T) if n.endswith("Attrs") and not n.startswith("_")}
@@ -444,6 +444,26 @@ def constants_section(n):
     return "\n".join(lines) + "\n"
 
 
+def composition_section(n):
+    utils = "../utils/index.md#datachart.utils"
+    rows = [
+        ("Grid", "yes"),
+        ("Panel", "yes" if CHART_KINDS[n.lower()].overlayable else "no"),
+    ]
+    # a matrix is a grid of cells: there is no one axes to annotate
+    if n == "ScatterMatrix":
+        rows.append(("Annotate", "no"))
+    lines = [
+        "## Composition",
+        "",
+        "Whether the figure composes with each composition function.",
+        "",
+        "| Function | Composes |",
+        "| :-- | :-- |",
+    ] + [f"| [`{f}`]({utils}.{f}) | {ok} |" for f, ok in rows]
+    return "\n".join(lines) + "\n"
+
+
 def chart_page(n):
     guide = f"../../how-to-guides/charts/{slug(n)}.ipynb"
     return (
@@ -455,7 +475,14 @@ def chart_page(n):
         + block(f"datachart.charts.{n}")
         + "\n\n"
         + "\n".join(
-            s for s in (data_section(n), style_section(n), constants_section(n)) if s
+            s
+            for s in (
+                data_section(n),
+                style_section(n),
+                constants_section(n),
+                composition_section(n),
+            )
+            if s
         )
     )
 

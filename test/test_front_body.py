@@ -2,6 +2,7 @@ import ast
 import inspect
 import textwrap
 import unittest
+from typing import Optional
 from unittest import mock
 
 import datachart.charts
@@ -17,6 +18,7 @@ from datachart.charts import (
     RidgelinePlot,
     ScatterChart,
 )
+from datachart.utils import Grid, Panel
 from datachart.utils._internal import plot_engine
 from datachart.utils._internal.chart_kinds import (
     CHART_KINDS,
@@ -108,6 +110,22 @@ class TestSharedParameters(unittest.TestCase):
                         params[name].annotation, row.signature_annotation(kind)
                     )
                     self.assertEqual(params[name].default, row.default)
+
+    def test_composition_fronts_conform_to_the_table(self):
+        # a composition front has no row: it reads every value whole
+        for front in (Panel, Grid):
+            params = inspect.signature(front).parameters
+            for name in params.keys() & SHARED_PARAMETERS.keys():
+                row = SHARED_PARAMETERS[name]
+                with self.subTest(front=front.__name__, parameter=name):
+                    self.assertEqual(params[name].annotation, Optional[row.annotation])
+                    self.assertEqual(params[name].default, row.default)
+
+    def test_grid_takes_the_figure_furniture(self):
+        params = inspect.signature(Grid).parameters
+        furniture = {"show_legend", "legend", "show_grid", "aspect_ratio"}
+        limits = {"xmin", "xmax", "ymin", "ymax"}
+        self.assertLessEqual(furniture | limits, set(params))
 
     def test_every_row_is_shared(self):
         # a remap parameter is shared by its row, however many fronts take it

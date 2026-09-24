@@ -14,7 +14,7 @@ Two values per category, a dot at each and a connector between them. The [Dumbbe
 
 ## Data
 
-Each record in `data` is a [`DumbbellRecordAttrs`](#datachart.typings.DumbbellRecordAttrs); the `emphasis` parameter renames its keys.
+Each record in `data` is a [`DumbbellRecordAttrs`](#datachart.typings.DumbbellRecordAttrs); the `emphasis`, `label`, `start` and `end` parameters rename its keys.
 
 ::: datachart.typings.DumbbellRecordAttrs
     options:
@@ -46,3 +46,12 @@ The parameters that accept a constant, with the class in [datachart.constants](.
 | `value_format` | [`VALUE_FORMAT`](../constants.md#datachart.constants.VALUE_FORMAT) |
 | `sort` | [`SORT`](../constants.md#datachart.constants.SORT) |
 | `emphasis` | [`EMPHASIS`](../constants.md#datachart.constants.EMPHASIS) |
+
+## Composition
+
+Whether the figure composes with each composition function.
+
+| Function | Composes |
+| :-- | :-- |
+| [`Grid`](../utils/index.md#datachart.utils.Grid) | yes |
+| [`Panel`](../utils/index.md#datachart.utils.Panel) | yes |

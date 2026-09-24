@@ -147,7 +147,9 @@ class TestCenteredNorm(unittest.TestCase):
 
     def test_vcenter_moves_the_centre(self):
         image = (
-            Heatmap({"z": SIGNED}, norm=COLOR_NORM.CENTERED, vcenter=2).axes[0].images[0]
+            Heatmap({"z": SIGNED}, norm=COLOR_NORM.CENTERED, vcenter=2)
+            .axes[0]
+            .images[0]
         )
         self.assertEqual(image.norm.vcenter, 2)
 

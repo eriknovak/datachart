@@ -598,3 +598,139 @@ class TestPanel:
         plt.close(overlay_fig)
         plt.close(bar_fig)
         plt.close(line_fig)
+
+
+def _lines(offset, subtitle):
+    return LineChart(
+        data=[{"x": i, "y": i + offset} for i in range(5)], subtitle=subtitle
+    )
+
+
+def _legends(figure):
+    return [ax.get_legend() for ax in figure.axes if ax.get_legend() is not None]
+
+
+def _grid_on(ax, axis):
+    lines = ax.get_xgridlines() if axis == "x" else ax.get_ygridlines()
+    return any(line.get_visible() for line in lines)
+
+
+def _data_axes(figure):
+    return [ax for ax in figure.axes if ax.lines or ax.patches or ax.collections]
+
+
+class TestPanelFurniture:
+    """Panel speaks the fronts' legend and emphasis vocabulary."""
+
+    def test_default_legend_follows_the_front_default(self):
+        fig = Panel([_lines(0, "a"), _lines(5, "b")])
+        assert fig._chart_metadata["panel"].settings["show_legend"] is None
+        assert _legends(fig) == []
+        plt.close("all")
+
+    def test_emphasis_rule_reads_every_composed_layer(self):
+        fig = Panel(
+            [_lines(0, "low"), _lines(10, "high"), _lines(5, "mid")],
+            emphasis_rule={"top": 1},
+        )
+        panel = fig._chart_metadata["panel"]
+        roles = {
+            layer.subtitle: group.layer_role(layer)
+            for group in panel.groups
+            for layer in group.layers
+        }
+        assert roles == {"low": "background", "high": "highlight", "mid": "background"}
+        plt.close("all")
+
+    def test_emphasis_rule_keeps_a_figure_role(self):
+        fig = Panel(
+            [
+                {"figure": _lines(0, "low"), "emphasis": "highlight"},
+                _lines(10, "high"),
+            ],
+            emphasis_rule={"top": 1},
+        )
+        panel = fig._chart_metadata["panel"]
+        roles = [g.layer_role(layer) for g in panel.groups for layer in g.layers]
+        assert roles == ["highlight", "highlight"]
+        plt.close("all")
+
+    def test_emphasis_rule_leaves_source_figures_untouched(self):
+        low, high = _lines(0, "low"), _lines(10, "high")
+        Panel([low, high], emphasis_rule={"top": 1})
+        layer = low._chart_metadata["panel"].layers[0]
+        assert layer.emphasis is None
+        plt.close("all")
+
+
+class TestGridFurniture:
+    """Grid draws the fronts' legend, grid, limits and aspect for every cell."""
+
+    def test_no_furniture_keeps_cells_as_built(self):
+        fig = Grid([_lines(0, "a"), LineChart(data=[{"x": 0, "y": 1}], show_grid="x")])
+        axes = _data_axes(fig)
+        assert _legends(fig) == []
+        assert _grid_on(axes[1], "x") and not _grid_on(axes[1], "y")
+        plt.close("all")
+
+    def test_legend_is_drawn_once(self):
+        fig = Grid([[_lines(0, "a"), _lines(5, "b")]], show_legend=True)
+        legends = _legends(fig)
+        assert len(legends) == 1
+        assert [t.get_text() for t in legends[0].get_texts()] == ["a"]
+        plt.close("all")
+
+    def test_legend_location_names_the_edge(self):
+        fig = Grid(
+            [_lines(0, "a"), _lines(5, "b")],
+            show_legend=True,
+            legend={"location": "lower center"},
+        )
+        (legend,) = _legends(fig)
+        legend_ax = legend.axes
+        cells = _data_axes(fig)
+        assert legend_ax.get_position().y1 <= min(ax.get_position().y0 for ax in cells)
+        plt.close("all")
+
+    def test_show_grid_overrides_every_cell(self):
+        fig = Grid(
+            [LineChart(data=[{"x": 0, "y": 1}], show_grid="x"), _lines(0, "a")],
+            show_grid="y",
+        )
+        for ax in _data_axes(fig):
+            assert _grid_on(ax, "y") and not _grid_on(ax, "x")
+        plt.close("all")
+
+    def test_limits_override_every_cell(self):
+        fig = Grid([_lines(0, "a"), _lines(50, "b")], ymin=-5, ymax=100, xmax=10)
+        for ax in _data_axes(fig):
+            assert ax.get_ylim() == (-5, 100)
+            assert ax.get_xlim()[1] == 10
+        plt.close("all")
+
+    def test_overrides_reach_a_nested_grid(self):
+        inner = Grid([_lines(0, "a"), _lines(5, "b")])
+        fig = Grid([inner, _lines(50, "c")], ymin=-5, ymax=100)
+        axes = _data_axes(fig)
+        assert len(axes) == 3
+        for ax in axes:
+            assert ax.get_ylim() == (-5, 100)
+        plt.close("all")
+
+    def test_overrides_leave_the_source_figures_untouched(self):
+        source = _lines(0, "a")
+        Grid([source], ymin=-5)
+        assert source._chart_metadata["panel"].settings["ymin"] is None
+        plt.close("all")
+
+    def test_aspect_ratio_overrides_every_cell(self):
+        fig = Grid([_lines(0, "a"), _lines(5, "b")], aspect_ratio="equal")
+        for ax in _data_axes(fig):
+            assert ax.get_aspect() == 1.0
+        plt.close("all")
+
+    def test_invalid_furniture_raises_at_the_call(self):
+        for bad in ({"show_grid": "bogus"}, {"aspect_ratio": "bogus"}):
+            with pytest.raises(ValueError, match="bogus"):
+                Grid([_lines(0, "a")], **bad)
+        plt.close("all")

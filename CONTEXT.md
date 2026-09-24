@@ -51,7 +51,10 @@ Panel): a nested grid occupies one cell and rebuilds its own layout there in
 the parent's gridspec, so its axes envelope aligns with sibling cells; its
 title becomes a subtitle-sized heading row, its `xlabel`/`ylabel` a footer row
 and a left column (figure-level `supxlabel`/`supylabel` at the top level), and
-its axis sharing stays local.
+its axis sharing stays local. The front takes the shared figure-level
+parameters of the chart fronts (ADR 0070): title, labels and one grid legend
+apply to the figure; `show_grid`, limits and `aspect_ratio` override every
+cell only when given.
 _Avoid_: grid layout (for the front), figure grid
 
 **Projection**:
