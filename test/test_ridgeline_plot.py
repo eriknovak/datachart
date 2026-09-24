@@ -30,7 +30,6 @@ RIDGELINE_KEYS = (
     "plot_ridgeline_alpha",
     "plot_ridgeline_linewidth",
     "plot_ridgeline_edgecolor",
-    "plot_ridgeline_overlap",
     "plot_ridgeline_inner_color",
     "plot_ridgeline_inner_linewidth",
     "plot_ridgeline_hatch",
@@ -102,8 +101,13 @@ class TestRidgelineLayout(unittest.TestCase):
     def test_theme_overlap_default(self):
         ax = RidgelinePlot(ridge_data()).axes[0]
         self.assertAlmostEqual(
-            rise(fills(ax)[0], 0), 1 + config["plot_ridgeline_overlap"]
+            rise(fills(ax)[0], 0), 1 + config["chart_default_ridgeline_overlap"]
         )
+        config.update_config({"chart_default_ridgeline_overlap": 0.8})
+        ax = RidgelinePlot(ridge_data(), overlap=None).axes[0]
+        self.assertAlmostEqual(rise(fills(ax)[0], 0), 1.8)
+        ax = RidgelinePlot(ridge_data(), overlap=0.2).axes[0]
+        self.assertAlmostEqual(rise(fills(ax)[0], 0), 1.2)
 
     def test_per_row_scales_every_ridge_to_the_same_peak(self):
         data = ridge_data(scales=[0.5, 1.0, 3.0])

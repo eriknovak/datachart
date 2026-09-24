@@ -60,11 +60,12 @@ adds no tag; one that reverses, narrows, widens or replaces a commitment does.
 
 ## Themes and styling
 
-- [0004](0004-theme-driven-defaults-and-cycles.md) — Themes may supply defaults for chart settings and per-series hatch cycles (amended by [0033](0033-value-labels-across-charts.md), [0048](0048-ink-rendering-attributes-in-themes.md))
+- [0004](0004-theme-driven-defaults-and-cycles.md) — Themes may supply defaults for chart settings and per-series hatch cycles (amended by [0033](0033-value-labels-across-charts.md), [0048](0048-ink-rendering-attributes-in-themes.md), [0071](0071-theme-default-naming-and-resolver.md))
 - [0027](0027-render-scoped-rc-attributes-in-themes.md) — Render-scoped rc attributes in themes (amended by [0048](0048-ink-rendering-attributes-in-themes.md))
 - [0040](0040-json-theme-files-and-config-scopes.md) — Themes travel as JSON diff files, and temporary style changes are context-managed scopes
 - [0048](0048-ink-rendering-attributes-in-themes.md) — Ink rendering attributes in themes
 - [0058](0058-dark-theme.md) — A dark theme inverts the furniture, not the marks
+- [0071](0071-theme-default-naming-and-resolver.md) — A theme default is named for its parameter and read through one resolver
 
 See also 0009, which names the themes for their look, and 0063, which moves the
 theme faces out of the wheel.

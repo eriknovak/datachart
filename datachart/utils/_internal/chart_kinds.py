@@ -72,6 +72,7 @@ from .layers import (
     treemap_units,
     emphasis_rule_roles,
     resolve_show_values,
+    theme_default,
     value_axis_grid,
     value_label_font,
 )
@@ -257,6 +258,9 @@ class ChartKind:
         domains: The constant class each of the front's own constant-typed
             parameters takes (ADR 0068); a shared parameter's comes from its
             `SharedParameter` annotation.
+        theme_defaults: The theme key each of the front's own parameters
+            defaults to when the call leaves it None (ADR 0071); a shared
+            parameter's comes from its `SharedParameter`.
         group: Categories run along one axis and values along the other, so
             the scale keys name the value axis, not a literal one.
         overlayable: `Panel` may overlay the front's figures.
@@ -299,6 +303,7 @@ class ChartKind:
     rejects: Mapping[str, str] = field(default_factory=dict)
     renamed: Mapping[str, str] = field(default_factory=dict)
     domains: Mapping[str, Type[Domain]] = field(default_factory=dict)
+    theme_defaults: Mapping[str, str] = field(default_factory=dict)
     group: bool = False
     overlayable: bool = True
     gridless: Callable[[dict], bool] = _never
@@ -601,6 +606,7 @@ _KINDS = (
         "calendar heatmap",
         CalendarHeatmapLayer,
         domains={"week_start": CALENDAR_WEEKDAY},
+        theme_defaults={"week_start": "chart_default_calendar_heatmap_week_start"},
         chart_keys=frozenset({"colorbar", "norm", "vcenter", "vmax", "vmin"}),
         defaults={"aspect_ratio": ASPECT_RATIO.EQUAL, "max_cols": 1},
         dict_data=True,
@@ -729,6 +735,7 @@ _KINDS = (
         "ridgeline plot",
         RidgelineLayer,
         domains={"inner": VIOLIN_INNER, "ridge_scale": RIDGELINE_SCALE},
+        theme_defaults={"overlap": "chart_default_ridgeline_overlap"},
         record_keys=("label", "value"),
         required_keys=("label", "value"),
         defaults={"orientation": ORIENTATION.HORIZONTAL},
@@ -830,6 +837,7 @@ _KINDS = (
         "network",
         NetworkLayer,
         domains={"layout": NETWORK_LAYOUT, "label_position": NETWORK_LABEL_POSITION},
+        theme_defaults={"label_position": "chart_default_network_label_position"},
         dict_data=True,
         data_keys=("edges",),
         datasets=DatasetPolicy.SUBPLOT,
@@ -921,12 +929,15 @@ class SharedParameter:
         per_chart: The type of the value on a front that indexes it against
             the charts, without `Optional`; None when every front reads it
             whole.
+        theme_default: The theme key the parameter defaults to when the call
+            leaves it None (ADR 0071); None when the theme has no say.
     """
 
     name: str
     annotation: Any
     default: Any = None
     per_chart: Any = None
+    theme_default: Optional[str] = None
 
     def signature_annotation(self, kind: ChartKind) -> Any:
         """The annotation the parameter carries on the front of `kind`."""
@@ -969,7 +980,11 @@ _SHARED = (
     SharedParameter("figsize", Union[FIG_SIZE, Tuple[float, float]]),
     SharedParameter("show_legend", bool),
     SharedParameter("legend", LegendSettingAttrs),
-    SharedParameter("show_grid", Union[SHOW_GRID, str, bool]),
+    SharedParameter(
+        "show_grid",
+        Union[SHOW_GRID, str, bool],
+        theme_default="chart_default_show_grid",
+    ),
     SharedParameter("subplots", bool),
     SharedParameter("max_cols", int),
     SharedParameter("sharex", bool),
@@ -984,7 +999,7 @@ _SHARED = (
     SharedParameter("orientation", Union[ORIENTATION, str]),
     SharedParameter("sort", Union[SORT, str]),
     SharedParameter("bar_mode", Union[BAR_MODE, str]),
-    SharedParameter("show_values", bool),
+    SharedParameter("show_values", bool, theme_default="chart_default_show_values"),
     SharedParameter("value_step", int),
     SharedParameter("show_yerr", bool),
     SharedParameter("show_area", bool),
@@ -1163,7 +1178,7 @@ def build_chart_panel_settings(
     # a polar panel draws only the set an explicit value names (ADR 0015)
     show_grid_explicit = show_grid is not None
     if show_grid is None and not kind.gridless(settings):
-        show_grid = config.get("chart_default_show_grid")
+        show_grid = theme_default(chart_type, settings, "show_grid")
         if kind.grid_on_value_axis:
             orientation = settings.get("orientation") or DEFAULT_ORIENTATION
             show_grid = value_axis_grid(

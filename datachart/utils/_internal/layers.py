@@ -2153,10 +2153,31 @@ def resolve_value_kind(settings: dict) -> Optional[str]:
 def resolve_show_values(settings: dict) -> bool:
     """`show_values` as set, else the theme default for a front that takes it (ADR 0033)."""
 
-    value = settings.get("show_values")
-    if value is None and "show_values" in settings:
-        value = config.get("chart_default_show_values")
-    return bool(value)
+    if "show_values" not in settings:
+        return False
+    return bool(theme_default(None, settings, "show_values"))
+
+
+def theme_default(chart_type: Optional[str], settings: dict, name: str):
+    """The setting `name`, else the theme's default for it, else None (ADR 0071).
+
+    A shared parameter's theme key comes from its `SharedParameter`, so
+    `chart_type` may be None for one; a front's own parameter's comes from
+    the `theme_defaults` of its row.
+    """
+
+    # chart_kinds imports this module, so the descriptor is read at call time
+    from .chart_kinds import SHARED_PARAMETERS, chart_kind
+
+    value = settings.get(name)
+    if value is not None:
+        return value
+    shared = SHARED_PARAMETERS.get(name)
+    if shared is not None:
+        key = shared.theme_default
+    else:
+        key = chart_kind(chart_type).theme_defaults.get(name)
+    return None if key is None else config.get(key)
 
 
 class Layer:
@@ -6094,9 +6115,8 @@ class RidgelineLayer(GroupLayer):
         self.show_outline = self.settings.get("show_outline") is not False
         validate_ridge_marks(self.fill, self.show_outline)
         self.ridge_style = get_ridgeline_style(self.style)
-        overlap = self.settings.get("overlap")
         self.overlap = validate_overlap(
-            self.ridge_style["overlap"] if overlap is None else overlap
+            theme_default("ridgelineplot", self.settings, "overlap")
         )
         self.show_values = False
         # subplots share one value range, set once every layer is built
@@ -6801,12 +6821,10 @@ class CalendarHeatmapLayer(HeatmapLayer):
     style_prefix = "plot_calendar_heatmap"
 
     def _resolve_style(self):
-        week_start = self.settings.get("week_start")
-        if week_start is None:
-            week_start = get_attr_value(
-                "plot_calendar_heatmap_week_start", self.style, config
-            )
-        self.week_start = week_start or CALENDAR_WEEKDAY.DEFAULT
+        self.week_start = (
+            theme_default("calendarheatmap", self.settings, "week_start")
+            or CALENDAR_WEEKDAY.DEFAULT
+        )
         self.month_line_style = get_calendar_month_line_style(self.style)
         self.show_month_labels = _resolve_flag(self.settings, "show_month_labels")
         self.show_weekday_labels = _resolve_flag(self.settings, "show_weekday_labels")
@@ -10038,8 +10056,7 @@ class NetworkLayer(PointLabelMixin, Layer):
             }
         self.node_markers = [self.group_markers.get(g, plain) for g in groups]
         self.label_position = (
-            self.settings.get("label_position")
-            or config.get("chart_default_node_label_position")
+            theme_default("networkchart", self.settings, "label_position")
             or NETWORK_LABEL_POSITION.DEFAULT
         )
         roles = [node.get("emphasis") for node in self.nodes]

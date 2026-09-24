@@ -81,7 +81,8 @@ Classes:
     RADIAL_TYPE:             `mark` of `RadialChart`.
     RADIAL_DIRECTION:        `direction` of `RadialChart`.
     CALENDAR_WEEKDAY:        `week_start` of `CalendarHeatmap`; the
-                             `plot_calendar_heatmap_week_start` style attribute.
+                             `chart_default_calendar_heatmap_week_start`
+                             config attribute.
     GANTT_DATE_PERIOD:       `period` of `GanttChart`.
     GANTT_VALUE:             `value_kind` of `GanttChart`.
     GANTT_SORT_KEY:          `sort_by` of `GanttChart`.
@@ -93,7 +94,7 @@ Classes:
     HEXBIN_REDUCE:           `reduce` of `HexbinChart`.
     NETWORK_LAYOUT:          `layout` of `NetworkChart`.
     NETWORK_LABEL_POSITION:  `label_position` of `NetworkChart`; the
-                             `chart_default_node_label_position` config
+                             `chart_default_network_label_position` config
                              attribute.
     SCATTER_MATRIX_DIAGONAL: `diagonal` of `ScatterMatrix`.
     BASEMAP_FEATURE:         `data` of `BasemapChart`; the `feature` of its
@@ -963,7 +964,7 @@ class CALENDAR_WEEKDAY(Domain):
 
     Passed as the `week_start` setting of the calendar heatmap: the weekday
     drawn in the top row of every week column. The theme's
-    `plot_calendar_heatmap_week_start` supplies the default.
+    `chart_default_calendar_heatmap_week_start` supplies the default.
 
     ![CALENDAR_WEEKDAY at a glance](../assets/imgs/const-weekday.svg){ width="100%" }
 

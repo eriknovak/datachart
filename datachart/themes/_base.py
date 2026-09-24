@@ -5,6 +5,7 @@ overriding just the attributes that define its identity via `make_theme`.
 """
 
 import copy
+import warnings
 
 from ..typings import StyleAttrs
 from ..constants import (
@@ -19,12 +20,16 @@ from ..constants import (
     SHOW_GRID,
 )
 
-# the bar-specific value label keys predate the shared family; they resolve
-# to it wherever a style is read (ADR 0033)
+# renamed style keys, each kept one release: the bar-specific value label
+# keys predate the shared family (ADR 0033); the theme defaults of front
+# parameters follow one naming rule (ADR 0071)
 STYLE_ALIASES = {
     "plot_bar_value_fontsize": "plot_value_fontsize",
     "plot_bar_value_color": "plot_value_color",
     "plot_bar_value_padding": "plot_value_padding",
+    "plot_calendar_heatmap_week_start": "chart_default_calendar_heatmap_week_start",
+    "plot_ridgeline_overlap": "chart_default_ridgeline_overlap",
+    "chart_default_node_label_position": "chart_default_network_label_position",
 }
 
 
@@ -33,12 +38,17 @@ def canonical_style(style: dict) -> dict:
 
     An alias present in `style` wins over the canonical key: the alias was
     written by hand, while the canonical key usually arrives by spreading a
-    predefined theme underneath it.
+    predefined theme underneath it. Each alias warns with `DeprecationWarning`.
     """
 
     resolved = {k: v for k, v in style.items() if k not in STYLE_ALIASES}
     for alias, key in STYLE_ALIASES.items():
         if alias in style:
+            warnings.warn(
+                f"Style key {alias!r} is deprecated; use {key!r}.",
+                DeprecationWarning,
+                stacklevel=3,
+            )
             resolved[key] = style[alias]
     return resolved
 
@@ -107,7 +117,9 @@ BASE_THEME: StyleAttrs = {
     # theme-level chart-setting defaults (ADR 0004)
     "chart_default_show_grid": SHOW_GRID.Y,
     "chart_default_show_values": None,
-    "chart_default_node_label_position": None,
+    "chart_default_calendar_heatmap_week_start": CALENDAR_WEEKDAY.MONDAY,
+    "chart_default_ridgeline_overlap": 0.5,
+    "chart_default_network_label_position": None,
     "plot_hatch_cycle": None,
     "plot_linestyle_cycle": None,
     "plot_marker_cycle": None,
@@ -341,7 +353,6 @@ BASE_THEME: StyleAttrs = {
     "plot_calendar_heatmap_edge_color": "#FFFFFF",
     "plot_calendar_heatmap_month_line_width": 1.0,
     "plot_calendar_heatmap_month_line_color": "#000000",
-    "plot_calendar_heatmap_week_start": CALENDAR_WEEKDAY.MONDAY,
     # plot contour style; None derives from the line/heatmap/font keys (ADR 0022)
     "plot_contour_color": None,
     "plot_contour_cmap": None,
@@ -469,7 +480,6 @@ BASE_THEME: StyleAttrs = {
     "plot_ridgeline_linewidth": 1.0,
     "plot_ridgeline_edgecolor": None,
     "plot_ridgeline_hatch": None,
-    "plot_ridgeline_overlap": 0.5,
     "plot_ridgeline_inner_color": None,
     "plot_ridgeline_inner_linewidth": 1.0,
     "plot_xticks_label_rotate": None,

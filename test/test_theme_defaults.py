@@ -1,6 +1,7 @@
 """Tests for theme-driven defaults and cycles (ADR 0004) and the value-label fixes."""
 
 import unittest
+import warnings
 
 import matplotlib
 
@@ -551,6 +552,45 @@ class TestDivergingColormapDefaults(unittest.TestCase):
 
     def test_the_calendar_diverging_colormap_derives_from_the_heatmap_one(self):
         self.assertIsNone(config["plot_calendar_heatmap_cmap_diverging"])
+
+
+class TestThemeDefaultAliases(unittest.TestCase):
+    """The renamed theme-default keys still work for one release, with a warning."""
+
+    RENAMED = {
+        "plot_calendar_heatmap_week_start": "chart_default_calendar_heatmap_week_start",
+        "plot_ridgeline_overlap": "chart_default_ridgeline_overlap",
+        "chart_default_node_label_position": "chart_default_network_label_position",
+    }
+
+    def tearDown(self):
+        config.reset_config()
+
+    def test_reset_config_carries_the_new_keys_only(self):
+        config.reset_config()
+        self.assertEqual(
+            config.get("chart_default_calendar_heatmap_week_start"), "monday"
+        )
+        self.assertEqual(config.get("chart_default_ridgeline_overlap"), 0.5)
+        self.assertIsNone(config.get("chart_default_network_label_position", "unset"))
+        for theme in THEMES.values():
+            self.assertFalse(set(self.RENAMED) & set(theme))
+
+    def test_write_warns_and_the_value_round_trips(self):
+        with self.assertWarns(DeprecationWarning) as caught:
+            config.update_config({"plot_ridgeline_overlap": 0.3})
+        self.assertIn("chart_default_ridgeline_overlap", str(caught.warning))
+        self.assertEqual(config.get("chart_default_ridgeline_overlap"), 0.3)
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            self.assertEqual(config.get("plot_ridgeline_overlap"), 0.3)
+            self.assertEqual(config["plot_ridgeline_overlap"], 0.3)
+
+    def test_every_alias_warns_naming_its_replacement(self):
+        for alias, key in self.RENAMED.items():
+            with self.subTest(alias=alias):
+                with self.assertWarnsRegex(DeprecationWarning, key):
+                    config.update_config({alias: config.get(key)})
 
 
 if __name__ == "__main__":
