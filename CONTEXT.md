@@ -158,6 +158,15 @@ dicts (data) or the theme's `plot_*` keys (style). Typed by a
 `*SettingAttrs` TypedDict.
 _Avoid_: plot attrs, style (for this)
 
+**Typing role**:
+What a public TypedDict in `datachart.typings` describes, said by its suffix:
+`*RecordAttrs` one input record of a record front, `*DataAttrs` one
+non-record dataset (a grid, an image, a feature set), `*StyleAttrs` one group
+of theme keys, `*SettingAttrs` one setting payload. The record suffix follows
+the chart kind's record shape. Only the one-chart dict of the Sankey, Treemap
+and Network fronts keeps `*SingleChartAttrs` (ADR 0072).
+_Avoid_: data point attrs, single chart attrs (for a record)
+
 **Pyramid**:
 A back-to-back horizontal bar figure (`PyramidChart`): exactly two sides sharing
 one category axis, drawn in opposite horizontal directions from a common zero
