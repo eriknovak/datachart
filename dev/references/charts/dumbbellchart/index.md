@@ -205,7 +205,7 @@ Examples:
 
 ## Data
 
-Each record in `data` is a [`DumbbellRecordAttrs`](#datachart.typings.DumbbellRecordAttrs); the `emphasis` parameter renames its keys.
+Each record in `data` is a [`DumbbellRecordAttrs`](#datachart.typings.DumbbellRecordAttrs); the `emphasis`, `label`, `start` and `end` parameters rename its keys.
 
 ### datachart.typings.DumbbellRecordAttrs
 
@@ -271,3 +271,12 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `value_format`                               | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                           |
 | `sort`                                       | [`SORT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT)                                                                                                                                           |
 | `emphasis`                                   | [`EMPHASIS`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS)                                                                                                                                   |
+
+## Composition
+
+Whether the figure composes with each composition function.
+
+| Function                                                                                     | Composes |
+| -------------------------------------------------------------------------------------------- | -------- |
+| [`Grid`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid)   | yes      |
+| [`Panel`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) | yes      |

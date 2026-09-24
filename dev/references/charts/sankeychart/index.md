@@ -142,3 +142,12 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | -------------- | ------------------------------------------------------------------------------------------------------------------ |
 | `value_format` | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) |
 | `figsize`      | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)         |
+
+## Composition
+
+Whether the figure composes with each composition function.
+
+| Function                                                                                     | Composes |
+| -------------------------------------------------------------------------------------------- | -------- |
+| [`Grid`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid)   | yes      |
+| [`Panel`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) | no       |

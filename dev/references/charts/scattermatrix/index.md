@@ -139,3 +139,13 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `figsize`                                    | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                                                                                                                                   |
 | `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN) |
 | `show_grid`                                  | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                                                                                                                                 |
+
+## Composition
+
+Whether the figure composes with each composition function.
+
+| Function                                                                                           | Composes |
+| -------------------------------------------------------------------------------------------------- | -------- |
+| [`Grid`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid)         | yes      |
+| [`Panel`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel)       | no       |
+| [`Annotate`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Annotate) | no       |

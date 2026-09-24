@@ -22612,6 +22612,15 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `scaley`                                     | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                               |
 | `yticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
 
+## Composition
+
+Whether the figure composes with each composition function.
+
+| Function                                                                                     | Composes |
+| -------------------------------------------------------------------------------------------- | -------- |
+| [`Grid`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid)   | yes      |
+| [`Panel`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) | yes      |
+
 # StackedAreaChart
 
 Parts of a total along an ordered axis, filled on top of each other. The [Stacked Area Chart guide](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/stackedareachart/index.md) shows every feature on real data; this page is the contract: the function, the shape of its data, the keys `style` takes, and the constant each parameter accepts.
@@ -22866,6 +22875,15 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `scaley`                                     | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                               |
 | `yticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
 
+## Composition
+
+Whether the figure composes with each composition function.
+
+| Function                                                                                     | Composes |
+| -------------------------------------------------------------------------------------------- | -------- |
+| [`Grid`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid)   | yes      |
+| [`Panel`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) | yes      |
+
 # BumpChart
 
 Rank over time, one line per series. The [Bump Chart guide](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/bumpchart/index.md) shows every feature on real data; this page is the contract: the function, the shape of its data, the keys `style` takes, and the constant each parameter accepts.
@@ -23107,6 +23125,15 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `value_format`                               | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                           |
 | `aspect_ratio`                               | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                           |
 | `scalex`                                     | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                               |
+
+## Composition
+
+Whether the figure composes with each composition function.
+
+| Function                                                                                     | Composes |
+| -------------------------------------------------------------------------------------------- | -------- |
+| [`Grid`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid)   | yes      |
+| [`Panel`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) | yes      |
 
 # BarChart
 
@@ -23386,6 +23413,15 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `scaley`                                     | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                               |
 | `yticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
 
+## Composition
+
+Whether the figure composes with each composition function.
+
+| Function                                                                                     | Composes |
+| -------------------------------------------------------------------------------------------- | -------- |
+| [`Grid`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid)   | yes      |
+| [`Panel`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) | yes      |
+
 # PyramidChart
 
 Two series as horizontal bars mirrored around a shared category axis. The [Pyramid Chart guide](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/pyramidchart/index.md) shows every feature on real data; this page is the contract: the function, the shape of its data, the keys `style` takes, and the constant each parameter accepts.
@@ -23599,6 +23635,15 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `sort`                                       | [`SORT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT)                                                                                                                                           |
 | `yticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
 
+## Composition
+
+Whether the figure composes with each composition function.
+
+| Function                                                                                     | Composes |
+| -------------------------------------------------------------------------------------------- | -------- |
+| [`Grid`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid)   | yes      |
+| [`Panel`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) | no       |
+
 # RadialChart
 
 Series on polar axes, as a radar line, an area, bars, or a histogram. The [Radial Chart guide](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/radialchart/index.md) shows every feature on real data; this page is the contract: the function, the shape of its data, the keys `style` takes, and the constant each parameter accepts.
@@ -23806,6 +23851,15 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `sort`                                       | [`SORT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT)                                                                                                                                           |
 | `scaley`                                     | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                               |
 
+## Composition
+
+Whether the figure composes with each composition function.
+
+| Function                                                                                     | Composes |
+| -------------------------------------------------------------------------------------------- | -------- |
+| [`Grid`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid)   | yes      |
+| [`Panel`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) | yes      |
+
 # CalendarHeatmap
 
 One colored cell per day, weeks as columns and weekdays as rows. The [Calendar Heatmap guide](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/calendarheatmap/index.md) shows every feature on real data; this page is the contract: the function, the shape of its data, the keys `style` takes, and the constant each parameter accepts.
@@ -23960,6 +24014,15 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `value_format`                                                  | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                                                                                                                                                 |
 | `norm`                                                          | [`COLOR_NORM`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLOR_NORM)                                                                                                                                                                                                                                                     |
 | `colorbar={"location": ..., "format": ..., "orientation": ...}` | [`COLORBAR_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORBAR_LOCATION), [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION) |
+
+## Composition
+
+Whether the figure composes with each composition function.
+
+| Function                                                                                     | Composes |
+| -------------------------------------------------------------------------------------------- | -------- |
+| [`Grid`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid)   | yes      |
+| [`Panel`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) | no       |
 
 # GanttChart
 
@@ -24116,7 +24179,7 @@ Examples:
 
 ## Data
 
-Each record in `data` is a [`GanttTaskAttrs`](#datachart.typings.GanttTaskAttrs); the `emphasis` parameter renames its keys.
+Each record in `data` is a [`GanttTaskAttrs`](#datachart.typings.GanttTaskAttrs); the `emphasis`, `task`, `start`, `end`, `group`, `progress` and `depends_on` parameters rename its keys.
 
 ### datachart.typings.GanttTaskAttrs
 
@@ -24184,6 +24247,15 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `value_format`                               | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                           |
 | `sort`                                       | [`SORT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT)                                                                                                                                           |
 | `emphasis`                                   | [`EMPHASIS`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS)                                                                                                                                   |
+
+## Composition
+
+Whether the figure composes with each composition function.
+
+| Function                                                                                     | Composes |
+| -------------------------------------------------------------------------------------------- | -------- |
+| [`Grid`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid)   | yes      |
+| [`Panel`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) | no       |
 
 # DumbbellChart
 
@@ -24392,7 +24464,7 @@ Examples:
 
 ## Data
 
-Each record in `data` is a [`DumbbellRecordAttrs`](#datachart.typings.DumbbellRecordAttrs); the `emphasis` parameter renames its keys.
+Each record in `data` is a [`DumbbellRecordAttrs`](#datachart.typings.DumbbellRecordAttrs); the `emphasis`, `label`, `start` and `end` parameters rename its keys.
 
 ### datachart.typings.DumbbellRecordAttrs
 
@@ -24458,6 +24530,15 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `value_format`                               | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                           |
 | `sort`                                       | [`SORT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT)                                                                                                                                           |
 | `emphasis`                                   | [`EMPHASIS`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS)                                                                                                                                   |
+
+## Composition
+
+Whether the figure composes with each composition function.
+
+| Function                                                                                     | Composes |
+| -------------------------------------------------------------------------------------------- | -------- |
+| [`Grid`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid)   | yes      |
+| [`Panel`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) | yes      |
 
 # Histogram
 
@@ -24717,6 +24798,15 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `bar_mode`                                   | [`BAR_MODE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BAR_MODE)                                                                                                                                   |
 | `scalex`                                     | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                               |
 | `scaley`                                     | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                               |
+
+## Composition
+
+Whether the figure composes with each composition function.
+
+| Function                                                                                     | Composes |
+| -------------------------------------------------------------------------------------------- | -------- |
+| [`Grid`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid)   | yes      |
+| [`Panel`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) | yes      |
 
 # BoxPlot
 
@@ -24991,6 +25081,15 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `scaley`                                     | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                               |
 | `yticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
 
+## Composition
+
+Whether the figure composes with each composition function.
+
+| Function                                                                                     | Composes |
+| -------------------------------------------------------------------------------------------- | -------- |
+| [`Grid`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid)   | yes      |
+| [`Panel`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) | yes      |
+
 # ViolinPlot
 
 The density profile of each group's distribution. The [Violin Plot guide](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/violinplot/index.md) shows every feature on real data; this page is the contract: the function, the shape of its data, the keys `style` takes, and the constant each parameter accepts.
@@ -25263,6 +25362,15 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `yticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
 | `bandwidth`                                  | [`BANDWIDTH`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH)                                                                                                                                 |
 
+## Composition
+
+Whether the figure composes with each composition function.
+
+| Function                                                                                     | Composes |
+| -------------------------------------------------------------------------------------------- | -------- |
+| [`Grid`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid)   | yes      |
+| [`Panel`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) | yes      |
+
 # SwarmPlot
 
 Every observation as a point, spread within its group. The [Swarm Plot guide](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/swarmplot/index.md) shows every feature on real data; this page is the contract: the function, the shape of its data, the keys `style` takes, and the constant each parameter accepts.
@@ -25527,6 +25635,15 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `scaley`                                     | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                               |
 | `yticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
 
+## Composition
+
+Whether the figure composes with each composition function.
+
+| Function                                                                                     | Composes |
+| -------------------------------------------------------------------------------------------- | -------- |
+| [`Grid`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid)   | yes      |
+| [`Panel`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) | yes      |
+
 # RaincloudPlot
 
 A half violin, the raw points, and a box per group. The [Raincloud Plot guide](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/raincloudplot/index.md) shows every feature on real data; this page is the contract: the function, the shape of its data, the keys `style` takes, and the constant each parameter accepts.
@@ -25786,6 +25903,15 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `orientation`                                | [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)                                                                                                                             |
 | `scaley`                                     | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                               |
 | `yticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
+
+## Composition
+
+Whether the figure composes with each composition function.
+
+| Function                                                                                     | Composes |
+| -------------------------------------------------------------------------------------------- | -------- |
+| [`Grid`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid)   | yes      |
+| [`Panel`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) | yes      |
 
 # RidgelinePlot
 
@@ -26064,6 +26190,15 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `yticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
 | `bandwidth`                                  | [`BANDWIDTH`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH)                                                                                                                                 |
 | `sort`                                       | [`SORT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT)                                                                                                                                           |
+
+## Composition
+
+Whether the figure composes with each composition function.
+
+| Function                                                                                     | Composes |
+| -------------------------------------------------------------------------------------------- | -------- |
+| [`Grid`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid)   | yes      |
+| [`Panel`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) | yes      |
 
 # ScatterChart
 
@@ -26346,7 +26481,7 @@ Examples:
 
 ## Data
 
-Each record in `data` is a [`ScatterDataPointAttrs`](#datachart.typings.ScatterDataPointAttrs); the `emphasis`, `x`, `y`, `size`, `hue`, `label`, `xerr` and `yerr` parameters rename its keys.
+Each record in `data` is a [`ScatterDataPointAttrs`](#datachart.typings.ScatterDataPointAttrs); the `emphasis`, `x`, `y`, `size`, `hue`, `annotation`, `xerr` and `yerr` parameters rename its keys.
 
 ### datachart.typings.ScatterDataPointAttrs
 
@@ -26404,6 +26539,15 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `scalex`                                     | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                               |
 | `scaley`                                     | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                               |
 | `yticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
+
+## Composition
+
+Whether the figure composes with each composition function.
+
+| Function                                                                                     | Composes |
+| -------------------------------------------------------------------------------------------- | -------- |
+| [`Grid`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid)   | yes      |
+| [`Panel`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) | yes      |
 
 # Heatmap
 
@@ -26612,6 +26756,15 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `value_format`                                                  | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                                                                                                                                                 |
 | `yticks_format`                                                 | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)                                                                                                                               |
 | `colorbar={"location": ..., "format": ..., "orientation": ...}` | [`COLORBAR_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORBAR_LOCATION), [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION) |
+
+## Composition
+
+Whether the figure composes with each composition function.
+
+| Function                                                                                     | Composes |
+| -------------------------------------------------------------------------------------------- | -------- |
+| [`Grid`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid)   | yes      |
+| [`Panel`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) | no       |
 
 # ContourChart
 
@@ -26900,6 +27053,15 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `yticks_format`                                                 | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)                                                                                                                               |
 | `colorbar={"location": ..., "format": ..., "orientation": ...}` | [`COLORBAR_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORBAR_LOCATION), [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION) |
 
+## Composition
+
+Whether the figure composes with each composition function.
+
+| Function                                                                                     | Composes |
+| -------------------------------------------------------------------------------------------- | -------- |
+| [`Grid`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid)   | yes      |
+| [`Panel`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) | yes      |
+
 # HexbinChart
 
 Point density on the plane, as colored hexagons. The [Hexbin Chart guide](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/hexbinchart/index.md) shows every feature on real data; this page is the contract: the function, the shape of its data, the keys `style` takes, and the constant each parameter accepts.
@@ -27176,6 +27338,15 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `yticks_format`                                                 | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)                                                                                                                               |
 | `colorbar={"location": ..., "format": ..., "orientation": ...}` | [`COLORBAR_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORBAR_LOCATION), [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION) |
 
+## Composition
+
+Whether the figure composes with each composition function.
+
+| Function                                                                                     | Composes |
+| -------------------------------------------------------------------------------------------- | -------- |
+| [`Grid`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid)   | yes      |
+| [`Panel`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) | yes      |
+
 # ParallelCoords
 
 Each record as a polyline across one axis per dimension. The [Parallel Coordinates guide](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/parallelcoords/index.md) shows every feature on real data; this page is the contract: the function, the shape of its data, the keys `style` takes, and the constant each parameter accepts.
@@ -27328,6 +27499,15 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN) |
 | `show_grid`                                  | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                                                                                                                                 |
 | `aspect_ratio`                               | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                           |
+
+## Composition
+
+Whether the figure composes with each composition function.
+
+| Function                                                                                     | Composes |
+| -------------------------------------------------------------------------------------------- | -------- |
+| [`Grid`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid)   | yes      |
+| [`Panel`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) | yes      |
 
 # NetworkChart
 
@@ -27521,6 +27701,15 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN) |
 | `figsize`                                    | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                                                                                                                                   |
 
+## Composition
+
+Whether the figure composes with each composition function.
+
+| Function                                                                                     | Composes |
+| -------------------------------------------------------------------------------------------- | -------- |
+| [`Grid`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid)   | yes      |
+| [`Panel`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) | no       |
+
 # ScatterMatrix
 
 A scatter chart for every pair of dimensions, distributions on the diagonal. The [Scatter Matrix guide](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/scattermatrix/index.md) shows every feature on real data; this page is the contract: the function, the shape of its data, the keys `style` takes, and the constant each parameter accepts.
@@ -27663,6 +27852,16 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN) |
 | `show_grid`                                  | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                                                                                                                                 |
 
+## Composition
+
+Whether the figure composes with each composition function.
+
+| Function                                                                                           | Composes |
+| -------------------------------------------------------------------------------------------------- | -------- |
+| [`Grid`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid)         | yes      |
+| [`Panel`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel)       | no       |
+| [`Annotate`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Annotate) | no       |
+
 # ImageChart
 
 A picture in data coordinates, under or over the other charts. The [Image Chart guide](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/imagechart/index.md) shows every feature on real data; this page is the contract: the function, the shape of its data, the keys `style` takes, and the constant each parameter accepts.
@@ -27796,6 +27995,15 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `figsize`      | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)           |
 | `show_grid`    | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)         |
 | `aspect_ratio` | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)   |
+
+## Composition
+
+Whether the figure composes with each composition function.
+
+| Function                                                                                     | Composes |
+| -------------------------------------------------------------------------------------------- | -------- |
+| [`Grid`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid)   | yes      |
+| [`Panel`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) | yes      |
 
 # BasemapChart
 
@@ -27945,6 +28153,15 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `show_grid`    | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                   |
 | `aspect_ratio` | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)             |
 
+## Composition
+
+Whether the figure composes with each composition function.
+
+| Function                                                                                     | Composes |
+| -------------------------------------------------------------------------------------------- | -------- |
+| [`Grid`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid)   | yes      |
+| [`Panel`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) | yes      |
+
 # SankeyChart
 
 Weighted flows between categories, as ribbons between node columns. The [Sankey Chart guide](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/sankeychart/index.md) shows every feature on real data; this page is the contract: the function, the shape of its data, the keys `style` takes, and the constant each parameter accepts.
@@ -28089,6 +28306,15 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | -------------- | ------------------------------------------------------------------------------------------------------------------ |
 | `value_format` | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) |
 | `figsize`      | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)         |
+
+## Composition
+
+Whether the figure composes with each composition function.
+
+| Function                                                                                     | Composes |
+| -------------------------------------------------------------------------------------------- | -------- |
+| [`Grid`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid)   | yes      |
+| [`Panel`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) | no       |
 
 # Treemap
 
@@ -28243,6 +28469,15 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN) |
 | `figsize`                                    | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                                                                                                                                   |
 
+## Composition
+
+Whether the figure composes with each composition function.
+
+| Function                                                                                     | Composes |
+| -------------------------------------------------------------------------------------------- | -------- |
+| [`Grid`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid)   | yes      |
+| [`Panel`](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) | no       |
+
 # Utils Module
 
 ## datachart.utils
@@ -28278,21 +28513,22 @@ Panel(
     ylabel_left: str | None = None,
     ylabel_right: str | None = None,
     figsize: FIG_SIZE | tuple[float, float] | None = None,
-    show_legend: bool | None = False,
+    show_legend: bool | None = None,
     legend: LegendSettingAttrs | None = None,
     show_grid: SHOW_GRID | str | bool | None = None,
     auto_secondary_axis: float | None = None,
     xmin: float | None = None,
     xmax: float | None = None,
-    ymin: float | None = None,
-    ymax: float | None = None,
+    ymin: int | float | None = None,
+    ymax: int | float | None = None,
     ymin_right: float | None = None,
     ymax_right: float | None = None,
     scalex: AXIS_SCALE | str | None = None,
     scaley: AXIS_SCALE | str | None = None,
     scaley_right: AXIS_SCALE | str | None = None,
     bar_mode: BAR_MODE | str | None = None,
-    aspect_ratio: ASPECT_RATIO | str | None = None
+    aspect_ratio: ASPECT_RATIO | str | None = None,
+    emphasis_rule: EmphasisRuleAttrs | None = None
 ) -> plt.Figure
 ```
 
@@ -28369,8 +28605,8 @@ Examples:
 | `auto_secondary_axis` | Threshold ratio for automatic secondary axis creation. Default is taken from config (overlay_auto_threshold, default 3.0). **TYPE:** \`float                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | `xmin`                | Minimum value for the category-axis limits. **TYPE:** \`float                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | `xmax`                | Maximum value for the category-axis limits. **TYPE:** \`float                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| `ymin`                | Minimum value for the primary value-axis limits. **TYPE:** \`float                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| `ymax`                | Maximum value for the primary value-axis limits. **TYPE:** \`float                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `ymin`                | Minimum value for the primary value-axis limits. **TYPE:** \`int                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `ymax`                | Maximum value for the primary value-axis limits. **TYPE:** \`int                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | `ymin_right`          | Minimum value for the secondary value-axis limits. **TYPE:** \`float                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | `ymax_right`          | Maximum value for the secondary value-axis limits. **TYPE:** \`float                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | `scalex`              | The category-axis scale ("linear", "log", "symlog", "asinh"). Default: the scale of the first figure that was built with one. See AXIS_SCALE. **TYPE:** \`AXIS_SCALE                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
@@ -28378,6 +28614,7 @@ Examples:
 | `scaley_right`        | The secondary value-axis scale. Default: the scale of the first figure on that axis that was built with one. Inert on a polar panel, which has no secondary axis. **TYPE:** \`AXIS_SCALE                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | `bar_mode`            | How bar and histogram series share the axis: "group" (side-by-side bars; histograms overlay), "stack" (stacked), or "overlay" (overlapping). Default: the mode of the first figure that was built with one, then the config (overlay_bar_mode, default "group"). See BAR_MODE. **TYPE:** \`BAR_MODE                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | `aspect_ratio`        | The aspect ratio of the axes box; "geographic" keeps a map of longitude against latitude at true proportions. Default: "auto". See ASPECT_RATIO. **TYPE:** \`ASPECT_RATIO                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `emphasis_rule`       | A rule that highlights the composed series matching it and mutes the rest: {"above": v} or {"below": v} (strict), {"between": (lo, hi)} (inclusive), {"top": n} or {"bottom": n}, read against a summary of each series' own value-axis values, chosen by by: "mean" (default), "median", "min", "max", or "sum". A figure's "emphasis" role or a role its records carry wins, and a count ranks across every composed series. See EmphasisRuleAttrs. **TYPE:** \`EmphasisRuleAttrs                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 
 | RETURNS      | DESCRIPTION                                         |
 | ------------ | --------------------------------------------------- |
@@ -28399,10 +28636,18 @@ Grid(
     title: str | None = None,
     xlabel: str | None = None,
     ylabel: str | None = None,
-    max_cols: int = 4,
-    figsize: tuple[float, float] | None = None,
-    sharex: bool = False,
-    sharey: bool = False
+    max_cols: int | None = None,
+    figsize: FIG_SIZE | tuple[float, float] | None = None,
+    sharex: bool | None = None,
+    sharey: bool | None = None,
+    show_legend: bool | None = None,
+    legend: LegendSettingAttrs | None = None,
+    show_grid: SHOW_GRID | str | bool | None = None,
+    xmin: float | None = None,
+    xmax: float | None = None,
+    ymin: int | float | None = None,
+    ymax: int | float | None = None,
+    aspect_ratio: ASPECT_RATIO | str | None = None
 ) -> plt.Figure
 ```
 
@@ -28411,6 +28656,8 @@ Arrange rendered chart figures in a grid.
 Each figure's chart is redrawn into its grid cell. Nested rows define the layout directly: every inner list is one grid row, and a shorter row's cells stretch to fill the width. A flat list uses an automatic uniform grid governed by `max_cols`, with a `layout_spec` escape hatch for irregular grids (rowspans).
 
 Grids nest: a Grid figure placed in a cell occupies exactly that cell and rebuilds its internal layout inside it, to any depth. The nested grid keeps its own title (a heading spanning its subgrid) and its own sharex/sharey among its own cells; the outer grid's sharex/sharey applies only to its top-level cells. Panel figures also nest in a cell; the reverse — a Grid figure inside a Panel — stays an error.
+
+The grid's title, axis labels and legend are drawn once for the whole figure. Its limits, `show_grid` and `aspect_ratio` apply to every cell, nested grids included; one left unset keeps what each cell's chart was built with.
 
 Examples:
 
@@ -28448,16 +28695,24 @@ Examples:
 ... )
 ```
 
-| PARAMETER  | DESCRIPTION                                                                                                                                                                                                                                                                                                                              |
-| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `charts`   | Either nested rows — each inner list is one grid row of bare matplotlib Figures (or None for a blank cell) — or a flat list whose items are bare figures or dicts with a "figure" key and an optional "layout_spec" dict ('row', 'col', 'rowspan', 'colspan'). Nested rows and layout_spec cannot be mixed. **TYPE:** \`list\[plt.Figure |
-| `title`    | Optional title for the combined figure. **TYPE:** \`str                                                                                                                                                                                                                                                                                  |
-| `xlabel`   | Optional x-axis label for the whole grid, drawn once below every cell. A nested grid keeps its own as a footer of its cell. **TYPE:** \`str                                                                                                                                                                                              |
-| `ylabel`   | Optional y-axis label for the whole grid, drawn once to the left of every cell. A nested grid keeps its own beside its cell. **TYPE:** \`str                                                                                                                                                                                             |
-| `max_cols` | Maximum number of columns for the flat-list automatic grid. **TYPE:** `int` **DEFAULT:** `4`                                                                                                                                                                                                                                             |
-| `figsize`  | Size of the combined figure (width, height) in inches. If None, calculated from the first figure's size. **TYPE:** \`tuple[float, float]                                                                                                                                                                                                 |
-| `sharex`   | Whether to share the x-axis across all subplots. **TYPE:** `bool` **DEFAULT:** `False`                                                                                                                                                                                                                                                   |
-| `sharey`   | Whether to share the y-axis across all subplots. **TYPE:** `bool` **DEFAULT:** `False`                                                                                                                                                                                                                                                   |
+| PARAMETER      | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                   |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `charts`       | Either nested rows — each inner list is one grid row of bare matplotlib Figures (or None for a blank cell) — or a flat list whose items are bare figures or dicts with a "figure" key and an optional "layout_spec" dict ('row', 'col', 'rowspan', 'colspan'). Nested rows and layout_spec cannot be mixed. **TYPE:** \`list\[plt.Figure                      |
+| `title`        | Optional title for the combined figure. **TYPE:** \`str                                                                                                                                                                                                                                                                                                       |
+| `xlabel`       | Optional x-axis label for the whole grid, drawn once below every cell. A nested grid keeps its own as a footer of its cell. **TYPE:** \`str                                                                                                                                                                                                                   |
+| `ylabel`       | Optional y-axis label for the whole grid, drawn once to the left of every cell. A nested grid keeps its own beside its cell. **TYPE:** \`str                                                                                                                                                                                                                  |
+| `max_cols`     | Maximum number of columns for the flat-list automatic grid. Default: 4. **TYPE:** \`int                                                                                                                                                                                                                                                                       |
+| `figsize`      | Size of the combined figure (width, height) in inches. If None, calculated from the first figure's size. **TYPE:** \`FIG_SIZE                                                                                                                                                                                                                                 |
+| `sharex`       | Whether to share the x-axis across all subplots. **TYPE:** \`bool                                                                                                                                                                                                                                                                                             |
+| `sharey`       | Whether to share the y-axis across all subplots. **TYPE:** \`bool                                                                                                                                                                                                                                                                                             |
+| `show_legend`  | Whether to show one legend for the whole grid, with the entries of the first cell that has any. A cell's own legend stays. **TYPE:** \`bool                                                                                                                                                                                                                   |
+| `legend`       | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. The location picks the grid edge the legend sits on: an outside location its edge, "upper center" the top, "lower center" the bottom, "center left" the left, and any other the right. See LegendSettingAttrs. **TYPE:** \`LegendSettingAttrs |
+| `show_grid`    | Which grid lines every cell shows (e.g., "both", "x", "y"); False draws none. Default: each cell's own. **TYPE:** \`SHOW_GRID                                                                                                                                                                                                                                 |
+| `xmin`         | Minimum value for the x-axis limits of every cell. **TYPE:** \`float                                                                                                                                                                                                                                                                                          |
+| `xmax`         | Maximum value for the x-axis limits of every cell. **TYPE:** \`float                                                                                                                                                                                                                                                                                          |
+| `ymin`         | Minimum value for the y-axis limits of every cell. **TYPE:** \`int                                                                                                                                                                                                                                                                                            |
+| `ymax`         | Maximum value for the y-axis limits of every cell. **TYPE:** \`int                                                                                                                                                                                                                                                                                            |
+| `aspect_ratio` | The aspect ratio of every cell's axes box; "geographic" keeps a map of longitude against latitude at true proportions. Default: each cell's own. See ASPECT_RATIO. **TYPE:** \`ASPECT_RATIO                                                                                                                                                                   |
 
 | RETURNS      | DESCRIPTION                                                     |
 | ------------ | --------------------------------------------------------------- |

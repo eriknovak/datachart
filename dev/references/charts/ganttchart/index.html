@@ -3142,6 +3142,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#composition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Composition
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -4369,6 +4380,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#composition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Composition
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -5346,7 +5368,7 @@ positions.</p>
     </div>
 
 </div><h2 id="data">Data</h2>
-<p>Each record in <code>data</code> is a <a href="#datachart.typings.GanttTaskAttrs"><code>GanttTaskAttrs</code></a>; the <code>emphasis</code> parameter renames its keys.</p>
+<p>Each record in <code>data</code> is a <a href="#datachart.typings.GanttTaskAttrs"><code>GanttTaskAttrs</code></a>; the <code>emphasis</code>, <code>task</code>, <code>start</code>, <code>end</code>, <code>group</code>, <code>progress</code> and <code>depends_on</code> parameters rename its keys.</p>
 
 
 <div class="doc doc-object doc-class">
@@ -5874,6 +5896,26 @@ zorder); these keys set what is specific to a gantt chart.</p>
 <tr>
 <td style="text-align: left;"><code>emphasis</code></td>
 <td style="text-align: left;"><a href="../../constants/#datachart.constants.EMPHASIS"><code>EMPHASIS</code></a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="composition">Composition</h2>
+<p>Whether the figure composes with each composition function.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Function</th>
+<th style="text-align: left;">Composes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><a href="../../utils/#datachart.utils.Grid"><code>Grid</code></a></td>
+<td style="text-align: left;">yes</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="../../utils/#datachart.utils.Panel"><code>Panel</code></a></td>
+<td style="text-align: left;">no</td>
 </tr>
 </tbody>
 </table>

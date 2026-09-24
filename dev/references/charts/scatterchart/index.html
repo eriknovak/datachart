@@ -3516,6 +3516,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#composition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Composition
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -4363,6 +4374,17 @@
     <span class="md-ellipsis">
       
         Constants
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#composition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Composition
       
     </span>
   </a>
@@ -5804,7 +5826,7 @@ read like <code>xerr</code>.</p>
     </div>
 
 </div><h2 id="data">Data</h2>
-<p>Each record in <code>data</code> is a <a href="#datachart.typings.ScatterDataPointAttrs"><code>ScatterDataPointAttrs</code></a>; the <code>emphasis</code>, <code>x</code>, <code>y</code>, <code>size</code>, <code>hue</code>, <code>label</code>, <code>xerr</code> and <code>yerr</code> parameters rename its keys.</p>
+<p>Each record in <code>data</code> is a <a href="#datachart.typings.ScatterDataPointAttrs"><code>ScatterDataPointAttrs</code></a>; the <code>emphasis</code>, <code>x</code>, <code>y</code>, <code>size</code>, <code>hue</code>, <code>annotation</code>, <code>xerr</code> and <code>yerr</code> parameters rename its keys.</p>
 
 
 <div class="doc doc-object doc-class">
@@ -6235,6 +6257,26 @@ cap drawn at each end of an error bar; <code>0</code> draws none.</p>
 <tr>
 <td style="text-align: left;"><code>yticks_format</code></td>
 <td style="text-align: left;"><a href="../../constants/#datachart.constants.VALUE_FORMAT"><code>VALUE_FORMAT</code></a>, <a href="../../constants/#datachart.constants.DATE_FORMAT"><code>DATE_FORMAT</code></a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="composition">Composition</h2>
+<p>Whether the figure composes with each composition function.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Function</th>
+<th style="text-align: left;">Composes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><a href="../../utils/#datachart.utils.Grid"><code>Grid</code></a></td>
+<td style="text-align: left;">yes</td>
+</tr>
+<tr>
+<td style="text-align: left;"><a href="../../utils/#datachart.utils.Panel"><code>Panel</code></a></td>
+<td style="text-align: left;">yes</td>
 </tr>
 </tbody>
 </table>
