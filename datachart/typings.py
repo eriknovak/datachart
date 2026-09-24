@@ -2065,7 +2065,7 @@ class HeatmapSingleChartAttrs(TypedDict):
         ylabel (Union[str, None]): The ylabel of the heatmap chart.
         style (Union[HeatmapStyleAttrs, None]): The style of the heatmap chart.
 
-        norm (Union[NORMALIZE, str, None]): The value normalization.
+        norm (Union[COLOR_NORM, str, None]): The value normalization.
         vmin (Union[str, None]): The minimum value to normalize the data points.
         vmax (Union[str, None]): The maximum value to normalize the data points.
 
@@ -2128,7 +2128,7 @@ class CalendarHeatmapSingleChartAttrs(TypedDict):
         subtitle (Union[str, None]): The subtitle of the calendar; a multi-year calendar appends the year to it.
         style (Union[CalendarHeatmapStyleAttrs, None]): The style of the calendar.
 
-        norm (Union[NORMALIZE, str, None]): The value normalization.
+        norm (Union[COLOR_NORM, str, None]): The value normalization.
         vmin (Union[float, None]): The minimum value to normalize the data points.
         vmax (Union[float, None]): The maximum value to normalize the data points.
 
@@ -2291,7 +2291,7 @@ class ContourSingleChartAttrs(TypedDict):
         ylabel (Union[str, None]): The ylabel of the contour chart.
         style (Union[ContourStyleAttrs, None]): The style of the contour chart.
 
-        norm (Union[NORMALIZE, str, None]): The value normalization of the filled bands.
+        norm (Union[COLOR_NORM, str, None]): The value normalization of the filled bands.
         vmin (Union[float, None]): The minimum value to normalize the surface values.
         vmax (Union[float, None]): The maximum value to normalize the surface values.
         vcenter (Union[float, None]): The value a centred norm holds mid-colormap.
@@ -2377,7 +2377,7 @@ class HexbinSingleChartAttrs(TypedDict):
         gridsize (Union[int, None]): The number of hexagons across the x-axis; `None` takes the `plot_hexbin_gridsize` config value.
         reduce (Union[HEXBIN_REDUCE, str, None]): The aggregation of the `c` values in a hexagon; `None` takes the mean. Ignored without `c`.
         mincnt (Union[int, None]): The point count below which a hexagon stays blank; `None` draws every hexagon.
-        norm (Union[NORMALIZE, str, None]): The value normalization of the hexagon colors.
+        norm (Union[COLOR_NORM, str, None]): The value normalization of the hexagon colors.
         vmin (Union[float, None]): The minimum value to normalize the hexagon values.
         vmax (Union[float, None]): The maximum value to normalize the hexagon values.
         vcenter (Union[float, None]): The value a centred norm holds mid-colormap.

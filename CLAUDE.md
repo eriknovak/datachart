@@ -80,7 +80,9 @@ in a release, and the private `_<name>` type behind a `None` entry. Likewise
 remove any `renamed` entry on a `ChartKind` row in
 `datachart/utils/_internal/chart_kinds.py` that already shipped, with its
 deprecated keyword in the front's signature, and the legacy kind-as-
-`show_values` branch in `_validate_value_kind`. Publishing the GitHub release
+`show_values` branch in `_validate_value_kind`. Remove any
+`_DEPRECATED_ALIASES` entry in `datachart/constants.py` and any `_RENAMED`
+entry on a constant class that already shipped. Publishing the GitHub release
 then triggers PyPI and the versioned docs.
 
 ## Architecture

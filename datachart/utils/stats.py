@@ -769,6 +769,8 @@ def _kde(points: np.ndarray, bandwidth, cut: float) -> Tuple[GaussianKDE, np.nda
     """The kernel over the (n_dims, n_points) array and its per-axis padding."""
 
     validate_bandwidth(bandwidth)
+    if isinstance(bandwidth, str):
+        BANDWIDTH.check(bandwidth, "bandwidth")
     if points.shape[1] < 2:
         raise ValueError("A density estimate needs at least two points.")
     if not np.isfinite(points).all():

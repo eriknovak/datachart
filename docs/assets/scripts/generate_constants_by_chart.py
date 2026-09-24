@@ -161,7 +161,7 @@ STYLE_GROUPS = [
 ]
 # constants a parameter takes inside its payload, keyed by the parameter
 PAYLOADS = {
-    "norm": ("norm", ["NORMALIZE"]),
+    "norm": ("norm", ["COLOR_NORM"]),
     "legend": (
         'legend={"location": ..., "alignment": ...}',
         ["LEGEND_LOCATION", "LEGEND_ALIGN"],

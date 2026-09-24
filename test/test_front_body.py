@@ -117,7 +117,7 @@ class TestRenderSplit(unittest.TestCase):
             yerr="e",
             xticks=[[0, 1], [2]],
             xtickrotate=[10, 20],
-            emphasis=["primary", None],
+            emphasis=["highlight", None],
             title="T",
             xlabel="X",
             show_legend=True,
@@ -132,7 +132,7 @@ class TestRenderSplit(unittest.TestCase):
                 {
                     "data": [{"x": 0, "y": 1}],
                     "subtitle": "a",
-                    "emphasis": "primary",
+                    "emphasis": "highlight",
                     "xticks": [0, 1],
                     "xtickrotate": 10,
                     **shared,

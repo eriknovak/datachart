@@ -1,89 +1,219 @@
 """Module containing the `constants`.
 
 The `constants` module provides a set of predefined constants used in the package.
-These include figure size, format, style, and other figure manipulation values.
+Every class derives from [`Domain`][datachart.constants.Domain]: its members are
+the values it accepts, it carries `DEFAULT`, and a chart front checks each value
+passed for a constant-typed parameter against it before anything is drawn. A raw
+string equal to a member is the member, and `None` always means "unset, the
+default applies".
+
+Each class and what reads it: a chart parameter, a style attribute, or the
+config.
 
 **Figure Constants**
 
 Classes:
-    FIG_SIZE:   The predefined figure sizes.
-    FIG_FORMAT: The supported figure formats.
+    FIG_SIZE:   `figsize` of every chart, `Panel`, and `Grid`.
+    FIG_FORMAT: `format` of `save_figure`.
+    THEME:      `config.set_theme`.
 
 **Font Constants**
 
 Classes:
-    FONT_STYLE:  The supported font styles.
-    FONT_WEIGHT: The supported font weights.
+    FONT_STYLE:  The `font_*_style` style attributes.
+    FONT_WEIGHT: The `font_*_weight` style attributes.
 
 **Line Constants**
 
 Classes:
-    LINE_MARKER:     The supported line markers.
-    LINE_STYLE:      The supported line styles.
-    LINE_DRAW_STYLE: The supported line draw styles.
-    ARROW_STYLE:     The supported text annotation connector looks.
+    LINE_MARKER:     `marker` of `DumbbellChart`; the `plot_line_marker` and
+                     `plot_scatter_marker` style attributes.
+    LINE_STYLE:      `connector_style` of `DumbbellChart`; the
+                     `plot_line_style` style attribute.
+    LINE_DRAW_STYLE: The `plot_line_drawstyle` style attribute.
+    ARROW_STYLE:     The `plot_text_arrow_style` and `plot_network_edge_style`
+                     style attributes.
 
 **Style Constants**
 
 Classes:
-    HATCH_STYLE: The supported hatch styles.
-    COLORS:      The predefined colors.
-    THEME:       The predefined themes.
-    EMPHASIS:    The supported emphasis roles.
+    HATCH_STYLE: The `plot_bar_hatch` and `plot_hist_hatch` style attributes
+                 and the `HATCH` theme's hatch cycle.
+    COLORS:      The `color_general_singular` and `color_general_multiple`
+                 config attributes and the themes' palettes.
+    EMPHASIS:    `emphasis` of the charts and of a `Panel` item; the
+                 `emphasis` key of a record.
 
 **Legend Constants**
 
 Classes:
-    LEGEND_ALIGN:    The supported legend alignments.
-    LEGEND_LOCATION: The supported legend locations.
+    LEGEND_ALIGN:    The `plot_legend_alignment` style attribute.
+    LEGEND_LOCATION: The `location` of the `legend` setting; the
+                     `plot_legend_location` style attribute.
 
 **Chart Constants**
 
 Classes:
-    BAR_MODE:          The supported bar modes.
-    SORT:              The supported category sort orders.
-    NORMALIZE:         The supported normalization options.
-    ORIENTATION:       The supported orientations.
-    VIOLIN_INNER:      The supported violin inner marks.
-    BANDWIDTH:         The supported kernel density bandwidth rules.
-    SWARM_MODE:        The supported swarm plot modes.
-    VALUE_FORMAT:      The predefined value formats.
-    DATE_FORMAT:       The predefined date formats.
-    SHOW_GRID:         The supported show grid options.
-    SCALE:             The supported scale options.
-    ASPECT_RATIO:      The supported aspect ratio options.
-    COLORBAR_LOCATION: The supported colorbar locations.
-    DRAW_POSITION:     The supported draw positions of the image and basemap.
+    BAR_MODE:          `bar_mode` of `BarChart`, `Histogram`, `RadialChart`,
+                       and `Panel`.
+    SORT:              `sort` of the bar and group charts.
+    COLOR_NORM:        `norm` of the colormapped charts.
+    ORIENTATION:       `orientation`; the `orientation` of the `colorbar`
+                       setting.
+    VIOLIN_INNER:      `inner` of `ViolinPlot` and `RidgelinePlot`.
+    BANDWIDTH:         `bandwidth` of the density charts.
+    SWARM_MODE:        `mode` of `SwarmPlot` and `RaincloudPlot`.
+    VALUE_FORMAT:      `value_format`, `xticks_format`, and `yticks_format`.
+    DATE_FORMAT:       `xticks_format` and `yticks_format` on a date axis.
+    SHOW_GRID:         `show_grid`.
+    AXIS_SCALE:        `scalex` and `scaley`; `scaley_right` of `Panel`.
+    ASPECT_RATIO:      `aspect_ratio`.
+    COLORBAR_LOCATION: The `location` of the `colorbar` setting.
+    DRAW_POSITION:     `position` of `ImageChart` and `BasemapChart`.
+    HISTOGRAM_TYPE:    The `plot_hist_type` style attribute.
 
 **Chart-Specific Constants**
 
 Classes:
-    STACKED_AREA_BASELINE:   The supported stacked area baselines.
-    BUMP_RANK:               The supported bump chart ranking rules.
-    BUMP_LABEL_POSITION:     The supported end label positions.
-    RADIAL_TYPE:             The supported radial chart visuals.
-    RADIAL_DIRECTION:        The supported angular directions.
-    CALENDAR_WEEKDAY:        The supported week start days.
-    GANTT_DATE_PERIOD:       The supported date axis periods.
-    GANTT_VALUE:             The supported gantt chart value labels.
-    GANTT_SORT_KEY:          The supported gantt chart sort keys.
-    GANTT_ARROW_ENTRY:       The supported gantt dependency arrow entries.
-    DUMBBELL_VALUE:          The supported dumbbell chart value labels.
-    DUMBBELL_SORT_KEY:       The supported dumbbell chart sort keys.
-    HISTOGRAM_TYPE:          The supported histogram types.
-    RIDGELINE_SCALE:         The supported ridgeline density scales.
-    CONTOUR_LEVELS:          The supported contour level rules.
-    HEXBIN_REDUCE:           The supported hexbin aggregations.
-    NETWORK_LAYOUT:          The supported network chart layouts.
-    NETWORK_LABEL_POSITION:     The supported network node label positions.
-    SCATTER_MATRIX_DIAGONAL: The supported scatter matrix diagonal cells.
-    BASEMAP_FEATURE:         The supported basemap features.
-    BASEMAP_RESOLUTION:      The supported basemap outline resolutions.
+    STACKED_AREA_BASELINE:   `baseline` of `StackedAreaChart`.
+    BUMP_RANK:               `rank_by` of `BumpChart`.
+    BUMP_LABEL_POSITION:     `label_position` of `BumpChart`.
+    RADIAL_TYPE:             `mark` of `RadialChart`.
+    RADIAL_DIRECTION:        `direction` of `RadialChart`.
+    CALENDAR_WEEKDAY:        `week_start` of `CalendarHeatmap`; the
+                             `plot_calendar_heatmap_week_start` style attribute.
+    GANTT_DATE_PERIOD:       `period` of `GanttChart`.
+    GANTT_VALUE:             `value_kind` of `GanttChart`.
+    GANTT_SORT_KEY:          `sort_by` of `GanttChart`.
+    GANTT_ARROW_ENTRY:       The `plot_gantt_dependency_entry` style attribute.
+    DUMBBELL_VALUE:          `value_kind` of `DumbbellChart`.
+    DUMBBELL_SORT_KEY:       `sort_by` of `DumbbellChart`.
+    RIDGELINE_SCALE:         `ridge_scale` of `RidgelinePlot`.
+    CONTOUR_LEVELS:          `levels` of `ContourChart`.
+    HEXBIN_REDUCE:           `reduce` of `HexbinChart`.
+    NETWORK_LAYOUT:          `layout` of `NetworkChart`.
+    NETWORK_LABEL_POSITION:  `label_position` of `NetworkChart`; the
+                             `chart_default_node_label_position` config
+                             attribute.
+    SCATTER_MATRIX_DIAGONAL: `diagonal` of `ScatterMatrix`.
+    BASEMAP_FEATURE:         `data` of `BasemapChart`; the `feature` of its
+                             `geometry`.
+    BASEMAP_RESOLUTION:      `resolution` of `BasemapChart`.
+
+Deprecated names, removed in the next release: `SCALE` (now `AXIS_SCALE`),
+`NORMALIZE` (now `COLOR_NORM`), `LINE_MARKER.NONE` (now `NO_MARKER`),
+`LINE_STYLE.NONE` (now `NO_LINE`), and `SCATTER_MATRIX_DIAGONAL.NONE` (now
+`BLANK`).
 
 """
 
+import warnings
+from typing import Any
 
-class FIG_SIZE:
+
+class _DomainMeta(type):
+    """Collects a constant class's public attributes into its members."""
+
+    def __new__(mcls, name, bases, namespace):
+        cls = super().__new__(mcls, name, bases, namespace)
+        values = [
+            value
+            for key, value in namespace.items()
+            if not key.startswith("_")
+            and not callable(value)
+            and not isinstance(value, (classmethod, staticmethod, property))
+        ]
+        default = namespace.get("DEFAULT")
+        if isinstance(default, tuple) and default and set(default) <= set(values):
+            # a combination of members, e.g. the default basemap features
+            values.remove(default)
+        cls._members = tuple(v for i, v in enumerate(values) if v not in values[:i])
+        return cls
+
+    def __getattr__(cls, name):
+        renamed = cls.__dict__.get("_RENAMED", {})
+        if name not in renamed:
+            raise AttributeError(
+                f"type object {cls.__name__!r} has no attribute {name!r}"
+            )
+        warnings.warn(
+            f"`{cls.__name__}.{name}` is deprecated and will be removed in the next "
+            f"release; use `{cls.__name__}.{renamed[name]}` instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return getattr(cls, renamed[name])
+
+
+class Domain(metaclass=_DomainMeta):
+    """The base of every constant class: its members are the values it accepts.
+
+    A member is a plain class attribute, e.g. `LINEAR = "linear"`, so a raw
+    string equal to a member is the member. Every class carries `DEFAULT`,
+    and `None` passes every check as "unset, the default applies".
+
+    Examples:
+        >>> from datachart.constants import ORIENTATION
+        >>> ORIENTATION.members()
+        ('vertical', 'horizontal')
+        >>> ORIENTATION.check("horizontal", "orientation")
+        'horizontal'
+
+    """
+
+    # what else an open vocabulary accepts beside its members, in words
+    _OTHER = None
+
+    @classmethod
+    def members(cls) -> tuple:
+        """The values the class accepts, in definition order."""
+
+        return cls._members
+
+    @classmethod
+    def _accepts_other(cls, value) -> bool:
+        return False
+
+    @classmethod
+    def accepts(cls, value: Any) -> bool:
+        """Whether `value` is None, a member, or of an open vocabulary's form."""
+
+        return value is None or value in cls._members or cls._accepts_other(value)
+
+    @classmethod
+    def check(cls, value: Any, parameter: str) -> Any:
+        """Return `value`, or raise `ValueError` unless the class accepts it.
+
+        Args:
+            value: The value passed for `parameter`.
+            parameter: The parameter's name, used in the message.
+
+        Returns:
+            The value, unchanged.
+
+        Raises:
+            ValueError: If `value` is not None, a member, or of the form an
+                open vocabulary also takes.
+
+        """
+
+        if cls.accepts(value):
+            return value
+        other = f" or {cls._OTHER}" if cls._OTHER else ""
+        raise ValueError(
+            f"Invalid `{parameter}` value {value!r}. "
+            f"Must be one of {cls._members}{other}."
+        )
+
+
+def _is_format(value) -> bool:
+    # a `{x}`, `{}`, or `%` string formats a value; a callable formats itself
+    return callable(value) or (
+        isinstance(value, str) and ("{" in value or "%" in value)
+    )
+
+
+class FIG_SIZE(Domain):
     """The predefined figure sizes.
 
     All values are `(width, height)` in inches, matplotlib's `figsize` unit.
@@ -146,8 +276,18 @@ class FIG_SIZE:
     BEAMER_16_9 = (6.3, 3.54)
     BEAMER_4_3 = (5.04, 3.78)
 
+    _OTHER = "a `(width, height)` pair in inches"
 
-class FIG_FORMAT:
+    @classmethod
+    def _accepts_other(cls, value) -> bool:
+        return (
+            isinstance(value, (tuple, list))
+            and len(value) == 2
+            and all(isinstance(v, (int, float)) for v in value)
+        )
+
+
+class FIG_FORMAT(Domain):
     """The supported figure formats.
 
     Passed as the `format` argument of [`save_figure`][datachart.utils.save_figure].
@@ -179,7 +319,7 @@ class FIG_FORMAT:
     TIFF = "tiff"
 
 
-class FONT_STYLE:
+class FONT_STYLE(Domain):
     """The supported font styles.
 
     ![FONT_STYLE at a glance](../assets/imgs/const-font-style.svg){ width="100%" }
@@ -203,7 +343,7 @@ class FONT_STYLE:
     OBLIQUE = "oblique"
 
 
-class FONT_WEIGHT:
+class FONT_WEIGHT(Domain):
     """The supported font weights.
 
     Used by the `font_*_weight` style attributes (general, title, subtitle,
@@ -242,7 +382,7 @@ class FONT_WEIGHT:
     BLACK = "black"
 
 
-class LINE_MARKER:
+class LINE_MARKER(Domain):
     """The supported line markers.
 
     Used by the `plot_line_marker` (line charts) and `plot_scatter_marker`
@@ -256,7 +396,8 @@ class LINE_MARKER:
         ","
 
     Attributes:
-        NONE (str): No marker. Equals to `""`.
+        DEFAULT (None): The default marker: the theme's `plot_line_marker`, none in the default theme. Equals to `None`.
+        NO_MARKER (str): No marker. Equals to `""`.
         PIXEL (str): The pixel line marker. Equals to `","`.
         POINT (str): The point line marker. Equals to `"."`.
         CIRCLE (str): The circle line marker. Equals to `"o"`.
@@ -277,7 +418,8 @@ class LINE_MARKER:
 
     """
 
-    NONE = ""
+    DEFAULT = None
+    NO_MARKER = ""
     PIXEL = ","
     POINT = "."
     CIRCLE = "o"
@@ -296,8 +438,10 @@ class LINE_MARKER:
     VLINE = "|"
     HLINE = "_"
 
+    _RENAMED = {"NONE": "NO_MARKER"}
 
-class LINE_STYLE:
+
+class LINE_STYLE(Domain):
     """The supported line styles.
 
     Used by the `plot_line_style` style attribute of line charts.
@@ -310,7 +454,8 @@ class LINE_STYLE:
         "-"
 
     Attributes:
-        NONE (str): No line style. Equals to `""`.
+        DEFAULT (str): The default line style. Same as `LINE_STYLE.SOLID`.
+        NO_LINE (str): No line. Equals to `""`.
         SOLID (str): The solid line style. Equals to `"-"`.
         DASHED (str): The dashed line style. Equals to `"--"`.
         DASHDOT (str): The dashdot line style. Equals to `"-."`.
@@ -318,14 +463,17 @@ class LINE_STYLE:
 
     """
 
-    NONE = ""
+    DEFAULT = "-"
+    NO_LINE = ""
     SOLID = "-"
     DASHED = "--"
     DASHDOT = "-."
     DOTTED = ":"
 
+    _RENAMED = {"NONE": "NO_LINE"}
 
-class ARROW_STYLE:
+
+class ARROW_STYLE(Domain):
     """The supported connector looks.
 
     The one constant for every drawn connector: the `plot_text_arrow_style`
@@ -349,6 +497,7 @@ class ARROW_STYLE:
         "curve"
 
     Attributes:
+        DEFAULT (str): The default connector look. Same as `ARROW_STYLE.CURVE`.
         CURVE (str): A curved plain line with a small text-side gap. The default. Text annotations and network edges. Equals to `"curve"`.
         CURVE_ARROW (str): The same curve with an arrowhead at the target. Text annotations only. Equals to `"curve-arrow"`.
         STRAIGHT (str): A straight plain line with a small text-side gap. Text annotations and network edges. Equals to `"straight"`.
@@ -357,14 +506,21 @@ class ARROW_STYLE:
 
     """
 
+    DEFAULT = "curve"
     CURVE = "curve"
     CURVE_ARROW = "curve-arrow"
     STRAIGHT = "straight"
     TOUCHING = "touching"
     ARROW = "arrow"
 
+    _OTHER = "a matplotlib arrow style string"
 
-class LINE_DRAW_STYLE:
+    @classmethod
+    def _accepts_other(cls, value) -> bool:
+        return isinstance(value, str)
+
+
+class LINE_DRAW_STYLE(Domain):
     """The supported line draw styles.
 
     Used by the `plot_line_drawstyle` style attribute of line charts.
@@ -390,7 +546,7 @@ class LINE_DRAW_STYLE:
     STEPS_POST = "steps-post"
 
 
-class HATCH_STYLE:
+class HATCH_STYLE(Domain):
     """The supported hatch styles.
 
     Used by the `plot_bar_hatch` and `plot_hist_hatch` style attributes, and
@@ -429,7 +585,7 @@ class HATCH_STYLE:
     STARS = "*"
 
 
-class LEGEND_ALIGN:
+class LEGEND_ALIGN(Domain):
     """The supported legend alignments.
 
     Used by the `plot_legend_alignment` style attribute; aligns the legend's
@@ -456,7 +612,7 @@ class LEGEND_ALIGN:
     LEFT = "left"
 
 
-class LEGEND_LOCATION:
+class LEGEND_LOCATION(Domain):
     """The supported legend locations.
 
     Used by the `plot_legend_location` style attribute and the `location`
@@ -472,6 +628,7 @@ class LEGEND_LOCATION:
         "best"
 
     Attributes:
+        DEFAULT (str): The default legend location. Same as `LEGEND_LOCATION.BEST`.
         BEST (str): Automatic best location. Equals to `"best"`.
         UPPER_RIGHT (str): Upper right corner. Equals to `"upper right"`.
         UPPER_LEFT (str): Upper left corner. Equals to `"upper left"`.
@@ -489,6 +646,7 @@ class LEGEND_LOCATION:
         OUTSIDE_BOTTOM (str): Below the axes, centered. Equals to `"outside bottom"`.
     """
 
+    DEFAULT = "best"
     BEST = "best"
     UPPER_RIGHT = "upper right"
     UPPER_LEFT = "upper left"
@@ -506,7 +664,7 @@ class LEGEND_LOCATION:
     OUTSIDE_BOTTOM = "outside bottom"
 
 
-class HISTOGRAM_TYPE:
+class HISTOGRAM_TYPE(Domain):
     """The supported histogram types.
 
     Passed as the `plot_hist_type` style attribute of histograms: how each
@@ -521,6 +679,7 @@ class HISTOGRAM_TYPE:
         "bar"
 
     Attributes:
+        DEFAULT (str): The default histogram type. Same as `HISTOGRAM_TYPE.BAR`.
         BAR (str): The bar histogram style. Equals to `"bar"`.
         STEP (str): The step histogram style: an unfilled outline in the
             series color. Stacked series draw as `STEP_FILLED`, since a stack
@@ -529,12 +688,13 @@ class HISTOGRAM_TYPE:
 
     """
 
+    DEFAULT = "bar"
     BAR = "bar"
     STEP = "step"
     STEP_FILLED = "stepfilled"
 
 
-class BAR_MODE:
+class BAR_MODE(Domain):
     """The supported bar modes.
 
     Passed as the `bar_mode` setting of bar charts, histograms, and
@@ -563,7 +723,7 @@ class BAR_MODE:
     OVERLAY = "overlay"
 
 
-class SORT:
+class SORT(Domain):
     """The supported category sort orders.
 
     Passed as the `sort` setting of the bar-type fronts (`BarChart`,
@@ -593,7 +753,7 @@ class SORT:
     DESCENDING = "descending"
 
 
-class COLORS:
+class COLORS(Domain):
     """The predefined colors using [pypalettes](https://y-sunflower.github.io/pypalettes/).
 
     All palette names are valid pypalettes identifiers. You can use any of the 2500+
@@ -614,6 +774,7 @@ class COLORS:
         'Blues'
 
     Attributes:
+        DEFAULT (str): The default theme's singular palette. Same as `COLORS.Blues`.
         Blues (str): Sequential blue palette. Equals to `"Blues"`.
         Greens (str): Sequential green palette. Equals to `"Greens"`.
         Oranges (str): Sequential orange palette. Equals to `"Oranges"`.
@@ -660,6 +821,7 @@ class COLORS:
 
     """
 
+    DEFAULT = "Blues"
     # Sequential (Single-hue)
     Blues = "Blues"
     Greens = "Greens"
@@ -721,22 +883,29 @@ class COLORS:
     PaperYlGnBu = "PaperYlGnBu"
     PaperAccent = "PaperAccent"
 
+    _OTHER = "a pypalettes palette name or a matplotlib color"
 
-class NORMALIZE:
+    @classmethod
+    def _accepts_other(cls, value) -> bool:
+        return isinstance(value, str)
+
+
+class COLOR_NORM(Domain):
     """The supported normalization options.
 
     Passed as the `norm` attribute of a colormapped chart: normalizes the values
     before they are mapped to colors. Distinct from
-    [`SCALE`][datachart.constants.SCALE], which sets an axis scale.
+    [`AXIS_SCALE`][datachart.constants.AXIS_SCALE], which sets an axis scale.
 
-    ![NORMALIZE at a glance](../assets/imgs/const-normalize.svg){ width="100%" }
+    ![COLOR_NORM at a glance](../assets/imgs/const-normalize.svg){ width="100%" }
 
     Examples:
-        >>> from datachart.constants import NORMALIZE
-        >>> NORMALIZE.LINEAR
+        >>> from datachart.constants import COLOR_NORM
+        >>> COLOR_NORM.LINEAR
         "linear"
 
     Attributes:
+        DEFAULT (str): The default normalization. Same as `COLOR_NORM.LINEAR`.
         LINEAR (str): The linear normalization. Equals to `"linear"`.
         LOG (str): The logistic normalization. Equals to `"log"`.
         SYMLOG (str): The symlog normalization. Equals to `"symlog"`.
@@ -754,6 +923,7 @@ class NORMALIZE:
 
     """
 
+    DEFAULT = "linear"
     LINEAR = "linear"
     LOG = "log"
     SYMLOG = "symlog"
@@ -763,7 +933,7 @@ class NORMALIZE:
     TWOSLOPE = "twoslope"
 
 
-class ORIENTATION:
+class ORIENTATION(Domain):
     """The supported orientations.
 
     Passed as the `orientation` setting of bar charts, histograms, box
@@ -777,16 +947,18 @@ class ORIENTATION:
         "horizontal"
 
     Attributes:
+        DEFAULT (str): The default orientation. Same as `ORIENTATION.VERTICAL`.
         HORIZONTAL (str): The horizontal orientation. Equals to `"horizontal"`.
         VERTICAL (str): The vertical orientation. Equals to `"vertical"`.
 
     """
 
+    DEFAULT = "vertical"
     HORIZONTAL = "horizontal"
     VERTICAL = "vertical"
 
 
-class CALENDAR_WEEKDAY:
+class CALENDAR_WEEKDAY(Domain):
     """The supported week start days.
 
     Passed as the `week_start` setting of the calendar heatmap: the weekday
@@ -801,16 +973,18 @@ class CALENDAR_WEEKDAY:
         "monday"
 
     Attributes:
+        DEFAULT (str): The default week start. Same as `CALENDAR_WEEKDAY.MONDAY`.
         MONDAY (str): Weeks run from Monday to Sunday. Equals to `"monday"`.
         SUNDAY (str): Weeks run from Sunday to Saturday. Equals to `"sunday"`.
 
     """
 
+    DEFAULT = "monday"
     MONDAY = "monday"
     SUNDAY = "sunday"
 
 
-class SWARM_MODE:
+class SWARM_MODE(Domain):
     """The supported swarm plot modes.
 
     Passed as the `mode` setting of swarm plots: how the points of one group
@@ -824,17 +998,19 @@ class SWARM_MODE:
         "swarm"
 
     Attributes:
+        DEFAULT (str): The default mode. Same as `SWARM_MODE.SWARM`.
         SWARM (str): The beeswarm mode: non-overlapping offsets computed from
             the marker size. Equals to `"swarm"`.
         STRIP (str): The strip mode: seeded uniform jitter. Equals to `"strip"`.
 
     """
 
+    DEFAULT = "swarm"
     SWARM = "swarm"
     STRIP = "strip"
 
 
-class VIOLIN_INNER:
+class VIOLIN_INNER(Domain):
     """The supported violin inner marks.
 
     Passed as the `inner` setting of violin plots; `None` draws the body only.
@@ -847,6 +1023,7 @@ class VIOLIN_INNER:
         "box"
 
     Attributes:
+        DEFAULT (str): The violin plot's default inner marks. Same as `VIOLIN_INNER.BOX`.
         BOX (str): A thin quartile bar, a 1.5·IQR whisker line, and a median
             dot. Equals to `"box"`.
         QUARTILES (str): A dashed median line and dotted first and third
@@ -856,12 +1033,13 @@ class VIOLIN_INNER:
 
     """
 
+    DEFAULT = "box"
     BOX = "box"
     QUARTILES = "quartiles"
     MEDIAN = "median"
 
 
-class RIDGELINE_SCALE:
+class RIDGELINE_SCALE(Domain):
     """The supported ridgeline density scales.
 
     Passed as the `ridge_scale` setting of ridgeline plots: whether every ridge
@@ -889,7 +1067,7 @@ class RIDGELINE_SCALE:
     COMMON = "common"
 
 
-class BANDWIDTH:
+class BANDWIDTH(Domain):
     """The supported kernel density bandwidth rules.
 
     Passed as the `bandwidth` setting of violin plots: the rule of thumb that
@@ -919,7 +1097,7 @@ class BANDWIDTH:
     SILVERMAN = "silverman"
 
 
-class CONTOUR_LEVELS:
+class CONTOUR_LEVELS(Domain):
     """The supported contour level rules.
 
     Passed as the `levels` setting of contour charts: the rule that picks how
@@ -954,7 +1132,7 @@ class CONTOUR_LEVELS:
     FD = "fd"
 
 
-class HEXBIN_REDUCE:
+class HEXBIN_REDUCE(Domain):
     """The supported hexbin aggregations.
 
     Passed as the `reduce` attribute of hexbin charts: how the `c` values of
@@ -986,7 +1164,7 @@ class HEXBIN_REDUCE:
     MAX = "max"
 
 
-class BASEMAP_FEATURE:
+class BASEMAP_FEATURE(Domain):
     """The supported basemap features.
 
     Passed as the `features` of the basemap chart: which of the Natural
@@ -1034,7 +1212,7 @@ class BASEMAP_FEATURE:
     ROADS = "roads"
 
 
-class BASEMAP_RESOLUTION:
+class BASEMAP_RESOLUTION(Domain):
     """The supported basemap outline resolutions.
 
     Passed as the `resolution` of the basemap chart: the Natural Earth scale
@@ -1070,7 +1248,7 @@ class BASEMAP_RESOLUTION:
     HIGH = "10m"
 
 
-class STACKED_AREA_BASELINE:
+class STACKED_AREA_BASELINE(Domain):
     """The supported stacked area baselines.
 
     Passed as the `baseline` attribute of stacked area charts: where the
@@ -1101,7 +1279,7 @@ class STACKED_AREA_BASELINE:
     WEIGHTED_WIGGLE = "weighted_wiggle"
 
 
-class NETWORK_LAYOUT:
+class NETWORK_LAYOUT(Domain):
     """The supported network chart layouts.
 
     Passed as the `layout` attribute of network charts: the rule that places
@@ -1159,7 +1337,7 @@ class NETWORK_LAYOUT:
     FIXED = "fixed"
 
 
-class BUMP_RANK:
+class BUMP_RANK(Domain):
     """The supported bump chart ranking rules.
 
     Passed as the `rank_by` setting of the bump chart: whether each series'
@@ -1187,7 +1365,7 @@ class BUMP_RANK:
     GIVEN = "given"
 
 
-class BUMP_LABEL_POSITION:
+class BUMP_LABEL_POSITION(Domain):
     """The supported end label positions.
 
     Passed as the `label_position` setting of the bump chart: beside which
@@ -1214,7 +1392,7 @@ class BUMP_LABEL_POSITION:
     BOTH = "both"
 
 
-class NETWORK_LABEL_POSITION:
+class NETWORK_LABEL_POSITION(Domain):
     """The supported node label positions.
 
     Passed as the `label_position` setting of the network chart: where each
@@ -1244,7 +1422,7 @@ class NETWORK_LABEL_POSITION:
     BEST = "best"
 
 
-class GANTT_VALUE:
+class GANTT_VALUE(Domain):
     """The supported gantt chart value labels.
 
     Passed as the `value_kind` setting of the gantt chart: what each bar
@@ -1271,7 +1449,7 @@ class GANTT_VALUE:
     PROGRESS = "progress"
 
 
-class GANTT_SORT_KEY:
+class GANTT_SORT_KEY(Domain):
     """The supported gantt chart sort keys.
 
     Passed as the `sort_by` setting of the gantt chart: what a `sort` other
@@ -1297,7 +1475,7 @@ class GANTT_SORT_KEY:
     GROUP = "group"
 
 
-class GANTT_ARROW_ENTRY:
+class GANTT_ARROW_ENTRY(Domain):
     """The supported gantt dependency arrow entries.
 
     Passed as the `plot_gantt_dependency_entry` style attribute of the gantt
@@ -1324,7 +1502,7 @@ class GANTT_ARROW_ENTRY:
     LEFT = "left"
 
 
-class DUMBBELL_VALUE:
+class DUMBBELL_VALUE(Domain):
     """The supported dumbbell chart value labels.
 
     Passed as the `value_kind` setting of the dumbbell chart: what each
@@ -1353,7 +1531,7 @@ class DUMBBELL_VALUE:
     DELTA = "delta"
 
 
-class DUMBBELL_SORT_KEY:
+class DUMBBELL_SORT_KEY(Domain):
     """The supported dumbbell chart sort keys.
 
     Passed as the `sort_by` setting of the dumbbell chart: what a `sort`
@@ -1380,7 +1558,7 @@ class DUMBBELL_SORT_KEY:
     DELTA = "delta"
 
 
-class SCATTER_MATRIX_DIAGONAL:
+class SCATTER_MATRIX_DIAGONAL(Domain):
     """The supported scatter matrix diagonal cells.
 
     Passed as the `diagonal` setting of the scatter matrix: what each
@@ -1399,17 +1577,19 @@ class SCATTER_MATRIX_DIAGONAL:
             Equals to `"hist"`.
         KDE (str): A kernel density curve of the dimension, one per hue
             group. Equals to `"kde"`.
-        NONE (str): A blank cell. Equals to `"none"`.
+        BLANK (str): A blank cell. Equals to `"none"`.
 
     """
 
     DEFAULT = "hist"
     HIST = "hist"
     KDE = "kde"
-    NONE = "none"
+    BLANK = "none"
+
+    _RENAMED = {"NONE": "BLANK"}
 
 
-class GANTT_DATE_PERIOD:
+class GANTT_DATE_PERIOD(Domain):
     """The supported date axis periods.
 
     Passed as the `period` setting of the gantt chart: the calendar period
@@ -1424,6 +1604,7 @@ class GANTT_DATE_PERIOD:
         "month"
 
     Attributes:
+        DEFAULT (None): The default period: concise date ticks. Same as `GANTT_DATE_PERIOD.NONE`.
         NONE (None): Concise date ticks, no period edges. Equals to `None`.
         DAY (str): Days, under their month. Equals to `"day"`.
         WEEK (str): ISO weeks starting on Monday, under their month. Equals to `"week"`.
@@ -1436,6 +1617,7 @@ class GANTT_DATE_PERIOD:
 
     """
 
+    DEFAULT = None
     NONE = None
     DAY = "day"
     WEEK = "week"
@@ -1445,7 +1627,7 @@ class GANTT_DATE_PERIOD:
     PROJECT_MONTH = "project_month"
 
 
-class RADIAL_TYPE:
+class RADIAL_TYPE(Domain):
     """The supported radial chart visuals.
 
     Passed as the `type` setting of radial charts: the mark family the whole
@@ -1460,6 +1642,7 @@ class RADIAL_TYPE:
         "line"
 
     Attributes:
+        DEFAULT (str): The default visual. Same as `RADIAL_TYPE.LINE`.
         LINE (str): The line (radar) visual. Equals to `"line"`.
         BAR (str): The bar visual, one sector per label. Equals to `"bar"`.
         SCATTER (str): The scatter visual. Equals to `"scatter"`.
@@ -1467,13 +1650,14 @@ class RADIAL_TYPE:
 
     """
 
+    DEFAULT = "line"
     LINE = "line"
     BAR = "bar"
     SCATTER = "scatter"
     HISTOGRAM = "histogram"
 
 
-class RADIAL_DIRECTION:
+class RADIAL_DIRECTION(Domain):
     """The supported angular directions.
 
     Passed as the `direction` setting of radial charts: which way the angles
@@ -1487,16 +1671,18 @@ class RADIAL_DIRECTION:
         "clockwise"
 
     Attributes:
+        DEFAULT (str): The default direction. Same as `RADIAL_DIRECTION.CLOCKWISE`.
         CLOCKWISE (str): The angles increase clockwise. Equals to `"clockwise"`.
         COUNTERCLOCKWISE (str): The angles increase counterclockwise. Equals to `"counterclockwise"`.
 
     """
 
+    DEFAULT = "clockwise"
     CLOCKWISE = "clockwise"
     COUNTERCLOCKWISE = "counterclockwise"
 
 
-class VALUE_FORMAT:
+class VALUE_FORMAT(Domain):
     """The predefined value formats.
 
     Passed as the `value_format` attribute of every chart that takes
@@ -1533,8 +1719,14 @@ class VALUE_FORMAT:
     SCIENTIFIC = "{x:.2e}"
     THOUSANDS = "{x:,.0f}"
 
+    _OTHER = "a `{x}`, `{}`, or `%` format string, or a callable"
 
-class DATE_FORMAT:
+    @classmethod
+    def _accepts_other(cls, value) -> bool:
+        return _is_format(value)
+
+
+class DATE_FORMAT(Domain):
     """The predefined date formats.
 
     Passed as the `xticks_format` or `yticks_format` attribute of a chart
@@ -1552,6 +1744,7 @@ class DATE_FORMAT:
         "%Y-%m"
 
     Attributes:
+        DEFAULT (str): The default date format. Same as `DATE_FORMAT.AUTO`.
         AUTO (str): Pick the labels from the visible span: concise, non-repeating. Equals to `"auto"`.
         ISO (str): The ISO 8601 date. Equals to `"%Y-%m-%d"`.
         YEAR (str): The four-digit year. Equals to `"%Y"`.
@@ -1562,6 +1755,7 @@ class DATE_FORMAT:
 
     """
 
+    DEFAULT = "auto"
     AUTO = "auto"
     ISO = "%Y-%m-%d"
     YEAR = "%Y"
@@ -1570,8 +1764,14 @@ class DATE_FORMAT:
     DAY = "%d"
     TIME = "%H:%M"
 
+    _OTHER = "a `strftime` pattern"
 
-class THEME:
+    @classmethod
+    def _accepts_other(cls, value) -> bool:
+        return isinstance(value, str) and "%" in value
+
+
+class THEME(Domain):
     """The predefined themes.
 
     Applied with [`config.set_theme`][datachart.config.Config.set_theme].
@@ -1625,7 +1825,7 @@ class THEME:
     DARK = "dark"
 
 
-class EMPHASIS:
+class EMPHASIS(Domain):
     """The supported emphasis roles.
 
     Set per chart via the `emphasis` key in a charts list, or per figure via
@@ -1639,6 +1839,7 @@ class EMPHASIS:
         "background"
 
     Attributes:
+        DEFAULT (None): No emphasis role; the chart draws in its normal colors. Equals to `None`.
         BACKGROUND (str): Mute a series into context: theme muted color, lowered
             alpha, thinner strokes, behind the others, no legend entry.
             Equals to `"background"`.
@@ -1647,11 +1848,12 @@ class EMPHASIS:
 
     """
 
+    DEFAULT = None
     BACKGROUND = "background"
     HIGHLIGHT = "highlight"
 
 
-class SHOW_GRID:
+class SHOW_GRID(Domain):
     """The supported show grid options.
 
     Passed as the `show_grid` chart setting: which grid lines to draw. When
@@ -1682,22 +1884,22 @@ class SHOW_GRID:
     BOTH = "both"
 
 
-class SCALE:
+class AXIS_SCALE(Domain):
     """The supported scale options.
 
     Passed as the `scalex`/`scaley` chart settings to set an axis scale.
-    Distinct from [`NORMALIZE`][datachart.constants.NORMALIZE], which
+    Distinct from [`COLOR_NORM`][datachart.constants.COLOR_NORM], which
     normalizes heatmap colors.
 
-    ![SCALE at a glance](../assets/imgs/const-scale.svg){ width="100%" }
+    ![AXIS_SCALE at a glance](../assets/imgs/const-scale.svg){ width="100%" }
 
     Examples:
-        >>> from datachart.constants import SCALE
-        >>> SCALE.DEFAULT
+        >>> from datachart.constants import AXIS_SCALE
+        >>> AXIS_SCALE.DEFAULT
         "linear"
 
     Attributes:
-        DEFAULT (str): The default scale. Same as `SCALE.LINEAR`.
+        DEFAULT (str): The default scale. Same as `AXIS_SCALE.LINEAR`.
         LINEAR (str): The linear scale. Equals to `"linear"`.
         LOG (str): The log scale. Equals to `"log"`.
         SYMLOG (str): The symlog scale. Equals to `"symlog"`.
@@ -1712,7 +1914,7 @@ class SCALE:
     ASINH = "asinh"
 
 
-class ASPECT_RATIO:
+class ASPECT_RATIO(Domain):
     """The supported aspect ratio options.
 
     Passed as the `aspect_ratio` chart setting: the ratio of the y-unit to
@@ -1742,7 +1944,7 @@ class ASPECT_RATIO:
     GEOGRAPHIC = "geographic"
 
 
-class COLORBAR_LOCATION:
+class COLORBAR_LOCATION(Domain):
     """The supported colorbar locations.
 
     Used by the `location` field of a chart's `colorbar` setting
@@ -1756,6 +1958,7 @@ class COLORBAR_LOCATION:
         "right"
 
     Attributes:
+        DEFAULT (str): The default location of a vertical colorbar. Same as `COLORBAR_LOCATION.RIGHT`.
         RIGHT (str): Right side of the chart. Equals to `"right"`.
         LEFT (str): Left side of the chart. Equals to `"left"`.
         TOP (str): Top of the chart. Equals to `"top"`.
@@ -1763,13 +1966,14 @@ class COLORBAR_LOCATION:
 
     """
 
+    DEFAULT = "right"
     RIGHT = "right"
     LEFT = "left"
     TOP = "top"
     BOTTOM = "bottom"
 
 
-class DRAW_POSITION:
+class DRAW_POSITION(Domain):
     """The supported draw positions of the image and basemap.
 
     Passed as the `position` setting of the image chart and the basemap
@@ -1796,3 +2000,20 @@ class DRAW_POSITION:
     DEFAULT = "below"
     BELOW = "below"
     ABOVE = "above"
+
+
+# renamed classes, each removed one release after its rename shipped
+_DEPRECATED_ALIASES = {"SCALE": "AXIS_SCALE", "NORMALIZE": "COLOR_NORM"}
+
+
+def __getattr__(name):
+    if name in _DEPRECATED_ALIASES:
+        new_name = _DEPRECATED_ALIASES[name]
+        warnings.warn(
+            f"`{name}` is deprecated and will be removed in the next release; "
+            f"use `{new_name}` instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return globals()[new_name]
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

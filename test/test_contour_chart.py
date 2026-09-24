@@ -461,8 +461,8 @@ class TestContourLevels(unittest.TestCase):
         self.assertEqual(contour_levels(self._surface(), 6), 6)
 
     def test_contour_levels_invalid_rule(self):
-        with self.assertRaises(ValueError):
-            contour_levels(self._surface(), "sturges")
+        with self.assertRaisesRegex(ValueError, "levels"):
+            ContourChart(data=surface(), levels="sturges")
 
 
 if __name__ == "__main__":

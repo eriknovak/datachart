@@ -158,7 +158,7 @@ class TestScatterMatrixCells(unittest.TestCase):
         for mode, expected in [
             (SCATTER_MATRIX_DIAGONAL.HIST, {HistogramLayer}),
             (SCATTER_MATRIX_DIAGONAL.KDE, {KdeLayer}),
-            (SCATTER_MATRIX_DIAGONAL.NONE, set()),
+            (SCATTER_MATRIX_DIAGONAL.BLANK, set()),
         ]:
             with self.subTest(mode=mode):
                 kinds = cell_kinds(ScatterMatrix(columns(), diagonal=mode))
@@ -185,7 +185,7 @@ class TestScatterMatrixCells(unittest.TestCase):
 
     def test_lower_only_without_diagonal_trims_empty_edges(self):
         figure = ScatterMatrix(
-            columns(), lower_only=True, diagonal=SCATTER_MATRIX_DIAGONAL.NONE
+            columns(), lower_only=True, diagonal=SCATTER_MATRIX_DIAGONAL.BLANK
         )
         kinds = cell_kinds(figure)
         self.assertEqual(figure._chart_metadata["shape"], (2, 2))
@@ -306,7 +306,7 @@ class TestScatterMatrixCells(unittest.TestCase):
         self.assertFalse(labelled(axes[(0, 1)], "x"))
 
     def test_blank_diagonal_moves_edge_labels_inward(self):
-        figure = ScatterMatrix(columns(), diagonal=SCATTER_MATRIX_DIAGONAL.NONE)
+        figure = ScatterMatrix(columns(), diagonal=SCATTER_MATRIX_DIAGONAL.BLANK)
         axes = cell_axes(figure)
         figure.canvas.draw()
         # row 0 and the last column have a blank outer cell
@@ -362,7 +362,7 @@ class TestScatterMatrixLegend(unittest.TestCase):
         config.set_theme(THEME.QUILL)
         try:
             figure = ScatterMatrix(
-                columns(), hue="species", diagonal=SCATTER_MATRIX_DIAGONAL.NONE
+                columns(), hue="species", diagonal=SCATTER_MATRIX_DIAGONAL.BLANK
             )
             (legend,) = self.legends(figure)
             family = legend.get_texts()[0].get_fontfamily()

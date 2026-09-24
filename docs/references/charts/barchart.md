@@ -44,6 +44,6 @@ The parameters that accept a constant, with the class in [datachart.constants](.
 | `orientation` | [`ORIENTATION`](../constants.md#datachart.constants.ORIENTATION) |
 | `bar_mode` | [`BAR_MODE`](../constants.md#datachart.constants.BAR_MODE) |
 | `sort` | [`SORT`](../constants.md#datachart.constants.SORT) |
-| `scalex` | [`SCALE`](../constants.md#datachart.constants.SCALE) |
-| `scaley` | [`SCALE`](../constants.md#datachart.constants.SCALE) |
+| `scalex` | [`AXIS_SCALE`](../constants.md#datachart.constants.AXIS_SCALE) |
+| `scaley` | [`AXIS_SCALE`](../constants.md#datachart.constants.AXIS_SCALE) |
 | `yticks_format` | [`VALUE_FORMAT`](../constants.md#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](../constants.md#datachart.constants.DATE_FORMAT) |

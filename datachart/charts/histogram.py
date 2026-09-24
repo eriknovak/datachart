@@ -24,7 +24,7 @@ from ..constants import (
     FIG_SIZE,
     SHOW_GRID,
     ORIENTATION,
-    SCALE,
+    AXIS_SCALE,
 )
 
 # ================================================
@@ -57,8 +57,8 @@ def Histogram(
     orientation: Optional[Union[ORIENTATION, str]] = None,
     bar_mode: Optional[Union[BAR_MODE, str]] = None,
     num_bins: Optional[int] = None,
-    scalex: Optional[Union[SCALE, str]] = None,
-    scaley: Optional[Union[SCALE, str]] = None,
+    scalex: Optional[Union[AXIS_SCALE, str]] = None,
+    scaley: Optional[Union[AXIS_SCALE, str]] = None,
     subplots: Optional[bool] = None,
     max_cols: Optional[int] = None,
     sharex: Optional[bool] = None,

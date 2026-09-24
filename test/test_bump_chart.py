@@ -16,8 +16,6 @@ from datachart.constants import BUMP_RANK, BUMP_LABEL_POSITION, THEME
 from datachart.utils import Panel, Grid
 from datachart.utils._internal.layers import BumpLayer, MarkClipBox, rank_series
 from datachart.utils._internal.validate import (
-    validate_rank_by,
-    validate_label_position,
     validate_line_curve,
     validate_given_ranks,
 )
@@ -42,25 +40,6 @@ class TestBumpValidation(unittest.TestCase):
         ax = BumpChart(data=DATA, show_grid="y").axes[0]
         ax.figure.canvas.draw()
         self.assertTrue(any(l.get_visible() for l in ax.get_ygridlines()))
-
-    def test_rank_by_defaults_to_descending(self):
-        self.assertEqual(validate_rank_by(None), BUMP_RANK.VALUE_DESCENDING)
-        for member in (BUMP_RANK.VALUE_ASCENDING, BUMP_RANK.GIVEN):
-            self.assertEqual(validate_rank_by(member), member)
-
-    def test_rank_by_rejects_unknown(self):
-        with self.assertRaisesRegex(ValueError, "rank_by"):
-            validate_rank_by("value")
-
-    def test_label_position_defaults_to_end(self):
-        self.assertEqual(validate_label_position(None), BUMP_LABEL_POSITION.END)
-        self.assertEqual(
-            validate_label_position(BUMP_LABEL_POSITION.BOTH), BUMP_LABEL_POSITION.BOTH
-        )
-
-    def test_label_position_rejects_unknown(self):
-        with self.assertRaisesRegex(ValueError, "label_position"):
-            validate_label_position("middle")
 
     def test_line_curve_defaults_to_straight(self):
         self.assertEqual(validate_line_curve(None), 0.0)

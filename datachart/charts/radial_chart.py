@@ -21,13 +21,12 @@ from ..constants import (
     FIG_SIZE,
     RADIAL_DIRECTION,
     RADIAL_TYPE,
-    SCALE,
+    AXIS_SCALE,
     SHOW_GRID,
     SORT,
     VALUE_FORMAT,
 )
 
-_DIRECTIONS = (RADIAL_DIRECTION.CLOCKWISE, RADIAL_DIRECTION.COUNTERCLOCKWISE)
 _COMPASS = ("N", "NE", "E", "SE", "S", "SW", "W", "NW")
 
 _RadialStyleAttrs = Union[
@@ -69,7 +68,7 @@ def RadialChart(
     direction: Optional[Union[RADIAL_DIRECTION, str]] = None,
     innerradius: Optional[float] = None,
     scalex: None = None,
-    scaley: Optional[Union[SCALE, str]] = None,
+    scaley: Optional[Union[AXIS_SCALE, str]] = None,
     subplots: Optional[bool] = None,
     max_cols: Optional[int] = None,
     sharex: Optional[bool] = None,
@@ -220,10 +219,6 @@ def RadialChart(
     """
     params = dict(locals())
 
-    if direction is not None and direction not in _DIRECTIONS:
-        raise ValueError(
-            f"Invalid `direction` value {direction!r}. Must be one of {_DIRECTIONS}."
-        )
     if innerradius is not None and not 0 <= innerradius < 1:
         raise ValueError(
             f"Invalid `innerradius` value {innerradius!r}. "

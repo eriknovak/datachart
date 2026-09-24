@@ -3,7 +3,6 @@ from typing import Union, List, Optional, Tuple
 import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render
-from ..utils._internal.validate import validate_draw_position
 from ..typings import ImageDataAttrs, ImageStyleAttrs
 from ..constants import ASPECT_RATIO, FIG_SIZE, DRAW_POSITION, SHOW_GRID
 
@@ -107,7 +106,5 @@ def ImageChart(
 
     """
     params = dict(locals())
-
-    validate_draw_position(position)
 
     return render("imagechart", params)

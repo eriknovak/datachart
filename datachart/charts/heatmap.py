@@ -11,7 +11,14 @@ from ..typings import (
     ColorbarSettingAttrs,
     TextSettingAttrs,
 )
-from ..constants import ASPECT_RATIO, FIG_SIZE, SHOW_GRID, VALUE_FORMAT, DATE_FORMAT
+from ..constants import (
+    ASPECT_RATIO,
+    COLOR_NORM,
+    FIG_SIZE,
+    SHOW_GRID,
+    VALUE_FORMAT,
+    DATE_FORMAT,
+)
 
 # ================================================
 # Main Chart Definition
@@ -43,7 +50,7 @@ def Heatmap(
     sharex: Optional[bool] = None,
     sharey: Optional[bool] = None,
     style: Optional[Union[HeatmapStyleAttrs, List[Optional[HeatmapStyleAttrs]]]] = None,
-    norm: Optional[Union[str, List[Optional[str]]]] = None,
+    norm: Optional[Union[COLOR_NORM, str, List[Optional[str]]]] = None,
     vmin: Optional[Union[float, List[Optional[float]]]] = None,
     vmax: Optional[Union[float, List[Optional[float]]]] = None,
     vcenter: Optional[Union[float, List[Optional[float]]]] = None,
@@ -143,7 +150,7 @@ def Heatmap(
         style: Style configuration(s) for the heatmap(s).
         norm: Value normalization method(s). `"centered"` and `"twoslope"`
             hold `vcenter` in the middle of the theme's diverging colormap;
-            see [`NORMALIZE`][datachart.constants.NORMALIZE].
+            see [`COLOR_NORM`][datachart.constants.COLOR_NORM].
         vmin: Minimum value(s) for normalization.
         vmax: Maximum value(s) for normalization.
         vcenter: The value(s) a centred normalization holds in the middle of

@@ -9,7 +9,6 @@ from ..utils._internal.validate import (
     validate_gantt_sort_by,
     validate_gantt_tasks,
     validate_gantt_value_kind,
-    validate_sort,
 )
 from ..typings import (
     EmphasisRuleAttrs,
@@ -207,7 +206,7 @@ def GanttChart(
 
     # records fail here, before layers are built; settings fail in the layer
     schedules = data if data and isinstance(data[0], list) else [data]
-    sort_key = validate_gantt_sort_by(validate_sort(sort), sort_by)
+    sort_key = validate_gantt_sort_by(sort, sort_by)
     params["show_values"], params["value_kind"] = validate_gantt_value_kind(
         show_values, value_kind
     )

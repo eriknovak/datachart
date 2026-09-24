@@ -249,7 +249,7 @@ class TestValidation(unittest.TestCase):
 
     def test_unknown_layout_raises(self):
         with self.assertRaisesRegex(ValueError, "layout"):
-            validate_network_records(NODES, EDGES, "shell")
+            NetworkChart(DATA, layout="shell")
 
     def test_front_rejects_emphasis_and_bad_shape(self):
         with self.assertRaisesRegex(ValueError, "emphasis"):

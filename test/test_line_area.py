@@ -10,7 +10,7 @@ import pytest
 from matplotlib.collections import PolyCollection
 
 from datachart.charts import LineChart
-from datachart.constants import SCALE
+from datachart.constants import AXIS_SCALE
 
 TEMPERATURES = [{"x": i, "y": y} for i, y in enumerate([-0.5, 0.4, 2.9, 6.3, 10.6])]
 
@@ -63,7 +63,7 @@ def test_area_renders_on_log_scale_without_warnings():
     fig = LineChart(
         data=[{"x": i, "y": 10**i} for i in range(1, 5)],
         show_area=True,
-        scaley=SCALE.LOG,
+        scaley=AXIS_SCALE.LOG,
     )
     ax = fig.axes[0]
     assert ax.get_yscale() == "log"

@@ -68,8 +68,8 @@ from datachart.constants import (
     LEGEND_LOCATION,
     NETWORK_LABEL_POSITION,
     NETWORK_LAYOUT,
-    NORMALIZE,
-    SCALE,
+    COLOR_NORM,
+    AXIS_SCALE,
     SCATTER_MATRIX_DIAGONAL,
     SORT,
     STACKED_AREA_BASELINE,
@@ -664,7 +664,7 @@ def hist_step_log():
     return Histogram(
         data=data,
         num_bins=40,
-        scaley=SCALE.LOG,
+        scaley=AXIS_SCALE.LOG,
         style={"plot_hist_type": HISTOGRAM_TYPE.STEP},
     )
 
@@ -777,7 +777,7 @@ def heatmap_centered():
     data = {"z": signed_matrix()}
     return Heatmap(
         data=data,
-        norm=NORMALIZE.CENTERED,
+        norm=COLOR_NORM.CENTERED,
         show_values=True,
         show_colorbars=True,
         title="Centred on zero",
@@ -789,7 +789,7 @@ def heatmap_twoslope():
     data = {"z": signed_matrix()}
     return Heatmap(
         data=data,
-        norm=NORMALIZE.TWOSLOPE,
+        norm=COLOR_NORM.TWOSLOPE,
         vmin=-3,
         vmax=5,
         show_values=True,
@@ -1590,7 +1590,7 @@ def overlay_bar_linear_line_log():
     )
     return Panel(
         charts=[{"figure": fb, "y_axis": "left"}, {"figure": fl, "y_axis": "right"}],
-        scaley_right=SCALE.LOG,
+        scaley_right=AXIS_SCALE.LOG,
         title="Linear bars, log line",
         ylabel_left="count",
         ylabel_right="growth (log)",
@@ -2128,7 +2128,7 @@ def hexbin_counts():
 
 @case
 def hexbin_log():
-    return HexbinChart(data=hexbin_points(), norm=NORMALIZE.LOG, mincnt=1)
+    return HexbinChart(data=hexbin_points(), norm=COLOR_NORM.LOG, mincnt=1)
 
 
 @case
@@ -2895,7 +2895,7 @@ def calendar_multi_year():
         {"date": d1 + d2, "value": v1 + v2},
         subtitle="commits",
         title="Two years",
-        norm=NORMALIZE.ASINH,
+        norm=COLOR_NORM.ASINH,
         figsize=(9, 4.4),
     )
 
@@ -2923,7 +2923,7 @@ def calendar_centered():
     quarter = [(d, round(v - mean, 1)) for d, v in zip(days, values) if d.month <= 3]
     return CalendarHeatmap(
         {"date": [d for d, _ in quarter], "value": [v for _, v in quarter]},
-        norm=NORMALIZE.CENTERED,
+        norm=COLOR_NORM.CENTERED,
         show_colorbars=True,
         title="Q1 2024, daily anomaly",
         figsize=(9, 2.6),
@@ -3603,7 +3603,7 @@ def matrix_blank_diagonal_grid():
     matrix = ScatterMatrix(
         matrix_records(),
         dimensions=["flipper", "bill length"],
-        diagonal=SCATTER_MATRIX_DIAGONAL.NONE,
+        diagonal=SCATTER_MATRIX_DIAGONAL.BLANK,
         show_regression=True,
         show_grid="both",
         title="Nested",

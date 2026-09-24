@@ -8,7 +8,7 @@ import numpy as np
 
 from datachart.charts import Histogram
 from datachart.config import config
-from datachart.constants import HISTOGRAM_TYPE, ORIENTATION, SCALE
+from datachart.constants import HISTOGRAM_TYPE, ORIENTATION, AXIS_SCALE
 from datachart.utils import Panel
 from datachart.utils._internal.chart_kinds import build_chart_panel_settings
 
@@ -249,12 +249,12 @@ class TestLogStepGaps(unittest.TestCase):
         return outline_vertices(Histogram(data, **kwargs))
 
     def test_log_step_breaks_over_an_empty_bin(self):
-        values = self.step(scaley=SCALE.LOG)[:, 1]
+        values = self.step(scaley=AXIS_SCALE.LOG)[:, 1]
         self.assertTrue(np.isnan(values[[0, 3, 4, 7]]).all())
         self.assertEqual(values[np.isfinite(values)].tolist(), [100, 100, 2, 2])
 
     def test_log_step_gaps_count_the_empty_bins_and_the_ends(self):
-        values = self.step(scaley=SCALE.LOG)[:, 1]
+        values = self.step(scaley=AXIS_SCALE.LOG)[:, 1]
         # two vertices per empty bin, plus the rise in and the drop out
         self.assertEqual(int(np.isnan(values).sum()), 2 * 1 + 2)
 
@@ -264,7 +264,7 @@ class TestLogStepGaps(unittest.TestCase):
         self.assertEqual(int((values == 0).sum()), 4)
 
     def test_horizontal_log_step_breaks_on_the_value_axis(self):
-        vertices = self.step(scalex=SCALE.LOG, orientation=ORIENTATION.HORIZONTAL)
+        vertices = self.step(scalex=AXIS_SCALE.LOG, orientation=ORIENTATION.HORIZONTAL)
         # the counts run along x when the histogram lies down
         self.assertEqual(int(np.isnan(vertices[:, 0]).sum()), 4)
         self.assertFalse(np.isnan(vertices[:, 1]).any())
@@ -273,11 +273,11 @@ class TestLogStepGaps(unittest.TestCase):
         figure = Histogram(
             HIST_GAP, num_bins=3, style={"plot_hist_type": HISTOGRAM_TYPE.STEP}
         )
-        panel = Panel([{"figure": figure}], scaley=SCALE.LOG)
+        panel = Panel([{"figure": figure}], scaley=AXIS_SCALE.LOG)
         self.assertEqual(int(np.isnan(outline_vertices(panel)[:, 1]).sum()), 4)
 
     def test_cumulative_log_step_keeps_only_its_opening_gap(self):
-        values = self.step(scaley=SCALE.LOG, show_cumulative=True)[:, 1]
+        values = self.step(scaley=AXIS_SCALE.LOG, show_cumulative=True)[:, 1]
         # the closing drop is already gone; the rise from zero becomes the gap
         self.assertTrue(np.isnan(values[0]))
         self.assertEqual(int(np.isnan(values).sum()), 1)
@@ -285,7 +285,7 @@ class TestLogStepGaps(unittest.TestCase):
 
     def test_log_step_filled_keeps_its_zeros(self):
         values = self.step(
-            scaley=SCALE.LOG, style={"plot_hist_type": HISTOGRAM_TYPE.STEP_FILLED}
+            scaley=AXIS_SCALE.LOG, style={"plot_hist_type": HISTOGRAM_TYPE.STEP_FILLED}
         )[:, 1]
         # a filled step needs its baseline to have an area at all
         self.assertFalse(np.isnan(values).any())
@@ -307,7 +307,7 @@ class TestLogStepGaps(unittest.TestCase):
             return int(ink[:, column].sum())
 
         # the renderer breaks the path where the linear outline drops
-        self.assertLess(inked_rows(SCALE.LOG) * 5, inked_rows(SCALE.LINEAR))
+        self.assertLess(inked_rows(AXIS_SCALE.LOG) * 5, inked_rows(AXIS_SCALE.LINEAR))
 
 
 if __name__ == "__main__":

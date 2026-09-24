@@ -24,7 +24,7 @@ from ..constants import (
     DATE_FORMAT,
     EMPHASIS,
     FIG_SIZE,
-    SCALE,
+    AXIS_SCALE,
     SHOW_GRID,
     VALUE_FORMAT,
 )
@@ -60,7 +60,7 @@ def BumpChart(
     value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     value_step: Optional[int] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
-    scalex: Optional[Union[SCALE, str]] = None,
+    scalex: Optional[Union[AXIS_SCALE, str]] = None,
     subplots: Optional[bool] = None,
     max_cols: Optional[int] = None,
     sharex: Optional[bool] = None,

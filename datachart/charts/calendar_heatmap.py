@@ -15,7 +15,13 @@ from ..typings import (
     ColorbarSettingAttrs,
     TextSettingAttrs,
 )
-from ..constants import ASPECT_RATIO, FIG_SIZE, VALUE_FORMAT, CALENDAR_WEEKDAY
+from ..constants import (
+    ASPECT_RATIO,
+    COLOR_NORM,
+    FIG_SIZE,
+    VALUE_FORMAT,
+    CALENDAR_WEEKDAY,
+)
 
 # a calendar is wide and short: the default figure keeps the default width
 # and stacks this much height per row of calendars
@@ -45,7 +51,7 @@ def CalendarHeatmap(
     style: Optional[
         Union[CalendarHeatmapStyleAttrs, List[Optional[CalendarHeatmapStyleAttrs]]]
     ] = None,
-    norm: Optional[Union[str, List[Optional[str]]]] = None,
+    norm: Optional[Union[COLOR_NORM, str, List[Optional[str]]]] = None,
     vmin: Optional[Union[float, List[Optional[float]]]] = None,
     vmax: Optional[Union[float, List[Optional[float]]]] = None,
     vcenter: Optional[Union[float, List[Optional[float]]]] = None,
@@ -123,7 +129,7 @@ def CalendarHeatmap(
         style: Style configuration(s) for the calendar(s).
         norm: Value normalization method(s). `"centered"` and `"twoslope"`
             hold `vcenter` in the middle of the theme's diverging colormap;
-            see [`NORMALIZE`][datachart.constants.NORMALIZE].
+            see [`COLOR_NORM`][datachart.constants.COLOR_NORM].
         vmin: Minimum value(s) for normalization.
         vmax: Maximum value(s) for normalization.
         vcenter: The value(s) a centred normalization holds in the middle of

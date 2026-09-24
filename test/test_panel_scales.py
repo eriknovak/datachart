@@ -22,7 +22,7 @@ from datachart.charts import (
     ViolinPlot,
 )
 from datachart.config import config
-from datachart.constants import ORIENTATION, SCALE
+from datachart.constants import ORIENTATION, AXIS_SCALE
 from datachart.utils import Panel, Grid, Annotate
 from datachart.utils._internal.validate import validate_log_values
 
@@ -59,7 +59,7 @@ def close_figures():
 
 class TestExplicitScales:
     def test_scaley_is_the_primary_value_axis(self):
-        (ax,) = render(Panel([LineChart(data=LINE)], scaley=SCALE.LOG))
+        (ax,) = render(Panel([LineChart(data=LINE)], scaley=AXIS_SCALE.LOG))
         assert scales(ax) == ("linear", "log")
 
     def test_scalex_is_the_category_axis(self):
@@ -376,15 +376,15 @@ class TestLogValidator:
         validate_log_values("scaley", "value", scale, [-1, 0, 5])
 
     def test_log_accepts_positive_values(self):
-        validate_log_values("scaley", "value", SCALE.LOG, [0.1, 1, 1000])
+        validate_log_values("scaley", "value", AXIS_SCALE.LOG, [0.1, 1, 1000])
 
     def test_nan_and_missing_are_ignored(self):
-        validate_log_values("scaley", "value", SCALE.LOG, [1, None, np.nan, 3])
+        validate_log_values("scaley", "value", AXIS_SCALE.LOG, [1, None, np.nan, 3])
 
     @pytest.mark.parametrize("bad", [0, -2.5])
     def test_non_positive_raises_with_parameter_scale_and_value(self, bad):
         with pytest.raises(ValueError) as error:
-            validate_log_values("scalex", "category", SCALE.LOG, [1, bad, 3])
+            validate_log_values("scalex", "category", AXIS_SCALE.LOG, [1, bad, 3])
         message = str(error.value)
         assert "`scalex` 'log'" in message
         assert f"value {bad:g} on the category axis" in message
@@ -392,7 +392,7 @@ class TestLogValidator:
 
     def test_hint_is_appended(self):
         with pytest.raises(ValueError, match=r"zero\. Move it\.$"):
-            validate_log_values("scaley", "value", SCALE.LOG, [0], hint="Move it.")
+            validate_log_values("scaley", "value", AXIS_SCALE.LOG, [0], hint="Move it.")
 
 
 ZERO_LINE = [{"x": 1, "y": 0}, {"x": 2, "y": 100}]
