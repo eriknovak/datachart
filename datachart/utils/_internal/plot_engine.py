@@ -24,6 +24,7 @@ from .chart_kinds import (
     splits_datasets,
 )
 from .layers import Layer, Panel, LayerGroup, group_from_chart, layers_per_chart
+from ...themes._base import warn_aliases
 from ...constants import COLORBAR_LOCATION, FIG_SIZE, ORIENTATION
 
 # ================================================
@@ -136,6 +137,10 @@ def render(chart_type: str, params: dict) -> plt.Figure:
         if params.get(name) is not None:
             raise ValueError(reason)
     check_domains(params, kind.domains)
+    styles = params.get("style")
+    for style in styles if isinstance(styles, list) else [styles]:
+        # `render`, the front, then the caller
+        warn_aliases(style or {}, stacklevel=3)
     chart_keys = kind.per_chart_keys
     per_chart = {k: v for k, v in params.items() if k in chart_keys}
     settings = {k: v for k, v in params.items() if k not in chart_keys and k != "data"}

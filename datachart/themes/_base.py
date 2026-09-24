@@ -20,9 +20,7 @@ from ..constants import (
     SHOW_GRID,
 )
 
-# renamed style keys, each kept one release: the bar-specific value label
-# keys predate the shared family (ADR 0033); the theme defaults of front
-# parameters follow one naming rule (ADR 0071)
+# renamed style keys, each kept for one release (ADRs 0033, 0071)
 STYLE_ALIASES = {
     "plot_bar_value_fontsize": "plot_value_fontsize",
     "plot_bar_value_color": "plot_value_color",
@@ -33,22 +31,32 @@ STYLE_ALIASES = {
 }
 
 
-def canonical_style(style: dict) -> dict:
-    """`style` with every alias key renamed.
+def warn_aliases(style: dict, stacklevel: int = 2) -> None:
+    """Warn with `DeprecationWarning` for each alias key in `style`.
 
-    An alias present in `style` wins over the canonical key: the alias was
-    written by hand, while the canonical key usually arrives by spreading a
-    predefined theme underneath it. Each alias warns with `DeprecationWarning`.
+    `stacklevel` counts from the caller of this function, as in `warnings.warn`.
     """
 
-    resolved = {k: v for k, v in style.items() if k not in STYLE_ALIASES}
     for alias, key in STYLE_ALIASES.items():
         if alias in style:
             warnings.warn(
                 f"Style key {alias!r} is deprecated; use {key!r}.",
                 DeprecationWarning,
-                stacklevel=3,
+                stacklevel=stacklevel + 1,
             )
+
+
+def canonical_style(style: dict) -> dict:
+    """`style` with every alias key renamed.
+
+    An alias present in `style` wins over the canonical key: the alias was
+    written by hand, while the canonical key usually arrives by spreading a
+    predefined theme underneath it.
+    """
+
+    resolved = {k: v for k, v in style.items() if k not in STYLE_ALIASES}
+    for alias, key in STYLE_ALIASES.items():
+        if alias in style:
             resolved[key] = style[alias]
     return resolved
 

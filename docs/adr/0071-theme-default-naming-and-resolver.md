@@ -35,11 +35,13 @@ ridgeline defaults were read through the per-chart style dict, so
   constant's `DEFAULT` — because `overlap` has no constant and a `None`
   `show_grid` means something. Nothing else reads a `chart_default_` key.
 - **Theme defaults come from the config only.** A per-chart style dict no
-  longer sets `week_start` or `overlap`.
+  longer sets `week_start` or `overlap`; while the alias lasts, the old key in
+  one still does, so existing calls draw as before.
 - **Renamed keys warn for one release.** The old names are `STYLE_ALIASES`
-  entries; `canonical_style` warns with `DeprecationWarning` on every write
-  path, while `config[...]` and `config.get(...)` reads stay silent. The
-  release checklist removes an alias that already shipped.
+  entries; each write path (`register_theme`, `update_config`, `derive_theme`,
+  a front's `style`) warns once with `DeprecationWarning` at the caller, while
+  `config[...]` and `config.get(...)` reads stay silent. The release
+  checklist removes an alias that already shipped.
 
 ## Considered options
 

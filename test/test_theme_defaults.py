@@ -9,7 +9,7 @@ matplotlib.use("Agg")
 import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 
-from datachart.charts import BarChart, Heatmap, LineChart, RadialChart
+from datachart.charts import BarChart, Heatmap, LineChart, RadialChart, RidgelinePlot
 from datachart.config import config
 from datachart.constants import THEME
 from datachart.config.configuration import THEMES
@@ -585,6 +585,22 @@ class TestThemeDefaultAliases(unittest.TestCase):
             warnings.simplefilter("error")
             self.assertEqual(config.get("plot_ridgeline_overlap"), 0.3)
             self.assertEqual(config["plot_ridgeline_overlap"], 0.3)
+
+    def test_old_key_in_a_chart_style_still_sets_the_default(self):
+        data = [{"label": "a", "value": float(v)} for v in range(10)]
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            figure = RidgelinePlot(data, style={"plot_ridgeline_overlap": 0.0})
+        self.assertEqual(
+            [str(w.message) for w in caught if w.category is DeprecationWarning],
+            [
+                "Style key 'plot_ridgeline_overlap' is deprecated; "
+                "use 'chart_default_ridgeline_overlap'."
+            ],
+        )
+        self.assertEqual(caught[0].filename, __file__)
+        layer = figure._chart_metadata["panel"].groups[0].layers[0]
+        self.assertEqual(layer.overlap, 0.0)
 
     def test_every_alias_warns_naming_its_replacement(self):
         for alias, key in self.RENAMED.items():

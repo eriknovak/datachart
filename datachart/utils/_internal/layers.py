@@ -17,7 +17,7 @@ from collections import defaultdict
 from datetime import date, datetime, time, timedelta, tzinfo
 from dataclasses import dataclass, replace
 from itertools import cycle as iter_cycle
-from typing import Callable, List, NamedTuple, Optional, Tuple, Union
+from typing import Any, Callable, List, NamedTuple, Optional, Tuple, Union
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -230,6 +230,7 @@ from ...constants import (
     VIOLIN_INNER,
 )
 from ...config import config
+from ...themes._base import STYLE_ALIASES
 
 DEFAULT_NUM_BINS = 20
 DEFAULT_ORIENTATION = ORIENTATION.VERTICAL
@@ -2158,12 +2159,18 @@ def resolve_show_values(settings: dict) -> bool:
     return bool(theme_default(None, settings, "show_values"))
 
 
-def theme_default(chart_type: Optional[str], settings: dict, name: str):
+def theme_default(
+    chart_type: Optional[str],
+    settings: dict,
+    name: str,
+    style: Optional[dict] = None,
+) -> Any:
     """The setting `name`, else the theme's default for it, else None (ADR 0071).
 
     A shared parameter's theme key comes from its `SharedParameter`, so
     `chart_type` may be None for one; a front's own parameter's comes from
-    the `theme_defaults` of its row.
+    the `theme_defaults` of its row. A renamed key in the chart's `style`
+    still sets the default while its alias lasts.
     """
 
     # chart_kinds imports this module, so the descriptor is read at call time
@@ -2177,7 +2184,12 @@ def theme_default(chart_type: Optional[str], settings: dict, name: str):
         key = shared.theme_default
     else:
         key = chart_kind(chart_type).theme_defaults.get(name)
-    return None if key is None else config.get(key)
+    if key is None:
+        return None
+    for alias, target in STYLE_ALIASES.items():
+        if target == key and style and style.get(alias) is not None:
+            return style[alias]
+    return config.get(key)
 
 
 class Layer:
@@ -6116,7 +6128,7 @@ class RidgelineLayer(GroupLayer):
         validate_ridge_marks(self.fill, self.show_outline)
         self.ridge_style = get_ridgeline_style(self.style)
         self.overlap = validate_overlap(
-            theme_default("ridgelineplot", self.settings, "overlap")
+            theme_default("ridgelineplot", self.settings, "overlap", self.style)
         )
         self.show_values = False
         # subplots share one value range, set once every layer is built
@@ -6822,7 +6834,7 @@ class CalendarHeatmapLayer(HeatmapLayer):
 
     def _resolve_style(self):
         self.week_start = (
-            theme_default("calendarheatmap", self.settings, "week_start")
+            theme_default("calendarheatmap", self.settings, "week_start", self.style)
             or CALENDAR_WEEKDAY.DEFAULT
         )
         self.month_line_style = get_calendar_month_line_style(self.style)
