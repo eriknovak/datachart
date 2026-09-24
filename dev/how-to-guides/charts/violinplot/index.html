@@ -5908,7 +5908,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </tr>
 <tr>
 <td style="text-align:left"><code>scaley</code></td>
-<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.SCALE"><code>SCALE</code></a></td>
+<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.AXIS_SCALE"><code>AXIS_SCALE</code></a></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>yticks_format</code></td>
@@ -7618,7 +7618,7 @@ Panel(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="axis-scales">Axis scales<a class="anchor-link" href="#axis-scales">¶</a></h3><p>Waiting times, file sizes and incomes are skewed: most values are small and a few are huge, so on a linear axis the bodies are squashed against zero with a long thin tail. <code>scaley</code> takes a <a href="../../../references/constants/#datachart.constants.SCALE">SCALE</a> member, and a logarithmic axis spreads the small values out. Body masses are not skewed, so this example switches dataset: <code>first_reply</code>, defined in a hidden cell, holds 200 illustrative first-reply times (in minutes) of support requests per channel, from a seeded generator. On the linear axis only the forum body is visible; on the log axis all three are, minutes to days on one axis. The body is still estimated from the raw values, though, so on the log axis it keeps a linear-space shape: a flat, wide base and a thin spike toward the long tail.</p>
+<h3 id="axis-scales">Axis scales<a class="anchor-link" href="#axis-scales">¶</a></h3><p>Waiting times, file sizes and incomes are skewed: most values are small and a few are huge, so on a linear axis the bodies are squashed against zero with a long thin tail. <code>scaley</code> takes a <a href="../../../references/constants/#datachart.constants.AXIS_SCALE">AXIS_SCALE</a> member, and a logarithmic axis spreads the small values out. Body masses are not skewed, so this example switches dataset: <code>first_reply</code>, defined in a hidden cell, holds 200 illustrative first-reply times (in minutes) of support requests per channel, from a seeded generator. On the linear axis only the forum body is visible; on the log axis all three are, minutes to days on one axis. The body is still estimated from the raw values, though, so on the log axis it keeps a linear-space shape: a flat, wide base and a thin spike toward the long tail.</p>
 </div>
 </div>
 </div>
@@ -7644,9 +7644,9 @@ Panel(
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">SCALE</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">AXIS_SCALE</span>
 
-<span class="k">for</span> <span class="n">scale</span> <span class="ow">in</span> <span class="p">[</span><span class="n">SCALE</span><span class="o">.</span><span class="n">LINEAR</span><span class="p">,</span> <span class="n">SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">]:</span>
+<span class="k">for</span> <span class="n">scale</span> <span class="ow">in</span> <span class="p">[</span><span class="n">AXIS_SCALE</span><span class="o">.</span><span class="n">LINEAR</span><span class="p">,</span> <span class="n">AXIS_SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">]:</span>
     <span class="n">ViolinPlot</span><span class="p">(</span>
         <span class="n">data</span><span class="o">=</span><span class="n">first_reply</span><span class="p">,</span>
         <span class="n">inner</span><span class="o">=</span><span class="n">VIOLIN_INNER</span><span class="o">.</span><span class="n">QUARTILES</span><span class="p">,</span>
@@ -7659,9 +7659,9 @@ Panel(
         <span class="n">scaley</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span>
     <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-24">from datachart.constants import SCALE
+<div class="clipboard-copy-txt" id="cell-24">from datachart.constants import AXIS_SCALE
 
-for scale in [SCALE.LINEAR, SCALE.LOG]:
+for scale in [AXIS_SCALE.LINEAR, AXIS_SCALE.LOG]:
     ViolinPlot(
         data=first_reply,
         inner=VIOLIN_INNER.QUARTILES,

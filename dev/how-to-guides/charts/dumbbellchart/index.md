@@ -68,7 +68,7 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `connector_style`                            | [`LINE_STYLE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_STYLE)                                                                                                                               |
 | `figsize`                                    | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                                                                                                                                   |
 | `orientation`                                | [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)                                                                                                                             |
-| `scaley`                                     | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                         |
+| `scaley`                                     | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                               |
 | `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN) |
 | `show_grid`                                  | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                                                                                                                                 |
 | `value_format`                               | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                           |
@@ -507,12 +507,12 @@ Grid(
 
 ### Axis scales
 
-A dumbbell encodes value by position, and a linear axis is the honest default. When the values span orders of magnitude, a logarithmic axis is what keeps the small categories readable: `scaley` takes a [SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE) member and applies to the value axis whichever way it runs. `populations`, defined in a hidden cell, holds the population of the twelve countries in 2000 and in 2024, in millions (source: the World Bank's World Development Indicators, indicator SP.POP.TOTL, rounded). On a linear axis Slovenia, Norway and Switzerland collapse into one dot at the left edge; on a log axis every country's change is visible, at the price that equal connector lengths now mean equal ratios, not equal differences.
+A dumbbell encodes value by position, and a linear axis is the honest default. When the values span orders of magnitude, a logarithmic axis is what keeps the small categories readable: `scaley` takes a [AXIS_SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE) member and applies to the value axis whichever way it runs. `populations`, defined in a hidden cell, holds the population of the twelve countries in 2000 and in 2024, in millions (source: the World Bank's World Development Indicators, indicator SP.POP.TOTL, rounded). On a linear axis Slovenia, Norway and Switzerland collapse into one dot at the left edge; on a log axis every country's change is visible, at the price that equal connector lengths now mean equal ratios, not equal differences.
 
 ```
-from datachart.constants import SCALE
+from datachart.constants import AXIS_SCALE
 
-for scale in [SCALE.LINEAR, SCALE.LOG]:
+for scale in [AXIS_SCALE.LINEAR, AXIS_SCALE.LOG]:
     DumbbellChart(
         data=populations,
         title=f"Population, 2000 to 2024, on the '{scale}' scale",

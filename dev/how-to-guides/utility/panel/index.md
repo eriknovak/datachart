@@ -226,12 +226,12 @@ Panel(
 
 ### Axis scales
 
-A quantity that spans orders of magnitude next to one that does not is the case for two axes with two scales. `scalex`, `scaley` and `scaley_right` take a [SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE) member; `scaley` applies to the left value axis and `scaley_right` to the right one, so the two scale independently. Unlike the limits, a scale set on an individual chart is carried over: a chart drawn with `scaley=SCALE.LOG` stays log in the panel, on whichever axis it lands, and the panel attributes override it per axis. A chart that set no scale of its own takes the scale of the axis it lands on. When two charts sharing one axis were each built with a different scale, the first one wins and the panel warns; the `overlay_warn_scale_conflict` setting of the [panel configuration](#panel-configuration) switches the warning off.
+A quantity that spans orders of magnitude next to one that does not is the case for two axes with two scales. `scalex`, `scaley` and `scaley_right` take a [AXIS_SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE) member; `scaley` applies to the left value axis and `scaley_right` to the right one, so the two scale independently. Unlike the limits, a scale set on an individual chart is carried over: a chart drawn with `scaley=AXIS_SCALE.LOG` stays log in the panel, on whichever axis it lands, and the panel attributes override it per axis. A chart that set no scale of its own takes the scale of the axis it lands on. When two charts sharing one axis were each built with a different scale, the first one wins and the panel warns; the `overlay_warn_scale_conflict` setting of the [panel configuration](#panel-configuration) switches the warning off.
 
 `pollen` holds an illustrative monthly mean pollen concentration (in grains/m³), which spans three orders of magnitude between winter and spring. Against the precipitation bars on a linear left axis, a log right axis is what keeps the winter months readable:
 
 ```
-from datachart.constants import SCALE
+from datachart.constants import AXIS_SCALE
 
 # an illustrative monthly mean pollen concentration in grains/m³
 POLLEN = [4, 12, 180, 1400, 2100, 650, 210, 90, 40, 15, 6, 3]
@@ -246,7 +246,7 @@ Panel(
         {"figure": pollen, "y_axis": "right"},
     ],
     # a log scale on the right value axis only; the left one stays linear
-    scaley_right=SCALE.LOG,
+    scaley_right=AXIS_SCALE.LOG,
     title="Climate of Ljubljana",
     xlabel="Month",
     ylabel_left="Precipitation (mm)",

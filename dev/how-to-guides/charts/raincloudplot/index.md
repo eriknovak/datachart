@@ -69,7 +69,7 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `bandwidth`                                  | [`BANDWIDTH`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH)                                                                                                                                 |
 | `aspect_ratio`                               | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                           |
 | `orientation`                                | [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)                                                                                                                             |
-| `scaley`                                     | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                         |
+| `scaley`                                     | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                               |
 | `yticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
 
 The full list of style attributes is in the [datachart.typings.RaincloudStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/raincloudplot/#datachart.typings.RaincloudStyleAttrs) type; the full list of parameters is in the [datachart.charts.RaincloudPlot](https://eriknovak.github.io/datachart/dev/references/charts/raincloudplot/#datachart.charts.RaincloudPlot) reference.
@@ -558,12 +558,12 @@ Grid(
 
 ### Logarithmic scale
 
-Some measurements are strongly right-skewed: most values are small and a few are many times larger, so on a linear axis the bulk of each group is squeezed against the bottom. `scaley` takes a [SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE) member, and on `SCALE.LOG` the cloud, the rain and the box all follow the scaled axis. Penguin masses are not skewed, so this example switches dataset: `load_times`, defined in a hidden cell, holds 150 illustrative page load times (in ms) for each of three page types, drawn from log-normal distributions. On the log scale the three clouds become symmetric and readable, and the tails stay in view.
+Some measurements are strongly right-skewed: most values are small and a few are many times larger, so on a linear axis the bulk of each group is squeezed against the bottom. `scaley` takes a [AXIS_SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE) member, and on `AXIS_SCALE.LOG` the cloud, the rain and the box all follow the scaled axis. Penguin masses are not skewed, so this example switches dataset: `load_times`, defined in a hidden cell, holds 150 illustrative page load times (in ms) for each of three page types, drawn from log-normal distributions. On the log scale the three clouds become symmetric and readable, and the tails stay in view.
 
 ```
-from datachart.constants import SCALE
+from datachart.constants import AXIS_SCALE
 
-for scale in [SCALE.LINEAR, SCALE.LOG]:
+for scale in [AXIS_SCALE.LINEAR, AXIS_SCALE.LOG]:
     RaincloudPlot(
         data=load_times,
         title=f"Page load time on the '{scale}' scale",
@@ -619,7 +619,7 @@ RaincloudPlot(
     # 300 trials per condition: scatter instead of packing
     mode=SWARM_MODE.STRIP,
     # reaction times are right-skewed
-    scaley=SCALE.LOG,
+    scaley=AXIS_SCALE.LOG,
     yticks=[400, 600, 800, 1000, 1500],
     yticks_format=VALUE_FORMAT.INTEGER,
     # print the median, min and max

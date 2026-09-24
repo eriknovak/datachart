@@ -5212,7 +5212,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">EMPHASIS</span><span class="p">,</span>
     <span class="n">FIG_SIZE</span><span class="p">,</span>
     <span class="n">LEGEND_LOCATION</span><span class="p">,</span>
-    <span class="n">NORMALIZE</span><span class="p">,</span>
+    <span class="n">COLOR_NORM</span><span class="p">,</span>
     <span class="n">ORIENTATION</span><span class="p">,</span>
     <span class="n">SHOW_GRID</span><span class="p">,</span>
     <span class="n">SORT</span><span class="p">,</span>
@@ -5234,7 +5234,7 @@ from datachart.constants import (
     EMPHASIS,
     FIG_SIZE,
     LEGEND_LOCATION,
-    NORMALIZE,
+    COLOR_NORM,
     ORIENTATION,
     SHOW_GRID,
     SORT,
@@ -5604,7 +5604,7 @@ Grid(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="where-and-when-did-inflation-bite">Where and when did inflation bite?<a class="anchor-link" href="#where-and-when-did-inflation-bite">¶</a></h3><p>Nineteen countries over nine years of inflation is a table a reader cannot scan for the hot years; a <a href="../../how-to-guides/charts/heatmap/">heatmap</a> colours each cell by its value, so a hot year is a dark column and a chronically inflationary country is a dark row. Two members run inflation in the tens and hundreds of percent, which would leave every other cell the same pale shade on a linear scale, so <code>norm=NORMALIZE.SYMLOG</code> gives the colour scale a logarithmic reach that keeps the contrast among the single digits, and <code>show_values</code> prints the numbers so the extreme cells are read rather than guessed.</p>
+<h3 id="where-and-when-did-inflation-bite">Where and when did inflation bite?<a class="anchor-link" href="#where-and-when-did-inflation-bite">¶</a></h3><p>Nineteen countries over nine years of inflation is a table a reader cannot scan for the hot years; a <a href="../../how-to-guides/charts/heatmap/">heatmap</a> colours each cell by its value, so a hot year is a dark column and a chronically inflationary country is a dark row. Two members run inflation in the tens and hundreds of percent, which would leave every other cell the same pale shade on a linear scale, so <code>norm=COLOR_NORM.SYMLOG</code> gives the colour scale a logarithmic reach that keeps the contrast among the single digits, and <code>show_values</code> prints the numbers so the extreme cells are read rather than guessed.</p>
 </div>
 </div>
 </div>
@@ -5634,7 +5634,7 @@ Grid(
     <span class="n">title</span><span class="o">=</span><span class="s2">"2022 was the hot year everywhere; Argentina and Türkiye are hot every year"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Year"</span><span class="p">,</span>
     <span class="n">ylabel</span><span class="o">=</span><span class="s2">"Country, by 2022 inflation"</span><span class="p">,</span>
-    <span class="n">norm</span><span class="o">=</span><span class="n">NORMALIZE</span><span class="o">.</span><span class="n">SYMLOG</span><span class="p">,</span>
+    <span class="n">norm</span><span class="o">=</span><span class="n">COLOR_NORM</span><span class="o">.</span><span class="n">SYMLOG</span><span class="p">,</span>
     <span class="n">show_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">value_format</span><span class="o">=</span><span class="s2">"</span><span class="si">{x:.1f}</span><span class="s2">"</span><span class="p">,</span>
     <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -5650,7 +5650,7 @@ inflation_figure = Heatmap(
     title="2022 was the hot year everywhere; Argentina and Türkiye are hot every year",
     xlabel="Year",
     ylabel="Country, by 2022 inflation",
-    norm=NORMALIZE.SYMLOG,
+    norm=COLOR_NORM.SYMLOG,
     show_values=True,
     value_format="{x:.1f}",
     show_colorbars=True,

@@ -69,8 +69,8 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `show_grid`                                  | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                                                                                                                                 |
 | `value_format`                               | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                           |
 | `aspect_ratio`                               | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                           |
-| `scalex`                                     | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                         |
-| `scaley`                                     | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                         |
+| `scalex`                                     | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                               |
+| `scaley`                                     | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                               |
 | `yticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
 
 The full list of style attributes is in the [datachart.typings.LineStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/linechart/#datachart.typings.LineStyleAttrs) and [datachart.typings.AreaStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.AreaStyleAttrs) types; the full list of parameters is in the [datachart.charts.LineChart](https://eriknovak.github.io/datachart/dev/references/charts/linechart/#datachart.charts.LineChart) reference.
@@ -553,12 +553,12 @@ LineChart(
 
 ### Axis scales
 
-A quantity that grows by a constant factor looks like a hockey stick on a linear axis and like a straight line on a logarithmic one, and only the second lets the reader judge whether the growth rate changed. `scaley` and `scalex` take a [SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE) member: `LINEAR`, `LOG`, `SYMLOG` (log on both sides of zero) or `ASINH`. `transistors`, defined in a hidden cell, holds the transistor count of a representative microprocessor per year from the Intel 4004 (1971) to the Apple M1 Ultra (2022), Moore's law in sixteen data points rounded from the manufacturers' figures. On a linear scale the first forty years collapse onto the x-axis; on a log scale the doubling every two years becomes the straight line it is famous for.
+A quantity that grows by a constant factor looks like a hockey stick on a linear axis and like a straight line on a logarithmic one, and only the second lets the reader judge whether the growth rate changed. `scaley` and `scalex` take a [AXIS_SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE) member: `LINEAR`, `LOG`, `SYMLOG` (log on both sides of zero) or `ASINH`. `transistors`, defined in a hidden cell, holds the transistor count of a representative microprocessor per year from the Intel 4004 (1971) to the Apple M1 Ultra (2022), Moore's law in sixteen data points rounded from the manufacturers' figures. On a linear scale the first forty years collapse onto the x-axis; on a log scale the doubling every two years becomes the straight line it is famous for.
 
 ```
-from datachart.constants import SCALE
+from datachart.constants import AXIS_SCALE
 
-for scale in [SCALE.LINEAR, SCALE.LOG]:
+for scale in [AXIS_SCALE.LINEAR, AXIS_SCALE.LOG]:
     LineChart(
         data=transistors,
         style={"plot_line_marker": LINE_MARKER.CIRCLE},
@@ -663,7 +663,7 @@ LineChart(
     # draw the run-to-run spread as a band
     show_yerr=True,
     # a log value axis
-    scaley=SCALE.LOG,
+    scaley=AXIS_SCALE.LOG,
 ).show()
 ```
 

@@ -5877,11 +5877,11 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </tr>
 <tr>
 <td style="text-align:left"><code>scalex</code></td>
-<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.SCALE"><code>SCALE</code></a></td>
+<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.AXIS_SCALE"><code>AXIS_SCALE</code></a></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>scaley</code></td>
-<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.SCALE"><code>SCALE</code></a></td>
+<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.AXIS_SCALE"><code>AXIS_SCALE</code></a></td>
 </tr>
 </tbody>
 </table>
@@ -7411,7 +7411,7 @@ Panel(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="axis-scales">Axis scales<a class="anchor-link" href="#axis-scales">¶</a></h3><p>On a linear count axis the bins in the tail of a distribution hold a handful of values and vanish next to the peak. <code>scaley</code> (or <code>scalex</code> for a horizontal histogram) takes a <a href="../../../references/constants/#datachart.constants.SCALE">SCALE</a> member, and a logarithmic count axis gives every occupied bin a visible bar. The bins stay equal-width on the data scale whichever axis scale is applied, so a log scale on the binned axis stretches them unevenly and is rarely what you want. A log axis has no zero, so a <code>STEP</code> outline breaks over the empty bins instead of dropping to the axis floor.</p>
+<h3 id="axis-scales">Axis scales<a class="anchor-link" href="#axis-scales">¶</a></h3><p>On a linear count axis the bins in the tail of a distribution hold a handful of values and vanish next to the peak. <code>scaley</code> (or <code>scalex</code> for a horizontal histogram) takes a <a href="../../../references/constants/#datachart.constants.AXIS_SCALE">AXIS_SCALE</a> member, and a logarithmic count axis gives every occupied bin a visible bar. The bins stay equal-width on the data scale whichever axis scale is applied, so a log scale on the binned axis stretches them unevenly and is rarely what you want. A log axis has no zero, so a <code>STEP</code> outline breaks over the empty bins instead of dropping to the axis floor.</p>
 <p>Flipper lengths have no long tail, so this example switches dataset. <code>quakes</code>, defined in a hidden cell, holds 5,000 illustrative earthquake magnitudes from a seeded generator that follows the Gutenberg-Richter law: every step of one magnitude up makes earthquakes about ten times rarer. On a linear axis the strong earthquakes are invisible; on a log axis the counts fall along a straight line, which is how seismologists read the law.</p>
 </div>
 </div>
@@ -7438,9 +7438,9 @@ Panel(
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">SCALE</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">AXIS_SCALE</span>
 
-<span class="k">for</span> <span class="n">scale</span> <span class="ow">in</span> <span class="p">[</span><span class="n">SCALE</span><span class="o">.</span><span class="n">LINEAR</span><span class="p">,</span> <span class="n">SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">]:</span>
+<span class="k">for</span> <span class="n">scale</span> <span class="ow">in</span> <span class="p">[</span><span class="n">AXIS_SCALE</span><span class="o">.</span><span class="n">LINEAR</span><span class="p">,</span> <span class="n">AXIS_SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">]:</span>
     <span class="n">Histogram</span><span class="p">(</span>
         <span class="n">data</span><span class="o">=</span><span class="n">quakes</span><span class="p">,</span>
         <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Earthquake magnitudes on a '</span><span class="si">{</span><span class="n">scale</span><span class="si">}</span><span class="s2">' count axis"</span><span class="p">,</span>
@@ -7453,9 +7453,9 @@ Panel(
         <span class="n">scaley</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span>
     <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-22">from datachart.constants import SCALE
+<div class="clipboard-copy-txt" id="cell-22">from datachart.constants import AXIS_SCALE
 
-for scale in [SCALE.LINEAR, SCALE.LOG]:
+for scale in [AXIS_SCALE.LINEAR, AXIS_SCALE.LOG]:
     Histogram(
         data=quakes,
         title=f"Earthquake magnitudes on a '{scale}' count axis",
@@ -7872,7 +7872,7 @@ penguin_records[:2]</div>
     <span class="n">show_grid</span><span class="o">=</span><span class="n">SHOW_GRID</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span>
     <span class="n">num_bins</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span>
     <span class="c1"># the tail shows on a log count axis</span>
-    <span class="n">scaley</span><span class="o">=</span><span class="n">SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
+    <span class="n">scaley</span><span class="o">=</span><span class="n">AXIS_SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
     <span class="n">show_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 
@@ -7919,7 +7919,7 @@ counts = Histogram(
     show_grid=SHOW_GRID.Y,
     num_bins=80,
     # the tail shows on a log count axis
-    scaley=SCALE.LOG,
+    scaley=AXIS_SCALE.LOG,
     show_legend=True,
 )
 

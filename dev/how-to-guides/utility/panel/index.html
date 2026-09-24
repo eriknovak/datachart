@@ -6244,7 +6244,7 @@ Panel(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="axis-scales">Axis scales<a class="anchor-link" href="#axis-scales">¶</a></h3><p>A quantity that spans orders of magnitude next to one that does not is the case for two axes with two scales. <code>scalex</code>, <code>scaley</code> and <code>scaley_right</code> take a <a href="../../../references/constants/#datachart.constants.SCALE">SCALE</a> member; <code>scaley</code> applies to the left value axis and <code>scaley_right</code> to the right one, so the two scale independently. Unlike the limits, a scale set on an individual chart is carried over: a chart drawn with <code>scaley=SCALE.LOG</code> stays log in the panel, on whichever axis it lands, and the panel attributes override it per axis. A chart that set no scale of its own takes the scale of the axis it lands on. When two charts sharing one axis were each built with a different scale, the first one wins and the panel warns; the <code>overlay_warn_scale_conflict</code> setting of the <a href="#panel-configuration">panel configuration</a> switches the warning off.</p>
+<h3 id="axis-scales">Axis scales<a class="anchor-link" href="#axis-scales">¶</a></h3><p>A quantity that spans orders of magnitude next to one that does not is the case for two axes with two scales. <code>scalex</code>, <code>scaley</code> and <code>scaley_right</code> take a <a href="../../../references/constants/#datachart.constants.AXIS_SCALE">AXIS_SCALE</a> member; <code>scaley</code> applies to the left value axis and <code>scaley_right</code> to the right one, so the two scale independently. Unlike the limits, a scale set on an individual chart is carried over: a chart drawn with <code>scaley=AXIS_SCALE.LOG</code> stays log in the panel, on whichever axis it lands, and the panel attributes override it per axis. A chart that set no scale of its own takes the scale of the axis it lands on. When two charts sharing one axis were each built with a different scale, the first one wins and the panel warns; the <code>overlay_warn_scale_conflict</code> setting of the <a href="#panel-configuration">panel configuration</a> switches the warning off.</p>
 <p><code>pollen</code> holds an illustrative monthly mean pollen concentration (in grains/m³), which spans three orders of magnitude between winter and spring. Against the precipitation bars on a linear left axis, a log right axis is what keeps the winter months readable:</p>
 </div>
 </div>
@@ -6268,7 +6268,7 @@ Panel(
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">SCALE</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">AXIS_SCALE</span>
 
 <span class="c1"># an illustrative monthly mean pollen concentration in grains/m³</span>
 <span class="n">POLLEN</span> <span class="o">=</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">1400</span><span class="p">,</span> <span class="mi">2100</span><span class="p">,</span> <span class="mi">650</span><span class="p">,</span> <span class="mi">210</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
@@ -6283,7 +6283,7 @@ Panel(
         <span class="p">{</span><span class="s2">"figure"</span><span class="p">:</span> <span class="n">pollen</span><span class="p">,</span> <span class="s2">"y_axis"</span><span class="p">:</span> <span class="s2">"right"</span><span class="p">},</span>
     <span class="p">],</span>
     <span class="c1"># a log scale on the right value axis only; the left one stays linear</span>
-    <span class="n">scaley_right</span><span class="o">=</span><span class="n">SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
+    <span class="n">scaley_right</span><span class="o">=</span><span class="n">AXIS_SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Climate of Ljubljana"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Month"</span><span class="p">,</span>
     <span class="n">ylabel_left</span><span class="o">=</span><span class="s2">"Precipitation (mm)"</span><span class="p">,</span>
@@ -6293,7 +6293,7 @@ Panel(
     <span class="n">show_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-12">from datachart.constants import SCALE
+<div class="clipboard-copy-txt" id="cell-12">from datachart.constants import AXIS_SCALE
 
 # an illustrative monthly mean pollen concentration in grains/m³
 POLLEN = [4, 12, 180, 1400, 2100, 650, 210, 90, 40, 15, 6, 3]
@@ -6308,7 +6308,7 @@ Panel(
         {"figure": pollen, "y_axis": "right"},
     ],
     # a log scale on the right value axis only; the left one stays linear
-    scaley_right=SCALE.LOG,
+    scaley_right=AXIS_SCALE.LOG,
     title="Climate of Ljubljana",
     xlabel="Month",
     ylabel_left="Precipitation (mm)",

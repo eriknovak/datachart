@@ -5754,7 +5754,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </tr>
 <tr>
 <td style="text-align:left"><code>norm</code></td>
-<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.NORMALIZE"><code>NORMALIZE</code></a></td>
+<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.COLOR_NORM"><code>COLOR_NORM</code></a></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>value_format</code></td>
@@ -6317,7 +6317,7 @@ Heatmap(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><strong>Normalization.</strong> <code>norm</code> changes how the values spread over the 0 to 1 range, with a <a href="../../../references/constants/#datachart.constants.NORMALIZE">NORMALIZE</a> member: <code>LINEAR</code> (the default); <code>LOG</code>, for positive values spanning orders of magnitude, where zero and negative values have no logarithm and are left blank; <code>SYMLOG</code> and <code>ASINH</code>, which are linear near zero and logarithmic beyond, so they keep zeros and signed values; and <code>LOGIT</code>, for proportions strictly between 0 and 1. It rescales the colors, not an axis, unlike the <code>scalex</code> and <code>scaley</code> of the other charts.</p>
+<p><strong>Normalization.</strong> <code>norm</code> changes how the values spread over the 0 to 1 range, with a <a href="../../../references/constants/#datachart.constants.COLOR_NORM">COLOR_NORM</a> member: <code>LINEAR</code> (the default); <code>LOG</code>, for positive values spanning orders of magnitude, where zero and negative values have no logarithm and are left blank; <code>SYMLOG</code> and <code>ASINH</code>, which are linear near zero and logarithmic beyond, so they keep zeros and signed values; and <code>LOGIT</code>, for proportions strictly between 0 and 1. It rescales the colors, not an axis, unlike the <code>scalex</code> and <code>scaley</code> of the other charts.</p>
 <p>A non-linear normalization is honest when the question is about ratios rather than differences, or when a few large values would otherwise flatten everything else, and the colorbar must stay on so the reader can see the scale is not linear. The <code>precipitation</code> table is such a case: Singapore's 290 mm December claims the dark end of a linear colormap, and every other city's wet and dry seasons fade into the same pale shades. A log normalization would blank Cairo's rainless months; <code>SYMLOG</code> keeps them and spreads the low end, so Cairo's wet winter and dry summer show, at the price of compressing the differences between the wetter cities. The colorbar makes that trade visible, which is why it stays on.</p>
 </div>
 </div>
@@ -6341,9 +6341,9 @@ Heatmap(
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">NORMALIZE</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">COLOR_NORM</span>
 
-<span class="k">for</span> <span class="n">norm</span> <span class="ow">in</span> <span class="p">[</span><span class="n">NORMALIZE</span><span class="o">.</span><span class="n">LINEAR</span><span class="p">,</span> <span class="n">NORMALIZE</span><span class="o">.</span><span class="n">SYMLOG</span><span class="p">]:</span>
+<span class="k">for</span> <span class="n">norm</span> <span class="ow">in</span> <span class="p">[</span><span class="n">COLOR_NORM</span><span class="o">.</span><span class="n">LINEAR</span><span class="p">,</span> <span class="n">COLOR_NORM</span><span class="o">.</span><span class="n">SYMLOG</span><span class="p">]:</span>
     <span class="n">Heatmap</span><span class="p">(</span>
         <span class="n">data</span><span class="o">=</span><span class="n">precipitation</span><span class="p">,</span>
         <span class="c1"># how the values spread over the colormap</span>
@@ -6357,9 +6357,9 @@ Heatmap(
         <span class="n">value_format</span><span class="o">=</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">INTEGER</span><span class="p">,</span>
     <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-11">from datachart.constants import NORMALIZE
+<div class="clipboard-copy-txt" id="cell-11">from datachart.constants import COLOR_NORM
 
-for norm in [NORMALIZE.LINEAR, NORMALIZE.SYMLOG]:
+for norm in [COLOR_NORM.LINEAR, COLOR_NORM.SYMLOG]:
     Heatmap(
         data=precipitation,
         # how the values spread over the colormap
@@ -6402,8 +6402,8 @@ for norm in [NORMALIZE.LINEAR, NORMALIZE.SYMLOG]:
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><strong>Centered normalization.</strong> Values that carry a sign—a correlation, a difference, an anomaly—have one value that means "neither": usually zero. <code>norm=NORMALIZE.CENTERED</code> holds that value in the middle of the colormap and runs the same distance to each side of it, so a cell's hue is its sign and its depth is its size. The colormap it draws in is the theme's <code>plot_heatmap_cmap_diverging</code>, not the sequential <code>plot_heatmap_cmap</code> every other norm uses, so the centring and the colors that show it arrive together and follow a theme switch; a <code>plot_heatmap_cmap</code> in the chart's own <code>style</code> still wins if you want to name one yourself.</p>
-<p><code>vcenter</code> moves the middle off zero when the neutral value is elsewhere—a baseline accuracy, last year's average. <code>vmin</code> and <code>vmax</code> still pin the ends, folded into the larger distance from the centre so the scale stays symmetric. When the two sides genuinely differ in reach and you want both fully used, <code>NORMALIZE.TWOSLOPE</code> keeps <code>vmin</code> and <code>vmax</code> where you put them and stretches each side to the centre separately; it is the honest choice only when you say so in the caption, because equal color steps then mean different value steps on either side.</p>
+<p><strong>Centered normalization.</strong> Values that carry a sign—a correlation, a difference, an anomaly—have one value that means "neither": usually zero. <code>norm=COLOR_NORM.CENTERED</code> holds that value in the middle of the colormap and runs the same distance to each side of it, so a cell's hue is its sign and its depth is its size. The colormap it draws in is the theme's <code>plot_heatmap_cmap_diverging</code>, not the sequential <code>plot_heatmap_cmap</code> every other norm uses, so the centring and the colors that show it arrive together and follow a theme switch; a <code>plot_heatmap_cmap</code> in the chart's own <code>style</code> still wins if you want to name one yourself.</p>
+<p><code>vcenter</code> moves the middle off zero when the neutral value is elsewhere—a baseline accuracy, last year's average. <code>vmin</code> and <code>vmax</code> still pin the ends, folded into the larger distance from the centre so the scale stays symmetric. When the two sides genuinely differ in reach and you want both fully used, <code>COLOR_NORM.TWOSLOPE</code> keeps <code>vmin</code> and <code>vmax</code> where you put them and stretches each side to the centre separately; it is the honest choice only when you say so in the caption, because equal color steps then mean different value steps on either side.</p>
 <p>The temperatures below are centered on 0 °C, then on 18 °C, a room-temperature comfort baseline: the same table, two different questions.</p>
 </div>
 </div>
@@ -6431,7 +6431,7 @@ for norm in [NORMALIZE.LINEAR, NORMALIZE.SYMLOG]:
     <span class="n">Heatmap</span><span class="p">(</span>
         <span class="n">data</span><span class="o">=</span><span class="n">temperatures</span><span class="p">,</span>
         <span class="c1"># the middle of the theme's diverging colormap sits on `vcenter`</span>
-        <span class="n">norm</span><span class="o">=</span><span class="n">NORMALIZE</span><span class="o">.</span><span class="n">CENTERED</span><span class="p">,</span>
+        <span class="n">norm</span><span class="o">=</span><span class="n">COLOR_NORM</span><span class="o">.</span><span class="n">CENTERED</span><span class="p">,</span>
         <span class="n">vcenter</span><span class="o">=</span><span class="n">centre</span><span class="p">,</span>
         <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Mean monthly temperature (</span><span class="se">\u00b0</span><span class="s2">C), centered on </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
         <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Month"</span><span class="p">,</span>
@@ -6446,7 +6446,7 @@ for norm in [NORMALIZE.LINEAR, NORMALIZE.SYMLOG]:
     Heatmap(
         data=temperatures,
         # the middle of the theme's diverging colormap sits on `vcenter`
-        norm=NORMALIZE.CENTERED,
+        norm=COLOR_NORM.CENTERED,
         vcenter=centre,
         title=f"Mean monthly temperature (\u00b0C), centered on {label}",
         xlabel="Month",
@@ -6747,7 +6747,7 @@ Heatmap(
     <span class="n">subtitle</span><span class="o">=</span><span class="p">[</span><span class="s2">"Temperature (°C)"</span><span class="p">,</span> <span class="s2">"Precipitation (mm)"</span><span class="p">],</span>
     <span class="c1"># a colormap and a normalization per table</span>
     <span class="n">style</span><span class="o">=</span><span class="p">[{</span><span class="s2">"plot_heatmap_cmap"</span><span class="p">:</span> <span class="n">COLORS</span><span class="o">.</span><span class="n">YlOrRd</span><span class="p">},</span> <span class="p">{</span><span class="s2">"plot_heatmap_cmap"</span><span class="p">:</span> <span class="n">COLORS</span><span class="o">.</span><span class="n">Blues</span><span class="p">}],</span>
-    <span class="n">norm</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">NORMALIZE</span><span class="o">.</span><span class="n">SYMLOG</span><span class="p">],</span>
+    <span class="n">norm</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">COLOR_NORM</span><span class="o">.</span><span class="n">SYMLOG</span><span class="p">],</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"The climate of six cities"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Month"</span><span class="p">,</span>
     <span class="n">ylabel</span><span class="o">=</span><span class="s2">"City"</span><span class="p">,</span>
@@ -6763,7 +6763,7 @@ Heatmap(
     subtitle=["Temperature (°C)", "Precipitation (mm)"],
     # a colormap and a normalization per table
     style=[{"plot_heatmap_cmap": COLORS.YlOrRd}, {"plot_heatmap_cmap": COLORS.Blues}],
-    norm=[None, NORMALIZE.SYMLOG],
+    norm=[None, COLOR_NORM.SYMLOG],
     title="The climate of six cities",
     xlabel="Month",
     ylabel="City",
@@ -6823,7 +6823,7 @@ Heatmap(
     <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">temperatures</span><span class="p">,</span> <span class="n">precipitation</span><span class="p">],</span>
     <span class="n">subtitle</span><span class="o">=</span><span class="p">[</span><span class="s2">"Temperature (°C)"</span><span class="p">,</span> <span class="s2">"Precipitation (mm)"</span><span class="p">],</span>
     <span class="n">style</span><span class="o">=</span><span class="p">[{</span><span class="s2">"plot_heatmap_cmap"</span><span class="p">:</span> <span class="n">COLORS</span><span class="o">.</span><span class="n">YlOrRd</span><span class="p">},</span> <span class="p">{</span><span class="s2">"plot_heatmap_cmap"</span><span class="p">:</span> <span class="n">COLORS</span><span class="o">.</span><span class="n">Blues</span><span class="p">}],</span>
-    <span class="n">norm</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">NORMALIZE</span><span class="o">.</span><span class="n">SYMLOG</span><span class="p">],</span>
+    <span class="n">norm</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">COLOR_NORM</span><span class="o">.</span><span class="n">SYMLOG</span><span class="p">],</span>
     <span class="c1"># one format per table</span>
     <span class="n">value_format</span><span class="o">=</span><span class="p">[</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">DECIMAL</span><span class="p">,</span> <span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">INTEGER</span><span class="p">],</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"The climate of six cities"</span><span class="p">,</span>
@@ -6841,7 +6841,7 @@ Heatmap(
     data=[temperatures, precipitation],
     subtitle=["Temperature (°C)", "Precipitation (mm)"],
     style=[{"plot_heatmap_cmap": COLORS.YlOrRd}, {"plot_heatmap_cmap": COLORS.Blues}],
-    norm=[None, NORMALIZE.SYMLOG],
+    norm=[None, COLOR_NORM.SYMLOG],
     # one format per table
     value_format=[VALUE_FORMAT.DECIMAL, VALUE_FORMAT.INTEGER],
     title="The climate of six cities",
@@ -7119,7 +7119,7 @@ Heatmap(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="example-1-how-do-penguin-measurements-move-together-centered-norm-half-a-matrix-and-a-note">Example 1: How Do Penguin Measurements Move Together? (Centered Norm, Half a Matrix, and a Note)<a class="anchor-link" href="#example-1-how-do-penguin-measurements-move-together-centered-norm-half-a-matrix-and-a-note">¶</a></h3><p><code>correlations</code> holds the Pearson correlation between four body measurements (bill length, bill depth, flipper length and body mass) of the 342 penguins in the <a href="https://allisonhorst.github.io/palmerpenguins/">Palmer penguins</a> dataset (CC0). A correlation matrix is symmetric, so the upper triangle repeats the lower one and the diagonal is 1.00 by definition: both are left <code>None</code>, which draws them blank and leaves six cells that each say something. A correlation is also signed, so <code>norm=NORMALIZE.CENTERED</code> puts zero in the middle of the theme's diverging colormap and gives equally strong correlations of either sign equally dark shades, without naming a colormap or a range by hand. The variables label both axes, square cells keep the matrix square, and the cells carry the coefficients. One cell is a known trap: bill length and depth correlate negatively across all penguins but positively within each species, a case of Simpson's paradox, and a note says so.</p>
+<h3 id="example-1-how-do-penguin-measurements-move-together-centered-norm-half-a-matrix-and-a-note">Example 1: How Do Penguin Measurements Move Together? (Centered Norm, Half a Matrix, and a Note)<a class="anchor-link" href="#example-1-how-do-penguin-measurements-move-together-centered-norm-half-a-matrix-and-a-note">¶</a></h3><p><code>correlations</code> holds the Pearson correlation between four body measurements (bill length, bill depth, flipper length and body mass) of the 342 penguins in the <a href="https://allisonhorst.github.io/palmerpenguins/">Palmer penguins</a> dataset (CC0). A correlation matrix is symmetric, so the upper triangle repeats the lower one and the diagonal is 1.00 by definition: both are left <code>None</code>, which draws them blank and leaves six cells that each say something. A correlation is also signed, so <code>norm=COLOR_NORM.CENTERED</code> puts zero in the middle of the theme's diverging colormap and gives equally strong correlations of either sign equally dark shades, without naming a colormap or a range by hand. The variables label both axes, square cells keep the matrix square, and the cells carry the coefficients. One cell is a known trap: bill length and depth correlate negatively across all penguins but positively within each species, a case of Simpson's paradox, and a note says so.</p>
 </div>
 </div>
 </div>
@@ -7148,7 +7148,7 @@ Heatmap(
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">Heatmap</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">correlations</span><span class="p">,</span>
     <span class="c1"># zero sits in the middle of the theme's diverging colormap</span>
-    <span class="n">norm</span><span class="o">=</span><span class="n">NORMALIZE</span><span class="o">.</span><span class="n">CENTERED</span><span class="p">,</span>
+    <span class="n">norm</span><span class="o">=</span><span class="n">COLOR_NORM</span><span class="o">.</span><span class="n">CENTERED</span><span class="p">,</span>
     <span class="n">vmin</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">vmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">style</span><span class="o">=</span><span class="p">{</span>
@@ -7175,7 +7175,7 @@ Heatmap(
 <div class="clipboard-copy-txt" id="cell-21">Heatmap(
     data=correlations,
     # zero sits in the middle of the theme's diverging colormap
-    norm=NORMALIZE.CENTERED,
+    norm=COLOR_NORM.CENTERED,
     vmin=-1,
     vmax=1,
     style={

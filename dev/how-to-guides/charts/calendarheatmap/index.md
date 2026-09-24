@@ -63,7 +63,7 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `figsize`                                                       | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                                                                                                                                                                                                                                                         |
 | `aspect_ratio`                                                  | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                                                                                                                                                 |
 | `value_format`                                                  | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                                                                                                                                                 |
-| `norm`                                                          | [`NORMALIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.NORMALIZE)                                                                                                                                                                                                                                                       |
+| `norm`                                                          | [`COLOR_NORM`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLOR_NORM)                                                                                                                                                                                                                                                     |
 | `colorbar={"location": ..., "format": ..., "orientation": ...}` | [`COLORBAR_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORBAR_LOCATION), [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION) |
 
 The full list of style attributes is in the [datachart.typings.CalendarHeatmapStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/calendarheatmap/#datachart.typings.CalendarHeatmapStyleAttrs) type; the full list of parameters is in the [datachart.charts.CalendarHeatmap](https://eriknovak.github.io/datachart/dev/references/charts/calendarheatmap/#datachart.charts.CalendarHeatmap) reference.
@@ -193,21 +193,21 @@ CalendarHeatmap(
 ).show()
 ```
 
-When the values are skewed, a few very busy days above many quiet ones, `norm` changes how they spread over the 0–1 range: `"linear"` (the default), `"log"`, `"symlog"`, `"asinh"`, or `"logit"`, as the [NORMALIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.NORMALIZE) constants name them. `"log"` and `"asinh"` give the low values more of the colormap, so the quiet days stop looking alike; the colorbar ticks show the stretched scale.
+When the values are skewed, a few very busy days above many quiet ones, `norm` changes how they spread over the 0–1 range: `"linear"` (the default), `"log"`, `"symlog"`, `"asinh"`, or `"logit"`, as the [COLOR_NORM](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLOR_NORM) constants name them. `"log"` and `"asinh"` give the low values more of the colormap, so the quiet days stop looking alike; the colorbar ticks show the stretched scale.
 
 ```
-from datachart.constants import NORMALIZE
+from datachart.constants import COLOR_NORM
 
 CalendarHeatmap(
     data=cyclists,
     # spread the quiet days over more of the colormap
-    norm=NORMALIZE.LOG,
+    norm=COLOR_NORM.LOG,
     title="Cyclists counted per day, 2024",
     show_colorbars=True,
 ).show()
 ```
 
-A daily series is often read as a departure from something rather than as a level: how far above or below the usual a day ran. `norm=NORMALIZE.CENTERED` is for that shape. It holds `vcenter` (zero by default) in the middle of the theme's diverging colormap and runs the same distance to each side, so a day above the baseline and a day equally far below get the same depth in opposite hues, and the neutral middle is exactly the baseline. It also switches the cells from the theme's sequential colormap to its diverging one, `plot_heatmap_cmap_diverging`, which the calendar inherits like the sequential map; a `plot_calendar_heatmap_cmap` in the chart's own `style` still wins.
+A daily series is often read as a departure from something rather than as a level: how far above or below the usual a day ran. `norm=COLOR_NORM.CENTERED` is for that shape. It holds `vcenter` (zero by default) in the middle of the theme's diverging colormap and runs the same distance to each side, so a day above the baseline and a day equally far below get the same depth in opposite hues, and the neutral middle is exactly the baseline. It also switches the cells from the theme's sequential colormap to its diverging one, `plot_heatmap_cmap_diverging`, which the calendar inherits like the sequential map; a `plot_calendar_heatmap_cmap` in the chart's own `style` still wins.
 
 Subtracting the year's mean from every count turns the cyclist counts into such a series. Winter reads brown, the summer peak purple, and the weekends stand out as the quiet days inside every week.
 
@@ -222,7 +222,7 @@ anomaly = {
 CalendarHeatmap(
     data=anomaly,
     # zero, the year's mean, sits in the middle of the diverging colormap
-    norm=NORMALIZE.CENTERED,
+    norm=COLOR_NORM.CENTERED,
     title="Cyclists per day against the 2024 mean",
     show_colorbars=True,
     colorbar={"label": "Departure from the mean"},
@@ -375,7 +375,7 @@ The examples below put the features above to work, each one answering a question
 
 ### Example 1: When Does the Work Get Done? (Sunday Weeks, a Custom Colormap, No Colorbar)
 
-`contributions` holds the number of commits on each day of 2025 by one illustrative developer: a few commits on most weekdays, rarely any at the weekend, and a burst of them in two release weeks in March and September. The calendar is laid out like the GitHub contributions graph, because that is how developers read commit activity: the weeks start on Sunday, the colormap is GitHub's green scale passed as a list of hex colors, the month separators are off, and there is no colorbar, since the graph is read by pattern rather than by value. The release weeks would drown the everyday commits on a linear colormap, so `NORMALIZE.ASINH` spreads the low counts over the greens. The answer is in the rows: the work happens Monday to Friday, and the two dark columns are the releases.
+`contributions` holds the number of commits on each day of 2025 by one illustrative developer: a few commits on most weekdays, rarely any at the weekend, and a burst of them in two release weeks in March and September. The calendar is laid out like the GitHub contributions graph, because that is how developers read commit activity: the weeks start on Sunday, the colormap is GitHub's green scale passed as a list of hex colors, the month separators are off, and there is no colorbar, since the graph is read by pattern rather than by value. The release weeks would drown the everyday commits on a linear colormap, so `COLOR_NORM.ASINH` spreads the low counts over the greens. The answer is in the rows: the work happens Monday to Friday, and the two dark columns are the releases.
 
 ```
 # the green scale of the GitHub contributions graph, from no commits to many
@@ -389,7 +389,7 @@ CalendarHeatmap(
         "plot_calendar_heatmap_month_line_width": 0,
     },
     # spread the everyday counts over the greens despite the release weeks
-    norm=NORMALIZE.ASINH,
+    norm=COLOR_NORM.ASINH,
     week_start=CALENDAR_WEEKDAY.SUNDAY,
     title=f"Contributions in {YEAR}",
 ).show()

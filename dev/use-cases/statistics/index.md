@@ -20,7 +20,7 @@ from datachart.constants import (
     ASPECT_RATIO,
     FIG_SIZE,
     LINE_DRAW_STYLE,
-    NORMALIZE,
+    COLOR_NORM,
     SCATTER_MATRIX_DIAGONAL,
     SHOW_GRID,
     VALUE_FORMAT,
@@ -222,7 +222,7 @@ The observed difference sits in the middle of the hill, as it must, since the bo
 
 ### Which measurements move together?
 
-With four measurements there are six pairs, and reading six numbers out of a paragraph is what a correlation matrix exists to prevent. The matrix is a square grid of values, so it is a [heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/index.md). A correlation is signed, though, and a sequential colormap run from the smallest value would put zero on an arbitrary shade. `norm=NORMALIZE.CENTERED` pins zero to the middle of the theme's diverging colormap and runs the same distance to each side, so a cell's hue is its sign and its depth is its strength.
+With four measurements there are six pairs, and reading six numbers out of a paragraph is what a correlation matrix exists to prevent. The matrix is a square grid of values, so it is a [heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/index.md). A correlation is signed, though, and a sequential colormap run from the smallest value would put zero on an arbitrary shade. `norm=COLOR_NORM.CENTERED` pins zero to the middle of the theme's diverging colormap and runs the same distance to each side, so a cell's hue is its sign and its depth is its strength.
 
 A correlation matrix is also symmetric, which means half of it is decoration. A `None` in `z` leaves a cell blank, so the upper triangle goes; the diagonal of ones goes with the first row and the last column, which hold nothing once it does, and the six numbers that carry information remain.
 
@@ -247,7 +247,7 @@ correlation_figure = Heatmap(
     {"x": COLUMN_NAMES, "y": ROW_NAMES, "z": correlations},
     title="Flipper length and body mass are near-interchangeable",
     # zero in the middle of the diverging colormap, equal reach each way
-    norm=NORMALIZE.CENTERED,
+    norm=COLOR_NORM.CENTERED,
     show_values=True,
     show_colorbars=True,
     value_format=VALUE_FORMAT.DECIMAL_2,

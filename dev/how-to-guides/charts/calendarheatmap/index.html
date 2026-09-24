@@ -5771,7 +5771,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </tr>
 <tr>
 <td style="text-align:left"><code>norm</code></td>
-<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.NORMALIZE"><code>NORMALIZE</code></a></td>
+<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.COLOR_NORM"><code>COLOR_NORM</code></a></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>colorbar={"location": ..., "format": ..., "orientation": ...}</code></td>
@@ -6282,7 +6282,7 @@ CalendarHeatmap(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>When the values are skewed, a few very busy days above many quiet ones, <code>norm</code> changes how they spread over the 0–1 range: <code>"linear"</code> (the default), <code>"log"</code>, <code>"symlog"</code>, <code>"asinh"</code>, or <code>"logit"</code>, as the <a href="../../../references/constants/#datachart.constants.NORMALIZE">NORMALIZE</a> constants name them. <code>"log"</code> and <code>"asinh"</code> give the low values more of the colormap, so the quiet days stop looking alike; the colorbar ticks show the stretched scale.</p>
+<p>When the values are skewed, a few very busy days above many quiet ones, <code>norm</code> changes how they spread over the 0–1 range: <code>"linear"</code> (the default), <code>"log"</code>, <code>"symlog"</code>, <code>"asinh"</code>, or <code>"logit"</code>, as the <a href="../../../references/constants/#datachart.constants.COLOR_NORM">COLOR_NORM</a> constants name them. <code>"log"</code> and <code>"asinh"</code> give the low values more of the colormap, so the quiet days stop looking alike; the colorbar ticks show the stretched scale.</p>
 </div>
 </div>
 </div>
@@ -6305,22 +6305,22 @@ CalendarHeatmap(
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">NORMALIZE</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">COLOR_NORM</span>
 
 <span class="n">CalendarHeatmap</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">cyclists</span><span class="p">,</span>
     <span class="c1"># spread the quiet days over more of the colormap</span>
-    <span class="n">norm</span><span class="o">=</span><span class="n">NORMALIZE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
+    <span class="n">norm</span><span class="o">=</span><span class="n">COLOR_NORM</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Cyclists counted per day, 2024"</span><span class="p">,</span>
     <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-11">from datachart.constants import NORMALIZE
+<div class="clipboard-copy-txt" id="cell-11">from datachart.constants import COLOR_NORM
 
 CalendarHeatmap(
     data=cyclists,
     # spread the quiet days over more of the colormap
-    norm=NORMALIZE.LOG,
+    norm=COLOR_NORM.LOG,
     title="Cyclists counted per day, 2024",
     show_colorbars=True,
 ).show()</div>
@@ -6348,7 +6348,7 @@ CalendarHeatmap(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>A daily series is often read as a departure from something rather than as a level: how far above or below the usual a day ran. <code>norm=NORMALIZE.CENTERED</code> is for that shape. It holds <code>vcenter</code> (zero by default) in the middle of the theme's diverging colormap and runs the same distance to each side, so a day above the baseline and a day equally far below get the same depth in opposite hues, and the neutral middle is exactly the baseline. It also switches the cells from the theme's sequential colormap to its diverging one, <code>plot_heatmap_cmap_diverging</code>, which the calendar inherits like the sequential map; a <code>plot_calendar_heatmap_cmap</code> in the chart's own <code>style</code> still wins.</p>
+<p>A daily series is often read as a departure from something rather than as a level: how far above or below the usual a day ran. <code>norm=COLOR_NORM.CENTERED</code> is for that shape. It holds <code>vcenter</code> (zero by default) in the middle of the theme's diverging colormap and runs the same distance to each side, so a day above the baseline and a day equally far below get the same depth in opposite hues, and the neutral middle is exactly the baseline. It also switches the cells from the theme's sequential colormap to its diverging one, <code>plot_heatmap_cmap_diverging</code>, which the calendar inherits like the sequential map; a <code>plot_calendar_heatmap_cmap</code> in the chart's own <code>style</code> still wins.</p>
 <p>Subtracting the year's mean from every count turns the cyclist counts into such a series. Winter reads brown, the summer peak purple, and the weekends stand out as the quiet days inside every week.</p>
 </div>
 </div>
@@ -6382,7 +6382,7 @@ CalendarHeatmap(
 <span class="n">CalendarHeatmap</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">anomaly</span><span class="p">,</span>
     <span class="c1"># zero, the year's mean, sits in the middle of the diverging colormap</span>
-    <span class="n">norm</span><span class="o">=</span><span class="n">NORMALIZE</span><span class="o">.</span><span class="n">CENTERED</span><span class="p">,</span>
+    <span class="n">norm</span><span class="o">=</span><span class="n">COLOR_NORM</span><span class="o">.</span><span class="n">CENTERED</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Cyclists per day against the 2024 mean"</span><span class="p">,</span>
     <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">colorbar</span><span class="o">=</span><span class="p">{</span><span class="s2">"label"</span><span class="p">:</span> <span class="s2">"Departure from the mean"</span><span class="p">},</span>
@@ -6398,7 +6398,7 @@ anomaly = {
 CalendarHeatmap(
     data=anomaly,
     # zero, the year's mean, sits in the middle of the diverging colormap
-    norm=NORMALIZE.CENTERED,
+    norm=COLOR_NORM.CENTERED,
     title="Cyclists per day against the 2024 mean",
     show_colorbars=True,
     colorbar={"label": "Departure from the mean"},
@@ -6962,7 +6962,7 @@ figure.show()</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="example-1-when-does-the-work-get-done-sunday-weeks-a-custom-colormap-no-colorbar">Example 1: When Does the Work Get Done? (Sunday Weeks, a Custom Colormap, No Colorbar)<a class="anchor-link" href="#example-1-when-does-the-work-get-done-sunday-weeks-a-custom-colormap-no-colorbar">¶</a></h3><p><code>contributions</code> holds the number of commits on each day of 2025 by one illustrative developer: a few commits on most weekdays, rarely any at the weekend, and a burst of them in two release weeks in March and September. The calendar is laid out like the GitHub contributions graph, because that is how developers read commit activity: the weeks start on Sunday, the colormap is GitHub's green scale passed as a list of hex colors, the month separators are off, and there is no colorbar, since the graph is read by pattern rather than by value. The release weeks would drown the everyday commits on a linear colormap, so <code>NORMALIZE.ASINH</code> spreads the low counts over the greens. The answer is in the rows: the work happens Monday to Friday, and the two dark columns are the releases.</p>
+<h3 id="example-1-when-does-the-work-get-done-sunday-weeks-a-custom-colormap-no-colorbar">Example 1: When Does the Work Get Done? (Sunday Weeks, a Custom Colormap, No Colorbar)<a class="anchor-link" href="#example-1-when-does-the-work-get-done-sunday-weeks-a-custom-colormap-no-colorbar">¶</a></h3><p><code>contributions</code> holds the number of commits on each day of 2025 by one illustrative developer: a few commits on most weekdays, rarely any at the weekend, and a burst of them in two release weeks in March and September. The calendar is laid out like the GitHub contributions graph, because that is how developers read commit activity: the weeks start on Sunday, the colormap is GitHub's green scale passed as a list of hex colors, the month separators are off, and there is no colorbar, since the graph is read by pattern rather than by value. The release weeks would drown the everyday commits on a linear colormap, so <code>COLOR_NORM.ASINH</code> spreads the low counts over the greens. The answer is in the rows: the work happens Monday to Friday, and the two dark columns are the releases.</p>
 </div>
 </div>
 </div>
@@ -6999,7 +6999,7 @@ figure.show()</div>
         <span class="s2">"plot_calendar_heatmap_month_line_width"</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="c1"># spread the everyday counts over the greens despite the release weeks</span>
-    <span class="n">norm</span><span class="o">=</span><span class="n">NORMALIZE</span><span class="o">.</span><span class="n">ASINH</span><span class="p">,</span>
+    <span class="n">norm</span><span class="o">=</span><span class="n">COLOR_NORM</span><span class="o">.</span><span class="n">ASINH</span><span class="p">,</span>
     <span class="n">week_start</span><span class="o">=</span><span class="n">CALENDAR_WEEKDAY</span><span class="o">.</span><span class="n">SUNDAY</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Contributions in </span><span class="si">{</span><span class="n">YEAR</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
@@ -7015,7 +7015,7 @@ CalendarHeatmap(
         "plot_calendar_heatmap_month_line_width": 0,
     },
     # spread the everyday counts over the greens despite the release weeks
-    norm=NORMALIZE.ASINH,
+    norm=COLOR_NORM.ASINH,
     week_start=CALENDAR_WEEKDAY.SUNDAY,
     title=f"Contributions in {YEAR}",
 ).show()</div>

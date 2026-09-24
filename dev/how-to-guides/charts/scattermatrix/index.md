@@ -130,7 +130,7 @@ ScatterMatrix(
 ).show()
 ```
 
-When the distributions are not the question, `SCATTER_MATRIX_DIAGONAL.NONE` leaves the diagonal blank, which suits a matrix whose readers only care about the pairs. The tick labels and variable names move to the outermost cell that is drawn:
+When the distributions are not the question, `SCATTER_MATRIX_DIAGONAL.BLANK` leaves the diagonal blank, which suits a matrix whose readers only care about the pairs. The tick labels and variable names move to the outermost cell that is drawn:
 
 ```
 ScatterMatrix(
@@ -138,7 +138,7 @@ ScatterMatrix(
     dimensions=BILL_AND_MASS,
     hue="species",
     # nothing on the diagonal
-    diagonal=SCATTER_MATRIX_DIAGONAL.NONE,
+    diagonal=SCATTER_MATRIX_DIAGONAL.BLANK,
 ).show()
 ```
 
@@ -163,7 +163,7 @@ ScatterMatrix(
     hue="species",
     lower_only=True,
     # no diagonal: the empty top row and right column go
-    diagonal=SCATTER_MATRIX_DIAGONAL.NONE,
+    diagonal=SCATTER_MATRIX_DIAGONAL.BLANK,
 ).show()
 ```
 
@@ -378,7 +378,7 @@ ScatterMatrix(
     data=runs,
     # only the pairs: no upper cells, no diagonal
     lower_only=True,
-    diagonal=SCATTER_MATRIX_DIAGONAL.NONE,
+    diagonal=SCATTER_MATRIX_DIAGONAL.BLANK,
     # the trend of each pair
     show_regression=True,
     title="Twenty training runs",

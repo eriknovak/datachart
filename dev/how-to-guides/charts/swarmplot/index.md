@@ -69,7 +69,7 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `value_format`                               | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                           |
 | `aspect_ratio`                               | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                           |
 | `orientation`                                | [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)                                                                                                                             |
-| `scaley`                                     | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                         |
+| `scaley`                                     | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                               |
 | `yticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
 
 The full list of style attributes is in the [datachart.typings.SwarmStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/swarmplot/#datachart.typings.SwarmStyleAttrs) type; the full list of parameters is in the [datachart.charts.SwarmPlot](https://eriknovak.github.io/datachart/dev/references/charts/swarmplot/#datachart.charts.SwarmPlot) reference.
@@ -542,10 +542,10 @@ SwarmPlot(
 
 ### Logarithmic scale
 
-Some values span orders of magnitude, and on a linear axis the small ones pile up at the bottom. `scaley` takes a [SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE) member, and the swarm packs the points on the scaled axis, so they stay apart. `days_in_office`, defined in a hidden cell, holds the length of each completed presidency in days, from William Henry Harrison's 31 days to Franklin D. Roosevelt's 4,422 (the current presidency is left out). The log axis spreads the short presidencies, cut short by death or resignation, as clearly as the long ones, and the value labels name the extremes of each era.
+Some values span orders of magnitude, and on a linear axis the small ones pile up at the bottom. `scaley` takes a [AXIS_SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE) member, and the swarm packs the points on the scaled axis, so they stay apart. `days_in_office`, defined in a hidden cell, holds the length of each completed presidency in days, from William Henry Harrison's 31 days to Franklin D. Roosevelt's 4,422 (the current presidency is left out). The log axis spreads the short presidencies, cut short by death or resignation, as clearly as the long ones, and the value labels name the extremes of each era.
 
 ```
-from datachart.constants import SCALE
+from datachart.constants import AXIS_SCALE
 
 SwarmPlot(
     data=days_in_office,
@@ -556,7 +556,7 @@ SwarmPlot(
     show_grid=SHOW_GRID.Y,
     show_values=True,
     # draw the value axis on a logarithmic scale
-    scaley=SCALE.LOG,
+    scaley=AXIS_SCALE.LOG,
     # ticks at readable round numbers
     yticks=[30, 100, 300, 1000, 3000],
     ymin=20,
@@ -607,7 +607,7 @@ SwarmPlot(
     # small, translucent points
     style={"plot_swarm_size": 6, "plot_swarm_alpha": 0.4, "plot_swarm_edge_width": 0},
     # the long tail reads at the same resolution as the bulk
-    scaley=SCALE.LOG,
+    scaley=AXIS_SCALE.LOG,
     # the SLA, and the requests that breach it
     hlines={
         "y": SLA_MS,

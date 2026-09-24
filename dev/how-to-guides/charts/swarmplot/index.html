@@ -5840,7 +5840,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </tr>
 <tr>
 <td style="text-align:left"><code>scaley</code></td>
-<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.SCALE"><code>SCALE</code></a></td>
+<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.AXIS_SCALE"><code>AXIS_SCALE</code></a></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>yticks_format</code></td>
@@ -7453,7 +7453,7 @@ SwarmPlot(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="logarithmic-scale">Logarithmic scale<a class="anchor-link" href="#logarithmic-scale">¶</a></h3><p>Some values span orders of magnitude, and on a linear axis the small ones pile up at the bottom. <code>scaley</code> takes a <a href="../../../references/constants/#datachart.constants.SCALE">SCALE</a> member, and the swarm packs the points on the scaled axis, so they stay apart. <code>days_in_office</code>, defined in a hidden cell, holds the length of each completed presidency in days, from William Henry Harrison's 31 days to Franklin D. Roosevelt's 4,422 (the current presidency is left out). The log axis spreads the short presidencies, cut short by death or resignation, as clearly as the long ones, and the value labels name the extremes of each era.</p>
+<h3 id="logarithmic-scale">Logarithmic scale<a class="anchor-link" href="#logarithmic-scale">¶</a></h3><p>Some values span orders of magnitude, and on a linear axis the small ones pile up at the bottom. <code>scaley</code> takes a <a href="../../../references/constants/#datachart.constants.AXIS_SCALE">AXIS_SCALE</a> member, and the swarm packs the points on the scaled axis, so they stay apart. <code>days_in_office</code>, defined in a hidden cell, holds the length of each completed presidency in days, from William Henry Harrison's 31 days to Franklin D. Roosevelt's 4,422 (the current presidency is left out). The log axis spreads the short presidencies, cut short by death or resignation, as clearly as the long ones, and the value labels name the extremes of each era.</p>
 </div>
 </div>
 </div>
@@ -7479,7 +7479,7 @@ SwarmPlot(
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">SCALE</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">AXIS_SCALE</span>
 
 <span class="n">SwarmPlot</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">days_in_office</span><span class="p">,</span>
@@ -7490,13 +7490,13 @@ SwarmPlot(
     <span class="n">show_grid</span><span class="o">=</span><span class="n">SHOW_GRID</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span>
     <span class="n">show_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="c1"># draw the value axis on a logarithmic scale</span>
-    <span class="n">scaley</span><span class="o">=</span><span class="n">SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
+    <span class="n">scaley</span><span class="o">=</span><span class="n">AXIS_SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
     <span class="c1"># ticks at readable round numbers</span>
     <span class="n">yticks</span><span class="o">=</span><span class="p">[</span><span class="mi">30</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">3000</span><span class="p">],</span>
     <span class="n">ymin</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-23">from datachart.constants import SCALE
+<div class="clipboard-copy-txt" id="cell-23">from datachart.constants import AXIS_SCALE
 
 SwarmPlot(
     data=days_in_office,
@@ -7507,7 +7507,7 @@ SwarmPlot(
     show_grid=SHOW_GRID.Y,
     show_values=True,
     # draw the value axis on a logarithmic scale
-    scaley=SCALE.LOG,
+    scaley=AXIS_SCALE.LOG,
     # ticks at readable round numbers
     yticks=[30, 100, 300, 1000, 3000],
     ymin=20,
@@ -7702,7 +7702,7 @@ president_records[:2]</div>
     <span class="c1"># small, translucent points</span>
     <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">"plot_swarm_size"</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="s2">"plot_swarm_alpha"</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span> <span class="s2">"plot_swarm_edge_width"</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
     <span class="c1"># the long tail reads at the same resolution as the bulk</span>
-    <span class="n">scaley</span><span class="o">=</span><span class="n">SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
+    <span class="n">scaley</span><span class="o">=</span><span class="n">AXIS_SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
     <span class="c1"># the SLA, and the requests that breach it</span>
     <span class="n">hlines</span><span class="o">=</span><span class="p">{</span>
         <span class="s2">"y"</span><span class="p">:</span> <span class="n">SLA_MS</span><span class="p">,</span>
@@ -7729,7 +7729,7 @@ president_records[:2]</div>
     # small, translucent points
     style={"plot_swarm_size": 6, "plot_swarm_alpha": 0.4, "plot_swarm_edge_width": 0},
     # the long tail reads at the same resolution as the bulk
-    scaley=SCALE.LOG,
+    scaley=AXIS_SCALE.LOG,
     # the SLA, and the requests that breach it
     hlines={
         "y": SLA_MS,

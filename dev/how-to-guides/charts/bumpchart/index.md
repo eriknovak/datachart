@@ -70,13 +70,13 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `show_grid`                                  | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                                                                                                                                 |
 | `value_format`                               | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                           |
 | `aspect_ratio`                               | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                           |
-| `scalex`                                     | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                         |
+| `scalex`                                     | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                               |
 
 The full list of style attributes is in the [datachart.typings.BumpStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/bumpchart/#datachart.typings.BumpStyleAttrs) type; the full list of parameters is in the [datachart.charts.BumpChart](https://eriknovak.github.io/datachart/dev/references/charts/bumpchart/#datachart.charts.BumpChart) reference.
 
 ### Title, axis labels and ticks
 
-A reader needs to know what is being ranked and by what; `title`, `xlabel` and `ylabel` say it. The period axis gets one tick per period by default. `xticks` picks other positions and `xticklabels` names them, and `xtickrotate` tilts long tick labels out of each other's way. Here the labels spell out that the last step is three years, not ten. `scalex` sets the scale of the period axis with a [SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE) member, which bump charts rarely need.
+A reader needs to know what is being ranked and by what; `title`, `xlabel` and `ylabel` say it. The period axis gets one tick per period by default. `xticks` picks other positions and `xticklabels` names them, and `xtickrotate` tilts long tick labels out of each other's way. Here the labels spell out that the last step is three years, not ten. `scalex` sets the scale of the period axis with a [AXIS_SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE) member, which bump charts rarely need.
 
 ```
 BumpChart(

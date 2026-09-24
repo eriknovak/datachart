@@ -72,7 +72,7 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `value_format`                               | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                           |
 | `bar_mode`                                   | [`BAR_MODE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BAR_MODE)                                                                                                                                   |
 | `sort`                                       | [`SORT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT)                                                                                                                                           |
-| `scaley`                                     | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                         |
+| `scaley`                                     | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                               |
 
 The full lists of style attributes are in the [datachart.typings.LineStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/linechart/#datachart.typings.LineStyleAttrs), [BarStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/barchart/#datachart.typings.BarStyleAttrs), [ScatterStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/scatterchart/#datachart.typings.ScatterStyleAttrs) and [HistStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/histogram/#datachart.typings.HistStyleAttrs) types; the full list of parameters is in the [datachart.charts.RadialChart](https://eriknovak.github.io/datachart/dev/references/charts/radialchart/#datachart.charts.RadialChart) reference.
 
@@ -452,16 +452,16 @@ RadialChart(
 
 ### Radial axis scale
 
-The radial axis is a value axis, and `scaley` changes its scale with a [SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE) member, like the y-axis of a cartesian chart; the angular axis has no scale. A logarithmic radius is for values that span orders of magnitude around the cycle. `lightning_by_month`, defined in a hidden cell, holds the illustrative monthly count of lightning strikes recorded by the station, from a handful in winter to thousands in summer. On a linear radius the winter months would sit on the center; on a log radius starting at `ymin=1` every month is readable. The scatter visual fits here: each count is a point that stands alone, and a line through them would draw a shape that is mostly the scale.
+The radial axis is a value axis, and `scaley` changes its scale with a [AXIS_SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE) member, like the y-axis of a cartesian chart; the angular axis has no scale. A logarithmic radius is for values that span orders of magnitude around the cycle. `lightning_by_month`, defined in a hidden cell, holds the illustrative monthly count of lightning strikes recorded by the station, from a handful in winter to thousands in summer. On a linear radius the winter months would sit on the center; on a log radius starting at `ymin=1` every month is readable. The scatter visual fits here: each count is a point that stands alone, and a line through them would draw a shape that is mostly the scale.
 
 ```
-from datachart.constants import SCALE
+from datachart.constants import AXIS_SCALE
 
 RadialChart(
     data=lightning_by_month,
     mark=RADIAL_TYPE.SCATTER,
     # a log radius: from a handful to thousands on one circle
-    scaley=SCALE.LOG,
+    scaley=AXIS_SCALE.LOG,
     # start the radius at one strike, so the winter counts leave the center
     ymin=1,
     title="Lightning strikes by month",

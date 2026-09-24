@@ -5861,7 +5861,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </tr>
 <tr>
 <td style="text-align:left"><code>scaley</code></td>
-<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.SCALE"><code>SCALE</code></a></td>
+<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.AXIS_SCALE"><code>AXIS_SCALE</code></a></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>yticks_format</code></td>
@@ -7553,7 +7553,7 @@ Grid(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="logarithmic-scale">Logarithmic scale<a class="anchor-link" href="#logarithmic-scale">¶</a></h3><p>Some measurements are strongly right-skewed: most values are small and a few are many times larger, so on a linear axis the bulk of each group is squeezed against the bottom. <code>scaley</code> takes a <a href="../../../references/constants/#datachart.constants.SCALE">SCALE</a> member, and on <code>SCALE.LOG</code> the cloud, the rain and the box all follow the scaled axis. Penguin masses are not skewed, so this example switches dataset: <code>load_times</code>, defined in a hidden cell, holds 150 illustrative page load times (in ms) for each of three page types, drawn from log-normal distributions. On the log scale the three clouds become symmetric and readable, and the tails stay in view.</p>
+<h3 id="logarithmic-scale">Logarithmic scale<a class="anchor-link" href="#logarithmic-scale">¶</a></h3><p>Some measurements are strongly right-skewed: most values are small and a few are many times larger, so on a linear axis the bulk of each group is squeezed against the bottom. <code>scaley</code> takes a <a href="../../../references/constants/#datachart.constants.AXIS_SCALE">AXIS_SCALE</a> member, and on <code>AXIS_SCALE.LOG</code> the cloud, the rain and the box all follow the scaled axis. Penguin masses are not skewed, so this example switches dataset: <code>load_times</code>, defined in a hidden cell, holds 150 illustrative page load times (in ms) for each of three page types, drawn from log-normal distributions. On the log scale the three clouds become symmetric and readable, and the tails stay in view.</p>
 </div>
 </div>
 </div>
@@ -7579,9 +7579,9 @@ Grid(
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">SCALE</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">AXIS_SCALE</span>
 
-<span class="k">for</span> <span class="n">scale</span> <span class="ow">in</span> <span class="p">[</span><span class="n">SCALE</span><span class="o">.</span><span class="n">LINEAR</span><span class="p">,</span> <span class="n">SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">]:</span>
+<span class="k">for</span> <span class="n">scale</span> <span class="ow">in</span> <span class="p">[</span><span class="n">AXIS_SCALE</span><span class="o">.</span><span class="n">LINEAR</span><span class="p">,</span> <span class="n">AXIS_SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">]:</span>
     <span class="n">RaincloudPlot</span><span class="p">(</span>
         <span class="n">data</span><span class="o">=</span><span class="n">load_times</span><span class="p">,</span>
         <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Page load time on the '</span><span class="si">{</span><span class="n">scale</span><span class="si">}</span><span class="s2">' scale"</span><span class="p">,</span>
@@ -7594,9 +7594,9 @@ Grid(
         <span class="n">scaley</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span>
     <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-25">from datachart.constants import SCALE
+<div class="clipboard-copy-txt" id="cell-25">from datachart.constants import AXIS_SCALE
 
-for scale in [SCALE.LINEAR, SCALE.LOG]:
+for scale in [AXIS_SCALE.LINEAR, AXIS_SCALE.LOG]:
     RaincloudPlot(
         data=load_times,
         title=f"Page load time on the '{scale}' scale",
@@ -7801,7 +7801,7 @@ flipper_records[:2]</div>
     <span class="c1"># 300 trials per condition: scatter instead of packing</span>
     <span class="n">mode</span><span class="o">=</span><span class="n">SWARM_MODE</span><span class="o">.</span><span class="n">STRIP</span><span class="p">,</span>
     <span class="c1"># reaction times are right-skewed</span>
-    <span class="n">scaley</span><span class="o">=</span><span class="n">SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
+    <span class="n">scaley</span><span class="o">=</span><span class="n">AXIS_SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
     <span class="n">yticks</span><span class="o">=</span><span class="p">[</span><span class="mi">400</span><span class="p">,</span> <span class="mi">600</span><span class="p">,</span> <span class="mi">800</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">1500</span><span class="p">],</span>
     <span class="n">yticks_format</span><span class="o">=</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">INTEGER</span><span class="p">,</span>
     <span class="c1"># print the median, min and max</span>
@@ -7826,7 +7826,7 @@ flipper_records[:2]</div>
     # 300 trials per condition: scatter instead of packing
     mode=SWARM_MODE.STRIP,
     # reaction times are right-skewed
-    scaley=SCALE.LOG,
+    scaley=AXIS_SCALE.LOG,
     yticks=[400, 600, 800, 1000, 1500],
     yticks_format=VALUE_FORMAT.INTEGER,
     # print the median, min and max

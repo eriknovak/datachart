@@ -5855,7 +5855,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </tr>
 <tr>
 <td style="text-align:left"><code>scaley</code></td>
-<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.SCALE"><code>SCALE</code></a></td>
+<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.AXIS_SCALE"><code>AXIS_SCALE</code></a></td>
 </tr>
 </tbody>
 </table>
@@ -7359,7 +7359,7 @@ RadialChart(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="radial-axis-scale">Radial axis scale<a class="anchor-link" href="#radial-axis-scale">¶</a></h3><p>The radial axis is a value axis, and <code>scaley</code> changes its scale with a <a href="../../../references/constants/#datachart.constants.SCALE">SCALE</a> member, like the y-axis of a cartesian chart; the angular axis has no scale. A logarithmic radius is for values that span orders of magnitude around the cycle. <code>lightning_by_month</code>, defined in a hidden cell, holds the illustrative monthly count of lightning strikes recorded by the station, from a handful in winter to thousands in summer. On a linear radius the winter months would sit on the center; on a log radius starting at <code>ymin=1</code> every month is readable. The scatter visual fits here: each count is a point that stands alone, and a line through them would draw a shape that is mostly the scale.</p>
+<h3 id="radial-axis-scale">Radial axis scale<a class="anchor-link" href="#radial-axis-scale">¶</a></h3><p>The radial axis is a value axis, and <code>scaley</code> changes its scale with a <a href="../../../references/constants/#datachart.constants.AXIS_SCALE">AXIS_SCALE</a> member, like the y-axis of a cartesian chart; the angular axis has no scale. A logarithmic radius is for values that span orders of magnitude around the cycle. <code>lightning_by_month</code>, defined in a hidden cell, holds the illustrative monthly count of lightning strikes recorded by the station, from a handful in winter to thousands in summer. On a linear radius the winter months would sit on the center; on a log radius starting at <code>ymin=1</code> every month is readable. The scatter visual fits here: each count is a point that stands alone, and a line through them would draw a shape that is mostly the scale.</p>
 </div>
 </div>
 </div>
@@ -7385,26 +7385,26 @@ RadialChart(
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">SCALE</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">AXIS_SCALE</span>
 
 <span class="n">RadialChart</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">lightning_by_month</span><span class="p">,</span>
     <span class="n">mark</span><span class="o">=</span><span class="n">RADIAL_TYPE</span><span class="o">.</span><span class="n">SCATTER</span><span class="p">,</span>
     <span class="c1"># a log radius: from a handful to thousands on one circle</span>
-    <span class="n">scaley</span><span class="o">=</span><span class="n">SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
+    <span class="n">scaley</span><span class="o">=</span><span class="n">AXIS_SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
     <span class="c1"># start the radius at one strike, so the winter counts leave the center</span>
     <span class="n">ymin</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Lightning strikes by month"</span><span class="p">,</span>
     <span class="n">ylabel</span><span class="o">=</span><span class="s2">"Strikes (log scale)"</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-25">from datachart.constants import SCALE
+<div class="clipboard-copy-txt" id="cell-25">from datachart.constants import AXIS_SCALE
 
 RadialChart(
     data=lightning_by_month,
     mark=RADIAL_TYPE.SCATTER,
     # a log radius: from a handful to thousands on one circle
-    scaley=SCALE.LOG,
+    scaley=AXIS_SCALE.LOG,
     # start the radius at one strike, so the winter counts leave the center
     ymin=1,
     title="Lightning strikes by month",

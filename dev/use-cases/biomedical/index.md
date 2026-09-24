@@ -21,7 +21,7 @@ from datachart.constants import (
     EMPHASIS,
     FIG_SIZE,
     LINE_DRAW_STYLE,
-    NORMALIZE,
+    COLOR_NORM,
     SHOW_GRID,
     VALUE_FORMAT,
 )
@@ -310,7 +310,7 @@ Nine placebo subjects left against two and three on the doses, and the placebo c
 
 ### Which markers moved with the dose?
 
-A trial measures more than its endpoint, and eight markers in three arms is a 24-cell table that a [heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/index.md) reads in one look. The cells hold the percent change from baseline, which is signed, so the colormap has to put zero in the middle: `norm=NORMALIZE.CENTERED` pins zero to the centre of the theme's diverging colormap and runs the same distance each way, so a cell's hue is its direction and its depth is its size. `show_values` prints the numbers in the cells, and `value_format` gives them their sign and unit.
+A trial measures more than its endpoint, and eight markers in three arms is a 24-cell table that a [heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/index.md) reads in one look. The cells hold the percent change from baseline, which is signed, so the colormap has to put zero in the middle: `norm=COLOR_NORM.CENTERED` pins zero to the centre of the theme's diverging colormap and runs the same distance each way, so a cell's hue is its direction and its depth is its size. `show_values` prints the numbers in the cells, and `value_format` gives them their sign and unit.
 
 ```
 marker_figure = Heatmap(
@@ -321,7 +321,7 @@ marker_figure = Heatmap(
     },
     title="The whole metabolic panel moves with the dose",
     # zero in the middle of the diverging colormap, equal reach each way
-    norm=NORMALIZE.CENTERED,
+    norm=COLOR_NORM.CENTERED,
     show_values=True,
     show_colorbars=True,
     value_format="{x:+.1f}%",

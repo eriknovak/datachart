@@ -5835,15 +5835,15 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </tr>
 <tr>
 <td style="text-align:left"><code>scalex</code></td>
-<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.SCALE"><code>SCALE</code></a></td>
+<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.AXIS_SCALE"><code>AXIS_SCALE</code></a></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>scaley</code></td>
-<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.SCALE"><code>SCALE</code></a></td>
+<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.AXIS_SCALE"><code>AXIS_SCALE</code></a></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>norm</code></td>
-<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.NORMALIZE"><code>NORMALIZE</code></a></td>
+<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.COLOR_NORM"><code>COLOR_NORM</code></a></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>value_format</code></td>
@@ -6712,7 +6712,7 @@ ContourChart(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><code>norm</code> changes how the values spread over the 0 to 1 range, with a <a href="../../../references/constants/#datachart.constants.NORMALIZE">NORMALIZE</a> member (<code>LINEAR</code>, <code>LOG</code>, <code>SYMLOG</code>, <code>ASINH</code>, <code>LOGIT</code>), and a surface that spans orders of magnitude needs it. <code>sighting_density</code>, computed in a hidden cell, is the density of illustrative chamois sightings on the hill, in sightings per km² (the <a href="#multiple-contour-charts">Multiple Contour Charts</a> section introduces the data). The sightings cluster in a few places, and the density falls a thousandfold towards the edges of the map. With log-spaced levels and <code>NORMALIZE.LOG</code>, every tenfold step gets an equally distinct shade, where a linear normalization would spend the colormap on the busy centers and paint the faint outskirts all one color.</p>
+<p><code>norm</code> changes how the values spread over the 0 to 1 range, with a <a href="../../../references/constants/#datachart.constants.COLOR_NORM">COLOR_NORM</a> member (<code>LINEAR</code>, <code>LOG</code>, <code>SYMLOG</code>, <code>ASINH</code>, <code>LOGIT</code>), and a surface that spans orders of magnitude needs it. <code>sighting_density</code>, computed in a hidden cell, is the density of illustrative chamois sightings on the hill, in sightings per km² (the <a href="#multiple-contour-charts">Multiple Contour Charts</a> section introduces the data). The sightings cluster in a few places, and the density falls a thousandfold towards the edges of the map. With log-spaced levels and <code>COLOR_NORM.LOG</code>, every tenfold step gets an equally distinct shade, where a linear normalization would spend the colormap on the busy centers and paint the faint outskirts all one color.</p>
 </div>
 </div>
 </div>
@@ -6738,7 +6738,7 @@ ContourChart(
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">NORMALIZE</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">COLOR_NORM</span>
 
 <span class="n">ContourChart</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">sighting_density</span><span class="p">,</span>
@@ -6747,7 +6747,7 @@ ContourChart(
     <span class="n">colorbar</span><span class="o">=</span><span class="p">{</span><span class="s2">"label"</span><span class="p">:</span> <span class="s2">"Sightings per km²"</span><span class="p">,</span> <span class="s2">"ticks"</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="s2">"format"</span><span class="p">:</span> <span class="s2">"</span><span class="si">{x:g}</span><span class="s2">"</span><span class="p">},</span>
     <span class="c1"># log-spaced levels, one shade per step</span>
     <span class="n">levels</span><span class="o">=</span><span class="p">[</span><span class="mf">0.003</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span>
-    <span class="n">norm</span><span class="o">=</span><span class="n">NORMALIZE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
+    <span class="n">norm</span><span class="o">=</span><span class="n">COLOR_NORM</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Density of chamois sightings"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Distance east (km)"</span><span class="p">,</span>
     <span class="n">ylabel</span><span class="o">=</span><span class="s2">"Distance north (km)"</span><span class="p">,</span>
@@ -6755,7 +6755,7 @@ ContourChart(
     <span class="n">aspect_ratio</span><span class="o">=</span><span class="n">ASPECT_RATIO</span><span class="o">.</span><span class="n">EQUAL</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-14">from datachart.constants import NORMALIZE
+<div class="clipboard-copy-txt" id="cell-14">from datachart.constants import COLOR_NORM
 
 ContourChart(
     data=sighting_density,
@@ -6764,7 +6764,7 @@ ContourChart(
     colorbar={"label": "Sightings per km²", "ticks": [0.01, 0.1, 1, 10], "format": "{x:g}"},
     # log-spaced levels, one shade per step
     levels=[0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30, 100],
-    norm=NORMALIZE.LOG,
+    norm=COLOR_NORM.LOG,
     title="Density of chamois sightings",
     xlabel="Distance east (km)",
     ylabel="Distance north (km)",
@@ -7369,7 +7369,7 @@ ContourChart(
     <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="c1"># the same levels, so the shades compare across panels</span>
     <span class="n">levels</span><span class="o">=</span><span class="p">[</span><span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">64</span><span class="p">],</span>
-    <span class="n">norm</span><span class="o">=</span><span class="n">NORMALIZE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
+    <span class="n">norm</span><span class="o">=</span><span class="n">COLOR_NORM</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
     <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">"plot_contour_cmap"</span><span class="p">:</span> <span class="n">COLORS</span><span class="o">.</span><span class="n">YlGnBu</span><span class="p">},</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Density of chamois sightings by season"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Distance east (km)"</span><span class="p">,</span>
@@ -7390,7 +7390,7 @@ ContourChart(
     sharey=True,
     # the same levels, so the shades compare across panels
     levels=[0.25, 0.5, 1, 2, 4, 8, 16, 32, 64],
-    norm=NORMALIZE.LOG,
+    norm=COLOR_NORM.LOG,
     style={"plot_contour_cmap": COLORS.YlGnBu},
     title="Density of chamois sightings by season",
     xlabel="Distance east (km)",
@@ -7589,7 +7589,7 @@ Panel(
                 <span class="n">data</span><span class="o">=</span><span class="n">sighting_density</span><span class="p">,</span>
                 <span class="n">filled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">levels</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">64</span><span class="p">],</span>
-                <span class="n">norm</span><span class="o">=</span><span class="n">NORMALIZE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
+                <span class="n">norm</span><span class="o">=</span><span class="n">COLOR_NORM</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
                 <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">"plot_contour_cmap"</span><span class="p">:</span> <span class="n">COLORS</span><span class="o">.</span><span class="n">YlGnBu</span><span class="p">},</span>
                 <span class="n">title</span><span class="o">=</span><span class="s2">"Chamois sightings per km²"</span><span class="p">,</span>
                 <span class="n">aspect_ratio</span><span class="o">=</span><span class="n">ASPECT_RATIO</span><span class="o">.</span><span class="n">EQUAL</span><span class="p">,</span>
@@ -7617,7 +7617,7 @@ Grid(
                 data=sighting_density,
                 filled=True,
                 levels=[0.5, 1, 2, 4, 8, 16, 32, 64],
-                norm=NORMALIZE.LOG,
+                norm=COLOR_NORM.LOG,
                 style={"plot_contour_cmap": COLORS.YlGnBu},
                 title="Chamois sightings per km²",
                 aspect_ratio=ASPECT_RATIO.EQUAL,
@@ -7776,7 +7776,7 @@ Grid(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="axis-scales">Axis scales<a class="anchor-link" href="#axis-scales">¶</a></h3><p>Some surfaces are sampled over values that span orders of magnitude, and a linear axis crams the interesting part into a corner. <code>scalex</code> and <code>scaley</code> take a <a href="../../../references/constants/#datachart.constants.SCALE">SCALE</a> member. <code>sweep</code>, defined in a hidden cell, holds the illustrative validation loss of a model trained over a grid of learning rates (1e-5 to 1e-1) and weight decays (1e-6 to 1e-1), both sampled evenly on a log scale, the way hyperparameter searches are. On log axes the valley of good settings is a clear oval; on linear axes it would be squeezed against the left and bottom edges.</p>
+<h3 id="axis-scales">Axis scales<a class="anchor-link" href="#axis-scales">¶</a></h3><p>Some surfaces are sampled over values that span orders of magnitude, and a linear axis crams the interesting part into a corner. <code>scalex</code> and <code>scaley</code> take a <a href="../../../references/constants/#datachart.constants.AXIS_SCALE">AXIS_SCALE</a> member. <code>sweep</code>, defined in a hidden cell, holds the illustrative validation loss of a model trained over a grid of learning rates (1e-5 to 1e-1) and weight decays (1e-6 to 1e-1), both sampled evenly on a log scale, the way hyperparameter searches are. On log axes the valley of good settings is a clear oval; on linear axes it would be squeezed against the left and bottom edges.</p>
 </div>
 </div>
 </div>
@@ -7802,13 +7802,13 @@ Grid(
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">SCALE</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">AXIS_SCALE</span>
 
 <span class="n">ContourChart</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">sweep</span><span class="p">,</span>
     <span class="c1"># both hyperparameters on a log scale</span>
-    <span class="n">scalex</span><span class="o">=</span><span class="n">SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
-    <span class="n">scaley</span><span class="o">=</span><span class="n">SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
+    <span class="n">scalex</span><span class="o">=</span><span class="n">AXIS_SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
+    <span class="n">scaley</span><span class="o">=</span><span class="n">AXIS_SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
     <span class="n">filled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">colorbar</span><span class="o">=</span><span class="p">{</span><span class="s2">"label"</span><span class="p">:</span> <span class="s2">"Validation loss"</span><span class="p">},</span>
@@ -7820,13 +7820,13 @@ Grid(
     <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_MEDIUM</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-26">from datachart.constants import SCALE
+<div class="clipboard-copy-txt" id="cell-26">from datachart.constants import AXIS_SCALE
 
 ContourChart(
     data=sweep,
     # both hyperparameters on a log scale
-    scalex=SCALE.LOG,
-    scaley=SCALE.LOG,
+    scalex=AXIS_SCALE.LOG,
+    scaley=AXIS_SCALE.LOG,
     filled=True,
     show_colorbars=True,
     colorbar={"label": "Validation loss"},

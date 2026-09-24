@@ -5838,11 +5838,11 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </tr>
 <tr>
 <td style="text-align:left"><code>scalex</code></td>
-<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.SCALE"><code>SCALE</code></a></td>
+<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.AXIS_SCALE"><code>AXIS_SCALE</code></a></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>scaley</code></td>
-<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.SCALE"><code>SCALE</code></a></td>
+<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.AXIS_SCALE"><code>AXIS_SCALE</code></a></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>yticks_format</code></td>
@@ -5861,7 +5861,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="title-axis-labels-and-ticks">Title, axis labels and ticks<a class="anchor-link" href="#title-axis-labels-and-ticks">¶</a></h3><p>A stack without a title and axis labels is a pile of colors; <code>title</code>, <code>xlabel</code> and <code>ylabel</code> say what is stacked and in what unit. The ticks are the reader's ruler: <code>xticks</code> and <code>yticks</code> set their positions (<code>xticklabels</code> and <code>yticklabels</code> replace the labels), <code>xticks_format</code> and <code>yticks_format</code> format them (a <a href="../../../references/constants/#datachart.constants.VALUE_FORMAT">VALUE_FORMAT</a> member or a <code>"{x:.1f}"</code> style string on a value axis), and <code>xtickrotate</code> and <code>ytickrotate</code> tilt them. <code>xmin</code>, <code>xmax</code>, <code>ymin</code> and <code>ymax</code> fix the axis range; a stack rests on zero, so the value axis already starts there, and <code>ymax</code> is mostly used to leave headroom for a legend or a note. The <code>scalex</code> and <code>scaley</code> parameters take a <a href="../../../references/constants/#datachart.constants.SCALE">SCALE</a> member as on every chart, but a logarithmic value axis cannot show the zero a stack rests on and distorts the band thicknesses, so leave them linear. Here the years tick every five years and end on the last year of the data, and the thousands print with a separator.</p>
+<h3 id="title-axis-labels-and-ticks">Title, axis labels and ticks<a class="anchor-link" href="#title-axis-labels-and-ticks">¶</a></h3><p>A stack without a title and axis labels is a pile of colors; <code>title</code>, <code>xlabel</code> and <code>ylabel</code> say what is stacked and in what unit. The ticks are the reader's ruler: <code>xticks</code> and <code>yticks</code> set their positions (<code>xticklabels</code> and <code>yticklabels</code> replace the labels), <code>xticks_format</code> and <code>yticks_format</code> format them (a <a href="../../../references/constants/#datachart.constants.VALUE_FORMAT">VALUE_FORMAT</a> member or a <code>"{x:.1f}"</code> style string on a value axis), and <code>xtickrotate</code> and <code>ytickrotate</code> tilt them. <code>xmin</code>, <code>xmax</code>, <code>ymin</code> and <code>ymax</code> fix the axis range; a stack rests on zero, so the value axis already starts there, and <code>ymax</code> is mostly used to leave headroom for a legend or a note. The <code>scalex</code> and <code>scaley</code> parameters take a <a href="../../../references/constants/#datachart.constants.AXIS_SCALE">AXIS_SCALE</a> member as on every chart, but a logarithmic value axis cannot show the zero a stack rests on and distorts the band thicknesses, so leave them linear. Here the years tick every five years and end on the last year of the data, and the thousands print with a separator.</p>
 </div>
 </div>
 </div>

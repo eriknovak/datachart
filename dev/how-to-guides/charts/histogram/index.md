@@ -72,8 +72,8 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `aspect_ratio`                               | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                           |
 | `orientation`                                | [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)                                                                                                                             |
 | `bar_mode`                                   | [`BAR_MODE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BAR_MODE)                                                                                                                                   |
-| `scalex`                                     | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                         |
-| `scaley`                                     | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                         |
+| `scalex`                                     | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                               |
+| `scaley`                                     | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                               |
 
 The full list of style attributes is in the [datachart.typings.HistStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/histogram/#datachart.typings.HistStyleAttrs) type; the full list of parameters is in the [datachart.charts.Histogram](https://eriknovak.github.io/datachart/dev/references/charts/histogram/#datachart.charts.Histogram) reference.
 
@@ -525,14 +525,14 @@ Histogram(
 
 ### Axis scales
 
-On a linear count axis the bins in the tail of a distribution hold a handful of values and vanish next to the peak. `scaley` (or `scalex` for a horizontal histogram) takes a [SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE) member, and a logarithmic count axis gives every occupied bin a visible bar. The bins stay equal-width on the data scale whichever axis scale is applied, so a log scale on the binned axis stretches them unevenly and is rarely what you want. A log axis has no zero, so a `STEP` outline breaks over the empty bins instead of dropping to the axis floor.
+On a linear count axis the bins in the tail of a distribution hold a handful of values and vanish next to the peak. `scaley` (or `scalex` for a horizontal histogram) takes a [AXIS_SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE) member, and a logarithmic count axis gives every occupied bin a visible bar. The bins stay equal-width on the data scale whichever axis scale is applied, so a log scale on the binned axis stretches them unevenly and is rarely what you want. A log axis has no zero, so a `STEP` outline breaks over the empty bins instead of dropping to the axis floor.
 
 Flipper lengths have no long tail, so this example switches dataset. `quakes`, defined in a hidden cell, holds 5,000 illustrative earthquake magnitudes from a seeded generator that follows the Gutenberg-Richter law: every step of one magnitude up makes earthquakes about ten times rarer. On a linear axis the strong earthquakes are invisible; on a log axis the counts fall along a straight line, which is how seismologists read the law.
 
 ```
-from datachart.constants import SCALE
+from datachart.constants import AXIS_SCALE
 
-for scale in [SCALE.LINEAR, SCALE.LOG]:
+for scale in [AXIS_SCALE.LINEAR, AXIS_SCALE.LOG]:
     Histogram(
         data=quakes,
         title=f"Earthquake magnitudes on a '{scale}' count axis",
@@ -662,7 +662,7 @@ counts = Histogram(
     show_grid=SHOW_GRID.Y,
     num_bins=80,
     # the tail shows on a log count axis
-    scaley=SCALE.LOG,
+    scaley=AXIS_SCALE.LOG,
     show_legend=True,
 )
 

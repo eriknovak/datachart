@@ -70,18 +70,18 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `show_grid`                                  | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                                                                                                                                 |
 | `value_format`                               | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                           |
 | `aspect_ratio`                               | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                           |
-| `scalex`                                     | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                         |
-| `scaley`                                     | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                         |
+| `scalex`                                     | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                               |
+| `scaley`                                     | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                               |
 | `yticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
 
 The full list of style attributes is in the [datachart.typings.ScatterStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/scatterchart/#datachart.typings.ScatterStyleAttrs) type; the full list of parameters is in the [datachart.charts.ScatterChart](https://eriknovak.github.io/datachart/dev/references/charts/scatterchart/#datachart.charts.ScatterChart) reference.
 
 ### Title, axis labels and ticks
 
-A chart without a title and axis labels leaves the reader guessing what the axes measure; `title`, `xlabel` and `ylabel` say it. GDP per capita runs from about 500 to 86,000 dollars, and on a linear axis the poorer half of the countries piles up against the left edge. `scalex=SCALE.LOG` ([SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)) spreads them out, so the examples below use it; the [Axis scales](#axis-scales) section compares the two. A log axis labels its ticks as powers of ten, so `xticks` places a tick at 1,000, 10,000 and 100,000 dollars and `xticklabels` names them. `xticks_format` (and `yticks_format`) is the alternative when the labels follow a pattern: a [VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) member or a `"{x:,.0f}"` style string. `xtickrotate` and `ytickrotate` tilt crowded labels, and `xmin`, `xmax`, `ymin` and `ymax` fix the axis range.
+A chart without a title and axis labels leaves the reader guessing what the axes measure; `title`, `xlabel` and `ylabel` say it. GDP per capita runs from about 500 to 86,000 dollars, and on a linear axis the poorer half of the countries piles up against the left edge. `scalex=AXIS_SCALE.LOG` ([AXIS_SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)) spreads them out, so the examples below use it; the [Axis scales](#axis-scales) section compares the two. A log axis labels its ticks as powers of ten, so `xticks` places a tick at 1,000, 10,000 and 100,000 dollars and `xticklabels` names them. `xticks_format` (and `yticks_format`) is the alternative when the labels follow a pattern: a [VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) member or a `"{x:,.0f}"` style string. `xtickrotate` and `ytickrotate` tilt crowded labels, and `xmin`, `xmax`, `ymin` and `ymax` fix the axis range.
 
 ```
-from datachart.constants import SCALE
+from datachart.constants import AXIS_SCALE
 
 GDP_TICKS = [1_000, 10_000, 100_000]
 GDP_TICK_LABELS = ["$1k", "$10k", "$100k"]
@@ -94,7 +94,7 @@ ScatterChart(
     xlabel="GDP per capita (USD, log scale)",
     ylabel="Life expectancy (years)",
     # a logarithmic income axis
-    scalex=SCALE.LOG,
+    scalex=AXIS_SCALE.LOG,
     # one labeled tick per power of ten
     xticks=GDP_TICKS,
     xticklabels=GDP_TICK_LABELS,
@@ -116,7 +116,7 @@ ScatterChart(
     title="Life expectancy and income, 2019",
     xlabel="GDP per capita (USD, log scale)",
     ylabel="Life expectancy (years)",
-    scalex=SCALE.LOG,
+    scalex=AXIS_SCALE.LOG,
     xticks=GDP_TICKS,
     xticklabels=GDP_TICK_LABELS,
     # a figure as wide as the page
@@ -147,7 +147,7 @@ ScatterChart(
     title="Life expectancy and income, 2019",
     xlabel="GDP per capita (USD, log scale)",
     ylabel="Life expectancy (years)",
-    scalex=SCALE.LOG,
+    scalex=AXIS_SCALE.LOG,
     xticks=GDP_TICKS,
     xticklabels=GDP_TICK_LABELS,
     figsize=FIG_SIZE.FULL_MEDIUM,
@@ -167,7 +167,7 @@ ScatterChart(
     title="Life expectancy and income, 2019",
     xlabel="GDP per capita (USD, log scale)",
     ylabel="Life expectancy (years)",
-    scalex=SCALE.LOG,
+    scalex=AXIS_SCALE.LOG,
     xticks=GDP_TICKS,
     xticklabels=GDP_TICK_LABELS,
     figsize=FIG_SIZE.FULL_MEDIUM,
@@ -198,7 +198,7 @@ ScatterChart(
     title="Life expectancy and income, sized by population, 2019",
     xlabel="GDP per capita (USD, log scale)",
     ylabel="Life expectancy (years)",
-    scalex=SCALE.LOG,
+    scalex=AXIS_SCALE.LOG,
     xticks=GDP_TICKS,
     xticklabels=GDP_TICK_LABELS,
     figsize=FIG_SIZE.FULL_MEDIUM,
@@ -220,7 +220,7 @@ ScatterChart(
     title="Life expectancy and income in the Americas, 2019",
     xlabel="GDP per capita (USD, log scale)",
     ylabel="Life expectancy (years)",
-    scalex=SCALE.LOG,
+    scalex=AXIS_SCALE.LOG,
     xticks=GDP_TICKS,
     xticklabels=GDP_TICK_LABELS,
     figsize=FIG_SIZE.FULL_MEDIUM,
@@ -246,7 +246,7 @@ ScatterChart(
     title="Life expectancy and income, 2019",
     xlabel="GDP per capita (USD, log scale)",
     ylabel="Life expectancy (years)",
-    scalex=SCALE.LOG,
+    scalex=AXIS_SCALE.LOG,
     xticks=GDP_TICKS,
     xticklabels=GDP_TICK_LABELS,
     figsize=FIG_SIZE.FULL_MEDIUM,
@@ -269,7 +269,7 @@ ScatterChart(
     title="Life expectancy and income in the Americas, 2019",
     xlabel="GDP per capita (USD, log scale)",
     ylabel="Life expectancy (years)",
-    scalex=SCALE.LOG,
+    scalex=AXIS_SCALE.LOG,
     xticks=GDP_TICKS,
     xticklabels=GDP_TICK_LABELS,
     figsize=FIG_SIZE.FULL_MEDIUM,
@@ -385,7 +385,7 @@ ScatterChart(
     title="Countries that break the pattern, 2019",
     xlabel="GDP per capita (USD, log scale)",
     ylabel="Life expectancy (years)",
-    scalex=SCALE.LOG,
+    scalex=AXIS_SCALE.LOG,
     xticks=GDP_TICKS,
     xticklabels=GDP_TICK_LABELS,
     figsize=FIG_SIZE.FULL_MEDIUM,
@@ -405,7 +405,7 @@ ScatterChart(
     title="Regions with a life expectancy below 65 years, 2019",
     xlabel="GDP per capita (USD, log scale)",
     ylabel="Life expectancy (years)",
-    scalex=SCALE.LOG,
+    scalex=AXIS_SCALE.LOG,
     xticks=GDP_TICKS,
     xticklabels=GDP_TICK_LABELS,
     figsize=FIG_SIZE.FULL_MEDIUM,
@@ -445,7 +445,7 @@ ScatterChart(
     title="Life expectancy and income, 2019",
     xlabel="GDP per capita (USD, log scale)",
     ylabel="Life expectancy (years)",
-    scalex=SCALE.LOG,
+    scalex=AXIS_SCALE.LOG,
     xticks=GDP_TICKS,
     xticklabels=GDP_TICK_LABELS,
     # a fixed income range, so the horizontal line spans it
@@ -503,7 +503,7 @@ ScatterChart(
     title="Life expectancy and income, 2019",
     xlabel="GDP per capita (USD, log scale)",
     ylabel="Life expectancy (years)",
-    scalex=SCALE.LOG,
+    scalex=AXIS_SCALE.LOG,
     xticks=GDP_TICKS,
     xticklabels=GDP_TICK_LABELS,
     figsize=FIG_SIZE.FULL_MEDIUM,
@@ -532,7 +532,7 @@ ScatterChart(
     title="Life expectancy and income, 2019",
     xlabel="GDP per capita (USD, log scale)",
     ylabel="Life expectancy (years)",
-    scalex=SCALE.LOG,
+    scalex=AXIS_SCALE.LOG,
     xticks=GDP_TICKS,
     xticklabels=GDP_TICK_LABELS,
     figsize=FIG_SIZE.FULL_MEDIUM,
@@ -567,7 +567,7 @@ ScatterChart(
     title="Life expectancy and income by WHO region, 2019",
     xlabel="GDP per capita (USD, log scale)",
     ylabel="Life expectancy (years)",
-    scalex=SCALE.LOG,
+    scalex=AXIS_SCALE.LOG,
     xticks=GDP_TICKS,
     xticklabels=GDP_TICK_LABELS,
     figsize=FIG_SIZE.FULL_MEDIUM,
@@ -590,7 +590,7 @@ ScatterChart(
     title="Life expectancy and income by WHO region, 2019",
     xlabel="GDP per capita (USD, log scale)",
     ylabel="Life expectancy (years)",
-    scalex=SCALE.LOG,
+    scalex=AXIS_SCALE.LOG,
     xticks=GDP_TICKS,
     xticklabels=GDP_TICK_LABELS,
     figsize=FIG_SIZE.FULL_MEDIUM,
@@ -612,7 +612,7 @@ ScatterChart(
     title="Life expectancy and income by WHO region, 2019",
     xlabel="GDP per capita (USD, log scale)",
     ylabel="Life expectancy (years)",
-    scalex=SCALE.LOG,
+    scalex=AXIS_SCALE.LOG,
     xticks=GDP_TICKS,
     xticklabels=GDP_TICK_LABELS,
     figsize=FIG_SIZE.FULL_MEDIUM,
@@ -633,10 +633,10 @@ ScatterChart(
 
 ### Axis scales
 
-A linear axis suits values of one order of magnitude; values that span several read better on a logarithmic one, where equal distances stand for equal ratios. `scalex` and `scaley` take a [SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE) member: `SCALE.LINEAR` (the default), `SCALE.LOG`, and `SCALE.SYMLOG` and `SCALE.ASINH` for data that also crosses zero. On the linear scale the countries under 10,000 dollars crowd into the left edge and the relationship looks like a sharp bend; on the log scale they spread out and the relationship is close to a straight line.
+A linear axis suits values of one order of magnitude; values that span several read better on a logarithmic one, where equal distances stand for equal ratios. `scalex` and `scaley` take a [AXIS_SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE) member: `AXIS_SCALE.LINEAR` (the default), `AXIS_SCALE.LOG`, and `AXIS_SCALE.SYMLOG` and `AXIS_SCALE.ASINH` for data that also crosses zero. On the linear scale the countries under 10,000 dollars crowd into the left edge and the relationship looks like a sharp bend; on the log scale they spread out and the relationship is close to a straight line.
 
 ```
-for scale in [SCALE.LINEAR, SCALE.LOG]:
+for scale in [AXIS_SCALE.LINEAR, AXIS_SCALE.LOG]:
     ScatterChart(
         data=countries,
         title=f"Life expectancy and income on the '{scale}' scale",
@@ -693,7 +693,7 @@ ScatterChart(
     title="Life expectancy and income, 2019",
     xlabel="GDP per capita (USD, log scale)",
     ylabel="Life expectancy (years)",
-    scalex=SCALE.LOG,
+    scalex=AXIS_SCALE.LOG,
     xticks=GDP_TICKS,
     xticklabels=GDP_TICK_LABELS,
     figsize=FIG_SIZE.FULL_MEDIUM,

@@ -37,8 +37,8 @@ BarChart(
     sort: SORT | str | None = None,
     sort_by: str | None = None,
     emphasis_rule: EmphasisRuleAttrs | None = None,
-    scalex: SCALE | str | None = None,
-    scaley: SCALE | str | None = None,
+    scalex: AXIS_SCALE | str | None = None,
+    scaley: AXIS_SCALE | str | None = None,
     subplots: bool | None = None,
     max_cols: int | None = None,
     sharex: bool | None = None,
@@ -183,8 +183,8 @@ Examples:
 | `sort_by`       | The subtitle of the one series whose values key the sort instead of the total. A category that series lacks sorts last. **TYPE:** \`str                                                                                                                                                                         |
 | `emphasis_rule` | A one-key dict that highlights the bars matching it and mutes the rest: {"above": v} or {"below": v} (strict), {"between": (lo, hi)} (inclusive), {"top": n} or {"bottom": n}. Reads each bar's own value; a record's own emphasis key wins over the rule. See EmphasisRuleAttrs. **TYPE:** \`EmphasisRuleAttrs |
 | `orientation`   | The orientation of the bars ("vertical" or "horizontal"). See ORIENTATION. **TYPE:** \`ORIENTATION                                                                                                                                                                                                              |
-| `scalex`        | The x-axis scale ("linear", "log", "symlog", "asinh"). Useful for horizontal bars. See SCALE. **TYPE:** \`SCALE                                                                                                                                                                                                 |
-| `scaley`        | The y-axis scale ("linear", "log", "symlog", "asinh"). Useful for vertical bars. See SCALE. **TYPE:** \`SCALE                                                                                                                                                                                                   |
+| `scalex`        | The x-axis scale ("linear", "log", "symlog", "asinh"). Useful for horizontal bars. See AXIS_SCALE. **TYPE:** \`AXIS_SCALE                                                                                                                                                                                       |
+| `scaley`        | The y-axis scale ("linear", "log", "symlog", "asinh"). Useful for vertical bars. See AXIS_SCALE. **TYPE:** \`AXIS_SCALE                                                                                                                                                                                         |
 | `subplots`      | Whether to create separate subplots for each chart. **TYPE:** \`bool                                                                                                                                                                                                                                            |
 | `max_cols`      | Maximum number of columns in subplots (when subplots=True). **TYPE:** \`int                                                                                                                                                                                                                                     |
 | `sharex`        | Whether to share the x-axis in subplots. **TYPE:** \`bool                                                                                                                                                                                                                                                       |
@@ -272,6 +272,6 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `orientation`                                | [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)                                                                                                                             |
 | `bar_mode`                                   | [`BAR_MODE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BAR_MODE)                                                                                                                                   |
 | `sort`                                       | [`SORT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT)                                                                                                                                           |
-| `scalex`                                     | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                         |
-| `scaley`                                     | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                         |
+| `scalex`                                     | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                               |
+| `scaley`                                     | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                               |
 | `yticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |

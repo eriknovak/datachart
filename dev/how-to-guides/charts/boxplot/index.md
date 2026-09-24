@@ -71,7 +71,7 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `aspect_ratio`                               | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                           |
 | `orientation`                                | [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)                                                                                                                             |
 | `sort`                                       | [`SORT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT)                                                                                                                                           |
-| `scaley`                                     | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                         |
+| `scaley`                                     | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                               |
 | `yticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
 
 The full list of style attributes is in the [datachart.typings.BoxStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/boxplot/#datachart.typings.BoxStyleAttrs) type; the full list of parameters is in the [datachart.charts.BoxPlot](https://eriknovak.github.io/datachart/dev/references/charts/boxplot/#datachart.charts.BoxPlot) reference.
@@ -602,12 +602,12 @@ BoxPlot(
 
 ### Axis scales
 
-Response times, incomes and file sizes are skewed: most values are small and a long tail runs far above them. On a linear axis the tail squeezes the boxes into a thin strip at the bottom. `scaley` takes a [SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE) member, and a logarithmic scale spreads the boxes out so that their medians and quartiles can be compared. `response_times`, defined in a hidden cell, holds illustrative response times (in ms) of 200 requests to each of four services, drawn from a seeded log-normal generator.
+Response times, incomes and file sizes are skewed: most values are small and a long tail runs far above them. On a linear axis the tail squeezes the boxes into a thin strip at the bottom. `scaley` takes a [AXIS_SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE) member, and a logarithmic scale spreads the boxes out so that their medians and quartiles can be compared. `response_times`, defined in a hidden cell, holds illustrative response times (in ms) of 200 requests to each of four services, drawn from a seeded log-normal generator.
 
 ```
-from datachart.constants import SCALE
+from datachart.constants import AXIS_SCALE
 
-for scale in [SCALE.LINEAR, SCALE.LOG]:
+for scale in [AXIS_SCALE.LINEAR, AXIS_SCALE.LOG]:
     BoxPlot(
         data=response_times,
         title=f"Response times on the '{scale}' scale",
@@ -722,7 +722,7 @@ SLA_LINE = {
 
 overview = BoxPlot(
     data=response_times,
-    scaley=SCALE.LOG,
+    scaley=AXIS_SCALE.LOG,
     hlines=SLA_LINE,
     # the services whose slowest request breaks the SLA
     emphasis_rule={"above": SLA_MS, "by": "max"},

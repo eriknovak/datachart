@@ -19,7 +19,7 @@ from datachart.constants import (
     EMPHASIS,
     FIG_SIZE,
     LEGEND_LOCATION,
-    NORMALIZE,
+    COLOR_NORM,
     ORIENTATION,
     SHOW_GRID,
     SORT,
@@ -132,7 +132,7 @@ South Korea is the finished path: agriculture was 36% of GDP in 1960 and is 1% n
 
 ### Where and when did inflation bite?
 
-Nineteen countries over nine years of inflation is a table a reader cannot scan for the hot years; a [heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/index.md) colours each cell by its value, so a hot year is a dark column and a chronically inflationary country is a dark row. Two members run inflation in the tens and hundreds of percent, which would leave every other cell the same pale shade on a linear scale, so `norm=NORMALIZE.SYMLOG` gives the colour scale a logarithmic reach that keeps the contrast among the single digits, and `show_values` prints the numbers so the extreme cells are read rather than guessed.
+Nineteen countries over nine years of inflation is a table a reader cannot scan for the hot years; a [heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/index.md) colours each cell by its value, so a hot year is a dark column and a chronically inflationary country is a dark row. Two members run inflation in the tens and hundreds of percent, which would leave every other cell the same pale shade on a linear scale, so `norm=COLOR_NORM.SYMLOG` gives the colour scale a logarithmic reach that keeps the contrast among the single digits, and `show_values` prints the numbers so the extreme cells are read rather than guessed.
 
 ```
 MEMBERS = sorted(INFLATION, key=lambda country: -INFLATION[country][INFLATION_YEARS.index(2022)])
@@ -142,7 +142,7 @@ inflation_figure = Heatmap(
     title="2022 was the hot year everywhere; Argentina and Türkiye are hot every year",
     xlabel="Year",
     ylabel="Country, by 2022 inflation",
-    norm=NORMALIZE.SYMLOG,
+    norm=COLOR_NORM.SYMLOG,
     show_values=True,
     value_format="{x:.1f}",
     show_colorbars=True,

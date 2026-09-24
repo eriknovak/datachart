@@ -5854,11 +5854,11 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </tr>
 <tr>
 <td style="text-align:left"><code>scalex</code></td>
-<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.SCALE"><code>SCALE</code></a></td>
+<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.AXIS_SCALE"><code>AXIS_SCALE</code></a></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>scaley</code></td>
-<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.SCALE"><code>SCALE</code></a></td>
+<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.AXIS_SCALE"><code>AXIS_SCALE</code></a></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>yticks_format</code></td>
@@ -7524,7 +7524,7 @@ BarChart(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="axis-scales">Axis scales<a class="anchor-link" href="#axis-scales">¶</a></h3><p>Bars encode value by length, so a linear axis is the honest default, and a logarithmic one is the exception for values that span orders of magnitude. <code>scaley</code> (or <code>scalex</code> for horizontal bars) takes a <a href="../../../references/constants/#datachart.constants.SCALE">SCALE</a> member. <code>populations</code>, defined in a hidden cell, holds the approximate mid-2024 population of seven countries in thousands (UN World Population Prospects 2024, rounded), from about 1.45 billion down to about 10 thousand. On a linear scale the small countries vanish; on a log scale every bar is readable, at the price that bar lengths no longer compare.</p>
+<h3 id="axis-scales">Axis scales<a class="anchor-link" href="#axis-scales">¶</a></h3><p>Bars encode value by length, so a linear axis is the honest default, and a logarithmic one is the exception for values that span orders of magnitude. <code>scaley</code> (or <code>scalex</code> for horizontal bars) takes a <a href="../../../references/constants/#datachart.constants.AXIS_SCALE">AXIS_SCALE</a> member. <code>populations</code>, defined in a hidden cell, holds the approximate mid-2024 population of seven countries in thousands (UN World Population Prospects 2024, rounded), from about 1.45 billion down to about 10 thousand. On a linear scale the small countries vanish; on a log scale every bar is readable, at the price that bar lengths no longer compare.</p>
 </div>
 </div>
 </div>
@@ -7550,9 +7550,9 @@ BarChart(
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">SCALE</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">AXIS_SCALE</span>
 
-<span class="k">for</span> <span class="n">scale</span> <span class="ow">in</span> <span class="p">[</span><span class="n">SCALE</span><span class="o">.</span><span class="n">LINEAR</span><span class="p">,</span> <span class="n">SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">]:</span>
+<span class="k">for</span> <span class="n">scale</span> <span class="ow">in</span> <span class="p">[</span><span class="n">AXIS_SCALE</span><span class="o">.</span><span class="n">LINEAR</span><span class="p">,</span> <span class="n">AXIS_SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">]:</span>
     <span class="n">BarChart</span><span class="p">(</span>
         <span class="n">data</span><span class="o">=</span><span class="n">populations</span><span class="p">,</span>
         <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Population on the '</span><span class="si">{</span><span class="n">scale</span><span class="si">}</span><span class="s2">' scale"</span><span class="p">,</span>
@@ -7564,9 +7564,9 @@ BarChart(
         <span class="n">scaley</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span>
     <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-24">from datachart.constants import SCALE
+<div class="clipboard-copy-txt" id="cell-24">from datachart.constants import AXIS_SCALE
 
-for scale in [SCALE.LINEAR, SCALE.LOG]:
+for scale in [AXIS_SCALE.LINEAR, AXIS_SCALE.LOG]:
     BarChart(
         data=populations,
         title=f"Population on the '{scale}' scale",

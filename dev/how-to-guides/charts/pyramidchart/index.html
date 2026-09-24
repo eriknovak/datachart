@@ -6822,7 +6822,7 @@ PyramidChart(
 
 <span class="n">DECADES</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"yticks"</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">2</span><span class="p">)),</span> <span class="s2">"yticklabels"</span><span class="p">:</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">age</span><span class="p">)</span> <span class="k">for</span> <span class="n">age</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">10</span><span class="p">)]}</span>
 <span class="c1"># the same value range in every cell, so the bars compare across the cells</span>
-<span class="n">SCALE</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"xmax"</span><span class="p">:</span> <span class="mi">500</span><span class="p">,</span> <span class="s2">"xticks"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">500</span><span class="p">]}</span>
+<span class="n">AXIS_SCALE</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"xmax"</span><span class="p">:</span> <span class="mi">500</span><span class="p">,</span> <span class="s2">"xticks"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">500</span><span class="p">]}</span>
 
 <span class="n">Grid</span><span class="p">(</span>
     <span class="p">[</span>
@@ -6833,10 +6833,10 @@ PyramidChart(
             <span class="c1"># the legend once, in the empty upper-right corner, without a title</span>
             <span class="n">show_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">legend</span><span class="o">=</span><span class="p">{</span><span class="s2">"title"</span><span class="p">:</span> <span class="s2">""</span><span class="p">,</span> <span class="s2">"location"</span><span class="p">:</span> <span class="n">LEGEND_LOCATION</span><span class="o">.</span><span class="n">UPPER_RIGHT</span><span class="p">},</span>
-            <span class="o">**</span><span class="n">SCALE</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">AXIS_SCALE</span><span class="p">,</span>
             <span class="o">**</span><span class="n">DECADES</span><span class="p">,</span>
         <span class="p">),</span>
-        <span class="n">PyramidChart</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">men_2050</span><span class="p">,</span> <span class="n">women_2050</span><span class="p">],</span> <span class="n">subtitle</span><span class="o">=</span><span class="n">SIDES</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">"2050"</span><span class="p">,</span> <span class="o">**</span><span class="n">SCALE</span><span class="p">,</span> <span class="o">**</span><span class="n">DECADES</span><span class="p">),</span>
+        <span class="n">PyramidChart</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">men_2050</span><span class="p">,</span> <span class="n">women_2050</span><span class="p">],</span> <span class="n">subtitle</span><span class="o">=</span><span class="n">SIDES</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">"2050"</span><span class="p">,</span> <span class="o">**</span><span class="n">AXIS_SCALE</span><span class="p">,</span> <span class="o">**</span><span class="n">DECADES</span><span class="p">),</span>
     <span class="p">],</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"An ageing population, today and in 25 years"</span><span class="p">,</span>
     <span class="c1"># one pair of axis labels for the whole grid</span>
@@ -6849,7 +6849,7 @@ PyramidChart(
 
 DECADES = {"yticks": list(range(0, 18, 2)), "yticklabels": [str(age) for age in range(0, 90, 10)]}
 # the same value range in every cell, so the bars compare across the cells
-SCALE = {"xmax": 500, "xticks": [0, 250, 500]}
+AXIS_SCALE = {"xmax": 500, "xticks": [0, 250, 500]}
 
 Grid(
     [
@@ -6860,10 +6860,10 @@ Grid(
             # the legend once, in the empty upper-right corner, without a title
             show_legend=True,
             legend={"title": "", "location": LEGEND_LOCATION.UPPER_RIGHT},
-            **SCALE,
+            **AXIS_SCALE,
             **DECADES,
         ),
-        PyramidChart(data=[men_2050, women_2050], subtitle=SIDES, title="2050", **SCALE, **DECADES),
+        PyramidChart(data=[men_2050, women_2050], subtitle=SIDES, title="2050", **AXIS_SCALE, **DECADES),
     ],
     title="An ageing population, today and in 25 years",
     # one pair of axis labels for the whole grid
@@ -6940,7 +6940,7 @@ Grid(
     <span class="n">title</span><span class="o">=</span><span class="s2">"Projected population in 2050, with the projection interval"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Population (thousands)"</span><span class="p">,</span>
     <span class="n">ylabel</span><span class="o">=</span><span class="s2">"Age band"</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">SCALE</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">AXIS_SCALE</span><span class="p">,</span>
     <span class="c1"># draw the error bars</span>
     <span class="n">show_yerr</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
@@ -6956,7 +6956,7 @@ Grid(
     title="Projected population in 2050, with the projection interval",
     xlabel="Population (thousands)",
     ylabel="Age band",
-    **SCALE,
+    **AXIS_SCALE,
     # draw the error bars
     show_yerr=True,
 ).show()</div>
@@ -7186,7 +7186,7 @@ census_rows[:2]</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="example-1-how-big-is-the-retirement-wave-emphasis-rule-reference-line-and-a-note">Example 1: How Big Is the Retirement Wave? (Emphasis Rule, Reference Line, and a Note)<a class="anchor-link" href="#example-1-how-big-is-the-retirement-wave-emphasis-rule-reference-line-and-a-note">¶</a></h3><p>The shared population has its three largest bands, 50-54 to 60-64, just below the retirement age, and the question a pension planner asks is how many people that is. An <code>emphasis_rule</code> picks every bar above 345 thousand, which are the six bars of those three bands, an <code>hlines</code> entry marks the retirement age they are about to cross, and a note gives the sum: about 2.2 million people, more than a fifth of the population, reaching 65 within fifteen years. Decade ticks keep the age axis quiet, and the shared <code>SCALE</code> leaves room for the note.</p>
+<h3 id="example-1-how-big-is-the-retirement-wave-emphasis-rule-reference-line-and-a-note">Example 1: How Big Is the Retirement Wave? (Emphasis Rule, Reference Line, and a Note)<a class="anchor-link" href="#example-1-how-big-is-the-retirement-wave-emphasis-rule-reference-line-and-a-note">¶</a></h3><p>The shared population has its three largest bands, 50-54 to 60-64, just below the retirement age, and the question a pension planner asks is how many people that is. An <code>emphasis_rule</code> picks every bar above 345 thousand, which are the six bars of those three bands, an <code>hlines</code> entry marks the retirement age they are about to cross, and a note gives the sum: about 2.2 million people, more than a fifth of the population, reaching 65 within fifteen years. Decade ticks keep the age axis quiet, and the shared <code>AXIS_SCALE</code> leaves room for the note.</p>
 </div>
 </div>
 </div>
@@ -7220,7 +7220,7 @@ census_rows[:2]</div>
     <span class="n">title</span><span class="o">=</span><span class="s2">"The cohorts about to retire"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Population (thousands)"</span><span class="p">,</span>
     <span class="n">ylabel</span><span class="o">=</span><span class="s2">"Age"</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">SCALE</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">AXIS_SCALE</span><span class="p">,</span>
     <span class="o">**</span><span class="n">DECADES</span><span class="p">,</span>
     <span class="c1"># the three largest bands, on both sides</span>
     <span class="n">emphasis_rule</span><span class="o">=</span><span class="p">{</span><span class="s2">"above"</span><span class="p">:</span> <span class="mi">345</span><span class="p">},</span>
@@ -7244,7 +7244,7 @@ census_rows[:2]</div>
     title="The cohorts about to retire",
     xlabel="Population (thousands)",
     ylabel="Age",
-    **SCALE,
+    **AXIS_SCALE,
     **DECADES,
     # the three largest bands, on both sides
     emphasis_rule={"above": 345},

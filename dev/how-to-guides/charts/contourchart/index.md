@@ -68,9 +68,9 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `legend={"location": ..., "alignment": ...}`                    | [`LEGEND_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN)                                                                                                                       |
 | `show_grid`                                                     | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                                                                                                                                                                                                                                                       |
 | `aspect_ratio`                                                  | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                                                                                                                                                 |
-| `scalex`                                                        | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                                                                                                                                               |
-| `scaley`                                                        | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                                                                                                                                               |
-| `norm`                                                          | [`NORMALIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.NORMALIZE)                                                                                                                                                                                                                                                       |
+| `scalex`                                                        | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                                                                                                                                                     |
+| `scaley`                                                        | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                                                                                                                                                     |
+| `norm`                                                          | [`COLOR_NORM`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLOR_NORM)                                                                                                                                                                                                                                                     |
 | `value_format`                                                  | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                                                                                                                                                 |
 | `yticks_format`                                                 | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)                                                                                                                               |
 | `colorbar={"location": ..., "format": ..., "orientation": ...}` | [`COLORBAR_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORBAR_LOCATION), [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION) |
@@ -315,10 +315,10 @@ ContourChart(
 ).show()
 ```
 
-`norm` changes how the values spread over the 0 to 1 range, with a [NORMALIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.NORMALIZE) member (`LINEAR`, `LOG`, `SYMLOG`, `ASINH`, `LOGIT`), and a surface that spans orders of magnitude needs it. `sighting_density`, computed in a hidden cell, is the density of illustrative chamois sightings on the hill, in sightings per km² (the [Multiple Contour Charts](#multiple-contour-charts) section introduces the data). The sightings cluster in a few places, and the density falls a thousandfold towards the edges of the map. With log-spaced levels and `NORMALIZE.LOG`, every tenfold step gets an equally distinct shade, where a linear normalization would spend the colormap on the busy centers and paint the faint outskirts all one color.
+`norm` changes how the values spread over the 0 to 1 range, with a [COLOR_NORM](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLOR_NORM) member (`LINEAR`, `LOG`, `SYMLOG`, `ASINH`, `LOGIT`), and a surface that spans orders of magnitude needs it. `sighting_density`, computed in a hidden cell, is the density of illustrative chamois sightings on the hill, in sightings per km² (the [Multiple Contour Charts](#multiple-contour-charts) section introduces the data). The sightings cluster in a few places, and the density falls a thousandfold towards the edges of the map. With log-spaced levels and `COLOR_NORM.LOG`, every tenfold step gets an equally distinct shade, where a linear normalization would spend the colormap on the busy centers and paint the faint outskirts all one color.
 
 ```
-from datachart.constants import NORMALIZE
+from datachart.constants import COLOR_NORM
 
 ContourChart(
     data=sighting_density,
@@ -327,7 +327,7 @@ ContourChart(
     colorbar={"label": "Sightings per km²", "ticks": [0.01, 0.1, 1, 10], "format": "{x:g}"},
     # log-spaced levels, one shade per step
     levels=[0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30, 100],
-    norm=NORMALIZE.LOG,
+    norm=COLOR_NORM.LOG,
     title="Density of chamois sightings",
     xlabel="Distance east (km)",
     ylabel="Distance north (km)",
@@ -506,7 +506,7 @@ ContourChart(
     sharey=True,
     # the same levels, so the shades compare across panels
     levels=[0.25, 0.5, 1, 2, 4, 8, 16, 32, 64],
-    norm=NORMALIZE.LOG,
+    norm=COLOR_NORM.LOG,
     style={"plot_contour_cmap": COLORS.YlGnBu},
     title="Density of chamois sightings by season",
     xlabel="Distance east (km)",
@@ -581,7 +581,7 @@ Grid(
                 data=sighting_density,
                 filled=True,
                 levels=[0.5, 1, 2, 4, 8, 16, 32, 64],
-                norm=NORMALIZE.LOG,
+                norm=COLOR_NORM.LOG,
                 style={"plot_contour_cmap": COLORS.YlGnBu},
                 title="Chamois sightings per km²",
                 aspect_ratio=ASPECT_RATIO.EQUAL,
@@ -640,16 +640,16 @@ Grid(
 
 ### Axis scales
 
-Some surfaces are sampled over values that span orders of magnitude, and a linear axis crams the interesting part into a corner. `scalex` and `scaley` take a [SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE) member. `sweep`, defined in a hidden cell, holds the illustrative validation loss of a model trained over a grid of learning rates (1e-5 to 1e-1) and weight decays (1e-6 to 1e-1), both sampled evenly on a log scale, the way hyperparameter searches are. On log axes the valley of good settings is a clear oval; on linear axes it would be squeezed against the left and bottom edges.
+Some surfaces are sampled over values that span orders of magnitude, and a linear axis crams the interesting part into a corner. `scalex` and `scaley` take a [AXIS_SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE) member. `sweep`, defined in a hidden cell, holds the illustrative validation loss of a model trained over a grid of learning rates (1e-5 to 1e-1) and weight decays (1e-6 to 1e-1), both sampled evenly on a log scale, the way hyperparameter searches are. On log axes the valley of good settings is a clear oval; on linear axes it would be squeezed against the left and bottom edges.
 
 ```
-from datachart.constants import SCALE
+from datachart.constants import AXIS_SCALE
 
 ContourChart(
     data=sweep,
     # both hyperparameters on a log scale
-    scalex=SCALE.LOG,
-    scaley=SCALE.LOG,
+    scalex=AXIS_SCALE.LOG,
+    scaley=AXIS_SCALE.LOG,
     filled=True,
     show_colorbars=True,
     colorbar={"label": "Validation loss"},

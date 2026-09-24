@@ -75,9 +75,9 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `legend={"location": ..., "alignment": ...}`                    | [`LEGEND_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN)                                                                                                                       |
 | `show_grid`                                                     | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                                                                                                                                                                                                                                                       |
 | `aspect_ratio`                                                  | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                                                                                                                                                 |
-| `scalex`                                                        | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                                                                                                                                               |
-| `scaley`                                                        | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                                                                                                                                               |
-| `norm`                                                          | [`NORMALIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.NORMALIZE)                                                                                                                                                                                                                                                       |
+| `scalex`                                                        | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                                                                                                                                                     |
+| `scaley`                                                        | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                                                                                                                                                     |
+| `norm`                                                          | [`COLOR_NORM`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLOR_NORM)                                                                                                                                                                                                                                                     |
 | `value_format`                                                  | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                                                                                                                                                 |
 | `yticks_format`                                                 | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)                                                                                                                               |
 | `colorbar={"location": ..., "format": ..., "orientation": ...}` | [`COLORBAR_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORBAR_LOCATION), [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION) |
@@ -186,15 +186,15 @@ HexbinChart(
 
 ### Normalization
 
-Counts are heavy-tailed: a few hexagons in the core hold hundreds of listings while most hold a handful, so on a linear color scale nearly every hexagon draws in the palest shade. `norm` changes how the values map to colors with a [NORMALIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.NORMALIZE) member; `NORMALIZE.LOG` spreads the counts, so the tail of the distribution becomes visible. A log scale needs positive values, so pair it with `mincnt=1`. `vmin` and `vmax` pin the color range instead of taking it from the data, which keeps the colors of several charts comparable.
+Counts are heavy-tailed: a few hexagons in the core hold hundreds of listings while most hold a handful, so on a linear color scale nearly every hexagon draws in the palest shade. `norm` changes how the values map to colors with a [COLOR_NORM](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLOR_NORM) member; `COLOR_NORM.LOG` spreads the counts, so the tail of the distribution becomes visible. A log scale needs positive values, so pair it with `mincnt=1`. `vmin` and `vmax` pin the color range instead of taking it from the data, which keeps the colors of several charts comparable.
 
 ```
-from datachart.constants import NORMALIZE
+from datachart.constants import COLOR_NORM
 
 HexbinChart(
     data=points,
     # log-scaled counts, so the sparse tail stays visible
-    norm=NORMALIZE.LOG,
+    norm=COLOR_NORM.LOG,
     mincnt=1,
     # the color range, from one listing to 300
     vmin=1,
@@ -353,7 +353,7 @@ A note on the chart says what the reader should see. `texts` places text at a po
 HexbinChart(
     data=points,
     mincnt=1,
-    norm=NORMALIZE.LOG,
+    norm=COLOR_NORM.LOG,
     # a note in the empty corner, pointing at the tail
     texts={
         "text": "a few large, expensive\napartments",
@@ -421,7 +421,7 @@ Panel(
             "figure": HexbinChart(
                 data=points,
                 mincnt=1,
-                norm=NORMALIZE.LOG,
+                norm=COLOR_NORM.LOG,
                 # the budget band, labeled in the panel legend
                 hspans={"ymin": 800, "ymax": 1200, "label": "Budget", "style": BUDGET_STYLE},
                 style={"plot_hexbin_cmap": COLORS.Greys},
@@ -466,7 +466,7 @@ Grid(
             HexbinChart(
                 data=points,
                 mincnt=1,
-                norm=NORMALIZE.LOG,
+                norm=COLOR_NORM.LOG,
                 title="Listings",
                 xlabel="Floor area (m²)",
                 ylabel="Rent (€/month)",
@@ -553,7 +553,7 @@ config.set_theme(THEME.INK)
 figure = HexbinChart(
     data=points,
     mincnt=1,
-    norm=NORMALIZE.LOG,
+    norm=COLOR_NORM.LOG,
     title="Apartment listings",
     xlabel="Floor area (m²)",
     ylabel="Rent (€/month)",
@@ -617,7 +617,7 @@ HexbinChart(
     data=locations,
     mincnt=1,
     gridsize=40,
-    norm=NORMALIZE.LOG,
+    norm=COLOR_NORM.LOG,
     aspect_ratio=ASPECT_RATIO.EQUAL,
     # outline the 25 fullest hexagons
     emphasis_rule={"top": 25},
@@ -648,7 +648,7 @@ def district_row(name, data):
     frame = dict(gridsize=18, xmin=15, xmax=160, ymin=0, ymax=3500)
     count = HexbinChart(
         data={"x": data["x"], "y": data["y"]},
-        norm=NORMALIZE.LOG,
+        norm=COLOR_NORM.LOG,
         mincnt=1,
         vmin=1,
         vmax=300,

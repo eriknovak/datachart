@@ -372,7 +372,7 @@ from datachart.utils import Grid
 
 DECADES = {"yticks": list(range(0, 18, 2)), "yticklabels": [str(age) for age in range(0, 90, 10)]}
 # the same value range in every cell, so the bars compare across the cells
-SCALE = {"xmax": 500, "xticks": [0, 250, 500]}
+AXIS_SCALE = {"xmax": 500, "xticks": [0, 250, 500]}
 
 Grid(
     [
@@ -383,10 +383,10 @@ Grid(
             # the legend once, in the empty upper-right corner, without a title
             show_legend=True,
             legend={"title": "", "location": LEGEND_LOCATION.UPPER_RIGHT},
-            **SCALE,
+            **AXIS_SCALE,
             **DECADES,
         ),
-        PyramidChart(data=[men_2050, women_2050], subtitle=SIDES, title="2050", **SCALE, **DECADES),
+        PyramidChart(data=[men_2050, women_2050], subtitle=SIDES, title="2050", **AXIS_SCALE, **DECADES),
     ],
     title="An ageing population, today and in 25 years",
     # one pair of axis labels for the whole grid
@@ -414,7 +414,7 @@ PyramidChart(
     title="Projected population in 2050, with the projection interval",
     xlabel="Population (thousands)",
     ylabel="Age band",
-    **SCALE,
+    **AXIS_SCALE,
     # draw the error bars
     show_yerr=True,
 ).show()
@@ -470,7 +470,7 @@ The examples below put the features above to work on realistic data, each one an
 
 ### Example 1: How Big Is the Retirement Wave? (Emphasis Rule, Reference Line, and a Note)
 
-The shared population has its three largest bands, 50-54 to 60-64, just below the retirement age, and the question a pension planner asks is how many people that is. An `emphasis_rule` picks every bar above 345 thousand, which are the six bars of those three bands, an `hlines` entry marks the retirement age they are about to cross, and a note gives the sum: about 2.2 million people, more than a fifth of the population, reaching 65 within fifteen years. Decade ticks keep the age axis quiet, and the shared `SCALE` leaves room for the note.
+The shared population has its three largest bands, 50-54 to 60-64, just below the retirement age, and the question a pension planner asks is how many people that is. An `emphasis_rule` picks every bar above 345 thousand, which are the six bars of those three bands, an `hlines` entry marks the retirement age they are about to cross, and a note gives the sum: about 2.2 million people, more than a fifth of the population, reaching 65 within fifteen years. Decade ticks keep the age axis quiet, and the shared `AXIS_SCALE` leaves room for the note.
 
 ```
 PyramidChart(
@@ -481,7 +481,7 @@ PyramidChart(
     title="The cohorts about to retire",
     xlabel="Population (thousands)",
     ylabel="Age",
-    **SCALE,
+    **AXIS_SCALE,
     **DECADES,
     # the three largest bands, on both sides
     emphasis_rule={"above": 345},

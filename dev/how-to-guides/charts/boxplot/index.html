@@ -5916,7 +5916,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </tr>
 <tr>
 <td style="text-align:left"><code>scaley</code></td>
-<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.SCALE"><code>SCALE</code></a></td>
+<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.AXIS_SCALE"><code>AXIS_SCALE</code></a></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>yticks_format</code></td>
@@ -7754,7 +7754,7 @@ BoxPlot(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="axis-scales">Axis scales<a class="anchor-link" href="#axis-scales">¶</a></h3><p>Response times, incomes and file sizes are skewed: most values are small and a long tail runs far above them. On a linear axis the tail squeezes the boxes into a thin strip at the bottom. <code>scaley</code> takes a <a href="../../../references/constants/#datachart.constants.SCALE">SCALE</a> member, and a logarithmic scale spreads the boxes out so that their medians and quartiles can be compared. <code>response_times</code>, defined in a hidden cell, holds illustrative response times (in ms) of 200 requests to each of four services, drawn from a seeded log-normal generator.</p>
+<h3 id="axis-scales">Axis scales<a class="anchor-link" href="#axis-scales">¶</a></h3><p>Response times, incomes and file sizes are skewed: most values are small and a long tail runs far above them. On a linear axis the tail squeezes the boxes into a thin strip at the bottom. <code>scaley</code> takes a <a href="../../../references/constants/#datachart.constants.AXIS_SCALE">AXIS_SCALE</a> member, and a logarithmic scale spreads the boxes out so that their medians and quartiles can be compared. <code>response_times</code>, defined in a hidden cell, holds illustrative response times (in ms) of 200 requests to each of four services, drawn from a seeded log-normal generator.</p>
 </div>
 </div>
 </div>
@@ -7780,9 +7780,9 @@ BoxPlot(
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">SCALE</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">AXIS_SCALE</span>
 
-<span class="k">for</span> <span class="n">scale</span> <span class="ow">in</span> <span class="p">[</span><span class="n">SCALE</span><span class="o">.</span><span class="n">LINEAR</span><span class="p">,</span> <span class="n">SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">]:</span>
+<span class="k">for</span> <span class="n">scale</span> <span class="ow">in</span> <span class="p">[</span><span class="n">AXIS_SCALE</span><span class="o">.</span><span class="n">LINEAR</span><span class="p">,</span> <span class="n">AXIS_SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">]:</span>
     <span class="n">BoxPlot</span><span class="p">(</span>
         <span class="n">data</span><span class="o">=</span><span class="n">response_times</span><span class="p">,</span>
         <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Response times on the '</span><span class="si">{</span><span class="n">scale</span><span class="si">}</span><span class="s2">' scale"</span><span class="p">,</span>
@@ -7794,9 +7794,9 @@ BoxPlot(
         <span class="n">scaley</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span>
     <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-26">from datachart.constants import SCALE
+<div class="clipboard-copy-txt" id="cell-26">from datachart.constants import AXIS_SCALE
 
-for scale in [SCALE.LINEAR, SCALE.LOG]:
+for scale in [AXIS_SCALE.LINEAR, AXIS_SCALE.LOG]:
     BoxPlot(
         data=response_times,
         title=f"Response times on the '{scale}' scale",
@@ -8187,7 +8187,7 @@ penguin_records[:2]</div>
 
 <span class="n">overview</span> <span class="o">=</span> <span class="n">BoxPlot</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">response_times</span><span class="p">,</span>
-    <span class="n">scaley</span><span class="o">=</span><span class="n">SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
+    <span class="n">scaley</span><span class="o">=</span><span class="n">AXIS_SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
     <span class="n">hlines</span><span class="o">=</span><span class="n">SLA_LINE</span><span class="p">,</span>
     <span class="c1"># the services whose slowest request breaks the SLA</span>
     <span class="n">emphasis_rule</span><span class="o">=</span><span class="p">{</span><span class="s2">"above"</span><span class="p">:</span> <span class="n">SLA_MS</span><span class="p">,</span> <span class="s2">"by"</span><span class="p">:</span> <span class="s2">"max"</span><span class="p">},</span>
@@ -8241,7 +8241,7 @@ SLA_LINE = {
 
 overview = BoxPlot(
     data=response_times,
-    scaley=SCALE.LOG,
+    scaley=AXIS_SCALE.LOG,
     hlines=SLA_LINE,
     # the services whose slowest request breaks the SLA
     emphasis_rule={"above": SLA_MS, "by": "max"},

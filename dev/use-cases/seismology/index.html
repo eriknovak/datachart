@@ -5253,9 +5253,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">FIG_SIZE</span><span class="p">,</span>
     <span class="n">NETWORK_LABEL_POSITION</span><span class="p">,</span>
     <span class="n">NETWORK_LAYOUT</span><span class="p">,</span>
-    <span class="n">NORMALIZE</span><span class="p">,</span>
+    <span class="n">COLOR_NORM</span><span class="p">,</span>
     <span class="n">RADIAL_TYPE</span><span class="p">,</span>
-    <span class="n">SCALE</span><span class="p">,</span>
+    <span class="n">AXIS_SCALE</span><span class="p">,</span>
     <span class="n">SHOW_GRID</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">datachart.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">Grid</span><span class="p">,</span> <span class="n">Panel</span>
@@ -5281,9 +5281,9 @@ from datachart.constants import (
     FIG_SIZE,
     NETWORK_LABEL_POSITION,
     NETWORK_LAYOUT,
-    NORMALIZE,
+    COLOR_NORM,
     RADIAL_TYPE,
-    SCALE,
+    AXIS_SCALE,
     SHOW_GRID,
 )
 from datachart.utils import Grid, Panel</div>
@@ -5324,7 +5324,7 @@ from datachart.utils import Grid, Panel</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="where-does-the-seismicity-concentrate">Where does the seismicity concentrate?<a class="anchor-link" href="#where-does-the-seismicity-concentrate">¶</a></h3><p>The first figure of an earthquake report is the map of the epicentres, and eight hundred points on one axes overplot wherever the activity is densest, which is exactly where the reader looks. A <a href="../../how-to-guides/charts/hexbinchart/">hexbin chart</a> bins them instead: the plane is tiled with hexagons and each one is coloured by the number of events inside it, so density reads as colour and nothing hides behind a marker. The counts span three orders of magnitude between a quiet hexagon and the aftershock zone, so <code>norm=NORMALIZE.LOG</code> gives the colour scale a logarithmic reach and keeps the sparse cells visible. <code>mincnt=1</code> leaves the empty cells blank rather than colouring them as zero, and through them shows the ground: an <a href="../../how-to-guides/charts/imagechart/">image chart</a> draws the relief grid as a faded grey picture stretched over its extent, a <a href="../../how-to-guides/charts/basemapchart/">basemap chart</a> traces the coastline over it, and <a href="../../how-to-guides/utility/panel/">Panel</a> puts both under the hexagons, so the density reads against the land and the sea it falls on. The grid's first row is its southern edge while a picture's first row is its top, so the rows are flipped. A degree of longitude at 38 degrees north is a fifth shorter than a degree of latitude, so <code>aspect_ratio=ASPECT_RATIO.GEOGRAPHIC</code> narrows it by that much and the region keeps its true shape.</p>
+<h3 id="where-does-the-seismicity-concentrate">Where does the seismicity concentrate?<a class="anchor-link" href="#where-does-the-seismicity-concentrate">¶</a></h3><p>The first figure of an earthquake report is the map of the epicentres, and eight hundred points on one axes overplot wherever the activity is densest, which is exactly where the reader looks. A <a href="../../how-to-guides/charts/hexbinchart/">hexbin chart</a> bins them instead: the plane is tiled with hexagons and each one is coloured by the number of events inside it, so density reads as colour and nothing hides behind a marker. The counts span three orders of magnitude between a quiet hexagon and the aftershock zone, so <code>norm=COLOR_NORM.LOG</code> gives the colour scale a logarithmic reach and keeps the sparse cells visible. <code>mincnt=1</code> leaves the empty cells blank rather than colouring them as zero, and through them shows the ground: an <a href="../../how-to-guides/charts/imagechart/">image chart</a> draws the relief grid as a faded grey picture stretched over its extent, a <a href="../../how-to-guides/charts/basemapchart/">basemap chart</a> traces the coastline over it, and <a href="../../how-to-guides/utility/panel/">Panel</a> puts both under the hexagons, so the density reads against the land and the sea it falls on. The grid's first row is its southern edge while a picture's first row is its top, so the rows are flipped. A degree of longitude at 38 degrees north is a fifth shorter than a degree of latitude, so <code>aspect_ratio=ASPECT_RATIO.GEOGRAPHIC</code> narrows it by that much and the region keeps its true shape.</p>
 </div>
 </div>
 </div>
@@ -5376,7 +5376,7 @@ from datachart.utils import Grid, Panel</div>
     <span class="p">{</span><span class="s2">"x"</span><span class="p">:</span> <span class="n">longitude</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="s2">"y"</span><span class="p">:</span> <span class="n">latitude</span><span class="o">.</span><span class="n">tolist</span><span class="p">()},</span>
     <span class="n">gridsize</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span>
     <span class="c1"># counts run from 1 to several hundred, so the colour scale is logarithmic</span>
-    <span class="n">norm</span><span class="o">=</span><span class="n">NORMALIZE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
+    <span class="n">norm</span><span class="o">=</span><span class="n">COLOR_NORM</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
     <span class="n">mincnt</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="c1"># a hairline edge keeps the single-event cells visible on white</span>
     <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">"plot_hexbin_edge_width"</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span> <span class="s2">"plot_hexbin_edge_color"</span><span class="p">:</span> <span class="s2">"#d0d0d0"</span><span class="p">},</span>
@@ -5440,7 +5440,7 @@ density = HexbinChart(
     {"x": longitude.tolist(), "y": latitude.tolist()},
     gridsize=42,
     # counts run from 1 to several hundred, so the colour scale is logarithmic
-    norm=NORMALIZE.LOG,
+    norm=COLOR_NORM.LOG,
     mincnt=1,
     # a hairline edge keeps the single-event cells visible on white
     style={"plot_hexbin_edge_width": 0.3, "plot_hexbin_edge_color": "#d0d0d0"},
@@ -5631,7 +5631,7 @@ relief_figure.show()</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="how-are-the-magnitudes-distributed">How are the magnitudes distributed?<a class="anchor-link" href="#how-are-the-magnitudes-distributed">¶</a></h3><p>Earthquake sizes follow the Gutenberg-Richter law: the number of events of magnitude M or greater falls by a constant factor for every unit of magnitude, so a plot of the cumulative count against magnitude is a straight line on a logarithmic count axis. The slope of that line is the b-value, which is close to 1 for most of the world and is the number a seismicity report quotes. A <a href="../../how-to-guides/charts/linechart/">line chart</a> with <code>scaley=SCALE.LOG</code> draws it, and a second series carries the fitted line so the eye can judge the fit rather than trust it.</p>
+<h3 id="how-are-the-magnitudes-distributed">How are the magnitudes distributed?<a class="anchor-link" href="#how-are-the-magnitudes-distributed">¶</a></h3><p>Earthquake sizes follow the Gutenberg-Richter law: the number of events of magnitude M or greater falls by a constant factor for every unit of magnitude, so a plot of the cumulative count against magnitude is a straight line on a logarithmic count axis. The slope of that line is the b-value, which is close to 1 for most of the world and is the number a seismicity report quotes. A <a href="../../how-to-guides/charts/linechart/">line chart</a> with <code>scaley=AXIS_SCALE.LOG</code> draws it, and a second series carries the fitted line so the eye can judge the fit rather than trust it.</p>
 <p>The line bends away from the data at the left because a catalogue misses small events far from stations. The magnitude where that begins is the completeness magnitude, taken here as 4.5 and marked with <code>vlines</code>; the b-value is estimated from the events above it with the Aki maximum-likelihood formula, which needs only their mean magnitude.</p>
 </div>
 </div>
@@ -5678,7 +5678,7 @@ relief_figure.show()</div>
     <span class="n">ylabel</span><span class="o">=</span><span class="s2">"Earthquakes of this magnitude or greater"</span><span class="p">,</span>
     <span class="n">subtitle</span><span class="o">=</span><span class="p">[</span><span class="s2">"Catalogue"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"Fit above M</span><span class="si">{</span><span class="n">MC</span><span class="si">}</span><span class="s2">"</span><span class="p">],</span>
     <span class="c1"># the counts fall by three orders of magnitude across the axis</span>
-    <span class="n">scaley</span><span class="o">=</span><span class="n">SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
+    <span class="n">scaley</span><span class="o">=</span><span class="n">AXIS_SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
     <span class="c1"># the fit runs on below one event a year; the axis stops where the data does</span>
     <span class="n">ymin</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
     <span class="n">vlines</span><span class="o">=</span><span class="p">{</span><span class="s2">"x"</span><span class="p">:</span> <span class="n">MC</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Completeness (M</span><span class="si">{</span><span class="n">MC</span><span class="si">}</span><span class="s2">)"</span><span class="p">},</span>
@@ -5711,7 +5711,7 @@ gutenberg_figure = LineChart(
     ylabel="Earthquakes of this magnitude or greater",
     subtitle=["Catalogue", f"Fit above M{MC}"],
     # the counts fall by three orders of magnitude across the axis
-    scaley=SCALE.LOG,
+    scaley=AXIS_SCALE.LOG,
     # the fit runs on below one event a year; the axis stops where the data does
     ymin=0.8,
     vlines={"x": MC, "label": f"Completeness (M{MC})"},
@@ -5816,8 +5816,8 @@ gutenberg_figure.show()</div>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Days since the mainshock"</span><span class="p">,</span>
     <span class="n">ylabel</span><span class="o">=</span><span class="s2">"Aftershocks per day"</span><span class="p">,</span>
     <span class="n">subtitle</span><span class="o">=</span><span class="p">[</span><span class="s2">"Observed rate"</span><span class="p">,</span> <span class="s2">"Omori fit"</span><span class="p">],</span>
-    <span class="n">scalex</span><span class="o">=</span><span class="n">SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
-    <span class="n">scaley</span><span class="o">=</span><span class="n">SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
+    <span class="n">scalex</span><span class="o">=</span><span class="n">AXIS_SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
+    <span class="n">scaley</span><span class="o">=</span><span class="n">AXIS_SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
     <span class="n">show_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">show_grid</span><span class="o">=</span><span class="n">SHOW_GRID</span><span class="o">.</span><span class="n">BOTH</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_MEDIUM</span><span class="p">,</span>
@@ -5862,8 +5862,8 @@ omori_figure = LineChart(
     xlabel="Days since the mainshock",
     ylabel="Aftershocks per day",
     subtitle=["Observed rate", "Omori fit"],
-    scalex=SCALE.LOG,
-    scaley=SCALE.LOG,
+    scalex=AXIS_SCALE.LOG,
+    scaley=AXIS_SCALE.LOG,
     show_legend=True,
     show_grid=SHOW_GRID.BOTH,
     figsize=FIG_SIZE.FULL_MEDIUM,

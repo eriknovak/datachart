@@ -21,7 +21,7 @@ from datachart.constants import (
     FIG_SIZE,
     LEGEND_LOCATION,
     RIDGELINE_SCALE,
-    SCALE,
+    AXIS_SCALE,
     SHOW_GRID,
     SORT,
     VALUE_FORMAT,
@@ -258,7 +258,7 @@ In 1990 the ridge is wide and has a second hump, a cluster of countries in the m
 
 ### Do richer countries live longer?
 
-The Preston curve is the classic figure of development: every country as one point, GDP per capita across, life expectancy up. Income spans two orders of magnitude, so on a linear axis the poorer half of the world piles up against the left edge; `scalex=SCALE.LOG` spreads them out and turns the curve into something close to a line. The [scatter chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/scatterchart/index.md) takes a `hue` per record to colour the points by region and a `size` to scale them by population, so a small rich country and a large poor one read differently. The country of the page gets a `texts` note with a `target`, which draws the arrow from the note to its point.
+The Preston curve is the classic figure of development: every country as one point, GDP per capita across, life expectancy up. Income spans two orders of magnitude, so on a linear axis the poorer half of the world piles up against the left edge; `scalex=AXIS_SCALE.LOG` spreads them out and turns the curve into something close to a line. The [scatter chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/scatterchart/index.md) takes a `hue` per record to colour the points by region and a `size` to scale them by population, so a small rich country and a large poor one read differently. The country of the page gets a `texts` note with a `target`, which draws the arrow from the note to its point.
 
 ```
 HOME_POINT = next(row for row in PRESTON if row[0] == HOME)
@@ -271,7 +271,7 @@ preston_figure = ScatterChart(
     title="Income buys years, with diminishing returns",
     xlabel="GDP per capita (2021 PPP dollars, log scale)",
     ylabel="Life expectancy at birth (years)",
-    scalex=SCALE.LOG,
+    scalex=AXIS_SCALE.LOG,
     xticks=[1000, 10000, 100000],
     xticklabels=["1,000", "10,000", "100,000"],
     # a note on the home country, with an arrow to its point

@@ -5884,7 +5884,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </tr>
 <tr>
 <td style="text-align:left"><code>scaley</code></td>
-<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.SCALE"><code>SCALE</code></a></td>
+<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.AXIS_SCALE"><code>AXIS_SCALE</code></a></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>yticks_format</code></td>
@@ -7400,7 +7400,7 @@ Grid(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="axis-scales">Axis scales<a class="anchor-link" href="#axis-scales">¶</a></h3><p>Some values span orders of magnitude, and on a linear axis the small ones collapse into a spike at zero. <code>scaley</code> sets the scale of the value axis, whichever direction it runs, with a <a href="../../../references/constants/#datachart.constants.SCALE">SCALE</a> member. The ridges, though, are estimated at evenly spaced values, so on a log axis the rows with small values get only a few of them and turn jagged. For data that spans orders of magnitude, estimate the ridges on the logarithm of the values instead, and label the ticks in the original unit with <code>xticks</code> and <code>xticklabels</code>. <code>response_times</code>, defined in a hidden cell, holds illustrative response times of three API endpoints, from a health check of a few milliseconds to a report that takes over a second; on the log scale all three ridges are readable, and the right-skewed response times turn into symmetric bumps.</p>
+<h3 id="axis-scales">Axis scales<a class="anchor-link" href="#axis-scales">¶</a></h3><p>Some values span orders of magnitude, and on a linear axis the small ones collapse into a spike at zero. <code>scaley</code> sets the scale of the value axis, whichever direction it runs, with a <a href="../../../references/constants/#datachart.constants.AXIS_SCALE">AXIS_SCALE</a> member. The ridges, though, are estimated at evenly spaced values, so on a log axis the rows with small values get only a few of them and turn jagged. For data that spans orders of magnitude, estimate the ridges on the logarithm of the values instead, and label the ticks in the original unit with <code>xticks</code> and <code>xticklabels</code>. <code>response_times</code>, defined in a hidden cell, holds illustrative response times of three API endpoints, from a health check of a few milliseconds to a report that takes over a second; on the log scale all three ridges are readable, and the right-skewed response times turn into symmetric bumps.</p>
 </div>
 </div>
 </div>

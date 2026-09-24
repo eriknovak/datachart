@@ -72,8 +72,8 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `orientation`                                | [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)                                                                                                                             |
 | `bar_mode`                                   | [`BAR_MODE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BAR_MODE)                                                                                                                                   |
 | `sort`                                       | [`SORT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT)                                                                                                                                           |
-| `scalex`                                     | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                         |
-| `scaley`                                     | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                         |
+| `scalex`                                     | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                               |
+| `scaley`                                     | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                               |
 | `yticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
 
 The full list of style attributes is in the [datachart.typings.BarStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/barchart/#datachart.typings.BarStyleAttrs) type; the full list of parameters is in the [datachart.charts.BarChart](https://eriknovak.github.io/datachart/dev/references/charts/barchart/#datachart.charts.BarChart) reference.
@@ -552,12 +552,12 @@ BarChart(
 
 ### Axis scales
 
-Bars encode value by length, so a linear axis is the honest default, and a logarithmic one is the exception for values that span orders of magnitude. `scaley` (or `scalex` for horizontal bars) takes a [SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE) member. `populations`, defined in a hidden cell, holds the approximate mid-2024 population of seven countries in thousands (UN World Population Prospects 2024, rounded), from about 1.45 billion down to about 10 thousand. On a linear scale the small countries vanish; on a log scale every bar is readable, at the price that bar lengths no longer compare.
+Bars encode value by length, so a linear axis is the honest default, and a logarithmic one is the exception for values that span orders of magnitude. `scaley` (or `scalex` for horizontal bars) takes a [AXIS_SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE) member. `populations`, defined in a hidden cell, holds the approximate mid-2024 population of seven countries in thousands (UN World Population Prospects 2024, rounded), from about 1.45 billion down to about 10 thousand. On a linear scale the small countries vanish; on a log scale every bar is readable, at the price that bar lengths no longer compare.
 
 ```
-from datachart.constants import SCALE
+from datachart.constants import AXIS_SCALE
 
-for scale in [SCALE.LINEAR, SCALE.LOG]:
+for scale in [AXIS_SCALE.LINEAR, AXIS_SCALE.LOG]:
     BarChart(
         data=populations,
         title=f"Population on the '{scale}' scale",

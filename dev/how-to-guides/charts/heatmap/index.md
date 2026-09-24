@@ -64,7 +64,7 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `legend={"location": ..., "alignment": ...}`                    | [`LEGEND_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN)                                                                                                                       |
 | `show_grid`                                                     | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                                                                                                                                                                                                                                                       |
 | `aspect_ratio`                                                  | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                                                                                                                                                 |
-| `norm`                                                          | [`NORMALIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.NORMALIZE)                                                                                                                                                                                                                                                       |
+| `norm`                                                          | [`COLOR_NORM`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLOR_NORM)                                                                                                                                                                                                                                                     |
 | `value_format`                                                  | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                                                                                                                                                 |
 | `yticks_format`                                                 | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)                                                                                                                               |
 | `colorbar={"location": ..., "format": ..., "orientation": ...}` | [`COLORBAR_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORBAR_LOCATION), [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION) |
@@ -223,14 +223,14 @@ Heatmap(
 ).show()
 ```
 
-**Normalization.** `norm` changes how the values spread over the 0 to 1 range, with a [NORMALIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.NORMALIZE) member: `LINEAR` (the default); `LOG`, for positive values spanning orders of magnitude, where zero and negative values have no logarithm and are left blank; `SYMLOG` and `ASINH`, which are linear near zero and logarithmic beyond, so they keep zeros and signed values; and `LOGIT`, for proportions strictly between 0 and 1. It rescales the colors, not an axis, unlike the `scalex` and `scaley` of the other charts.
+**Normalization.** `norm` changes how the values spread over the 0 to 1 range, with a [COLOR_NORM](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLOR_NORM) member: `LINEAR` (the default); `LOG`, for positive values spanning orders of magnitude, where zero and negative values have no logarithm and are left blank; `SYMLOG` and `ASINH`, which are linear near zero and logarithmic beyond, so they keep zeros and signed values; and `LOGIT`, for proportions strictly between 0 and 1. It rescales the colors, not an axis, unlike the `scalex` and `scaley` of the other charts.
 
 A non-linear normalization is honest when the question is about ratios rather than differences, or when a few large values would otherwise flatten everything else, and the colorbar must stay on so the reader can see the scale is not linear. The `precipitation` table is such a case: Singapore's 290 mm December claims the dark end of a linear colormap, and every other city's wet and dry seasons fade into the same pale shades. A log normalization would blank Cairo's rainless months; `SYMLOG` keeps them and spreads the low end, so Cairo's wet winter and dry summer show, at the price of compressing the differences between the wetter cities. The colorbar makes that trade visible, which is why it stays on.
 
 ```
-from datachart.constants import NORMALIZE
+from datachart.constants import COLOR_NORM
 
-for norm in [NORMALIZE.LINEAR, NORMALIZE.SYMLOG]:
+for norm in [COLOR_NORM.LINEAR, COLOR_NORM.SYMLOG]:
     Heatmap(
         data=precipitation,
         # how the values spread over the colormap
@@ -245,9 +245,9 @@ for norm in [NORMALIZE.LINEAR, NORMALIZE.SYMLOG]:
     ).show()
 ```
 
-**Centered normalization.** Values that carry a sign—a correlation, a difference, an anomaly—have one value that means "neither": usually zero. `norm=NORMALIZE.CENTERED` holds that value in the middle of the colormap and runs the same distance to each side of it, so a cell's hue is its sign and its depth is its size. The colormap it draws in is the theme's `plot_heatmap_cmap_diverging`, not the sequential `plot_heatmap_cmap` every other norm uses, so the centring and the colors that show it arrive together and follow a theme switch; a `plot_heatmap_cmap` in the chart's own `style` still wins if you want to name one yourself.
+**Centered normalization.** Values that carry a sign—a correlation, a difference, an anomaly—have one value that means "neither": usually zero. `norm=COLOR_NORM.CENTERED` holds that value in the middle of the colormap and runs the same distance to each side of it, so a cell's hue is its sign and its depth is its size. The colormap it draws in is the theme's `plot_heatmap_cmap_diverging`, not the sequential `plot_heatmap_cmap` every other norm uses, so the centring and the colors that show it arrive together and follow a theme switch; a `plot_heatmap_cmap` in the chart's own `style` still wins if you want to name one yourself.
 
-`vcenter` moves the middle off zero when the neutral value is elsewhere—a baseline accuracy, last year's average. `vmin` and `vmax` still pin the ends, folded into the larger distance from the centre so the scale stays symmetric. When the two sides genuinely differ in reach and you want both fully used, `NORMALIZE.TWOSLOPE` keeps `vmin` and `vmax` where you put them and stretches each side to the centre separately; it is the honest choice only when you say so in the caption, because equal color steps then mean different value steps on either side.
+`vcenter` moves the middle off zero when the neutral value is elsewhere—a baseline accuracy, last year's average. `vmin` and `vmax` still pin the ends, folded into the larger distance from the centre so the scale stays symmetric. When the two sides genuinely differ in reach and you want both fully used, `COLOR_NORM.TWOSLOPE` keeps `vmin` and `vmax` where you put them and stretches each side to the centre separately; it is the honest choice only when you say so in the caption, because equal color steps then mean different value steps on either side.
 
 The temperatures below are centered on 0 °C, then on 18 °C, a room-temperature comfort baseline: the same table, two different questions.
 
@@ -256,7 +256,7 @@ for centre, label in [(0, "freezing"), (18, "room temperature")]:
     Heatmap(
         data=temperatures,
         # the middle of the theme's diverging colormap sits on `vcenter`
-        norm=NORMALIZE.CENTERED,
+        norm=COLOR_NORM.CENTERED,
         vcenter=centre,
         title=f"Mean monthly temperature (\u00b0C), centered on {label}",
         xlabel="Month",
@@ -342,7 +342,7 @@ Heatmap(
     subtitle=["Temperature (°C)", "Precipitation (mm)"],
     # a colormap and a normalization per table
     style=[{"plot_heatmap_cmap": COLORS.YlOrRd}, {"plot_heatmap_cmap": COLORS.Blues}],
-    norm=[None, NORMALIZE.SYMLOG],
+    norm=[None, COLOR_NORM.SYMLOG],
     title="The climate of six cities",
     xlabel="Month",
     ylabel="City",
@@ -362,7 +362,7 @@ Heatmap(
     data=[temperatures, precipitation],
     subtitle=["Temperature (°C)", "Precipitation (mm)"],
     style=[{"plot_heatmap_cmap": COLORS.YlOrRd}, {"plot_heatmap_cmap": COLORS.Blues}],
-    norm=[None, NORMALIZE.SYMLOG],
+    norm=[None, COLOR_NORM.SYMLOG],
     # one format per table
     value_format=[VALUE_FORMAT.DECIMAL, VALUE_FORMAT.INTEGER],
     title="The climate of six cities",
@@ -442,13 +442,13 @@ The examples below put the features above to work, each one answering a question
 
 ### Example 1: How Do Penguin Measurements Move Together? (Centered Norm, Half a Matrix, and a Note)
 
-`correlations` holds the Pearson correlation between four body measurements (bill length, bill depth, flipper length and body mass) of the 342 penguins in the [Palmer penguins](https://allisonhorst.github.io/palmerpenguins/) dataset (CC0). A correlation matrix is symmetric, so the upper triangle repeats the lower one and the diagonal is 1.00 by definition: both are left `None`, which draws them blank and leaves six cells that each say something. A correlation is also signed, so `norm=NORMALIZE.CENTERED` puts zero in the middle of the theme's diverging colormap and gives equally strong correlations of either sign equally dark shades, without naming a colormap or a range by hand. The variables label both axes, square cells keep the matrix square, and the cells carry the coefficients. One cell is a known trap: bill length and depth correlate negatively across all penguins but positively within each species, a case of Simpson's paradox, and a note says so.
+`correlations` holds the Pearson correlation between four body measurements (bill length, bill depth, flipper length and body mass) of the 342 penguins in the [Palmer penguins](https://allisonhorst.github.io/palmerpenguins/) dataset (CC0). A correlation matrix is symmetric, so the upper triangle repeats the lower one and the diagonal is 1.00 by definition: both are left `None`, which draws them blank and leaves six cells that each say something. A correlation is also signed, so `norm=COLOR_NORM.CENTERED` puts zero in the middle of the theme's diverging colormap and gives equally strong correlations of either sign equally dark shades, without naming a colormap or a range by hand. The variables label both axes, square cells keep the matrix square, and the cells carry the coefficients. One cell is a known trap: bill length and depth correlate negatively across all penguins but positively within each species, a case of Simpson's paradox, and a note says so.
 
 ```
 Heatmap(
     data=correlations,
     # zero sits in the middle of the theme's diverging colormap
-    norm=NORMALIZE.CENTERED,
+    norm=COLOR_NORM.CENTERED,
     vmin=-1,
     vmax=1,
     style={

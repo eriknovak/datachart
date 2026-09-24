@@ -5818,11 +5818,11 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </tr>
 <tr>
 <td style="text-align:left"><code>scalex</code></td>
-<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.SCALE"><code>SCALE</code></a></td>
+<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.AXIS_SCALE"><code>AXIS_SCALE</code></a></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>scaley</code></td>
-<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.SCALE"><code>SCALE</code></a></td>
+<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.AXIS_SCALE"><code>AXIS_SCALE</code></a></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>yticks_format</code></td>
@@ -7418,7 +7418,7 @@ LineChart(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="axis-scales">Axis scales<a class="anchor-link" href="#axis-scales">¶</a></h3><p>A quantity that grows by a constant factor looks like a hockey stick on a linear axis and like a straight line on a logarithmic one, and only the second lets the reader judge whether the growth rate changed. <code>scaley</code> and <code>scalex</code> take a <a href="../../../references/constants/#datachart.constants.SCALE">SCALE</a> member: <code>LINEAR</code>, <code>LOG</code>, <code>SYMLOG</code> (log on both sides of zero) or <code>ASINH</code>. <code>transistors</code>, defined in a hidden cell, holds the transistor count of a representative microprocessor per year from the Intel 4004 (1971) to the Apple M1 Ultra (2022), Moore's law in sixteen data points rounded from the manufacturers' figures. On a linear scale the first forty years collapse onto the x-axis; on a log scale the doubling every two years becomes the straight line it is famous for.</p>
+<h3 id="axis-scales">Axis scales<a class="anchor-link" href="#axis-scales">¶</a></h3><p>A quantity that grows by a constant factor looks like a hockey stick on a linear axis and like a straight line on a logarithmic one, and only the second lets the reader judge whether the growth rate changed. <code>scaley</code> and <code>scalex</code> take a <a href="../../../references/constants/#datachart.constants.AXIS_SCALE">AXIS_SCALE</a> member: <code>LINEAR</code>, <code>LOG</code>, <code>SYMLOG</code> (log on both sides of zero) or <code>ASINH</code>. <code>transistors</code>, defined in a hidden cell, holds the transistor count of a representative microprocessor per year from the Intel 4004 (1971) to the Apple M1 Ultra (2022), Moore's law in sixteen data points rounded from the manufacturers' figures. On a linear scale the first forty years collapse onto the x-axis; on a log scale the doubling every two years becomes the straight line it is famous for.</p>
 </div>
 </div>
 </div>
@@ -7444,9 +7444,9 @@ LineChart(
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">SCALE</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">AXIS_SCALE</span>
 
-<span class="k">for</span> <span class="n">scale</span> <span class="ow">in</span> <span class="p">[</span><span class="n">SCALE</span><span class="o">.</span><span class="n">LINEAR</span><span class="p">,</span> <span class="n">SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">]:</span>
+<span class="k">for</span> <span class="n">scale</span> <span class="ow">in</span> <span class="p">[</span><span class="n">AXIS_SCALE</span><span class="o">.</span><span class="n">LINEAR</span><span class="p">,</span> <span class="n">AXIS_SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">]:</span>
     <span class="n">LineChart</span><span class="p">(</span>
         <span class="n">data</span><span class="o">=</span><span class="n">transistors</span><span class="p">,</span>
         <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">"plot_line_marker"</span><span class="p">:</span> <span class="n">LINE_MARKER</span><span class="o">.</span><span class="n">CIRCLE</span><span class="p">},</span>
@@ -7459,9 +7459,9 @@ LineChart(
         <span class="n">scaley</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span>
     <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-22">from datachart.constants import SCALE
+<div class="clipboard-copy-txt" id="cell-22">from datachart.constants import AXIS_SCALE
 
-for scale in [SCALE.LINEAR, SCALE.LOG]:
+for scale in [AXIS_SCALE.LINEAR, AXIS_SCALE.LOG]:
     LineChart(
         data=transistors,
         style={"plot_line_marker": LINE_MARKER.CIRCLE},
@@ -7790,7 +7790,7 @@ LineChart(
     <span class="c1"># draw the run-to-run spread as a band</span>
     <span class="n">show_yerr</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="c1"># a log value axis</span>
-    <span class="n">scaley</span><span class="o">=</span><span class="n">SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
+    <span class="n">scaley</span><span class="o">=</span><span class="n">AXIS_SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-26">LineChart(
@@ -7811,7 +7811,7 @@ LineChart(
     # draw the run-to-run spread as a band
     show_yerr=True,
     # a log value axis
-    scaley=SCALE.LOG,
+    scaley=AXIS_SCALE.LOG,
 ).show()</div>
 </div>
 </div>

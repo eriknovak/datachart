@@ -74,7 +74,7 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `aspect_ratio`                               | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                           |
 | `orientation`                                | [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)                                                                                                                             |
 | `sort`                                       | [`SORT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT)                                                                                                                                           |
-| `scaley`                                     | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                         |
+| `scaley`                                     | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                               |
 | `yticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
 | `bandwidth`                                  | [`BANDWIDTH`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH)                                                                                                                                 |
 
@@ -572,12 +572,12 @@ ViolinPlot(
 
 ### Axis scales
 
-Waiting times, file sizes and incomes are skewed: most values are small and a few are huge, so on a linear axis the bodies are squashed against zero with a long thin tail. `scaley` takes a [SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE) member, and a logarithmic axis spreads the small values out. Body masses are not skewed, so this example switches dataset: `first_reply`, defined in a hidden cell, holds 200 illustrative first-reply times (in minutes) of support requests per channel, from a seeded generator. On the linear axis only the forum body is visible; on the log axis all three are, minutes to days on one axis. The body is still estimated from the raw values, though, so on the log axis it keeps a linear-space shape: a flat, wide base and a thin spike toward the long tail.
+Waiting times, file sizes and incomes are skewed: most values are small and a few are huge, so on a linear axis the bodies are squashed against zero with a long thin tail. `scaley` takes a [AXIS_SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE) member, and a logarithmic axis spreads the small values out. Body masses are not skewed, so this example switches dataset: `first_reply`, defined in a hidden cell, holds 200 illustrative first-reply times (in minutes) of support requests per channel, from a seeded generator. On the linear axis only the forum body is visible; on the log axis all three are, minutes to days on one axis. The body is still estimated from the raw values, though, so on the log axis it keeps a linear-space shape: a flat, wide base and a thin spike toward the long tail.
 
 ```
-from datachart.constants import SCALE
+from datachart.constants import AXIS_SCALE
 
-for scale in [SCALE.LINEAR, SCALE.LOG]:
+for scale in [AXIS_SCALE.LINEAR, AXIS_SCALE.LOG]:
     ViolinPlot(
         data=first_reply,
         inner=VIOLIN_INNER.QUARTILES,

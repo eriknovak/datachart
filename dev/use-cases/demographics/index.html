@@ -5270,7 +5270,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">FIG_SIZE</span><span class="p">,</span>
     <span class="n">LEGEND_LOCATION</span><span class="p">,</span>
     <span class="n">RIDGELINE_SCALE</span><span class="p">,</span>
-    <span class="n">SCALE</span><span class="p">,</span>
+    <span class="n">AXIS_SCALE</span><span class="p">,</span>
     <span class="n">SHOW_GRID</span><span class="p">,</span>
     <span class="n">SORT</span><span class="p">,</span>
     <span class="n">VALUE_FORMAT</span><span class="p">,</span>
@@ -5293,7 +5293,7 @@ from datachart.constants import (
     FIG_SIZE,
     LEGEND_LOCATION,
     RIDGELINE_SCALE,
-    SCALE,
+    AXIS_SCALE,
     SHOW_GRID,
     SORT,
     VALUE_FORMAT,
@@ -6080,7 +6080,7 @@ world_figure.show()</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="do-richer-countries-live-longer">Do richer countries live longer?<a class="anchor-link" href="#do-richer-countries-live-longer">¶</a></h3><p>The Preston curve is the classic figure of development: every country as one point, GDP per capita across, life expectancy up. Income spans two orders of magnitude, so on a linear axis the poorer half of the world piles up against the left edge; <code>scalex=SCALE.LOG</code> spreads them out and turns the curve into something close to a line. The <a href="../../how-to-guides/charts/scatterchart/">scatter chart</a> takes a <code>hue</code> per record to colour the points by region and a <code>size</code> to scale them by population, so a small rich country and a large poor one read differently. The country of the page gets a <code>texts</code> note with a <code>target</code>, which draws the arrow from the note to its point.</p>
+<h3 id="do-richer-countries-live-longer">Do richer countries live longer?<a class="anchor-link" href="#do-richer-countries-live-longer">¶</a></h3><p>The Preston curve is the classic figure of development: every country as one point, GDP per capita across, life expectancy up. Income spans two orders of magnitude, so on a linear axis the poorer half of the world piles up against the left edge; <code>scalex=AXIS_SCALE.LOG</code> spreads them out and turns the curve into something close to a line. The <a href="../../how-to-guides/charts/scatterchart/">scatter chart</a> takes a <code>hue</code> per record to colour the points by region and a <code>size</code> to scale them by population, so a small rich country and a large poor one read differently. The country of the page gets a <code>texts</code> note with a <code>target</code>, which draws the arrow from the note to its point.</p>
 </div>
 </div>
 </div>
@@ -6113,7 +6113,7 @@ world_figure.show()</div>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Income buys years, with diminishing returns"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"GDP per capita (2021 PPP dollars, log scale)"</span><span class="p">,</span>
     <span class="n">ylabel</span><span class="o">=</span><span class="s2">"Life expectancy at birth (years)"</span><span class="p">,</span>
-    <span class="n">scalex</span><span class="o">=</span><span class="n">SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
+    <span class="n">scalex</span><span class="o">=</span><span class="n">AXIS_SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
     <span class="n">xticks</span><span class="o">=</span><span class="p">[</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">10000</span><span class="p">,</span> <span class="mi">100000</span><span class="p">],</span>
     <span class="n">xticklabels</span><span class="o">=</span><span class="p">[</span><span class="s2">"1,000"</span><span class="p">,</span> <span class="s2">"10,000"</span><span class="p">,</span> <span class="s2">"100,000"</span><span class="p">],</span>
     <span class="c1"># a note on the home country, with an arrow to its point</span>
@@ -6142,7 +6142,7 @@ preston_figure = ScatterChart(
     title="Income buys years, with diminishing returns",
     xlabel="GDP per capita (2021 PPP dollars, log scale)",
     ylabel="Life expectancy at birth (years)",
-    scalex=SCALE.LOG,
+    scalex=AXIS_SCALE.LOG,
     xticks=[1000, 10000, 100000],
     xticklabels=["1,000", "10,000", "100,000"],
     # a note on the home country, with an arrow to its point

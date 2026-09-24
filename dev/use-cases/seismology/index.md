@@ -26,9 +26,9 @@ from datachart.constants import (
     FIG_SIZE,
     NETWORK_LABEL_POSITION,
     NETWORK_LAYOUT,
-    NORMALIZE,
+    COLOR_NORM,
     RADIAL_TYPE,
-    SCALE,
+    AXIS_SCALE,
     SHOW_GRID,
 )
 from datachart.utils import Grid, Panel
@@ -40,7 +40,7 @@ The hidden cell below holds the three tables. `EVENTS` is one tuple per earthqua
 
 ### Where does the seismicity concentrate?
 
-The first figure of an earthquake report is the map of the epicentres, and eight hundred points on one axes overplot wherever the activity is densest, which is exactly where the reader looks. A [hexbin chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/hexbinchart/index.md) bins them instead: the plane is tiled with hexagons and each one is coloured by the number of events inside it, so density reads as colour and nothing hides behind a marker. The counts span three orders of magnitude between a quiet hexagon and the aftershock zone, so `norm=NORMALIZE.LOG` gives the colour scale a logarithmic reach and keeps the sparse cells visible. `mincnt=1` leaves the empty cells blank rather than colouring them as zero, and through them shows the ground: an [image chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/imagechart/index.md) draws the relief grid as a faded grey picture stretched over its extent, a [basemap chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/basemapchart/index.md) traces the coastline over it, and [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) puts both under the hexagons, so the density reads against the land and the sea it falls on. The grid's first row is its southern edge while a picture's first row is its top, so the rows are flipped. A degree of longitude at 38 degrees north is a fifth shorter than a degree of latitude, so `aspect_ratio=ASPECT_RATIO.GEOGRAPHIC` narrows it by that much and the region keeps its true shape.
+The first figure of an earthquake report is the map of the epicentres, and eight hundred points on one axes overplot wherever the activity is densest, which is exactly where the reader looks. A [hexbin chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/hexbinchart/index.md) bins them instead: the plane is tiled with hexagons and each one is coloured by the number of events inside it, so density reads as colour and nothing hides behind a marker. The counts span three orders of magnitude between a quiet hexagon and the aftershock zone, so `norm=COLOR_NORM.LOG` gives the colour scale a logarithmic reach and keeps the sparse cells visible. `mincnt=1` leaves the empty cells blank rather than colouring them as zero, and through them shows the ground: an [image chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/imagechart/index.md) draws the relief grid as a faded grey picture stretched over its extent, a [basemap chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/basemapchart/index.md) traces the coastline over it, and [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) puts both under the hexagons, so the density reads against the land and the sea it falls on. The grid's first row is its southern edge while a picture's first row is its top, so the rows are flipped. A degree of longitude at 38 degrees north is a fifth shorter than a degree of latitude, so `aspect_ratio=ASPECT_RATIO.GEOGRAPHIC` narrows it by that much and the region keeps its true shape.
 
 ```
 LATITUDE, LONGITUDE, DEPTH, MAGNITUDE = 1, 2, 3, 4
@@ -72,7 +72,7 @@ density = HexbinChart(
     {"x": longitude.tolist(), "y": latitude.tolist()},
     gridsize=42,
     # counts run from 1 to several hundred, so the colour scale is logarithmic
-    norm=NORMALIZE.LOG,
+    norm=COLOR_NORM.LOG,
     mincnt=1,
     # a hairline edge keeps the single-event cells visible on white
     style={"plot_hexbin_edge_width": 0.3, "plot_hexbin_edge_color": "#d0d0d0"},
@@ -149,7 +149,7 @@ Sea level sits at the midpoint of the colour scale, so the coastline is the band
 
 ### How are the magnitudes distributed?
 
-Earthquake sizes follow the Gutenberg-Richter law: the number of events of magnitude M or greater falls by a constant factor for every unit of magnitude, so a plot of the cumulative count against magnitude is a straight line on a logarithmic count axis. The slope of that line is the b-value, which is close to 1 for most of the world and is the number a seismicity report quotes. A [line chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/index.md) with `scaley=SCALE.LOG` draws it, and a second series carries the fitted line so the eye can judge the fit rather than trust it.
+Earthquake sizes follow the Gutenberg-Richter law: the number of events of magnitude M or greater falls by a constant factor for every unit of magnitude, so a plot of the cumulative count against magnitude is a straight line on a logarithmic count axis. The slope of that line is the b-value, which is close to 1 for most of the world and is the number a seismicity report quotes. A [line chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/index.md) with `scaley=AXIS_SCALE.LOG` draws it, and a second series carries the fitted line so the eye can judge the fit rather than trust it.
 
 The line bends away from the data at the left because a catalogue misses small events far from stations. The magnitude where that begins is the completeness magnitude, taken here as 4.5 and marked with `vlines`; the b-value is estimated from the events above it with the Aki maximum-likelihood formula, which needs only their mean magnitude.
 
@@ -177,7 +177,7 @@ gutenberg_figure = LineChart(
     ylabel="Earthquakes of this magnitude or greater",
     subtitle=["Catalogue", f"Fit above M{MC}"],
     # the counts fall by three orders of magnitude across the axis
-    scaley=SCALE.LOG,
+    scaley=AXIS_SCALE.LOG,
     # the fit runs on below one event a year; the axis stops where the data does
     ymin=0.8,
     vlines={"x": MC, "label": f"Completeness (M{MC})"},
@@ -233,8 +233,8 @@ omori_figure = LineChart(
     xlabel="Days since the mainshock",
     ylabel="Aftershocks per day",
     subtitle=["Observed rate", "Omori fit"],
-    scalex=SCALE.LOG,
-    scaley=SCALE.LOG,
+    scalex=AXIS_SCALE.LOG,
+    scaley=AXIS_SCALE.LOG,
     show_legend=True,
     show_grid=SHOW_GRID.BOTH,
     figsize=FIG_SIZE.FULL_MEDIUM,

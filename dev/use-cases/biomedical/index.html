@@ -5292,7 +5292,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">EMPHASIS</span><span class="p">,</span>
     <span class="n">FIG_SIZE</span><span class="p">,</span>
     <span class="n">LINE_DRAW_STYLE</span><span class="p">,</span>
-    <span class="n">NORMALIZE</span><span class="p">,</span>
+    <span class="n">COLOR_NORM</span><span class="p">,</span>
     <span class="n">SHOW_GRID</span><span class="p">,</span>
     <span class="n">VALUE_FORMAT</span><span class="p">,</span>
 <span class="p">)</span>
@@ -5315,7 +5315,7 @@ from datachart.constants import (
     EMPHASIS,
     FIG_SIZE,
     LINE_DRAW_STYLE,
-    NORMALIZE,
+    COLOR_NORM,
     SHOW_GRID,
     VALUE_FORMAT,
 )
@@ -6200,7 +6200,7 @@ retention_figure.show()</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="which-markers-moved-with-the-dose">Which markers moved with the dose?<a class="anchor-link" href="#which-markers-moved-with-the-dose">¶</a></h3><p>A trial measures more than its endpoint, and eight markers in three arms is a 24-cell table that a <a href="../../how-to-guides/charts/heatmap/">heatmap</a> reads in one look. The cells hold the percent change from baseline, which is signed, so the colormap has to put zero in the middle: <code>norm=NORMALIZE.CENTERED</code> pins zero to the centre of the theme's diverging colormap and runs the same distance each way, so a cell's hue is its direction and its depth is its size. <code>show_values</code> prints the numbers in the cells, and <code>value_format</code> gives them their sign and unit.</p>
+<h3 id="which-markers-moved-with-the-dose">Which markers moved with the dose?<a class="anchor-link" href="#which-markers-moved-with-the-dose">¶</a></h3><p>A trial measures more than its endpoint, and eight markers in three arms is a 24-cell table that a <a href="../../how-to-guides/charts/heatmap/">heatmap</a> reads in one look. The cells hold the percent change from baseline, which is signed, so the colormap has to put zero in the middle: <code>norm=COLOR_NORM.CENTERED</code> pins zero to the centre of the theme's diverging colormap and runs the same distance each way, so a cell's hue is its direction and its depth is its size. <code>show_values</code> prints the numbers in the cells, and <code>value_format</code> gives them their sign and unit.</p>
 </div>
 </div>
 </div>
@@ -6231,7 +6231,7 @@ retention_figure.show()</div>
     <span class="p">},</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"The whole metabolic panel moves with the dose"</span><span class="p">,</span>
     <span class="c1"># zero in the middle of the diverging colormap, equal reach each way</span>
-    <span class="n">norm</span><span class="o">=</span><span class="n">NORMALIZE</span><span class="o">.</span><span class="n">CENTERED</span><span class="p">,</span>
+    <span class="n">norm</span><span class="o">=</span><span class="n">COLOR_NORM</span><span class="o">.</span><span class="n">CENTERED</span><span class="p">,</span>
     <span class="n">show_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">value_format</span><span class="o">=</span><span class="s2">"</span><span class="si">{x:+.1f}</span><span class="s2">%"</span><span class="p">,</span>
@@ -6248,7 +6248,7 @@ retention_figure.show()</div>
     },
     title="The whole metabolic panel moves with the dose",
     # zero in the middle of the diverging colormap, equal reach each way
-    norm=NORMALIZE.CENTERED,
+    norm=COLOR_NORM.CENTERED,
     show_values=True,
     show_colorbars=True,
     value_format="{x:+.1f}%",
