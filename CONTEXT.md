@@ -120,7 +120,7 @@ _Avoid_: forwarding, per-chart dict / settings dict (for the mechanism)
 
 **Chart kind**:
 The one record of what a chart front *is* — its layer class, record shape,
-projection, group / bare / gridless flags, emphasis unit, multiplot and subplot
+projection, group / bare / gridless flags, emphasis unit, dataset policy and subplot
 rules, rejected parameters, key split, legend default — held as a frozen
 `ChartKind` row in one table and read through one accessor. The engine,
 builder, and composition branch on the row, never on the chart-type string;

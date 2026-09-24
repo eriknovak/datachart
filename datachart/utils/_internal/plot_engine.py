@@ -21,9 +21,9 @@ from .chart_kinds import (
     build_layers,
     chart_kind,
     check_domains,
+    splits_datasets,
 )
 from .layers import Layer, Panel, LayerGroup, group_from_chart, layers_per_chart
-from .validate import validate_single_dataset
 from ...constants import COLORBAR_LOCATION, FIG_SIZE, ORIENTATION
 
 # ================================================
@@ -182,16 +182,14 @@ def render_chart(
 
     charts = charts if isinstance(charts, list) else [charts]
     kind = chart_kind(chart_type)
-    if kind.single_dataset:
-        validate_single_dataset(charts, kind.label, settings.get("subplots"))
+    split = splits_datasets(kind, len(charts), settings.get("subplots"))
 
     # build the layers; style is resolved against the config here, once
     layers = build_layers(chart_type, charts, settings)
 
     max_cols = settings.get("max_cols")
     subplot_config = get_subplot_config(
-        kind,
-        settings.get("subplots"),
+        split,
         n_charts=len(charts),
         max_cols=4 if max_cols is None else max_cols,
     )

@@ -81,14 +81,10 @@ def validate_bandwidth(bandwidth) -> None:
         )
 
 
-def validate_single_dataset(datasets, name: str, subplots=None) -> None:
-    """Raise when several datasets of a non-overlaying chart share one axes.
+def validate_single_dataset(n_datasets: int, name: str) -> None:
+    """Raise when several datasets of a non-overlaying chart share one axes."""
 
-    `datasets` is one chart dict, or a list of charts or of their layers.
-    """
-
-    n_datasets = len(datasets) if isinstance(datasets, list) else 1
-    if n_datasets > 1 and subplots is not True:
+    if n_datasets > 1:
         raise ValueError(
             f"Multiple {name} datasets require `subplots=True`. "
             f"{name.capitalize()}s do not support overlaying multiple "

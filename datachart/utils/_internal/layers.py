@@ -11308,7 +11308,7 @@ class Panel:
             ("violin", "violin plot"),
             ("ridge", "ridgeline plot"),
         ):
-            validate_single_dataset([l for l in self.layers if l.kind == kind], name)
+            validate_single_dataset(sum(l.kind == kind for l in self.layers), name)
         if any(isinstance(l, BasemapLayer) for l in self.layers):
             validate_basemap_company(
                 [

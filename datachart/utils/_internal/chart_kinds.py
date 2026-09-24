@@ -5,7 +5,9 @@ chart-type string. `chart_kind()` is the lookup; a name without a row raises
 before anything is drawn.
 """
 
+import warnings
 from dataclasses import dataclass, field
+from enum import Enum
 from typing import (
     Any,
     Callable,
@@ -72,7 +74,7 @@ from .layers import (
     value_axis_grid,
     value_label_font,
 )
-from .validate import validate_emphasis_rule
+from .validate import validate_emphasis_rule, validate_single_dataset
 from ...config import config
 from ...constants import (
     ASPECT_RATIO,
@@ -184,6 +186,17 @@ def _gantt_legend(charts: List[dict], settings: dict) -> Optional[bool]:
     )
 
 
+class DatasetPolicy(Enum):
+    """What several datasets of one front draw as, unless `subplots` is set."""
+
+    # every dataset shares one axes
+    OVERLAY = "overlay"
+    # every dataset takes its own subplot
+    SUBPLOT = "subplot"
+    # several datasets need `subplots=True`
+    RAISE = "raise"
+
+
 @dataclass(frozen=True)
 class ChartKind:
     """Everything the engine, builder, and composition read about a front.
@@ -207,9 +220,8 @@ class ChartKind:
             several charts come as a list of dicts rather than of lists.
         data_keys: The keys one chart's `data` dict must carry; None skips
             the shape check.
-        multiplot: Several charts may share one axes.
+        datasets: What several datasets draw as when `subplots` is unset.
         subplots: The charts may split into one subplot each.
-        single_dataset: Several datasets need `subplots=True`.
         rejects: Parameters the front takes only as None, with the reason
             a value raises.
         renamed: Deprecated parameter names the front still takes, mapped
@@ -250,9 +262,8 @@ class ChartKind:
     projection: Optional[str] = None
     dict_data: bool = False
     data_keys: Optional[Tuple[str, ...]] = None
-    multiplot: bool = True
+    datasets: DatasetPolicy = DatasetPolicy.OVERLAY
     subplots: bool = True
-    single_dataset: bool = False
     rejects: Mapping[str, str] = field(default_factory=dict)
     renamed: Mapping[str, str] = field(default_factory=dict)
     domains: Mapping[str, Type[Domain]] = field(default_factory=dict)
@@ -436,7 +447,7 @@ _KINDS = (
         defaults={"aspect_ratio": ASPECT_RATIO.EQUAL, "max_cols": 1},
         dict_data=True,
         data_keys=("date", "value"),
-        multiplot=False,
+        datasets=DatasetPolicy.SUBPLOT,
         rejects=_no_emphasis(
             "CalendarHeatmap",
             "a calendar is a single raster layer with no series to mute or "
@@ -456,7 +467,7 @@ _KINDS = (
         },
         defaults={"max_cols": 1, "orientation": ORIENTATION.HORIZONTAL},
         legend_default=_gantt_legend,
-        multiplot=False,
+        datasets=DatasetPolicy.SUBPLOT,
         # a horizontal panel's twin is a second x, off the task rows (ADR 0049)
         overlayable=False,
         emphasis_units=gantt_units,
@@ -499,8 +510,7 @@ _KINDS = (
         BoxLayer,
         chart_keys=frozenset({"label", "value"}),
         defaults={"orientation": ORIENTATION.VERTICAL},
-        multiplot=False,
-        single_dataset=True,
+        datasets=DatasetPolicy.RAISE,
         group=True,
         emphasis_units=group_units,
         emphasis_by="median",
@@ -512,8 +522,7 @@ _KINDS = (
         domains={"inner": VIOLIN_INNER},
         chart_keys=frozenset({"label", "value"}),
         defaults={"orientation": ORIENTATION.VERTICAL},
-        multiplot=False,
-        single_dataset=True,
+        datasets=DatasetPolicy.RAISE,
         group=True,
         emphasis_units=group_units,
         emphasis_by="median",
@@ -539,7 +548,7 @@ _KINDS = (
             "show_outliers": True,
         },
         build=_raincloud_layers,
-        multiplot=False,
+        datasets=DatasetPolicy.SUBPLOT,
         group=True,
         emphasis_units=group_units,
         emphasis_by="median",
@@ -552,7 +561,7 @@ _KINDS = (
         chart_keys=frozenset({"label", "value"}),
         defaults={"orientation": ORIENTATION.HORIZONTAL},
         build=_ridgeline_layers,
-        multiplot=False,
+        datasets=DatasetPolicy.SUBPLOT,
         renamed={"normalize": "ridge_scale"},
         group=True,
         emphasis_units=group_units,
@@ -575,7 +584,7 @@ _KINDS = (
         ),
         dict_data=True,
         data_keys=("z",),
-        multiplot=False,
+        datasets=DatasetPolicy.SUBPLOT,
         rejects=_no_emphasis(
             "Heatmap",
             "a heatmap has no series to mute or highlight. Set the `emphasis` "
@@ -648,7 +657,7 @@ _KINDS = (
         domains={"layout": NETWORK_LAYOUT, "label_position": NETWORK_LABEL_POSITION},
         dict_data=True,
         data_keys=("edges",),
-        multiplot=False,
+        datasets=DatasetPolicy.SUBPLOT,
         rejects=_no_emphasis(
             "NetworkChart",
             "set the `emphasis` key on the nodes to mute or highlight instead.",
@@ -662,7 +671,7 @@ _KINDS = (
         "scatter matrix",
         ScatterLayer,
         domains={"diagonal": SCATTER_MATRIX_DIAGONAL},
-        multiplot=False,
+        datasets=DatasetPolicy.SUBPLOT,
         overlayable=False,
     ),
     ChartKind("imagechart", "image chart", ImageLayer, dict_data=True),
@@ -672,7 +681,7 @@ _KINDS = (
         BasemapLayer,
         domains={"data": BASEMAP_FEATURE, "resolution": BASEMAP_RESOLUTION},
         dict_data=True,
-        multiplot=False,
+        datasets=DatasetPolicy.SUBPLOT,
         subplots=False,
         renamed={"features": "data"},
     ),
@@ -682,7 +691,7 @@ _KINDS = (
         SankeyLayer,
         dict_data=True,
         data_keys=("links",),
-        multiplot=False,
+        datasets=DatasetPolicy.SUBPLOT,
         rejects=_no_emphasis(
             "SankeyChart", "a Sankey has no series to mute or highlight."
         ),
@@ -694,7 +703,7 @@ _KINDS = (
         TreemapLayer,
         dict_data=True,
         data_keys=("data",),
-        multiplot=False,
+        datasets=DatasetPolicy.SUBPLOT,
         rejects=_no_emphasis(
             "Treemap",
             "set the `emphasis` key on the records to mute or highlight instead.",
@@ -926,6 +935,27 @@ def apply_emphasis_rule(kind: ChartKind, charts: List[dict], settings: dict) -> 
     for (_, fill), role in zip(units, roles):
         fill(role)
     return charts
+
+
+def splits_datasets(kind: ChartKind, n_charts: int, subplots: Optional[bool]) -> bool:
+    """Whether the charts draw one subplot each: the one dataset policy reader.
+
+    `subplots` wins where the front takes subplots, and warns where it does
+    not; unset, the row's `datasets` policy decides, raising for `RAISE`
+    when there are several charts.
+    """
+
+    if subplots and not kind.subplots:
+        warnings.warn(
+            f"Chart type '{kind.name}' does not support subplots. "
+            "Setting subplots to False..."
+        )
+        subplots = False
+    if subplots:
+        return True
+    if kind.datasets is DatasetPolicy.RAISE and n_charts > 1:
+        validate_single_dataset(n_charts, kind.label)
+    return kind.datasets is not DatasetPolicy.OVERLAY
 
 
 def build_layers(chart_type: str, charts: List[dict], settings: dict) -> List[Layer]:

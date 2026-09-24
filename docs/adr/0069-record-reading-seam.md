@@ -45,7 +45,8 @@ declares.
   replaced by one `datasets` value — `OVERLAY`, `SUBPLOT` or `RAISE` — read
   in one place. `RAISE` has one message. No front changes policy: the box
   and violin raise, the raincloud and ridgeline subplot, the swarm overlays,
-  and every grid front keeps splitting into subplots.
+  and every other front keeps what it does today (the contour, hexbin and
+  image overlay; the other grid fronts split into subplots).
 - **Golden parity plus builder tests.** The pixel diff is clean for every
   case that does not rename the scatter's key; a unit test feeds each row a
   single-record and a multi-dataset input and asserts the canonical dicts

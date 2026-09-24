@@ -2,7 +2,6 @@ import unittest
 
 from datachart.config import config as _config
 from datachart.constants import ARROW_STYLE
-from datachart.utils._internal.chart_kinds import chart_kind
 from datachart.utils._internal.config_helpers import (
     get_attr_value,
     create_config_dict,
@@ -44,24 +43,23 @@ class TestAttrs(unittest.TestCase):
         self.assertEqual(config["alpha"], 1.0)
 
     def test_get_subplot_config(self):
-        LINE = chart_kind("linechart")
         # no subplot
-        config = get_subplot_config(LINE, False)
+        config = get_subplot_config(False)
         self.assertEqual(config["nrows"], 1)
         self.assertEqual(config["ncols"], 1)
 
         # with subplot and default number of charts
-        config = get_subplot_config(LINE, True)
+        config = get_subplot_config(True)
         self.assertEqual(config["nrows"], 1)
         self.assertEqual(config["ncols"], 1)
 
         # with two subplots
-        config = get_subplot_config(LINE, True, 2)
+        config = get_subplot_config(True, 2)
         self.assertEqual(config["nrows"], 2)
         self.assertEqual(config["ncols"], 1)
 
         # with four subplots in three columns
-        config = get_subplot_config(LINE, True, 4, 3)
+        config = get_subplot_config(True, 4, 3)
         self.assertEqual(config["nrows"], 2)
         self.assertEqual(config["ncols"], 3)
 
