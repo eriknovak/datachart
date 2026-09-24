@@ -1,5 +1,6 @@
 ---
 status: accepted
+amended-by: [0069]
 ---
 
 # A chart front's identity is one `ChartKind` row, not eight registries

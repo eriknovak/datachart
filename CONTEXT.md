@@ -127,6 +127,27 @@ builder, and composition branch on the row, never on the chart-type string;
 a front with no row fails before drawing.
 _Avoid_: chart config, chart registry, chart-type table
 
+**Record shape**:
+What one chart's `data` is, declared on the chart kind: a list of records
+carrying named keys, or one dict (a grid, links, a tree). For a record front
+the row names its canonical keys and which are required; a grid front names
+none.
+_Avoid_: data format, input shape, 2D data
+
+**Canonical key**:
+The name a record's field has once the builder has read it — `x`, `y`,
+`label`, `value`, `start`, `end`, `source`, … — as the row declares it. A
+caller may store a field under any name and say so through the key's remap
+parameter (`label="name"`); every layer reads the canonical key and never a
+user's name.
+_Avoid_: attr name, data key (for the canonical side), column
+
+**Dataset policy**:
+What a front does when given several datasets, one declared value per chart
+kind: overlay them on one axes, split them into subplots, or raise unless
+`subplots=True`. Read in one place; a front never decides it.
+_Avoid_: multiplot flag, single-dataset check
+
 **Setting payload**:
 A dict a caller passes to a chart front to configure one per-figure element —
 a reference line, band, text, legend, or colorbar — as opposed to the chart
@@ -268,16 +289,16 @@ axis limit. On a polar axes a `vspan` is a wedge bounded in degrees and an
 `hspan` an annulus bounded in radius.
 _Avoid_: span (for the concept), region, shading, highlight
 
-**Point label**:
-A scatter point's name, read from the data key the `label` parameter names
-(`label="name"`, off when unset) and drawn beside its marker in the text
-font. The panel places all of a coordinate space's point labels at once,
+**Annotation**:
+A scatter point's name, read from the data key the `annotation` parameter
+names (`annotation="name"`, off when unset) and drawn beside its marker in
+the text font. The panel places all of a coordinate space's annotations at once,
 after limits are final: each takes the spot around its marker with the least
 overlap against every marker in the panel, the labels already placed, the
 correlation box, and the axes edge. A crowded label is placed at its
 least-overlap spot, never dropped; a background layer's labels take the muted
-color.
-_Avoid_: annotation (for this), tag, name label, adjusted text
+color. `label` on every other front is a category key, never this.
+_Avoid_: point label, label (for the parameter), tag, name label, adjusted text
 
 **Error bar**:
 A scatter point's uncertainty in either variable, read from the data keys the
