@@ -116,7 +116,7 @@ class TestThemeDefaults(unittest.TestCase):
         """Light colormaps never flip value text to white."""
         figure = Heatmap(
             {"z": [[0.0, 1.0]]},
-            show_heatmap_values=True,
+            show_values=True,
             style={"plot_heatmap_cmap": ["#F7F7F7", "#B0B0B0"]},
         )
         colors = {text.get_color() for text in figure.axes[0].texts}
@@ -464,7 +464,7 @@ class TestDarkTheme(unittest.TestCase):
     def test_a_light_heatmap_cell_keeps_dark_text(self):
         """The cell label follows the cell, not the figure face (ADR 0058)."""
         config.set_theme(THEME.DARK)
-        figure = Heatmap(HEAT, show_heatmap_values=True)
+        figure = Heatmap(HEAT, show_values=True)
         texts = [t for t in figure.axes[0].texts if t.get_text()]
         self.assertTrue(texts)
         by_value = {t.get_text(): t for t in texts}
@@ -517,7 +517,7 @@ class TestFurnitureFollowsEveryTheme(unittest.TestCase):
             with self.subTest(theme=theme):
                 config.set_theme(theme)
                 expected = config["font_general_color"]
-                figure = RadialChart(RADIAL, type="bar")
+                figure = RadialChart(RADIAL, mark="bar")
                 texts = [t for t in figure.axes[0].texts if t.get_text()]
                 self.assertTrue(texts)
                 for text in texts:

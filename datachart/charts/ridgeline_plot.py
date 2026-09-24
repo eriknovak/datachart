@@ -55,7 +55,7 @@ def RidgelinePlot(
     legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
-    orientation: Optional[Union[ORIENTATION, str]] = ORIENTATION.HORIZONTAL,
+    orientation: Optional[Union[ORIENTATION, str]] = None,
     scaley: Optional[Union[SCALE, str]] = None,
     subplots: Optional[bool] = None,
     max_cols: Optional[int] = None,
@@ -129,11 +129,12 @@ def RidgelinePlot(
     value: Optional[Union[str, List[Optional[str]]]] = None,
     bandwidth: Optional[Union[BANDWIDTH, str, float]] = None,
     overlap: Optional[float] = None,
-    normalize: Optional[Union[RIDGELINE_SCALE, str]] = RIDGELINE_SCALE.PER_ROW,
+    ridge_scale: Optional[Union[RIDGELINE_SCALE, str]] = None,
     inner: Optional[Union[VIOLIN_INNER, str]] = None,
     fill: bool = True,
     show_outline: bool = True,
     sort: Optional[Union[SORT, str]] = SORT.NONE,
+    normalize: Optional[Union[RIDGELINE_SCALE, str]] = None,
 ) -> plt.Figure:
     """Creates the ridgeline plot.
 
@@ -232,8 +233,8 @@ def RidgelinePlot(
         overlap: How far a ridge's peak rises into the row above, in `[0, 1]`:
             a ridge rises from its tick and its peak stands `1 + overlap`
             rows above it, so 0 makes rows touch. None takes the theme's `plot_ridgeline_overlap`.
-        normalize: "per_row" scales every ridge to the same peak so shapes
-            compare; "common" keeps one density scale so heights compare. See
+        ridge_scale: "per_row" (default) scales every ridge to the same peak so
+            shapes compare; "common" keeps one density scale so heights compare. See
             [`RIDGELINE_SCALE`][datachart.constants.RIDGELINE_SCALE].
         inner: The marks drawn inside each ridge, up to its height: "median" (one line),
             "quartiles" (dashed median, dotted Q1/Q3), or None. See
@@ -243,6 +244,7 @@ def RidgelinePlot(
         sort: The row order: None keeps input order, "ascending" or
             "descending" orders the rows by their median; ties keep input
             order. See [`SORT`][datachart.constants.SORT].
+        normalize: Deprecated; use `ridge_scale`. Removed in the next release.
 
     Returns:
         The figure containing the ridgeline plot.

@@ -36,7 +36,7 @@ def Heatmap(
     legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
     show_colorbars: Optional[bool] = None,
-    show_heatmap_values: Optional[bool] = None,
+    show_values: Optional[bool] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     subplots: Optional[bool] = None,
     max_cols: Optional[int] = None,
@@ -47,7 +47,7 @@ def Heatmap(
     vmin: Optional[Union[float, List[Optional[float]]]] = None,
     vmax: Optional[Union[float, List[Optional[float]]]] = None,
     vcenter: Optional[Union[float, List[Optional[float]]]] = None,
-    valfmt: Optional[Union[VALUE_FORMAT, str, List[Optional[str]]]] = None,
+    value_format: Optional[Union[VALUE_FORMAT, str, List[Optional[str]]]] = None,
     xticks: Optional[
         Union[List[Union[int, float]], List[List[Union[int, float]]]]
     ] = None,
@@ -70,6 +70,8 @@ def Heatmap(
             List[Union[TextSettingAttrs, List[TextSettingAttrs], None]],
         ]
     ] = None,
+    show_heatmap_values: Optional[bool] = None,
+    valfmt: Optional[Union[VALUE_FORMAT, str, List[Optional[str]]]] = None,
 ) -> plt.Figure:
     """Creates the heatmap.
 
@@ -131,7 +133,7 @@ def Heatmap(
         show_grid: Which grid lines to show (e.g., "both", "x", "y");
             `False` draws none.
         show_colorbars: Whether to show the colorbar(s).
-        show_heatmap_values: Whether to show values on the heatmap cells.
+        show_values: Whether to write each cell's value in the cell.
         aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
             [`ASPECT_RATIO`][datachart.constants.ASPECT_RATIO].
         subplots: Whether to create separate subplots for each heatmap.
@@ -146,7 +148,7 @@ def Heatmap(
         vmax: Maximum value(s) for normalization.
         vcenter: The value(s) a centred normalization holds in the middle of
             the colormap (0 by default); ignored by every other norm.
-        valfmt: Format string(s) for cell values, with the value named `x`
+        value_format: Format string(s) for cell values, with the value named `x`
             (e.g., `"{x:.1f}"`). See [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT].
         xticks: Custom x-axis tick positions.
         xticklabels: Custom x-axis tick labels.
@@ -164,6 +166,8 @@ def Heatmap(
             positions. See
             [`ColorbarSettingAttrs`][datachart.typings.ColorbarSettingAttrs].
         texts: Text annotation(s) to draw.
+        show_heatmap_values: Deprecated; use `show_values`. Removed in the next release.
+        valfmt: Deprecated; use `value_format`. Removed in the next release.
 
     Returns:
         The figure containing the heatmap.

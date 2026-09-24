@@ -38,7 +38,8 @@ adds no tag; one that reverses, narrows, widens or replaces a commitment does.
 - [0031](0031-interactive-show-hover-seam.md) — `show(interactive=True)` is the single interactive opt-in, fed by a per-layer hover seam
 - [0054](0054-draw-order-ladder.md) — Draw order is a fixed ladder: surfaces at the bottom, reference lines near the top (amended by [0060](0060-image-chart.md))
 - [0065](0065-chart-kind-descriptor.md) — A chart front's identity is one `ChartKind` row, not eight registries
-- [0066](0066-front-body-one-call.md) — A chart front's body is one engine call; the row declares the key split
+- [0066](0066-front-body-one-call.md) — A chart front's body is one engine call; the row declares the key split (amended by [0067](0067-shared-parameter-table.md))
+- [0067](0067-shared-parameter-table.md) — A shared parameter has one name, type and default; a table enforces it
 
 ## Composition: Panel and Grid
 
@@ -71,7 +72,7 @@ theme faces out of the wheel.
 - [0010](0010-fig-size-grid-and-constants-audit.md) — FIG_SIZE becomes a small A4-anchored grid; constants audit fixes
 - [0034](0034-per-figure-legend-settings.md) — The legend is a per-figure setting, and outside locations expand to two matplotlib arguments
 - [0035](0035-colorbar-setting.md) — The colorbar is a per-figure setting located by edge, and its type takes the setting suffix (amended by [0043](0043-setting-payloads-take-the-setting-suffix.md))
-- [0043](0043-setting-payloads-take-the-setting-suffix.md) — Every setting payload takes the `*SettingAttrs` suffix, old names warn for one release
+- [0043](0043-setting-payloads-take-the-setting-suffix.md) — Every setting payload takes the `*SettingAttrs` suffix, old names warn for one release (amended by [0067](0067-shared-parameter-table.md))
 - [0052](0052-chart-prefixed-constants.md) — A constant one chart owns carries that chart's prefix
 
 ## Axes, scales, and colormaps

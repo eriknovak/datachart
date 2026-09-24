@@ -24,14 +24,9 @@ from ..constants import (
     SCALE,
     SHOW_GRID,
     SORT,
+    VALUE_FORMAT,
 )
 
-_RADIAL_TYPES = (
-    RADIAL_TYPE.LINE,
-    RADIAL_TYPE.BAR,
-    RADIAL_TYPE.SCATTER,
-    RADIAL_TYPE.HISTOGRAM,
-)
 _DIRECTIONS = (RADIAL_DIRECTION.CLOCKWISE, RADIAL_DIRECTION.COUNTERCLOCKWISE)
 _COMPASS = ("N", "NE", "E", "SE", "S", "SW", "W", "NW")
 
@@ -47,7 +42,7 @@ _RadialStyleAttrs = Union[
 def RadialChart(
     data: Union[List[RadialDataPointAttrs], List[List[RadialDataPointAttrs]]],
     *,
-    type: Optional[Union[RADIAL_TYPE, str]] = None,
+    mark: Optional[Union[RADIAL_TYPE, str]] = None,
     title: Optional[str] = None,
     xlabel: Optional[str] = None,
     ylabel: Optional[str] = None,
@@ -64,7 +59,7 @@ def RadialChart(
     show_values: Optional[bool] = None,
     show_tip_labels: Optional[bool] = None,
     show_border: Optional[bool] = None,
-    value_format: Optional[str] = None,
+    value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     bar_mode: Optional[Union[BAR_MODE, str]] = None,
     sort: Optional[Union[SORT, str]] = None,
     sort_by: Optional[str] = None,
@@ -73,7 +68,7 @@ def RadialChart(
     startangle: Optional[Union[str, int, float]] = None,
     direction: Optional[Union[RADIAL_DIRECTION, str]] = None,
     innerradius: Optional[float] = None,
-    scalex: Optional[Union[SCALE, str]] = None,
+    scalex: None = None,
     scaley: Optional[Union[SCALE, str]] = None,
     subplots: Optional[bool] = None,
     max_cols: Optional[int] = None,
@@ -87,10 +82,10 @@ def RadialChart(
             List[Union[TextSettingAttrs, List[TextSettingAttrs], None]],
         ]
     ] = None,
-    vlines: Optional[dict] = None,
-    hlines: Optional[dict] = None,
-    dlines: Optional[dict] = None,
-    brackets: Optional[dict] = None,
+    vlines: None = None,
+    hlines: None = None,
+    dlines: None = None,
+    brackets: None = None,
     vspans: Optional[
         Union[
             VSpanSettingAttrs,
@@ -109,11 +104,12 @@ def RadialChart(
     x: Optional[Union[str, List[Optional[str]]]] = None,
     y: Optional[Union[str, List[Optional[str]]]] = None,
     yerr: Optional[Union[str, List[Optional[str]]]] = None,
+    type: Optional[Union[RADIAL_TYPE, str]] = None,
 ) -> plt.Figure:
     """Creates the radial chart.
 
     A radial chart plots series on polar axes: as a line (radar) profile, an
-    area, bars, or a histogram, chosen with `type`. Use the radar form to
+    area, bars, or a histogram, chosen with `mark`. Use the radar form to
     compare a few entities across several metrics on a shared scale, and the
     bar and histogram forms for cyclic categories such as hours, weekdays, or
     compass directions.
@@ -136,7 +132,7 @@ def RadialChart(
             The line, bar, and scatter visuals take `label`/`y` points whose labels
             are placed evenly around the circle; the histogram visual takes numeric
             `x` observations in degrees, binned over [0, 360).
-        type: The visual the whole figure draws: "line" (default), "bar", "scatter", or
+        mark: The visual the whole figure draws: "line" (default), "bar", "scatter", or
             "histogram". See [`RADIAL_TYPE`][datachart.constants.RADIAL_TYPE].
         title: The title of the chart.
         xlabel: The angular-axis label.
@@ -216,6 +212,7 @@ def RadialChart(
         x: The key name in data for the histogram observations (default: "x").
         y: The key name in data for radial values (default: "y").
         yerr: The key name in data for radial error values (default: "yerr").
+        type: Deprecated; use `mark`. Removed in the next release.
 
     Returns:
         The figure containing the radial chart.
@@ -223,22 +220,6 @@ def RadialChart(
     """
     params = dict(locals())
 
-    if scalex is not None:
-        raise ValueError(
-            "RadialChart does not support `scalex`: "
-            "the angular axis has no scale to change."
-        )
-    if any(ref is not None for ref in (vlines, hlines, dlines, brackets)):
-        raise ValueError(
-            "RadialChart does not support `vlines`, `hlines`, `dlines` and "
-            "`brackets`: straight reference marks are geometrically "
-            "meaningless on a polar axes."
-        )
-    radial_type = RADIAL_TYPE.LINE if type is None else type
-    if radial_type not in _RADIAL_TYPES:
-        raise ValueError(
-            f"Invalid `type` value {radial_type!r}. Must be one of {_RADIAL_TYPES}."
-        )
     if direction is not None and direction not in _DIRECTIONS:
         raise ValueError(
             f"Invalid `direction` value {direction!r}. Must be one of {_DIRECTIONS}."
@@ -252,13 +233,6 @@ def RadialChart(
         raise ValueError(
             f"Invalid `startangle` value {startangle!r}. Must be a compass "
             f"location {_COMPASS} or a numeric bearing in degrees."
-        )
-    if radial_type != RADIAL_TYPE.BAR and not (
-        sort is None and sort_by is None and emphasis_rule is None
-    ):
-        raise ValueError(
-            "RadialChart takes `sort`, `sort_by`, and `emphasis_rule` on the "
-            f"bar visual only; the {radial_type!r} visual has no bars to order."
         )
 
     return render("radialchart", params)

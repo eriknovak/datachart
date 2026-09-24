@@ -22,7 +22,7 @@ Each record in `data` is a [`RadialDataPointAttrs`](#datachart.typings.RadialDat
 
 ## Style
 
-`style` takes the keys of [`LineStyleAttrs`](linechart.md#datachart.typings.LineStyleAttrs), [`BarStyleAttrs`](barchart.md#datachart.typings.BarStyleAttrs), [`HistStyleAttrs`](histogram.md#datachart.typings.HistStyleAttrs) and [`ScatterStyleAttrs`](scatterchart.md#datachart.typings.ScatterStyleAttrs). The chart also reads the shared groups it draws: value labels ([`ValueLabelStyleAttrs`](../typings.md#datachart.typings.ValueLabelStyleAttrs)), the area fill ([`AreaStyleAttrs`](../typings.md#datachart.typings.AreaStyleAttrs)), reference lines ([`VLineStyleAttrs`](../typings.md#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](../typings.md#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](../typings.md#datachart.typings.DLineStyleAttrs)), reference bands ([`VSpanStyleAttrs`](../typings.md#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](../typings.md#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](../typings.md#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](../config.md).
+`style` takes the keys of [`LineStyleAttrs`](linechart.md#datachart.typings.LineStyleAttrs), [`BarStyleAttrs`](barchart.md#datachart.typings.BarStyleAttrs), [`HistStyleAttrs`](histogram.md#datachart.typings.HistStyleAttrs) and [`ScatterStyleAttrs`](scatterchart.md#datachart.typings.ScatterStyleAttrs). The chart also reads the shared groups it draws: value labels ([`ValueLabelStyleAttrs`](../typings.md#datachart.typings.ValueLabelStyleAttrs)), the area fill ([`AreaStyleAttrs`](../typings.md#datachart.typings.AreaStyleAttrs)), reference lines ([`VLineStyleAttrs`](../typings.md#datachart.typings.VLineStyleAttrs), [`HLineStyleAttrs`](../typings.md#datachart.typings.HLineStyleAttrs) and [`DLineStyleAttrs`](../typings.md#datachart.typings.DLineStyleAttrs)), pairwise brackets ([`BracketStyleAttrs`](../typings.md#datachart.typings.BracketStyleAttrs)), reference bands ([`VSpanStyleAttrs`](../typings.md#datachart.typings.VSpanStyleAttrs) and [`HSpanStyleAttrs`](../typings.md#datachart.typings.HSpanStyleAttrs)) and text annotations ([`TextStyleAttrs`](../typings.md#datachart.typings.TextStyleAttrs)). Every key falls back to the theme, so the same keys set the default look through [`config`](../config.md).
 
 ## Constants
 
@@ -30,12 +30,13 @@ The parameters that accept a constant, with the class in [datachart.constants](.
 
 | Parameter | Constant |
 | :-- | :-- |
-| `type` | [`RADIAL_TYPE`](../constants.md#datachart.constants.RADIAL_TYPE) |
+| `mark` | [`RADIAL_TYPE`](../constants.md#datachart.constants.RADIAL_TYPE) |
 | `direction` | [`RADIAL_DIRECTION`](../constants.md#datachart.constants.RADIAL_DIRECTION) |
 | `emphasis` | [`EMPHASIS`](../constants.md#datachart.constants.EMPHASIS) |
 | `figsize` | [`FIG_SIZE`](../constants.md#datachart.constants.FIG_SIZE) |
 | `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](../constants.md#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](../constants.md#datachart.constants.LEGEND_ALIGN) |
 | `show_grid` | [`SHOW_GRID`](../constants.md#datachart.constants.SHOW_GRID) |
+| `value_format` | [`VALUE_FORMAT`](../constants.md#datachart.constants.VALUE_FORMAT) |
 | `bar_mode` | [`BAR_MODE`](../constants.md#datachart.constants.BAR_MODE) |
 | `sort` | [`SORT`](../constants.md#datachart.constants.SORT) |
 | `scaley` | [`SCALE`](../constants.md#datachart.constants.SCALE) |

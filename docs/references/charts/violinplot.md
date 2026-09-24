@@ -34,6 +34,8 @@ The parameters that accept a constant, with the class in [datachart.constants](.
 
 | Parameter | Constant |
 | :-- | :-- |
+| `xticks_format` | [`VALUE_FORMAT`](../constants.md#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](../constants.md#datachart.constants.DATE_FORMAT) |
+| `inner` | [`VIOLIN_INNER`](../constants.md#datachart.constants.VIOLIN_INNER) |
 | `emphasis` | [`EMPHASIS`](../constants.md#datachart.constants.EMPHASIS) |
 | `figsize` | [`FIG_SIZE`](../constants.md#datachart.constants.FIG_SIZE) |
 | `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](../constants.md#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](../constants.md#datachart.constants.LEGEND_ALIGN) |
@@ -43,7 +45,5 @@ The parameters that accept a constant, with the class in [datachart.constants](.
 | `orientation` | [`ORIENTATION`](../constants.md#datachart.constants.ORIENTATION) |
 | `sort` | [`SORT`](../constants.md#datachart.constants.SORT) |
 | `scaley` | [`SCALE`](../constants.md#datachart.constants.SCALE) |
-| `xticks_format` | [`VALUE_FORMAT`](../constants.md#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](../constants.md#datachart.constants.DATE_FORMAT) |
 | `yticks_format` | [`VALUE_FORMAT`](../constants.md#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](../constants.md#datachart.constants.DATE_FORMAT) |
-| `inner` | [`VIOLIN_INNER`](../constants.md#datachart.constants.VIOLIN_INNER) |
 | `bandwidth` | [`BANDWIDTH`](../constants.md#datachart.constants.BANDWIDTH) |

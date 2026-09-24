@@ -8,6 +8,7 @@ from ..utils._internal.validate import (
     validate_gantt_groups,
     validate_gantt_sort_by,
     validate_gantt_tasks,
+    validate_gantt_value_kind,
     validate_sort,
 )
 from ..typings import (
@@ -52,7 +53,8 @@ def GanttChart(
     show_legend: Optional[bool] = None,
     legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
-    show_values: Optional[Union[GANTT_VALUE, str]] = None,
+    show_values: Optional[bool] = None,
+    value_kind: Optional[Union[GANTT_VALUE, str]] = None,
     value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     show_dependencies: Optional[bool] = None,
     show_today: Optional[bool] = None,
@@ -63,12 +65,30 @@ def GanttChart(
     emphasis: Optional[Union[EMPHASIS, str, List[Optional[str]]]] = None,
     emphasis_rule: Optional[EmphasisRuleAttrs] = None,
     style: Optional[Union[GanttStyleAttrs, List[Optional[GanttStyleAttrs]]]] = None,
-    xtickrotate: Optional[int] = None,
-    ytickrotate: Optional[int] = None,
+    xtickrotate: Optional[Union[int, List[Optional[int]]]] = None,
+    ytickrotate: Optional[Union[int, List[Optional[int]]]] = None,
     xticks_format: Optional[Union[DATE_FORMAT, str]] = None,
-    vlines: Optional[Union[VLineSettingAttrs, List[VLineSettingAttrs]]] = None,
-    vspans: Optional[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]] = None,
-    texts: Optional[Union[TextSettingAttrs, List[TextSettingAttrs]]] = None,
+    vlines: Optional[
+        Union[
+            VLineSettingAttrs,
+            List[VLineSettingAttrs],
+            List[Union[VLineSettingAttrs, List[VLineSettingAttrs], None]],
+        ]
+    ] = None,
+    vspans: Optional[
+        Union[
+            VSpanSettingAttrs,
+            List[VSpanSettingAttrs],
+            List[Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]],
+        ]
+    ] = None,
+    texts: Optional[
+        Union[
+            TextSettingAttrs,
+            List[TextSettingAttrs],
+            List[Union[TextSettingAttrs, List[TextSettingAttrs], None]],
+        ]
+    ] = None,
 ) -> plt.Figure:
     """Creates the gantt chart.
 
@@ -136,10 +156,13 @@ def GanttChart(
             [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
         show_grid: Which grid lines to show ("both", "x", "y"); `False`
             draws none. See [`SHOW_GRID`][datachart.constants.SHOW_GRID].
-        show_values: The label printed past each bar end: None (none), `"duration"` (the
-            duration in days), or `"progress"` (the progress as a percentage). A
-            milestone prints its date instead, in the `xticks_format` or as day and
-            month. See [`GANTT_VALUE`][datachart.constants.GANTT_VALUE].
+        show_values: Whether to print a label past each bar end, the one
+            `value_kind` names. A milestone prints its date instead, in the
+            `xticks_format` or as day and month.
+        value_kind: The label `show_values` prints: `"duration"` (default, the
+            duration in days) or `"progress"` (the progress as a percentage).
+            Ignored while `show_values` is off. See
+            [`GANTT_VALUE`][datachart.constants.GANTT_VALUE].
         value_format: Format string for the value labels: a
             [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT] constant or any
             `"{x:.1f}"`, `"{:.1f}%"`, or `"%g"` style string. It formats the duration in
@@ -185,6 +208,9 @@ def GanttChart(
     # records fail here, before layers are built; settings fail in the layer
     schedules = data if data and isinstance(data[0], list) else [data]
     sort_key = validate_gantt_sort_by(validate_sort(sort), sort_by)
+    params["show_values"], params["value_kind"] = validate_gantt_value_kind(
+        show_values, value_kind
+    )
     for records in schedules:
         validate_gantt_tasks(records)
         validate_gantt_groups(

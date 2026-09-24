@@ -34,8 +34,10 @@ The parameters that accept a constant, with the class in [datachart.constants](.
 
 | Parameter | Constant |
 | :-- | :-- |
-| `show_values` | [`DUMBBELL_VALUE`](../constants.md#datachart.constants.DUMBBELL_VALUE) |
+| `value_kind` | [`DUMBBELL_VALUE`](../constants.md#datachart.constants.DUMBBELL_VALUE) |
 | `sort_by` | [`DUMBBELL_SORT_KEY`](../constants.md#datachart.constants.DUMBBELL_SORT_KEY) |
+| `marker` | [`LINE_MARKER`](../constants.md#datachart.constants.LINE_MARKER) |
+| `connector_style` | [`LINE_STYLE`](../constants.md#datachart.constants.LINE_STYLE) |
 | `figsize` | [`FIG_SIZE`](../constants.md#datachart.constants.FIG_SIZE) |
 | `orientation` | [`ORIENTATION`](../constants.md#datachart.constants.ORIENTATION) |
 | `scaley` | [`SCALE`](../constants.md#datachart.constants.SCALE) |
@@ -43,6 +45,4 @@ The parameters that accept a constant, with the class in [datachart.constants](.
 | `show_grid` | [`SHOW_GRID`](../constants.md#datachart.constants.SHOW_GRID) |
 | `value_format` | [`VALUE_FORMAT`](../constants.md#datachart.constants.VALUE_FORMAT) |
 | `sort` | [`SORT`](../constants.md#datachart.constants.SORT) |
-| `marker` | [`LINE_MARKER`](../constants.md#datachart.constants.LINE_MARKER) |
-| `connector_style` | [`LINE_STYLE`](../constants.md#datachart.constants.LINE_STYLE) |
 | `emphasis` | [`EMPHASIS`](../constants.md#datachart.constants.EMPHASIS) |

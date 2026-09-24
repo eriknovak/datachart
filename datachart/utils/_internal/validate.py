@@ -6,6 +6,7 @@ so the fronts fail early with one message instead of deep inside matplotlib.
 
 import math
 import os
+import warnings
 from collections import defaultdict
 from datetime import date, datetime
 from numbers import Real
@@ -150,17 +151,17 @@ def validate_overlap(overlap) -> float:
     return float(overlap)
 
 
-def validate_ridgeline_scale(normalize):
+def validate_ridgeline_scale(ridge_scale):
     """Validate a ridgeline density scale; None means `PER_ROW`."""
 
-    if normalize is None:
+    if ridge_scale is None:
         return RIDGELINE_SCALE.DEFAULT
-    if normalize not in RIDGELINE_SCALES:
+    if ridge_scale not in RIDGELINE_SCALES:
         raise ValueError(
-            f"Invalid `normalize` value {normalize!r}. "
+            f"Invalid `ridge_scale` value {ridge_scale!r}. "
             f"Must be one of {RIDGELINE_SCALES} or None."
         )
-    return normalize
+    return ridge_scale
 
 
 def validate_ridgeline_inner(inner):
@@ -1007,16 +1008,32 @@ def validate_gantt_arrow_entry(value):
     return value
 
 
-def _validate_value_mode(value, modes: tuple):
-    """Validate a `show_values` mode of a range front; None or False prints none."""
+def _validate_value_kind(show_values, value_kind, kinds: tuple, default: str):
+    """`show_values` and the value label kind of a range front.
 
-    if value is None or value is False:
-        return None
-    if value not in modes:
-        raise ValueError(
-            f"Invalid `show_values` value {value!r}. Must be one of {modes} or None."
+    A kind passed as `show_values` warns at the front's caller and moves to
+    `value_kind`; an unset kind is `default`.
+    """
+
+    if isinstance(show_values, str):
+        # this function, its front wrapper, the front, then the caller
+        warnings.warn(
+            "Passing the label kind as `show_values` is deprecated and will be "
+            "removed in the next release; use `show_values=True, "
+            f"value_kind={show_values!r}` instead.",
+            DeprecationWarning,
+            stacklevel=4,
         )
-    return value
+        if value_kind is not None:
+            raise ValueError("Pass the label kind as `value_kind` only.")
+        show_values, value_kind = True, show_values
+    if value_kind is None:
+        return show_values, default
+    if value_kind not in kinds:
+        raise ValueError(
+            f"Invalid `value_kind` value {value_kind!r}. Must be one of {kinds} or None."
+        )
+    return show_values, value_kind
 
 
 def _validate_sort_key(sort, sort_by, keys: tuple, default: str) -> str:
@@ -1033,10 +1050,12 @@ def _validate_sort_key(sort, sort_by, keys: tuple, default: str) -> str:
     return sort_by
 
 
-def validate_gantt_show_values(value):
-    """Validate a gantt value label; None or False prints none."""
+def validate_gantt_value_kind(show_values, value_kind) -> tuple:
+    """`show_values` and the gantt value label kind; None means `DEFAULT`."""
 
-    return _validate_value_mode(value, GANTT_VALUES)
+    return _validate_value_kind(
+        show_values, value_kind, GANTT_VALUES, GANTT_VALUE.DEFAULT
+    )
 
 
 def validate_gantt_sort_by(sort, sort_by) -> str:
@@ -1045,10 +1064,12 @@ def validate_gantt_sort_by(sort, sort_by) -> str:
     return _validate_sort_key(sort, sort_by, GANTT_SORT_KEYS, GANTT_SORT_KEY.DEFAULT)
 
 
-def validate_dumbbell_show_values(value):
-    """Validate a dumbbell value label; None or False prints none."""
+def validate_dumbbell_value_kind(show_values, value_kind) -> tuple:
+    """`show_values` and the dumbbell value label kind; None means `DEFAULT`."""
 
-    return _validate_value_mode(value, DUMBBELL_VALUES)
+    return _validate_value_kind(
+        show_values, value_kind, DUMBBELL_VALUES, DUMBBELL_VALUE.DEFAULT
+    )
 
 
 def validate_dumbbell_sort_by(sort, sort_by) -> str:
@@ -1289,7 +1310,7 @@ def validate_basemap_source(
     if geometry is None:
         return
     for name, value in (
-        ("features", features),
+        ("data", features),
         ("resolution", resolution),
         ("highlight", highlight),
     ):
@@ -1307,7 +1328,7 @@ def validate_basemap_highlight(highlight, features) -> tuple:
         return ()
     if BASEMAP_FEATURE.COUNTRIES not in features:
         raise ValueError(
-            "`highlight` picks countries out, so `features` must include "
+            "`highlight` picks countries out, so `data` must include "
             f"{BASEMAP_FEATURE.COUNTRIES!r}."
         )
     codes = (highlight,) if isinstance(highlight, str) else tuple(highlight)
@@ -1381,7 +1402,7 @@ def validate_basemap_features(features) -> tuple:
     unknown = [f for f in features if f not in BASEMAP_FEATURES]
     if unknown or not features:
         raise ValueError(
-            f"Invalid basemap `features` {unknown or list(features)!r}. "
+            f"Invalid basemap `data` features {unknown or list(features)!r}. "
             f"Must be one or more of {BASEMAP_FEATURES}."
         )
     return features

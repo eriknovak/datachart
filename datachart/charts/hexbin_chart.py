@@ -50,7 +50,7 @@ def HexbinChart(
     show_legend: Optional[bool] = None,
     legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
-    show_colorbars: bool = True,
+    show_colorbars: Optional[bool] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     scalex: Optional[Union[SCALE, str]] = None,
     scaley: Optional[Union[SCALE, str]] = None,
@@ -65,7 +65,8 @@ def HexbinChart(
     norm: Optional[Union[str, List[Optional[str]]]] = None,
     vmin: Optional[Union[float, List[Optional[float]]]] = None,
     vmax: Optional[Union[float, List[Optional[float]]]] = None,
-    valfmt: Optional[Union[VALUE_FORMAT, str, List[Optional[str]]]] = None,
+    vcenter: Optional[Union[float, List[Optional[float]]]] = None,
+    value_format: Optional[Union[VALUE_FORMAT, str, List[Optional[str]]]] = None,
     xticks: Optional[
         Union[
             List[Union[int, float, datetime]],
@@ -133,6 +134,7 @@ def HexbinChart(
             List[Union[TextSettingAttrs, List[TextSettingAttrs], None]],
         ]
     ] = None,
+    valfmt: Optional[Union[VALUE_FORMAT, str, List[Optional[str]]]] = None,
 ) -> plt.Figure:
     """Creates the hexbin chart.
 
@@ -206,10 +208,14 @@ def HexbinChart(
         mincnt: The point count below which a hexagon stays blank; every
             hexagon is drawn by default.
         norm: Value normalization method(s) of the colormap; `"log"` spreads
-            heavy-tailed counts.
+            heavy-tailed counts. `"centered"` and `"twoslope"`
+            hold `vcenter` in the middle of the theme's diverging colormap;
+            see [`NORMALIZE`][datachart.constants.NORMALIZE].
         vmin: Minimum value(s) for normalization.
         vmax: Maximum value(s) for normalization.
-        valfmt: Format string(s) for the colorbar tick labels, with the value named `x`
+        vcenter: The value(s) a centred normalization holds in the middle of
+            the colormap (0 by default); ignored by every other norm.
+        value_format: Format string(s) for the colorbar tick labels, with the value named `x`
             (e.g., `"{x:.0f}"`). See [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT].
             The `format` field of the `colorbar` setting wins when set.
         xticks: Custom x-axis tick positions.
@@ -235,6 +241,7 @@ def HexbinChart(
             positions. See
             [`ColorbarSettingAttrs`][datachart.typings.ColorbarSettingAttrs].
         texts: Text annotation(s) to draw.
+        valfmt: Deprecated; use `value_format`. Removed in the next release.
 
     Returns:
         The figure containing the hexbin chart.

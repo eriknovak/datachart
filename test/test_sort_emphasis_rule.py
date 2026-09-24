@@ -330,7 +330,7 @@ class TestSortPyramidAndRadial:
 
     def test_radial_bar_sorts(self):
         wind = [{"label": d, "y": v} for d, v in zip(["N", "E", "S"], [2, 3, 1])]
-        ax = RadialChart(data=wind, type=RADIAL_TYPE.BAR, sort=SORT.ASCENDING).axes[0]
+        ax = RadialChart(data=wind, mark=RADIAL_TYPE.BAR, sort=SORT.ASCENDING).axes[0]
         assert tick_labels(ax) == ["S", "N", "E"]
 
     def test_radial_line_rejects_sort(self):
@@ -439,7 +439,7 @@ class TestEmphasisRuleBars:
 
     def test_columnar_radial_data_keeps_its_tip_values(self):
         columns = {"label": list("ABC"), "y": [1.0, 2.0, 3.0]}
-        ax = RadialChart(data=columns, type=RADIAL_TYPE.BAR, show_values=True).axes[0]
+        ax = RadialChart(data=columns, mark=RADIAL_TYPE.BAR, show_values=True).axes[0]
         tips = sorted(t.get_text() for t in ax.texts if t.get_text() in "123")
         assert tips == ["1", "2", "3"]
 
@@ -468,6 +468,6 @@ class TestEmphasisRulePyramidAndRadial:
     def test_radial_bar_rule(self):
         wind = [{"label": d, "y": v} for d, v in zip(["N", "E", "S"], [2, 3, 1])]
         ax = RadialChart(
-            data=wind, type=RADIAL_TYPE.BAR, emphasis_rule={"bottom": 1}
+            data=wind, mark=RADIAL_TYPE.BAR, emphasis_rule={"bottom": 1}
         ).axes[0]
         assert muted(ax.containers[0]) == [True, True, False]

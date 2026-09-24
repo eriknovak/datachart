@@ -49,7 +49,7 @@ class TestPanelProjection:
 
     def test_mixed_visuals_in_one_panel(self):
         fig = Panel(
-            [RadialChart(data=WIND), RadialChart(data=WIND2, type=RADIAL_TYPE.BAR)]
+            [RadialChart(data=WIND), RadialChart(data=WIND2, mark=RADIAL_TYPE.BAR)]
         )
         ax = fig.axes[0]
         assert len(ax.lines) == 1
@@ -71,7 +71,7 @@ class TestGridProjection:
         fig.canvas.draw()
 
     def test_polar_cell_draws_the_marks(self):
-        fig = Grid([RadialChart(data=WIND, type=RADIAL_TYPE.BAR)])
+        fig = Grid([RadialChart(data=WIND, mark=RADIAL_TYPE.BAR)])
         polar_ax = next(ax for ax in fig.axes if ax.name == "polar")
         assert len(polar_ax.patches) == len(WIND)
 

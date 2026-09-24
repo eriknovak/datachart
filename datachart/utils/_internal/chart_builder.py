@@ -340,13 +340,10 @@ def build_charts_structure(
         Either a single chart dict or a list of chart dicts.
 
     Raises:
-        ValueError: If the chart type has no row, a parameter the row
-            rejects is set, or the data misses the row's dict shape.
+        ValueError: If the chart type has no row, or the data misses the
+            row's dict shape.
     """
     kind = chart_kind(chart_type)
-    for name, reason in kind.rejects.items():
-        if extra_attrs.get(name) is not None:
-            raise ValueError(reason)
     if kind.data_keys is not None:
         dict_datasets(chart_type, data)
 

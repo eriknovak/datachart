@@ -107,13 +107,15 @@ class TestRidgelineLayout(unittest.TestCase):
 
     def test_per_row_scales_every_ridge_to_the_same_peak(self):
         data = ridge_data(scales=[0.5, 1.0, 3.0])
-        ax = RidgelinePlot(data, overlap=0.5, normalize=RIDGELINE_SCALE.PER_ROW).axes[0]
+        ax = RidgelinePlot(data, overlap=0.5, ridge_scale=RIDGELINE_SCALE.PER_ROW).axes[
+            0
+        ]
         rises = [rise(f, p) for p, f in enumerate(fills(ax))]
         np.testing.assert_allclose(rises, [1.5, 1.5, 1.5])
 
     def test_common_keeps_one_density_scale(self):
         data = ridge_data(scales=[0.5, 1.0, 3.0])
-        ax = RidgelinePlot(data, overlap=0.5, normalize="common").axes[0]
+        ax = RidgelinePlot(data, overlap=0.5, ridge_scale="common").axes[0]
         rises = [rise(f, p) for p, f in enumerate(fills(ax))]
         self.assertAlmostEqual(max(rises), 1.5)
         # the narrowest spread is the densest row, the widest the flattest
@@ -258,9 +260,9 @@ class TestRidgelineValidation(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "fill"):
             RidgelinePlot(ridge_data(), fill=False, show_outline=False)
 
-    def test_invalid_normalize_and_sort_raise(self):
-        with self.assertRaisesRegex(ValueError, "normalize"):
-            RidgelinePlot(ridge_data(), normalize="global")
+    def test_invalid_ridge_scale_and_sort_raise(self):
+        with self.assertRaisesRegex(ValueError, "ridge_scale"):
+            RidgelinePlot(ridge_data(), ridge_scale="global")
         with self.assertRaisesRegex(ValueError, "sort"):
             RidgelinePlot(ridge_data(), sort="median")
         with self.assertRaises(ValueError):

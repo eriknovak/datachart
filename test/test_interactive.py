@@ -458,23 +458,23 @@ class TestRadialLayers:
         assert resolver(1) == {"label": "wind", "angle": "E", "radius": 10}
         # the closing point repeats the first
         assert resolver(4) == resolver(0)
-        ((bars, resolver),) = _targets(RadialChart(data=RADIAL_DATA, type="bar"))
+        ((bars, resolver),) = _targets(RadialChart(data=RADIAL_DATA, mark="bar"))
         assert isinstance(bars, BarContainer)
         assert resolver(3) == {"label": None, "angle": "W", "radius": 20}
-        ((points, resolver),) = _targets(RadialChart(data=RADIAL_DATA, type="scatter"))
+        ((points, resolver),) = _targets(RadialChart(data=RADIAL_DATA, mark="scatter"))
         assert isinstance(points, PathCollection)
         assert resolver(2) == {"label": None, "angle": "S", "radius": 15}
 
     def test_stacked_radial_bars_report_their_own_value(self):
         figure = RadialChart(
-            data=[RADIAL_DATA, RADIAL_DATA], type="bar", bar_mode="stack"
+            data=[RADIAL_DATA, RADIAL_DATA], mark="bar", bar_mode="stack"
         )
         assert [r(0)["radius"] for _, r in _targets(figure)] == [5, 5]
 
     def test_radial_histogram_bins_report_degree_ranges(self):
         figure = RadialChart(
             data=[{"x": d} for d in [5, 10, 100, 200, 350]],
-            type="histogram",
+            mark="histogram",
             num_bins=4,
         )
         ((bars, resolver),) = _targets(figure)
@@ -693,7 +693,7 @@ class TestShowInteractive:
         ]
 
     def test_radial_bar_hover_names_the_category(self):
-        figure = RadialChart(data=RADIAL_DATA, type="bar", subtitle="wind")
+        figure = RadialChart(data=RADIAL_DATA, mark="bar", subtitle="wind")
         _show_interactive(figure)
         # the "E" bar sits a quarter turn in and reaches radius 10
         assert _hover(figure, figure.axes[0], np.pi / 2, 5) == [

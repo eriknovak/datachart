@@ -740,7 +740,7 @@ def scatter_multi_subplots():
 @case
 def heatmap_basic():
     data = {"z": [[(i * j) % 7 for j in range(5)] for i in range(4)]}
-    return Heatmap(data=data, show_heatmap_values=True, show_colorbars=True)
+    return Heatmap(data=data, show_values=True, show_colorbars=True)
 
 
 @case
@@ -757,13 +757,13 @@ def heatmap_labels():
         "y": ["q1", "q2", "q3", "q4"],
         "z": [[(i * j) % 7 for j in range(5)] for i in range(4)],
     }
-    return Heatmap(data=data, show_heatmap_values=True, xtickrotate=45)
+    return Heatmap(data=data, show_values=True, xtickrotate=45)
 
 
 @case
 def heatmap_blank_cells():
     data = {"z": [[1, None, 3], [None, 5, 6]]}
-    return Heatmap(data=data, show_heatmap_values=True, show_colorbars=True)
+    return Heatmap(data=data, show_values=True, show_colorbars=True)
 
 
 def signed_matrix():
@@ -778,7 +778,7 @@ def heatmap_centered():
     return Heatmap(
         data=data,
         norm=NORMALIZE.CENTERED,
-        show_heatmap_values=True,
+        show_values=True,
         show_colorbars=True,
         title="Centred on zero",
     )
@@ -792,7 +792,7 @@ def heatmap_twoslope():
         norm=NORMALIZE.TWOSLOPE,
         vmin=-3,
         vmax=5,
-        show_heatmap_values=True,
+        show_values=True,
         show_colorbars=True,
         title="Two slopes about zero",
     )
@@ -885,7 +885,7 @@ def ridgeline_sorted_overlap():
 def ridgeline_common():
     return RidgelinePlot(
         data=ridgeline_data(seed=7),
-        normalize="common",
+        ridge_scale="common",
         fill=False,
         bandwidth=0.3,
     )
@@ -1191,7 +1191,7 @@ def theme_quill_heatmap_steps():
     data = {"z": [[(i * j) % 7 for j in range(5)] for i in range(4)]}
     return Heatmap(
         data=data,
-        show_heatmap_values=True,
+        show_values=True,
         show_colorbars=True,
         colorbar={"label": "value"},
     )
@@ -1277,7 +1277,7 @@ def theme_dark_heatmap():
     data = {"z": [[(i * j) % 7 for j in range(5)] for i in range(4)]}
     return Heatmap(
         data=data,
-        show_heatmap_values=True,
+        show_values=True,
         show_colorbars=True,
         colorbar={"label": "value"},
     )
@@ -1825,14 +1825,14 @@ def radial_line_area_donut():
 
 @case
 def radial_bar():
-    return RadialChart(data=RAD1, type="bar", title="Circular bars", show_grid="both")
+    return RadialChart(data=RAD1, mark="bar", title="Circular bars", show_grid="both")
 
 
 @case
 def radial_bar_stacked():
     return RadialChart(
         data=[RAD1, RAD2],
-        type="bar",
+        mark="bar",
         bar_mode="stack",
         subtitle=["a", "b"],
         show_legend=True,
@@ -1841,12 +1841,12 @@ def radial_bar_stacked():
 
 @case
 def radial_scatter():
-    return RadialChart(data=RAD1, type="scatter", direction="counterclockwise")
+    return RadialChart(data=RAD1, mark="scatter", direction="counterclockwise")
 
 
 @case
 def radial_hist_rose():
-    return RadialChart(data=wind_directions(), type="histogram", num_bins=16)
+    return RadialChart(data=wind_directions(), mark="histogram", num_bins=16)
 
 
 @case
@@ -1857,7 +1857,7 @@ def radial_bar_tip_labels():
     s2 = [{"label": l, "y": int(v)} for l, v in zip(labels, rng.randint(10, 60, 16))]
     return RadialChart(
         data=[s1, s2],
-        type="bar",
+        mark="bar",
         bar_mode="stack",
         show_tip_labels=True,
         show_border=False,
@@ -1874,13 +1874,13 @@ def radial_line_values():
 @case
 def radial_panel_two():
     f1 = RadialChart(data=RAD1, subtitle="a")
-    f2 = RadialChart(data=RAD2, type="bar", subtitle="b")
+    f2 = RadialChart(data=RAD2, mark="bar", subtitle="b")
     return Panel([f2, f1], title="Radial panel", show_legend=True)
 
 
 @case
 def radial_grid_mixed():
-    fr = RadialChart(data=RAD1, type="bar", title="Rose")
+    fr = RadialChart(data=RAD1, mark="bar", title="Rose")
     fl = LineChart(data=LINE1, title="Line")
     return Grid([fr, fl], max_cols=2, figsize=(10, 4))
 
@@ -2018,7 +2018,7 @@ def contour_labels():
     return ContourChart(
         data=contour_grid_data(himmelblau),
         show_labels=True,
-        valfmt="{x:.0f}",
+        value_format="{x:.0f}",
         levels=CONTOUR_LEVELS.RICE,
     )
 
@@ -2429,7 +2429,8 @@ def gantt_grouped_progress():
         without(gantt_tasks(), "depends_on"),
         sort=SORT.ASCENDING,
         sort_by="group",
-        show_values="progress",
+        show_values=True,
+        value_kind="progress",
         title="Grouped with progress",
     )
 
@@ -2441,7 +2442,8 @@ def gantt_dependencies_today():
         show_dependencies=True,
         show_today=True,
         today=date(2024, 3, 30),
-        show_values="duration",
+        show_values=True,
+        value_kind="duration",
         emphasis_rule={"above": 11},
         xticks_format=DATE_FORMAT.ISO,
         xtickrotate=30,
@@ -2469,7 +2471,8 @@ def gantt_week_headers_milestone():
         gantt_with_milestone(),
         period="week",
         show_group_headers=True,
-        show_values="duration",
+        show_values=True,
+        value_kind="duration",
         show_today=True,
         today=date(2024, 3, 30),
         today_label="Today",
@@ -2526,7 +2529,8 @@ def dumbbell_basic():
         dumbbell_records(),
         start_name="2000",
         end_name="2019",
-        show_values="endpoints",
+        show_values=True,
+        value_kind="endpoints",
         xlabel="Life expectancy (years)",
         title="Life expectancy",
     )
@@ -2541,7 +2545,8 @@ def dumbbell_vertical_delta_sorted():
         orientation="vertical",
         sort=SORT.DESCENDING,
         sort_by="delta",
-        show_values="delta",
+        show_values=True,
+        value_kind="delta",
         value_format="{:+.1f}",
         marker=("s", "o"),
         connector_style="--",
@@ -2569,7 +2574,8 @@ def dumbbell_direction_mixed():
                     start_name="2019",
                     end_name="2021",
                     show_direction=True,
-                    show_values="delta",
+                    show_values=True,
+                    value_kind="delta",
                     value_format="{:+.1f}",
                     title="Horizontal",
                 ),
@@ -2577,7 +2583,8 @@ def dumbbell_direction_mixed():
                     dumbbell_records(rows),
                     orientation="vertical",
                     show_direction=True,
-                    show_values="endpoints",
+                    show_values=True,
+                    value_kind="endpoints",
                     title="Vertical",
                 ),
             ]
@@ -2622,7 +2629,8 @@ def dumbbell_grid_themes():
                 dumbbell_records(DUMBBELL_LIFE[:4]),
                 start_name="2000",
                 end_name="2019",
-                show_values="endpoints",
+                show_values=True,
+                value_kind="endpoints",
                 title=theme,
             )
         )
@@ -3305,7 +3313,7 @@ def band_radial_wedge():
 def band_radial_annulus():
     return RadialChart(
         data=RAD1,
-        type="bar",
+        mark="bar",
         hspans={"ymin": 3, "ymax": 5, "style": {"plot_hspan_color": "#E76F51"}},
         vspans={"xmin": 300, "xmax": 30},
         innerradius=0.2,
@@ -3518,7 +3526,7 @@ def heatmap_rule_above():
     return Heatmap(
         data=data,
         emphasis_rule={"above": 4},
-        show_heatmap_values=True,
+        show_values=True,
         show_colorbars=True,
     )
 

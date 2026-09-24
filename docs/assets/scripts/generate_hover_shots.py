@@ -167,7 +167,7 @@ def radial():
                 ["N", "NE", "E", "SE", "S", "SW", "W", "NW"], [5, 8, 12, 9, 6, 4, 7, 10]
             )
         ],
-        type="bar",
+        mark="bar",
         subtitle="Wind hours",
         figsize=FIGSIZE,
     )

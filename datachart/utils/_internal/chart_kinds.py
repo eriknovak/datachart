@@ -6,7 +6,17 @@ before anything is drawn.
 """
 
 from dataclasses import dataclass, field
-from typing import Any, Callable, FrozenSet, List, Mapping, Optional, Tuple, Type
+from typing import (
+    Any,
+    Callable,
+    FrozenSet,
+    List,
+    Mapping,
+    Optional,
+    Tuple,
+    Type,
+    Union,
+)
 
 from .config_helpers import (
     get_grid_style,
@@ -63,7 +73,56 @@ from .layers import (
 )
 from .validate import validate_baseline, validate_date_period, validate_emphasis_rule
 from ...config import config
-from ...constants import ASPECT_RATIO, ORIENTATION, RADIAL_TYPE
+from ...constants import (
+    ASPECT_RATIO,
+    BANDWIDTH,
+    BAR_MODE,
+    DATE_FORMAT,
+    DRAW_POSITION,
+    EMPHASIS,
+    FIG_SIZE,
+    ORIENTATION,
+    RADIAL_TYPE,
+    SCALE,
+    SHOW_GRID,
+    SORT,
+    SWARM_MODE,
+    VALUE_FORMAT,
+)
+from ...typings import (
+    BracketSettingAttrs,
+    ColorbarSettingAttrs,
+    DLineSettingAttrs,
+    EmphasisRuleAttrs,
+    HLineSettingAttrs,
+    HSpanSettingAttrs,
+    LegendSettingAttrs,
+    TextSettingAttrs,
+    VLineSettingAttrs,
+    VSpanSettingAttrs,
+)
+
+# the per-chart keys every front shares; a row's `chart_keys` adds its own
+CHART_KEYS = frozenset(
+    {
+        "subtitle",
+        "emphasis",
+        "style",
+        "xticks",
+        "xticklabels",
+        "xtickrotate",
+        "yticks",
+        "yticklabels",
+        "ytickrotate",
+        "vlines",
+        "hlines",
+        "dlines",
+        "brackets",
+        "vspans",
+        "hspans",
+        "texts",
+    }
+)
 
 # a function of the charts and settings, returning the charts it rewrote
 ChartsStep = Callable[[List[dict], dict], List[dict]]
@@ -129,6 +188,8 @@ class ChartKind:
         single_dataset: Several datasets need `subplots=True`.
         rejects: Parameters the front takes only as None, with the reason
             a value raises.
+        renamed: Deprecated parameter names the front still takes, mapped
+            to their new names; each is removed one release after it ships.
         group: Categories run along one axis and values along the other, so
             the scale keys name the value axis, not a literal one.
         overlayable: `Panel` may overlay the front's figures.
@@ -166,6 +227,7 @@ class ChartKind:
     subplots: bool = True
     single_dataset: bool = False
     rejects: Mapping[str, str] = field(default_factory=dict)
+    renamed: Mapping[str, str] = field(default_factory=dict)
     group: bool = False
     overlayable: bool = True
     gridless: Callable[[dict], bool] = _never
@@ -181,6 +243,12 @@ class ChartKind:
     emphasis_ranks: bool = False
     prepare: Optional[ChartsStep] = None
     order: Optional[ChartsStep] = None
+
+    @property
+    def per_chart_keys(self) -> FrozenSet[str]:
+        """The parameters indexed against the charts; the rest are settings."""
+
+        return (CHART_KEYS | self.chart_keys) - self.figure_keys
 
     def build_layers(self, charts: List[dict], settings: dict) -> List[Layer]:
         """The front's layers for already prepared charts."""
@@ -200,13 +268,26 @@ def _parallel_layers(charts: List[dict], settings: dict) -> List[Layer]:
     return [ParallelCoordsLayer(list(charts), settings)]
 
 
-def _radial_layers(charts: List[dict], settings: dict) -> List[Layer]:
-    visual = settings.get("type") or RADIAL_TYPE.LINE
+def _radial_mark(charts: List[dict], settings: dict) -> List[dict]:
+    # the visual is checked before the emphasis rule and the sort read bars
+    visual = settings.get("mark") or RADIAL_TYPE.LINE
     if visual not in RADIAL_LAYER_TYPES:
         raise ValueError(
-            f"Invalid radial `type` value {visual!r}. "
-            f"Must be one of {sorted(RADIAL_LAYER_TYPES)}."
+            f"Invalid `mark` value {visual!r}. "
+            f"Must be one of {tuple(RADIAL_LAYER_TYPES)}."
         )
+    if visual != RADIAL_TYPE.BAR and any(
+        settings.get(key) is not None for key in ("sort", "sort_by", "emphasis_rule")
+    ):
+        raise ValueError(
+            "RadialChart takes `sort`, `sort_by`, and `emphasis_rule` on the "
+            f"bar visual only; the {visual!r} visual has no bars to order."
+        )
+    return charts
+
+
+def _radial_layers(charts: List[dict], settings: dict) -> List[Layer]:
+    visual = settings.get("mark") or RADIAL_TYPE.LINE
     return [RADIAL_LAYER_TYPES[visual](chart, settings) for chart in charts]
 
 
@@ -277,6 +358,7 @@ _KINDS = (
         "bar chart",
         BarLayer,
         chart_keys=frozenset({"label", "y", "yerr"}),
+        defaults={"orientation": ORIENTATION.VERTICAL},
         swaps_horizontal_labels=True,
         emphasis_units=bar_units,
         order=sort_bar_charts,
@@ -304,6 +386,17 @@ _KINDS = (
         chart_keys=frozenset({"label", "x", "y", "yerr"}),
         build=_radial_layers,
         projection="polar",
+        rejects={
+            "scalex": "RadialChart does not support `scalex`: the angular axis "
+            "has no scale to change.",
+            **{
+                name: f"RadialChart does not support `{name}`: straight "
+                "reference marks are geometrically meaningless on a polar axes."
+                for name in ("vlines", "hlines", "dlines", "brackets")
+            },
+        },
+        renamed={"type": "mark"},
+        prepare=_radial_mark,
         # the front takes a rule and a sort on the bar visual only
         emphasis_units=bar_units,
         order=sort_bar_charts,
@@ -341,6 +434,7 @@ _KINDS = (
         "dumbbellchart",
         "dumbbell chart",
         DumbbellLayer,
+        defaults={"orientation": ORIENTATION.HORIZONTAL},
         legend_default=_dumbbell_legend,
         group=True,
         grid_on_value_axis=True,
@@ -352,6 +446,7 @@ _KINDS = (
         "histogram",
         HistogramLayer,
         chart_keys=frozenset({"x"}),
+        defaults={"orientation": ORIENTATION.VERTICAL},
         # histograms stack by default; bars group (ADR 0014)
         bar_mode="stack",
         shared_bins=True,
@@ -365,6 +460,7 @@ _KINDS = (
         "box plot",
         BoxLayer,
         chart_keys=frozenset({"label", "value"}),
+        defaults={"orientation": ORIENTATION.VERTICAL},
         multiplot=False,
         single_dataset=True,
         group=True,
@@ -376,6 +472,7 @@ _KINDS = (
         "violin plot",
         ViolinLayer,
         chart_keys=frozenset({"label", "value"}),
+        defaults={"orientation": ORIENTATION.VERTICAL},
         multiplot=False,
         single_dataset=True,
         group=True,
@@ -387,6 +484,7 @@ _KINDS = (
         "swarm plot",
         SwarmLayer,
         chart_keys=frozenset({"label", "value"}),
+        defaults={"orientation": ORIENTATION.VERTICAL, "mode": SWARM_MODE.SWARM},
         group=True,
         emphasis_units=group_units,
         emphasis_by="median",
@@ -396,6 +494,11 @@ _KINDS = (
         "raincloud plot",
         ViolinLayer,
         chart_keys=frozenset({"label", "value"}),
+        defaults={
+            "orientation": ORIENTATION.VERTICAL,
+            "mode": SWARM_MODE.SWARM,
+            "show_outliers": True,
+        },
         build=_raincloud_layers,
         multiplot=False,
         group=True,
@@ -407,8 +510,10 @@ _KINDS = (
         "ridgeline plot",
         RidgelineLayer,
         chart_keys=frozenset({"label", "value"}),
+        defaults={"orientation": ORIENTATION.HORIZONTAL},
         build=_ridgeline_layers,
         multiplot=False,
+        renamed={"normalize": "ridge_scale"},
         group=True,
         emphasis_units=group_units,
         emphasis_by="median",
@@ -425,7 +530,9 @@ _KINDS = (
         "heatmap",
         "heatmap",
         HeatmapLayer,
-        chart_keys=frozenset({"colorbar", "norm", "valfmt", "vcenter", "vmax", "vmin"}),
+        chart_keys=frozenset(
+            {"colorbar", "norm", "value_format", "vcenter", "vmax", "vmin"}
+        ),
         dict_data=True,
         data_keys=("z",),
         multiplot=False,
@@ -434,6 +541,7 @@ _KINDS = (
             "a heatmap has no series to mute or highlight. Set the `emphasis` "
             "grid on `data` for per-cell roles instead.",
         ),
+        renamed={"show_heatmap_values": "show_values", "valfmt": "value_format"},
         overlayable=False,
         # a raster covers the grid
         gridless=_always,
@@ -444,8 +552,11 @@ _KINDS = (
         "contourchart",
         "contour chart",
         ContourLayer,
-        chart_keys=frozenset({"colorbar", "norm", "valfmt", "vmax", "vmin"}),
+        chart_keys=frozenset(
+            {"colorbar", "norm", "value_format", "vcenter", "vmax", "vmin"}
+        ),
         dict_data=True,
+        renamed={"valfmt": "value_format"},
         # filled contour bands cover the grid
         gridless=_filled,
         emphasis_units=series_units("z"),
@@ -462,17 +573,20 @@ _KINDS = (
                 "mincnt",
                 "norm",
                 "reduce",
-                "valfmt",
+                "value_format",
+                "vcenter",
                 "vmax",
                 "vmin",
             }
         ),
+        defaults={"show_colorbars": True},
         dict_data=True,
         rejects=_no_emphasis(
             "HexbinChart",
             "a hexbin chart is a single colormapped layer with no series to "
             "mute or highlight.",
         ),
+        renamed={"valfmt": "value_format"},
         # hexagons cover the grid
         gridless=_always,
     ),
@@ -515,6 +629,7 @@ _KINDS = (
         dict_data=True,
         multiplot=False,
         subplots=False,
+        renamed={"features": "data"},
     ),
     ChartKind(
         "sankeychart",
@@ -557,6 +672,142 @@ def chart_kind(name: str) -> ChartKind:
             f"known types are {sorted(CHART_KINDS)}."
         )
     return kind
+
+
+# ================================================
+# Shared parameters
+# ================================================
+
+
+@dataclass(frozen=True)
+class SharedParameter:
+    """A parameter spelled, typed and defaulted alike on every front taking it.
+
+    Attributes:
+        name: The parameter's name.
+        annotation: The type of one value, without `Optional`: a parameter
+            defaulting to None is annotated `Optional[annotation]`.
+        default: The signature default.
+        per_chart: The type of the value on a front that indexes it against
+            the charts, without `Optional`; None when every front reads it
+            whole.
+    """
+
+    name: str
+    annotation: Any
+    default: Any = None
+    per_chart: Any = None
+
+    def signature_annotation(self, kind: ChartKind) -> Any:
+        """The annotation the parameter carries on the front of `kind`."""
+
+        if self.name in kind.rejects:
+            return None
+        if self.name in kind.per_chart_keys and self.per_chart is not None:
+            annotation = self.per_chart
+        else:
+            annotation = self.annotation
+        return annotation if self.default is not None else Optional[annotation]
+
+
+def _each(annotation: Any) -> Any:
+    # one value for every chart, or one per chart
+    return Union[annotation, List[Optional[annotation]]]
+
+
+def _nested(setting: Any) -> Any:
+    # one or several settings for every chart, or those of each chart
+    return Union[setting, List[setting], List[Union[setting, List[setting], None]]]
+
+
+def _setting(name: str, setting: Any) -> SharedParameter:
+    return SharedParameter(
+        name, Union[setting, List[setting]], per_chart=_nested(setting)
+    )
+
+
+_Number = Union[int, float]
+_Ticks = List[_Number]
+_Labels = List[str]
+
+# x-axis values, limits, ticks and tick formats are left out: a front's x axis
+# holds numbers or dates, and the annotation says which (ADR 0067)
+_SHARED = (
+    SharedParameter("title", str),
+    SharedParameter("xlabel", str),
+    SharedParameter("ylabel", str),
+    SharedParameter("figsize", Union[FIG_SIZE, Tuple[float, float]]),
+    SharedParameter("show_legend", bool),
+    SharedParameter("legend", LegendSettingAttrs),
+    SharedParameter("show_grid", Union[SHOW_GRID, str, bool]),
+    SharedParameter("subplots", bool),
+    SharedParameter("max_cols", int),
+    SharedParameter("sharex", bool),
+    SharedParameter("sharey", bool),
+    SharedParameter("aspect_ratio", Union[ASPECT_RATIO, str]),
+    SharedParameter("emphasis_rule", EmphasisRuleAttrs),
+    SharedParameter("ymin", _Number),
+    SharedParameter("ymax", _Number),
+    SharedParameter("yticks_format", Union[VALUE_FORMAT, DATE_FORMAT, str]),
+    SharedParameter("scalex", Union[SCALE, str]),
+    SharedParameter("scaley", Union[SCALE, str]),
+    SharedParameter("orientation", Union[ORIENTATION, str]),
+    SharedParameter("sort", Union[SORT, str]),
+    SharedParameter("bar_mode", Union[BAR_MODE, str]),
+    SharedParameter("show_values", bool),
+    SharedParameter("value_step", int),
+    SharedParameter("show_yerr", bool),
+    SharedParameter("show_area", bool),
+    SharedParameter("show_labels", bool),
+    SharedParameter("show_outliers", bool),
+    SharedParameter("show_colorbars", bool),
+    SharedParameter("show_regression", bool),
+    SharedParameter("show_correlation", bool),
+    SharedParameter("num_bins", int),
+    SharedParameter("bandwidth", Union[BANDWIDTH, str, float]),
+    SharedParameter("mode", Union[SWARM_MODE, str]),
+    SharedParameter("jitter", float, default=0.4),
+    SharedParameter("position", Union[DRAW_POSITION, str]),
+    SharedParameter(
+        "value_format",
+        Union[VALUE_FORMAT, str],
+        per_chart=Union[VALUE_FORMAT, str, List[Optional[str]]],
+    ),
+    SharedParameter("subtitle", str, per_chart=_each(str)),
+    SharedParameter(
+        "emphasis",
+        Union[EMPHASIS, str],
+        per_chart=Union[EMPHASIS, str, List[Optional[str]]],
+    ),
+    SharedParameter("xticklabels", _Labels, per_chart=Union[_Labels, List[_Labels]]),
+    SharedParameter("xtickrotate", int, per_chart=_each(int)),
+    SharedParameter("yticks", _Ticks, per_chart=Union[_Ticks, List[_Ticks]]),
+    SharedParameter("yticklabels", _Labels, per_chart=Union[_Labels, List[_Labels]]),
+    SharedParameter("ytickrotate", int, per_chart=_each(int)),
+    _setting("vlines", VLineSettingAttrs),
+    _setting("hlines", HLineSettingAttrs),
+    _setting("dlines", DLineSettingAttrs),
+    _setting("brackets", BracketSettingAttrs),
+    _setting("vspans", VSpanSettingAttrs),
+    _setting("hspans", HSpanSettingAttrs),
+    _setting("texts", TextSettingAttrs),
+    SharedParameter("label", str, per_chart=_each(str)),
+    SharedParameter("x", str, per_chart=_each(str)),
+    SharedParameter("y", str, per_chart=_each(str)),
+    SharedParameter("yerr", str, per_chart=_each(str)),
+    SharedParameter("value", str, per_chart=_each(str)),
+    SharedParameter("hue", str, per_chart=_each(str)),
+    SharedParameter("dimensions", _Labels, per_chart=Union[_Labels, List[_Labels]]),
+    SharedParameter("vmin", float, per_chart=_each(float)),
+    SharedParameter("vmax", float, per_chart=_each(float)),
+    SharedParameter("vcenter", float, per_chart=_each(float)),
+    SharedParameter("norm", str, per_chart=_each(str)),
+    SharedParameter(
+        "colorbar", ColorbarSettingAttrs, per_chart=_each(ColorbarSettingAttrs)
+    ),
+)
+
+SHARED_PARAMETERS = {parameter.name: parameter for parameter in _SHARED}
 
 
 # ================================================

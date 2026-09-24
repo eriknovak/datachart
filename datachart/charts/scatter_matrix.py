@@ -255,7 +255,7 @@ def ScatterMatrix(
     sharex: Optional[bool] = None,
     sharey: Optional[bool] = None,
     title: Optional[str] = None,
-    figsize: Optional[Tuple[float, float]] = None,
+    figsize: Optional[Union[FIG_SIZE, Tuple[float, float]]] = None,
     show_legend: Optional[bool] = None,
     legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
