@@ -2484,7 +2484,7 @@ class ScatterDataPointAttrs(TypedDict):
         y (Union[int, float]): The y-axis value.
         size (Optional[Union[int, float]]): The marker size (for bubble charts).
         hue (Optional[str]): The category for color grouping.
-        label (Optional[str]): The label drawn beside the point.
+        annotation (Optional[str]): The text drawn beside the point.
         emphasis (Optional[Union[EMPHASIS, str]]): The point's own emphasis role
             ("background" or "highlight"); wins over the chart's `emphasis` and
             `emphasis_rule`.
@@ -2500,7 +2500,7 @@ class ScatterDataPointAttrs(TypedDict):
     y: Union[int, float]
     size: Optional[Union[int, float]]
     hue: Optional[str]
-    label: Optional[str]
+    annotation: Optional[str]
     emphasis: Optional[Union[EMPHASIS, str]]
     xerr: Optional[Union[float, Tuple[float, float]]]
     yerr: Optional[Union[float, Tuple[float, float]]]
@@ -2532,7 +2532,7 @@ class ScatterSingleChartAttrs(TypedDict):
         y (Union[str, None]): The key name in `data` that contains the y-axis value. Defaults to `"y"`.
         size (Union[str, None]): The key name in `data` that contains the marker size value.
         hue (Union[str, None]): The key name in `data` that contains the hue/category value.
-        label (Union[str, None]): The key name in `data` that contains the point label.
+        annotation (Union[str, None]): The key name in `data` that contains the point annotation.
         xerr (Union[str, None]): The key name in `data` that contains the x-axis error. Defaults to `"xerr"`.
         yerr (Union[str, None]): The key name in `data` that contains the y-axis error. Defaults to `"yerr"`.
 
@@ -2563,7 +2563,7 @@ class ScatterSingleChartAttrs(TypedDict):
     y: Union[str, None]
     size: Union[str, None]
     hue: Union[str, None]
-    label: Union[str, None]
+    annotation: Union[str, None]
     xerr: Union[str, None]
     yerr: Union[str, None]
 

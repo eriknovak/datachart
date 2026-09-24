@@ -3,7 +3,6 @@ from typing import Union, List, Optional, Tuple
 import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render
-from ..utils._internal.chart_builder import _get_indexed_value
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
@@ -219,27 +218,10 @@ def PyramidChart(
             "PyramidChart does not support `xmin`: "
             "the value axis is always symmetric around zero."
         )
-    if not (
-        isinstance(data, list)
-        and len(data) == 2
-        and all(isinstance(side, list) for side in data)
-    ):
-        raise ValueError(
-            "PyramidChart takes exactly two data series: "
-            "`data=[left_points, right_points]`."
-        )
     if xticks is not None and any(tick < 0 for tick in xticks):
         raise ValueError(
             "PyramidChart `xticks` are positive positions; "
             "each is mirrored to both halves."
         )
-
-    # the left side draws in the negative direction; users pass positive values
-    left_y_key = _get_indexed_value(y, 0) or "y"
-    left_side = [
-        {**point, left_y_key: -point[left_y_key]} if left_y_key in point else point
-        for point in data[0]
-    ]
-    params["data"] = [left_side, data[1]]
 
     return render("pyramidchart", params)

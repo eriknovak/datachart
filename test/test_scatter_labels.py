@@ -1,4 +1,4 @@
-"""Point labels sit beside their markers and steer clear of the other marks."""
+"""Point annotations sit beside their markers and steer clear of the other marks."""
 
 import matplotlib
 
@@ -12,9 +12,9 @@ from datachart.config import config
 from datachart.utils import Grid, Panel
 
 POINTS = [
-    {"x": 1, "y": 1, "label": "a"},
-    {"x": 5, "y": 5, "label": "b"},
-    {"x": 9, "y": 2, "label": "c"},
+    {"x": 1, "y": 1, "annotation": "a"},
+    {"x": 5, "y": 5, "annotation": "b"},
+    {"x": 9, "y": 2, "annotation": "c"},
 ]
 
 
@@ -45,9 +45,9 @@ def test_labels_drawn_from_default_key():
     assert [t.get_text() for t in labels] == ["a", "b", "c"]
 
 
-def test_label_parameter_names_the_key():
-    data = [{"x": p["x"], "y": p["y"], "name": p["label"]} for p in POINTS]
-    fig = ScatterChart(data=data, label="name")
+def test_annotation_parameter_names_the_key():
+    data = [{"x": p["x"], "y": p["y"], "name": p["annotation"]} for p in POINTS]
+    fig = ScatterChart(data=data, annotation="name")
     assert [t.get_text() for t in _labels(fig.axes[0])] == ["a", "b", "c"]
 
 
@@ -57,13 +57,13 @@ def test_no_labels_without_the_key():
 
 
 def test_missing_label_skips_the_point():
-    data = [{"x": 1, "y": 1, "label": "a"}, {"x": 2, "y": 2}]
+    data = [{"x": 1, "y": 1, "annotation": "a"}, {"x": 2, "y": 2}]
     fig = ScatterChart(data=data)
     assert [t.get_text() for t in _labels(fig.axes[0])] == ["a"]
 
 
 def test_per_chart_none_leaves_the_series_unlabelled():
-    fig = ScatterChart(data=[POINTS, POINTS], label=[None, "label"])
+    fig = ScatterChart(data=[POINTS, POINTS], annotation=[None, "annotation"])
     assert [t.get_text() for t in _labels(fig.axes[0])] == ["a", "b", "c"]
 
 
@@ -84,9 +84,9 @@ def test_background_labels_are_muted():
 def test_labels_clear_markers_and_each_other():
     # neighbours whose obvious right-hand spots collide with the next point
     data = [
-        {"x": 1.0, "y": 1.0, "label": "left point"},
-        {"x": 1.15, "y": 1.0, "label": "right point"},
-        {"x": 1.3, "y": 1.02, "label": "far point"},
+        {"x": 1.0, "y": 1.0, "annotation": "left point"},
+        {"x": 1.15, "y": 1.0, "annotation": "right point"},
+        {"x": 1.3, "y": 1.02, "annotation": "far point"},
     ]
     fig = ScatterChart(data=data, figsize=(6, 4))
     fig.canvas.draw()
@@ -108,7 +108,7 @@ def test_hue_groups_keep_their_labels():
 
 
 def test_labels_survive_panel_and_grid():
-    other = [{"x": 2, "y": 6, "label": "d"}]
+    other = [{"x": 2, "y": 6, "annotation": "d"}]
     panel = Panel([ScatterChart(data=POINTS), ScatterChart(data=other)])
     assert sorted(t.get_text() for t in _labels(panel.axes[0])) == [
         "a",
@@ -123,8 +123,8 @@ def test_labels_survive_panel_and_grid():
 
 def test_panel_labels_clear_the_other_figure_markers():
     # each figure's right-hand spot lands on the other figure's marker
-    left = [{"x": 1.0, "y": 1.0, "label": "left point"}]
-    right = [{"x": 1.15, "y": 1.0, "label": "right point"}]
+    left = [{"x": 1.0, "y": 1.0, "annotation": "left point"}]
+    right = [{"x": 1.15, "y": 1.0, "annotation": "right point"}]
     fig = Panel([ScatterChart(data=left), ScatterChart(data=right)], figsize=(6, 4))
     fig.canvas.draw()
     renderer = fig.canvas.get_renderer()
@@ -139,6 +139,21 @@ def test_panel_labels_clear_the_other_figure_markers():
 
 
 def test_log_scale_places_labels():
-    data = [{"x": 10**i, "y": 10**i, "label": str(i)} for i in range(1, 4)]
+    data = [{"x": 10**i, "y": 10**i, "annotation": str(i)} for i in range(1, 4)]
     fig = ScatterChart(data=data, scalex="log", scaley="log")
     assert len(_labels(fig.axes[0])) == 3
+
+
+def test_label_parameter_warns_and_names_the_key():
+    data = [{"x": p["x"], "y": p["y"], "name": p["annotation"]} for p in POINTS]
+    with pytest.warns(DeprecationWarning, match="`annotation`"):
+        fig = ScatterChart(data=data, label="name")
+    assert [t.get_text() for t in _labels(fig.axes[0])] == ["a", "b", "c"]
+
+
+def test_label_record_key_warns_and_annotates():
+    data = [{"x": p["x"], "y": p["y"], "label": p["annotation"]} for p in POINTS]
+    with pytest.warns(DeprecationWarning, match="`label` record key") as caught:
+        fig = ScatterChart(data=data)
+    assert caught[0].filename == __file__
+    assert [t.get_text() for t in _labels(fig.axes[0])] == ["a", "b", "c"]

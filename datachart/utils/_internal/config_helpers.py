@@ -1,7 +1,7 @@
 import math
 import warnings
 from functools import lru_cache
-from typing import TYPE_CHECKING, Union, Tuple, Dict, List, Optional
+from typing import Union, Tuple, Dict, List, Optional
 
 import matplotlib.font_manager as font_manager
 import matplotlib.pyplot as plt
@@ -10,9 +10,6 @@ from ...config import config, Config
 from ...constants import ARROW_STYLE, COLORBAR_LOCATION, LEGEND_LOCATION, ORIENTATION
 from ...themes._base import canonical_style
 from .fonts import FACES, ensure_face, font_available
-
-if TYPE_CHECKING:
-    from .chart_kinds import ChartKind
 
 # ================================================
 # Helper Functions
@@ -71,13 +68,12 @@ def create_config_dict(
 
 
 def get_subplot_config(
-    kind: "ChartKind", subplots: bool, n_charts: int = 1, max_cols: int = 1
+    split: bool, n_charts: int = 1, max_cols: int = 1
 ) -> Dict[str, int]:
     """Calculate the configuration for subplots in a figure.
 
     Args:
-        kind: The front's `ChartKind` row, read for its multiplot and subplot rules.
-        subplots: Whether to show subplots.
+        split: Whether the charts draw one subplot each.
         n_charts: The number of charts.
         max_cols: The maximum number of columns.
 
@@ -89,13 +85,7 @@ def get_subplot_config(
     nrows = 1
     ncols = 1
 
-    if subplots and not kind.subplots:
-        warnings.warn(
-            f"Chart type '{kind.name}' does not support subplots. Setting subplots to False..."
-        )
-        subplots = False
-
-    if subplots or not kind.multiplot:
+    if split:
         if not isinstance(n_charts, int):
             raise TypeError("The number of charts is not an integer.")
         if n_charts <= 0:

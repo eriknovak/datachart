@@ -1,6 +1,6 @@
 ---
 status: accepted
-amended-by: [0067]
+amended-by: [0067, 0069]
 ---
 
 # A chart front's body is one engine call; the row declares the key split

@@ -5,7 +5,10 @@ chart-type string. `chart_kind()` is the lookup; a name without a row raises
 before anything is drawn.
 """
 
+import math
+import warnings
 from dataclasses import dataclass, field
+from enum import Enum
 from typing import (
     Any,
     Callable,
@@ -72,7 +75,17 @@ from .layers import (
     value_axis_grid,
     value_label_font,
 )
-from .validate import validate_emphasis_rule
+from .validate import (
+    validate_calendar_dates,
+    validate_calendar_year,
+    validate_dumbbell_records,
+    validate_emphasis_rule,
+    validate_gantt_groups,
+    validate_gantt_sort_by,
+    validate_gantt_tasks,
+    validate_single_dataset,
+    validate_unique_dates,
+)
 from ...config import config
 from ...constants import (
     ASPECT_RATIO,
@@ -151,6 +164,16 @@ CHART_KEYS = frozenset(
 # a function of the charts and settings, returning the charts it rewrote
 ChartsStep = Callable[[List[dict], dict], List[dict]]
 
+# rewrites the built charts and settings, for charts not one per dataset
+Expand = Callable[[List[dict], dict], Tuple[List[dict], dict]]
+
+# a calendar is wide and short: the default figure keeps the default width
+# and stacks this much height per row of calendars
+CALENDAR_ROW_HEIGHT = 1.9
+
+# the settings the map layer reads from its chart's data
+_MAP_KEYS = ("resolution", "highlight", "geometry")
+
 
 def _never(settings: dict) -> bool:
     return False
@@ -184,6 +207,17 @@ def _gantt_legend(charts: List[dict], settings: dict) -> Optional[bool]:
     )
 
 
+class DatasetPolicy(Enum):
+    """What several datasets of one front draw as, unless `subplots` is set."""
+
+    # every dataset shares one axes
+    OVERLAY = "overlay"
+    # every dataset takes its own subplot
+    SUBPLOT = "subplot"
+    # several datasets need `subplots=True`
+    RAISE = "raise"
+
+
 @dataclass(frozen=True)
 class ChartKind:
     """Everything the engine, builder, and composition read about a front.
@@ -203,13 +237,19 @@ class ChartKind:
         build: Builds all of the front's layers from its charts and settings,
             in place of one `layer` per chart.
         projection: The axes projection, e.g. `"polar"`; None is Cartesian.
+        record_keys: The canonical keys of one record, in order; each is a
+            remap parameter the builder reads the caller's key name from.
+        required_keys: The record keys every record must carry.
+        check_records: Raises for records the key check cannot judge, given
+            the built charts and settings.
+        expand: Rewrites the built charts and settings, for a front whose
+            charts are not one per dataset.
         dict_data: One chart's `data` is a dict (a grid, links, a tree), so
             several charts come as a list of dicts rather than of lists.
         data_keys: The keys one chart's `data` dict must carry; None skips
             the shape check.
-        multiplot: Several charts may share one axes.
+        datasets: What several datasets draw as when `subplots` is unset.
         subplots: The charts may split into one subplot each.
-        single_dataset: Several datasets need `subplots=True`.
         rejects: Parameters the front takes only as None, with the reason
             a value raises.
         renamed: Deprecated parameter names the front still takes, mapped
@@ -248,11 +288,14 @@ class ChartKind:
     legend_default: Optional[Callable[[List[dict], dict], Optional[bool]]] = None
     build: Optional[Callable[[List[dict], dict], List[Layer]]] = None
     projection: Optional[str] = None
+    record_keys: Tuple[str, ...] = ()
+    required_keys: Tuple[str, ...] = ()
+    check_records: Optional[Callable[[List[dict], dict], None]] = None
+    expand: Optional[Expand] = None
     dict_data: bool = False
     data_keys: Optional[Tuple[str, ...]] = None
-    multiplot: bool = True
+    datasets: DatasetPolicy = DatasetPolicy.OVERLAY
     subplots: bool = True
-    single_dataset: bool = False
     rejects: Mapping[str, str] = field(default_factory=dict)
     renamed: Mapping[str, str] = field(default_factory=dict)
     domains: Mapping[str, Type[Domain]] = field(default_factory=dict)
@@ -276,7 +319,7 @@ class ChartKind:
     def per_chart_keys(self) -> FrozenSet[str]:
         """The parameters indexed against the charts; the rest are settings."""
 
-        return (CHART_KEYS | self.chart_keys) - self.figure_keys
+        return (CHART_KEYS | self.chart_keys | set(self.record_keys)) - self.figure_keys
 
     def build_layers(self, charts: List[dict], settings: dict) -> List[Layer]:
         """The front's layers for already prepared charts."""
@@ -333,6 +376,125 @@ def _ridgeline_layers(charts: List[dict], settings: dict) -> List[Layer]:
 
 
 # ================================================
+# Record checks and expansions
+# ================================================
+
+
+def _check_dumbbells(charts: List[dict], settings: dict) -> None:
+    for chart in charts:
+        validate_dumbbell_records(chart["data"])
+
+
+def _check_tasks(charts: List[dict], settings: dict) -> None:
+    sort = settings.get("sort")
+    sort_key = validate_gantt_sort_by(sort, settings.get("sort_by"))
+    for chart in charts:
+        validate_gantt_tasks(chart["data"])
+        validate_gantt_groups(
+            chart["data"],
+            sort_key if sort is not None else None,
+            settings.get("show_group_headers"),
+        )
+
+
+def _year_panels(charts: List[dict], settings: dict) -> Tuple[List[dict], dict]:
+    """One chart per calendar year, on a figure tall enough for their rows."""
+
+    year = settings.get("year")
+    charts = [panel for chart in charts for panel in _year_charts(chart, year)]
+    if settings.get("figsize") is None:
+        rows = math.ceil(len(charts) / settings["max_cols"])
+        figsize = (FIG_SIZE.DEFAULT[0], CALENDAR_ROW_HEIGHT * rows)
+        settings = {**settings, "figsize": figsize}
+    return charts, settings
+
+
+def _year_charts(chart: dict, year: Optional[int]) -> List[dict]:
+    """One chart per year of a dataset, in year order; `year` keeps one.
+
+    The years of one dataset share its value range unless `vmin`/`vmax`
+    pin one, so the same value takes the same color on every calendar.
+    """
+
+    data = chart["data"]
+    dates = validate_calendar_dates(data["date"])
+    values = list(data["value"])
+    if len(values) != len(dates):
+        raise ValueError(
+            "CalendarHeatmap `data` needs one value per date: "
+            f"{len(dates)} dates, {len(values)} values."
+        )
+    if not dates:
+        raise ValueError("CalendarHeatmap `data` needs at least one date.")
+    validate_unique_dates(dates)
+    years = {day.year for day in dates}
+    validate_calendar_year(year, years)
+    if year is not None:
+        years = {year}
+
+    by_year = {y: ([], []) for y in sorted(years)}
+    for day, value in zip(dates, values):
+        if day.year in by_year:
+            by_year[day.year][0].append(day)
+            by_year[day.year][1].append(value)
+
+    shared = _shared_range(values, chart.get("norm"))
+    charts = []
+    for y, (year_dates, year_values) in by_year.items():
+        panel = dict(chart)
+        panel["data"] = {"date": year_dates, "value": year_values}
+        panel["year"] = y
+        if len(by_year) > 1:
+            subtitle = chart.get("subtitle")
+            panel["subtitle"] = str(y) if subtitle is None else f"{subtitle} {y}"
+            for key, bound in zip(("vmin", "vmax"), shared or ()):
+                if panel.get(key) is None:
+                    panel[key] = bound
+        charts.append(panel)
+    return charts
+
+
+def _shared_range(values: list, norm) -> Optional[Tuple[float, float]]:
+    """The (min, max) of the values a normalization can show; None without any.
+
+    A log norm shows the positive values, a logit norm those inside (0, 1);
+    the range skips what the norm would mask, as its own autoscale does.
+    """
+
+    numbers = [v for v in values if v is not None and not math.isnan(v)]
+    if norm == "log":
+        numbers = [v for v in numbers if v > 0]
+    elif norm == "logit":
+        numbers = [v for v in numbers if 0 < v < 1]
+    if not numbers:
+        return None
+    return min(numbers), max(numbers)
+
+
+def _pyramid_sides(charts: List[dict], settings: dict) -> Tuple[List[dict], dict]:
+    if len(charts) != 2:
+        raise ValueError(
+            "PyramidChart takes exactly two data series: "
+            "`data=[left_points, right_points]`."
+        )
+    # the left side draws in the negative direction; users pass positive values
+    left, right = charts
+    records = [
+        {**record, "y": -record["y"]} if isinstance(record, dict) else record
+        for record in left["data"]
+    ]
+    return [{**left, "data": records}, right], settings
+
+
+def _basemap_chart(charts: List[dict], settings: dict) -> Tuple[List[dict], dict]:
+    # the basemap's one chart is its features and overlay geometry
+    (chart,) = charts
+    data = {"features": chart["data"]}
+    data.update((key, settings.pop(key)) for key in _MAP_KEYS)
+    return [{**chart, "data": data}], settings
+
+
+# ================================================
 # The table
 # ================================================
 
@@ -346,7 +508,8 @@ _KINDS = (
         "linechart",
         "line chart",
         LineLayer,
-        chart_keys=frozenset({"x", "y", "yerr"}),
+        record_keys=("x", "y", "yerr"),
+        required_keys=("x", "y"),
         tighten_xlim=True,
         emphasis_units=series_units("y"),
         emphasis_by="mean",
@@ -356,7 +519,8 @@ _KINDS = (
         "stacked area chart",
         StackedAreaLayer,
         domains={"baseline": STACKED_AREA_BASELINE},
-        chart_keys=frozenset({"x", "y"}),
+        record_keys=("x", "y"),
+        required_keys=("x", "y"),
         tighten_xlim=True,
         emphasis_units=series_units("y"),
         emphasis_by="mean",
@@ -366,7 +530,8 @@ _KINDS = (
         "bump chart",
         BumpLayer,
         domains={"rank_by": BUMP_RANK, "label_position": BUMP_LABEL_POSITION},
-        chart_keys=frozenset({"x", "y"}),
+        record_keys=("x", "y"),
+        required_keys=("x", "y"),
         legend_default=_bump_legend,
         # a bump chart's ranks read from the lines and labels
         gridless=_always,
@@ -382,7 +547,8 @@ _KINDS = (
         "barchart",
         "bar chart",
         BarLayer,
-        chart_keys=frozenset({"label", "y", "yerr"}),
+        record_keys=("label", "y", "yerr"),
+        required_keys=("label", "y"),
         defaults={"orientation": ORIENTATION.VERTICAL},
         swaps_horizontal_labels=True,
         emphasis_units=bar_units,
@@ -393,10 +559,12 @@ _KINDS = (
         "pyramidchart",
         "pyramid",
         BarLayer,
-        chart_keys=frozenset({"label", "y", "yerr"}),
+        record_keys=("label", "y", "yerr"),
+        required_keys=("label", "y"),
         # the panel mirrors the value ticks to both halves (ADR 0017)
         figure_keys=frozenset({"xticks", "xticklabels", "xtickrotate"}),
         defaults={"pyramid": True, "orientation": ORIENTATION.HORIZONTAL},
+        expand=_pyramid_sides,
         subplots=False,
         # unmirrored data on a mirrored axis would silently mangle (ADR 0017)
         overlayable=False,
@@ -409,7 +577,8 @@ _KINDS = (
         "radial chart",
         RadialLayer,
         domains={"mark": RADIAL_TYPE, "direction": RADIAL_DIRECTION},
-        chart_keys=frozenset({"label", "x", "y", "yerr"}),
+        # the histogram visual reads `x`, the others `label` and `y`
+        record_keys=("label", "x", "y", "yerr"),
         build=_radial_layers,
         projection="polar",
         rejects={
@@ -436,7 +605,9 @@ _KINDS = (
         defaults={"aspect_ratio": ASPECT_RATIO.EQUAL, "max_cols": 1},
         dict_data=True,
         data_keys=("date", "value"),
-        multiplot=False,
+        # one calendar per year of each dataset
+        expand=_year_panels,
+        datasets=DatasetPolicy.SUBPLOT,
         rejects=_no_emphasis(
             "CalendarHeatmap",
             "a calendar is a single raster layer with no series to mute or "
@@ -454,9 +625,12 @@ _KINDS = (
             "value_kind": GANTT_VALUE,
             "sort_by": GANTT_SORT_KEY,
         },
+        record_keys=("task", "start", "end", "group", "progress", "depends_on"),
+        required_keys=("task", "start", "end"),
+        check_records=_check_tasks,
         defaults={"max_cols": 1, "orientation": ORIENTATION.HORIZONTAL},
         legend_default=_gantt_legend,
-        multiplot=False,
+        datasets=DatasetPolicy.SUBPLOT,
         # a horizontal panel's twin is a second x, off the task rows (ADR 0049)
         overlayable=False,
         emphasis_units=gantt_units,
@@ -472,6 +646,9 @@ _KINDS = (
             "marker": LINE_MARKER,
             "connector_style": LINE_STYLE,
         },
+        record_keys=("label", "start", "end"),
+        required_keys=("label", "start", "end"),
+        check_records=_check_dumbbells,
         defaults={"orientation": ORIENTATION.HORIZONTAL},
         legend_default=_dumbbell_legend,
         group=True,
@@ -483,7 +660,8 @@ _KINDS = (
         "histogram",
         "histogram",
         HistogramLayer,
-        chart_keys=frozenset({"x"}),
+        record_keys=("x",),
+        required_keys=("x",),
         defaults={"orientation": ORIENTATION.VERTICAL},
         # histograms stack by default; bars group (ADR 0014)
         bar_mode="stack",
@@ -492,15 +670,15 @@ _KINDS = (
         emphasis_by="mean",
     ),
     # the ScatterMatrix diagonal's density curves; no front draws it alone
-    ChartKind("kde", "density", KdeLayer),
+    ChartKind("kde", "density", KdeLayer, record_keys=("x",), required_keys=("x",)),
     ChartKind(
         "boxplot",
         "box plot",
         BoxLayer,
-        chart_keys=frozenset({"label", "value"}),
+        record_keys=("label", "value"),
+        required_keys=("label", "value"),
         defaults={"orientation": ORIENTATION.VERTICAL},
-        multiplot=False,
-        single_dataset=True,
+        datasets=DatasetPolicy.RAISE,
         group=True,
         emphasis_units=group_units,
         emphasis_by="median",
@@ -510,10 +688,10 @@ _KINDS = (
         "violin plot",
         ViolinLayer,
         domains={"inner": VIOLIN_INNER},
-        chart_keys=frozenset({"label", "value"}),
+        record_keys=("label", "value"),
+        required_keys=("label", "value"),
         defaults={"orientation": ORIENTATION.VERTICAL},
-        multiplot=False,
-        single_dataset=True,
+        datasets=DatasetPolicy.RAISE,
         group=True,
         emphasis_units=group_units,
         emphasis_by="median",
@@ -522,7 +700,8 @@ _KINDS = (
         "swarmplot",
         "swarm plot",
         SwarmLayer,
-        chart_keys=frozenset({"label", "value"}),
+        record_keys=("label", "value"),
+        required_keys=("label", "value"),
         defaults={"orientation": ORIENTATION.VERTICAL, "mode": SWARM_MODE.SWARM},
         group=True,
         emphasis_units=group_units,
@@ -532,14 +711,15 @@ _KINDS = (
         "raincloudplot",
         "raincloud plot",
         ViolinLayer,
-        chart_keys=frozenset({"label", "value"}),
+        record_keys=("label", "value"),
+        required_keys=("label", "value"),
         defaults={
             "orientation": ORIENTATION.VERTICAL,
             "mode": SWARM_MODE.SWARM,
             "show_outliers": True,
         },
         build=_raincloud_layers,
-        multiplot=False,
+        datasets=DatasetPolicy.SUBPLOT,
         group=True,
         emphasis_units=group_units,
         emphasis_by="median",
@@ -549,10 +729,11 @@ _KINDS = (
         "ridgeline plot",
         RidgelineLayer,
         domains={"inner": VIOLIN_INNER, "ridge_scale": RIDGELINE_SCALE},
-        chart_keys=frozenset({"label", "value"}),
+        record_keys=("label", "value"),
+        required_keys=("label", "value"),
         defaults={"orientation": ORIENTATION.HORIZONTAL},
         build=_ridgeline_layers,
-        multiplot=False,
+        datasets=DatasetPolicy.SUBPLOT,
         renamed={"normalize": "ridge_scale"},
         group=True,
         emphasis_units=group_units,
@@ -562,7 +743,10 @@ _KINDS = (
         "scatterchart",
         "scatter chart",
         ScatterLayer,
-        chart_keys=frozenset({"hue", "label", "size", "x", "xerr", "y", "yerr"}),
+        record_keys=("x", "y", "size", "hue", "annotation", "xerr", "yerr"),
+        required_keys=("x", "y"),
+        # `label` is the category key on every other front (ADR 0069)
+        renamed={"label": "annotation"},
         emphasis_units=series_units("y"),
         emphasis_by="mean",
     ),
@@ -575,7 +759,7 @@ _KINDS = (
         ),
         dict_data=True,
         data_keys=("z",),
-        multiplot=False,
+        datasets=DatasetPolicy.SUBPLOT,
         rejects=_no_emphasis(
             "Heatmap",
             "a heatmap has no series to mute or highlight. Set the `emphasis` "
@@ -648,7 +832,7 @@ _KINDS = (
         domains={"layout": NETWORK_LAYOUT, "label_position": NETWORK_LABEL_POSITION},
         dict_data=True,
         data_keys=("edges",),
-        multiplot=False,
+        datasets=DatasetPolicy.SUBPLOT,
         rejects=_no_emphasis(
             "NetworkChart",
             "set the `emphasis` key on the nodes to mute or highlight instead.",
@@ -662,7 +846,7 @@ _KINDS = (
         "scatter matrix",
         ScatterLayer,
         domains={"diagonal": SCATTER_MATRIX_DIAGONAL},
-        multiplot=False,
+        datasets=DatasetPolicy.SUBPLOT,
         overlayable=False,
     ),
     ChartKind("imagechart", "image chart", ImageLayer, dict_data=True),
@@ -672,9 +856,10 @@ _KINDS = (
         BasemapLayer,
         domains={"data": BASEMAP_FEATURE, "resolution": BASEMAP_RESOLUTION},
         dict_data=True,
-        multiplot=False,
+        datasets=DatasetPolicy.SUBPLOT,
         subplots=False,
         renamed={"features": "data"},
+        expand=_basemap_chart,
     ),
     ChartKind(
         "sankeychart",
@@ -682,7 +867,7 @@ _KINDS = (
         SankeyLayer,
         dict_data=True,
         data_keys=("links",),
-        multiplot=False,
+        datasets=DatasetPolicy.SUBPLOT,
         rejects=_no_emphasis(
             "SankeyChart", "a Sankey has no series to mute or highlight."
         ),
@@ -694,7 +879,7 @@ _KINDS = (
         TreemapLayer,
         dict_data=True,
         data_keys=("data",),
-        multiplot=False,
+        datasets=DatasetPolicy.SUBPLOT,
         rejects=_no_emphasis(
             "Treemap",
             "set the `emphasis` key on the records to mute or highlight instead.",
@@ -836,12 +1021,6 @@ _SHARED = (
     _setting("vspans", VSpanSettingAttrs),
     _setting("hspans", HSpanSettingAttrs),
     _setting("texts", TextSettingAttrs),
-    SharedParameter("label", str, per_chart=_each(str)),
-    SharedParameter("x", str, per_chart=_each(str)),
-    SharedParameter("y", str, per_chart=_each(str)),
-    SharedParameter("yerr", str, per_chart=_each(str)),
-    SharedParameter("value", str, per_chart=_each(str)),
-    SharedParameter("hue", str, per_chart=_each(str)),
     SharedParameter("dimensions", _Labels, per_chart=Union[_Labels, List[_Labels]]),
     SharedParameter("vmin", float, per_chart=_each(float)),
     SharedParameter("vmax", float, per_chart=_each(float)),
@@ -856,7 +1035,14 @@ _SHARED = (
     ),
 )
 
-SHARED_PARAMETERS = {parameter.name: parameter for parameter in _SHARED}
+# every record key is a remap parameter naming the caller's key (ADR 0069)
+RECORD_KEYS = tuple(dict.fromkeys(key for kind in _KINDS for key in kind.record_keys))
+
+SHARED_PARAMETERS = {
+    parameter.name: parameter
+    for parameter in _SHARED
+    + tuple(SharedParameter(key, str, per_chart=_each(str)) for key in RECORD_KEYS)
+}
 
 
 # the x-axis format stays out of the table (ADR 0067) but takes these classes
@@ -926,6 +1112,27 @@ def apply_emphasis_rule(kind: ChartKind, charts: List[dict], settings: dict) -> 
     for (_, fill), role in zip(units, roles):
         fill(role)
     return charts
+
+
+def splits_datasets(kind: ChartKind, n_charts: int, subplots: Optional[bool]) -> bool:
+    """Whether the charts draw one subplot each: the one dataset policy reader.
+
+    `subplots` wins where the front takes subplots, and warns where it does
+    not; unset, the row's `datasets` policy decides, raising for `RAISE`
+    when there are several charts.
+    """
+
+    if subplots and not kind.subplots:
+        warnings.warn(
+            f"Chart type '{kind.name}' does not support subplots. "
+            "Setting subplots to False..."
+        )
+        subplots = False
+    if subplots:
+        return True
+    if kind.datasets is DatasetPolicy.RAISE and n_charts > 1:
+        validate_single_dataset(n_charts, kind.label)
+    return kind.datasets is not DatasetPolicy.OVERLAY
 
 
 def build_layers(chart_type: str, charts: List[dict], settings: dict) -> List[Layer]:

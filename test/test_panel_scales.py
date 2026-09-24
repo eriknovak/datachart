@@ -30,7 +30,7 @@ BARS = [{"label": c, "y": v} for c, v in zip("ABCD", [10, 20, 30, 20])]
 LINE = [{"x": i, "y": v} for i, v in enumerate([1, 10, 100, 1000], 1)]
 LINE2 = [{"x": i, "y": v} for i, v in enumerate([2, 20, 200, 2000], 1)]
 LINE_SMALL = [{"x": i, "y": v} for i, v in enumerate([1, 2, 3, 2], 1)]
-BOX = [{"label": c, "y": [1, 10, 100, 1000]} for c in "AB"]
+BOX = [{"label": c, "value": v} for c in "AB" for v in (1, 10, 100, 1000)]
 WIND = [
     {"label": d, "y": v}
     for d, v in zip(["N", "NE", "E", "SE", "S", "SW", "W", "NW"], range(8, 0, -1))

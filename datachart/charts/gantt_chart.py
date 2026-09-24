@@ -5,9 +5,6 @@ import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render
 from ..utils._internal.validate import (
-    validate_gantt_groups,
-    validate_gantt_sort_by,
-    validate_gantt_tasks,
     validate_gantt_value_kind,
 )
 from ..typings import (
@@ -88,6 +85,12 @@ def GanttChart(
             List[Union[TextSettingAttrs, List[TextSettingAttrs], None]],
         ]
     ] = None,
+    task: Optional[Union[str, List[Optional[str]]]] = None,
+    start: Optional[Union[str, List[Optional[str]]]] = None,
+    end: Optional[Union[str, List[Optional[str]]]] = None,
+    group: Optional[Union[str, List[Optional[str]]]] = None,
+    progress: Optional[Union[str, List[Optional[str]]]] = None,
+    depends_on: Optional[Union[str, List[Optional[str]]]] = None,
 ) -> plt.Figure:
     """Creates the gantt chart.
 
@@ -197,23 +200,20 @@ def GanttChart(
         vspans: Vertical reference band(s) to shade, between two temporal
             positions.
         texts: Text annotation(s) to draw.
+        task: The key name in data for the task names (default: "task").
+        start: The key name in data for the task starts (default: "start").
+        end: The key name in data for the task ends (default: "end").
+        group: The key name in data for the task groups (default: "group").
+        progress: The key name in data for the task progress (default: "progress").
+        depends_on: The key name in data for the task dependencies (default: "depends_on").
 
     Returns:
         The figure containing the gantt chart.
 
     """
     params = dict(locals())
-
-    # records fail here, before layers are built; settings fail in the layer
-    schedules = data if data and isinstance(data[0], list) else [data]
-    sort_key = validate_gantt_sort_by(sort, sort_by)
     params["show_values"], params["value_kind"] = validate_gantt_value_kind(
         show_values, value_kind
     )
-    for records in schedules:
-        validate_gantt_tasks(records)
-        validate_gantt_groups(
-            records, sort_key if sort is not None else None, show_group_headers
-        )
 
     return render("ganttchart", params)

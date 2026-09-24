@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render
 from ..utils._internal.validate import (
-    validate_dumbbell_records,
     validate_dumbbell_value_kind,
     validate_dumbbell_sort_by,
     validate_marker_pair,
@@ -128,6 +127,9 @@ def DumbbellChart(
             List[Union[TextSettingAttrs, List[TextSettingAttrs], None]],
         ]
     ] = None,
+    label: Optional[Union[str, List[Optional[str]]]] = None,
+    start: Optional[Union[str, List[Optional[str]]]] = None,
+    end: Optional[Union[str, List[Optional[str]]]] = None,
 ) -> plt.Figure:
     """Creates the dumbbell chart.
 
@@ -239,6 +241,9 @@ def DumbbellChart(
         vspans: Vertical reference band(s) to shade.
         hspans: Horizontal reference band(s) to shade.
         texts: Text annotation(s) to draw.
+        label: The key name in data for the category labels (default: "label").
+        start: The key name in data for the start values (default: "start").
+        end: The key name in data for the end values (default: "end").
 
     Returns:
         The figure containing the dumbbell chart.
@@ -246,11 +251,7 @@ def DumbbellChart(
     """
     params = dict(locals())
 
-    # records and settings fail here, before layers are built
-    nested = isinstance(data, list) and bool(data) and isinstance(data[0], list)
-    charts_data = data if nested else [data]
-    for records in charts_data:
-        validate_dumbbell_records(records)
+    # settings fail here, before layers are built
     validate_dumbbell_sort_by(sort, sort_by)
     params["show_values"], params["value_kind"] = validate_dumbbell_value_kind(
         show_values, value_kind

@@ -94,7 +94,7 @@ class TestTextsParameter(unittest.TestCase):
         charts = build_charts_structure(
             "linechart", LINE1, texts=[NOTE, {"text": "b", "x": 1, "y": 1}]
         )
-        self.assertEqual(len(charts["texts"]), 2)
+        self.assertEqual(len(charts[0]["texts"]), 2)
 
     def test_texts_index_per_subplot_chart(self):
         figure = LineChart(

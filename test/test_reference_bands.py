@@ -271,7 +271,7 @@ class TestFronts(unittest.TestCase):
         span = {"vspans": {"xmin": 0, "xmax": 1}, "hspans": {"ymin": 0, "ymax": 1}}
         rng = np.random.RandomState(0)
         sample = [{"x": float(v)} for v in rng.randn(30)]
-        boxes = [{"label": c, "y": float(v)} for c, v in zip("AABB", rng.randn(4))]
+        boxes = [{"label": c, "value": float(v)} for c, v in zip("AABB", rng.randn(4))]
         scat = [{"x": i, "y": i} for i in range(5)]
         grid = {
             "x": [0, 1, 2],
