@@ -7,7 +7,7 @@ from ..utils._internal.validate import validate_bandwidth
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
-    ViolinDataPointAttrs,
+    ViolinRecordAttrs,
     ViolinStyleAttrs,
     VLineSettingAttrs,
     HLineSettingAttrs,
@@ -37,7 +37,7 @@ from ..constants import (
 
 
 def ViolinPlot(
-    data: Union[List[ViolinDataPointAttrs], List[List[ViolinDataPointAttrs]]],
+    data: Union[List[ViolinRecordAttrs], List[List[ViolinRecordAttrs]]],
     *,
     title: Optional[str] = None,
     xlabel: Optional[str] = None,

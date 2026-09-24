@@ -8,7 +8,7 @@ from ..typings import (
     BumpStyleAttrs,
     EmphasisRuleAttrs,
     LegendSettingAttrs,
-    LineDataPointAttrs,
+    LineRecordAttrs,
     VLineSettingAttrs,
     HLineSettingAttrs,
     DLineSettingAttrs,
@@ -35,7 +35,7 @@ from ..constants import (
 
 
 def BumpChart(
-    data: Union[List[LineDataPointAttrs], List[List[LineDataPointAttrs]]],
+    data: Union[List[LineRecordAttrs], List[List[LineRecordAttrs]]],
     *,
     rank_by: Optional[Union[BUMP_RANK, str]] = None,
     title: Optional[str] = None,

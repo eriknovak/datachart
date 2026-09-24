@@ -10,7 +10,7 @@ from ..utils._internal.validate import (
 from ..typings import (
     EmphasisRuleAttrs,
     GanttStyleAttrs,
-    GanttTaskAttrs,
+    GanttTaskRecordAttrs,
     LegendSettingAttrs,
     TextSettingAttrs,
     VLineSettingAttrs,
@@ -34,7 +34,7 @@ from ..constants import (
 
 
 def GanttChart(
-    data: Union[List[GanttTaskAttrs], List[List[GanttTaskAttrs]]],
+    data: Union[List[GanttTaskRecordAttrs], List[List[GanttTaskRecordAttrs]]],
     *,
     title: Optional[str] = None,
     xlabel: Optional[str] = None,
@@ -130,7 +130,7 @@ def GanttChart(
             `start` and `end` are `date`, `datetime`, `numpy.datetime64`, or pandas
             `Timestamp` objects; date strings are never parsed. A list of such lists
             draws one schedule per subplot. See
-            [`GanttTaskAttrs`][datachart.typings.GanttTaskAttrs].
+            [`GanttTaskRecordAttrs`][datachart.typings.GanttTaskRecordAttrs].
         title: The title of the chart.
         xlabel: The label of the horizontal date axis.
         ylabel: The label of the vertical task axis.

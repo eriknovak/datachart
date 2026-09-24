@@ -6,7 +6,7 @@ from ..utils._internal.plot_engine import render
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
-    HistDataPointAttrs,
+    HistRecordAttrs,
     HistStyleAttrs,
     VLineSettingAttrs,
     HLineSettingAttrs,
@@ -33,7 +33,7 @@ from ..constants import (
 
 
 def Histogram(
-    data: Union[List[HistDataPointAttrs], List[List[HistDataPointAttrs]]],
+    data: Union[List[HistRecordAttrs], List[List[HistRecordAttrs]]],
     *,
     title: Optional[str] = None,
     xlabel: Optional[str] = None,

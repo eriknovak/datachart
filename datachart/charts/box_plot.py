@@ -6,7 +6,7 @@ from ..utils._internal.plot_engine import render
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
-    BoxDataPointAttrs,
+    BoxRecordAttrs,
     BoxStyleAttrs,
     VLineSettingAttrs,
     HLineSettingAttrs,
@@ -34,7 +34,7 @@ from ..constants import (
 
 
 def BoxPlot(
-    data: Union[List[BoxDataPointAttrs], List[List[BoxDataPointAttrs]]],
+    data: Union[List[BoxRecordAttrs], List[List[BoxRecordAttrs]]],
     *,
     title: Optional[str] = None,
     xlabel: Optional[str] = None,

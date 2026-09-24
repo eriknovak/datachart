@@ -8,7 +8,7 @@ from ..utils._internal.validate import validate_annotation
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
-    ScatterDataPointAttrs,
+    ScatterRecordAttrs,
     ScatterStyleAttrs,
     VLineSettingAttrs,
     HLineSettingAttrs,
@@ -34,7 +34,7 @@ from ..constants import (
 
 
 def ScatterChart(
-    data: Union[List[ScatterDataPointAttrs], List[List[ScatterDataPointAttrs]]],
+    data: Union[List[ScatterRecordAttrs], List[List[ScatterRecordAttrs]]],
     *,
     title: Optional[str] = None,
     xlabel: Optional[str] = None,

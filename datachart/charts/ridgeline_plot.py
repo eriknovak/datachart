@@ -7,7 +7,7 @@ from ..utils._internal.validate import validate_bandwidth, validate_ridgeline_in
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
-    RidgelineDataPointAttrs,
+    RidgelineRecordAttrs,
     RidgelineStyleAttrs,
     VLineSettingAttrs,
     HLineSettingAttrs,
@@ -38,7 +38,7 @@ from ..constants import (
 
 
 def RidgelinePlot(
-    data: Union[List[RidgelineDataPointAttrs], List[List[RidgelineDataPointAttrs]]],
+    data: Union[List[RidgelineRecordAttrs], List[List[RidgelineRecordAttrs]]],
     *,
     title: Optional[str] = None,
     xlabel: Optional[str] = None,
