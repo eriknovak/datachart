@@ -41,3 +41,12 @@ The parameters that accept a constant, with the class in [datachart.constants](.
 | `scalex` | [`AXIS_SCALE`](../constants.md#datachart.constants.AXIS_SCALE) |
 | `scaley` | [`AXIS_SCALE`](../constants.md#datachart.constants.AXIS_SCALE) |
 | `yticks_format` | [`VALUE_FORMAT`](../constants.md#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](../constants.md#datachart.constants.DATE_FORMAT) |
+
+## Composition
+
+Whether the figure composes with each composition function.
+
+| Function | Composes |
+| :-- | :-- |
+| [`Grid`](../utils/index.md#datachart.utils.Grid) | yes |
+| [`Panel`](../utils/index.md#datachart.utils.Panel) | yes |

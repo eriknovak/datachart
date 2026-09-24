@@ -38,3 +38,13 @@ The parameters that accept a constant, with the class in [datachart.constants](.
 | `figsize` | [`FIG_SIZE`](../constants.md#datachart.constants.FIG_SIZE) |
 | `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](../constants.md#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](../constants.md#datachart.constants.LEGEND_ALIGN) |
 | `show_grid` | [`SHOW_GRID`](../constants.md#datachart.constants.SHOW_GRID) |
+
+## Composition
+
+Whether the figure composes with each composition function.
+
+| Function | Composes |
+| :-- | :-- |
+| [`Grid`](../utils/index.md#datachart.utils.Grid) | yes |
+| [`Panel`](../utils/index.md#datachart.utils.Panel) | no |
+| [`Annotate`](../utils/index.md#datachart.utils.Annotate) | no |

@@ -45,3 +45,12 @@ The parameters that accept a constant, with the class in [datachart.constants](.
 | `bar_mode` | [`BAR_MODE`](../constants.md#datachart.constants.BAR_MODE) |
 | `scalex` | [`AXIS_SCALE`](../constants.md#datachart.constants.AXIS_SCALE) |
 | `scaley` | [`AXIS_SCALE`](../constants.md#datachart.constants.AXIS_SCALE) |
+
+## Composition
+
+Whether the figure composes with each composition function.
+
+| Function | Composes |
+| :-- | :-- |
+| [`Grid`](../utils/index.md#datachart.utils.Grid) | yes |
+| [`Panel`](../utils/index.md#datachart.utils.Panel) | yes |

@@ -40,3 +40,12 @@ The parameters that accept a constant, with the class in [datachart.constants](.
 | `figsize` | [`FIG_SIZE`](../constants.md#datachart.constants.FIG_SIZE) |
 | `show_grid` | [`SHOW_GRID`](../constants.md#datachart.constants.SHOW_GRID) |
 | `aspect_ratio` | [`ASPECT_RATIO`](../constants.md#datachart.constants.ASPECT_RATIO) |
+
+## Composition
+
+Whether the figure composes with each composition function.
+
+| Function | Composes |
+| :-- | :-- |
+| [`Grid`](../utils/index.md#datachart.utils.Grid) | yes |
+| [`Panel`](../utils/index.md#datachart.utils.Panel) | yes |
