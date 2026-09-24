@@ -1,6 +1,8 @@
-"""Shared utility for building chart data structures.
+"""The one record-reading seam: a front's `data` in, canonical chart dicts out.
 
-This module provides helper functions to reduce boilerplate in chart definitions.
+The data shape and the front's `ChartKind` row alone decide how many charts
+there are, and every record comes out under the row's canonical keys
+(ADR 0069).
 """
 
 import warnings
@@ -418,7 +420,12 @@ def canonical_records(kind: ChartKind, chart: dict, where: str) -> Any:
     sources = {key: chart.pop(key) if key in chart else key for key in kind.record_keys}
     data = chart["data"]
     for old, new in kind.renamed.items():
-        if sources.get(new) == new and _carries(data, old) and not _carries(data, new):
+        if (
+            new in kind.record_keys
+            and sources[new] == new
+            and _carries(data, old)
+            and not _carries(data, new)
+        ):
             warnings.warn(
                 f"The `{old}` record key is deprecated and will be removed in "
                 f"the next release; use `{new}` instead.",
@@ -454,12 +461,12 @@ def _carries(data: Any, key: str) -> bool:
 
 
 def _canonical(record: dict, sources: Dict[str, str]) -> dict:
-    # a source key moves to its canonical key; the rest carry over
-    moved = set(sources) | set(sources.values())
+    # a remapped canonical key takes its source's value; the rest carry over
+    moved = {k for k, src in sources.items() if src != k}
     canonical = {k: v for k, v in record.items() if k not in moved}
     canonical.update(
         (k, record[src])
         for k, src in sources.items()
-        if src is not None and src in record
+        if src is not None and src != k and src in record
     )
     return canonical

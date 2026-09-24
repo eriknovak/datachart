@@ -4,7 +4,7 @@ from typing import Union, List, Optional, Tuple
 import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render
-from ..utils._internal.validate import validate_point_labels
+from ..utils._internal.validate import validate_annotation
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
@@ -310,5 +310,5 @@ def ScatterChart(
     """
     params = dict(locals())
 
-    validate_point_labels(annotation if label is None else label, show_values)
+    validate_annotation(annotation if label is None else label, show_values)
     return render("scatterchart", params)

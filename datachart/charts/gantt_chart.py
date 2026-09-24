@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render
 from ..utils._internal.validate import (
-    validate_gantt_sort_by,
     validate_gantt_value_kind,
 )
 from ..typings import (
@@ -213,9 +212,6 @@ def GanttChart(
 
     """
     params = dict(locals())
-
-    # settings fail here, before layers are built
-    validate_gantt_sort_by(sort, sort_by)
     params["show_values"], params["value_kind"] = validate_gantt_value_kind(
         show_values, value_kind
     )

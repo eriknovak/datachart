@@ -160,7 +160,7 @@ def validate_bracket_endpoint(endpoint, positions: dict) -> float:
     )
 
 
-def validate_point_labels(annotation, show_values) -> None:
+def validate_annotation(annotation, show_values) -> None:
     """Raise when a scatter chart asks for annotations and value labels at once."""
 
     if annotation is not None and show_values:

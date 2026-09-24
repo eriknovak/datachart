@@ -105,7 +105,7 @@ The `_internal` submodule contains implementation details not exposed to users:
 - **layers.py**: The single drawing seam (ADR 0001): `Layer` classes per chart type with `draw(ax, ctx)`, `Panel` owning every cross-layer concern (colors, bar slotting, shared bins, scales, limits, legend, twin axes), `LayerGroup`, and the frozen `DrawContext`
 - **chart_kinds.py**: One frozen `ChartKind` row per front in `CHART_KINDS`, read through `chart_kind()` (ADR 0065); the engine, builder, and composition branch on the row, never on the chart-type string. Beside it, `SHARED_PARAMETERS`: one name, annotation and default per parameter the fronts share, which `test/test_front_body.py` checks every signature against (ADR 0067). Also holds its build-time readers `build_layers()` and `build_chart_panel_settings()`
 - **plot_engine.py**: Figure assembly: `render()` splits a front's arguments by its row (ADR 0066); `render_chart()` builds layers, assembles panels, renders them, and stores the metadata transport
-- **chart_builder.py**: Chart attribute building and validation logic
+- **chart_builder.py**: The one record-reading seam (ADR 0069): `build_charts_structure()` decides dataset count from the data shape and the row, and copies each record under the row's canonical `record_keys`, raising one `ValueError` for a missing required key
 - **config_helpers.py**: Helper functions for retrieving and applying style configurations
 - **colors.py**: Color cycle creation and colormap utilities
 - **validate.py**: Validation of user-facing values (bandwidth rules, emphasis roles); each raises `ValueError` with one message
@@ -130,7 +130,7 @@ from datachart.config import config
 ### Chart Creation Flow
 
 1. User calls a chart front (e.g., `LineChart(...)`) in `datachart/charts/line_chart.py`
-2. The front copies its arguments (`params = dict(locals())`), runs its own one-off checks, and calls `render(chart_type, params)`; `render` splits the arguments by the front's `ChartKind` row into the charts structure and the settings, then calls `render_chart(chart_type, charts, settings)` (ADRs 0003, 0066)
+2. The front copies its arguments (`params = dict(locals())`), runs its own one-off checks, and calls `render(chart_type, params)`; `render` splits the arguments by the front's `ChartKind` row into the charts structure and the settings, applies the row's `check_records` and `expand` steps, then calls `render_chart(chart_type, charts, settings)` (ADRs 0003, 0066, 0069)
 3. `render_chart()` in `plot_engine.py`:
    - Calculates the subplot layout; `None` settings resolve to defaults at point of use
    - Builds the layers via `build_layers()` — style is resolved here, once

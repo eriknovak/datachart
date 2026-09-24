@@ -30,7 +30,10 @@ declares.
 - **The builder decides multiplicity, alone.** Dataset count comes from the
   `data` shape and the row; no front runs its own `isinstance` check and no
   front multiplies charts after the builder. The calendar heatmap's per-year
-  split is a row-declared step the builder applies.
+  split is a row-declared step applied right after the builder, beside the
+  step that checks the dumbbell and gantt records against the settings; the
+  pyramid's negated left side is one too. This amends ADR 0066, whose fronts
+  passed `render` an `expand` step and rewrote `params["data"]` themselves.
 - **Every record key is a remap parameter, on every record front.** The
   union of all rows' canonical keys generates shared parameters in the ADR
   0067 table, so the conformance test enforces the remap on every front

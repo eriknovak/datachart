@@ -471,7 +471,22 @@ def _shared_range(values: list, norm) -> Optional[Tuple[float, float]]:
     return min(numbers), max(numbers)
 
 
-def _basemap_chart(charts: List[dict], settings: dict) -> tuple:
+def _pyramid_sides(charts: List[dict], settings: dict) -> Tuple[List[dict], dict]:
+    if len(charts) != 2:
+        raise ValueError(
+            "PyramidChart takes exactly two data series: "
+            "`data=[left_points, right_points]`."
+        )
+    # the left side draws in the negative direction; users pass positive values
+    left, right = charts
+    records = [
+        {**record, "y": -record["y"]} if isinstance(record, dict) else record
+        for record in left["data"]
+    ]
+    return [{**left, "data": records}, right], settings
+
+
+def _basemap_chart(charts: List[dict], settings: dict) -> Tuple[List[dict], dict]:
     # the basemap's one chart is its features and overlay geometry
     (chart,) = charts
     data = {"features": chart["data"]}
@@ -549,6 +564,7 @@ _KINDS = (
         # the panel mirrors the value ticks to both halves (ADR 0017)
         figure_keys=frozenset({"xticks", "xticklabels", "xtickrotate"}),
         defaults={"pyramid": True, "orientation": ORIENTATION.HORIZONTAL},
+        expand=_pyramid_sides,
         subplots=False,
         # unmirrored data on a mirrored axis would silently mangle (ADR 0017)
         overlayable=False,

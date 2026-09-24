@@ -64,7 +64,7 @@ class TestRecordRows(unittest.TestCase):
                 remaps = {key: f"my_{key}" for key in kind.record_keys}
                 self.assertEqual(
                     build_charts_structure(name, data, **remaps),
-                    [{"data": [record(kind)]}],
+                    [{"data": [{**data[0], **record(kind)}]}],
                 )
 
     def test_remaps_index_per_dataset(self):
@@ -72,7 +72,7 @@ class TestRecordRows(unittest.TestCase):
         charts = build_charts_structure("linechart", data, x=["a", "b"])
         self.assertEqual(
             [chart["data"] for chart in charts],
-            [[{"x": 1, "y": 2}], [{"x": 3, "y": 4}]],
+            [[{"a": 1, "x": 1, "y": 2}], [{"b": 3, "x": 3, "y": 4}]],
         )
 
     def test_none_remap_leaves_the_dataset_without_the_key(self):
@@ -83,7 +83,7 @@ class TestRecordRows(unittest.TestCase):
 
     def test_columns_are_renamed_too(self):
         charts = build_charts_structure("linechart", {"t": [1, 2], "y": [3, 4]}, x="t")
-        self.assertEqual(charts, [{"data": {"x": [1, 2], "y": [3, 4]}}])
+        self.assertEqual(charts, [{"data": {"t": [1, 2], "x": [1, 2], "y": [3, 4]}}])
 
     def test_caller_records_are_not_mutated(self):
         data = [{"t": 1, "v": 2}]
