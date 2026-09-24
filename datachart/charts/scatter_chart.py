@@ -135,10 +135,11 @@ def ScatterChart(
     y: Optional[Union[str, List[Optional[str]]]] = None,
     size: Optional[Union[str, List[Optional[str]]]] = None,
     hue: Optional[Union[str, List[Optional[str]]]] = None,
-    label: Optional[Union[str, List[Optional[str]]]] = None,
+    annotation: Optional[Union[str, List[Optional[str]]]] = None,
     xerr: Optional[Union[str, List[Optional[str]]]] = None,
     yerr: Optional[Union[str, List[Optional[str]]]] = None,
     size_range: Optional[Tuple[float, float]] = None,
+    label: Optional[Union[str, List[Optional[str]]]] = None,
 ) -> plt.Figure:
     """Creates a scatter chart.
 
@@ -198,13 +199,13 @@ def ScatterChart(
         ...     show_correlation=True
         ... )
         >>>
-        >>> # Scatter with a label beside each point
+        >>> # Scatter with an annotation beside each point
         >>> figure = ScatterChart(
         ...     data=[
         ...         {"x": 1, "y": 5, "name": "A"},
         ...         {"x": 2, "y": 10, "name": "B"}
         ...     ],
-        ...     label="name"
+        ...     annotation="name"
         ... )
 
     Args:
@@ -246,7 +247,8 @@ def ScatterChart(
         ci_level: The confidence interval level (default 0.95).
         show_correlation: Whether to show the Pearson correlation coefficient (r-value) as an annotation.
         show_values: Whether to print each point's y value beside it. Cannot be
-            combined with `label`: a point carries its label or its value.
+            combined with `annotation`: a point carries its annotation or its
+            value.
         value_format: Format string for the value labels: a
             [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT] constant or any
             `"{x:.1f}"`, `"{:.1f}%"`, or `"%g"` style string.
@@ -285,12 +287,12 @@ def ScatterChart(
         y: The key name in data for y-axis values (default: "y").
         size: The key name in data for marker size values (for bubble charts).
         hue: The key name in data for color grouping (categorical variable).
-        label: The key name in data for the point labels (default: "label"),
-            aligned like `style` for multiple charts; `None` in the list
-            leaves that chart unlabelled. Each label is drawn beside its
-            marker at the spot with the least overlap against the other
-            markers, labels, and the axes edge; points without the key stay
-            unlabelled.
+        annotation: The key name in data for the point annotations (default:
+            "annotation"), aligned like `style` for multiple charts; `None` in
+            the list leaves that chart unannotated. Each annotation is drawn
+            beside its marker at the spot with the least overlap against the
+            other markers, annotations, and the axes edge; points without the
+            key stay unannotated.
         xerr: The key name in data for the x-axis error values (default: "xerr").
             The value is a distance from the point: one number reaches the same
             distance both ways, a `(low, high)` pair reaches `low` left and
@@ -300,6 +302,7 @@ def ScatterChart(
         yerr: The key name in data for the y-axis error values (default: "yerr"),
             read like `xerr`.
         size_range: Tuple of (min_size, max_size) for bubble charts (default: (20, 200)).
+        label: Deprecated; use `annotation`. Removed in the next release.
 
     Returns:
         The figure containing the scatter chart.
@@ -307,6 +310,5 @@ def ScatterChart(
     """
     params = dict(locals())
 
-    # Build the charts structure using shared utility
-    validate_point_labels(label, show_values)
+    validate_point_labels(annotation if label is None else label, show_values)
     return render("scatterchart", params)

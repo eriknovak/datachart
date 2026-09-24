@@ -15,6 +15,7 @@ from datachart.charts import (
     NetworkChart,
     RadialChart,
     RidgelinePlot,
+    ScatterChart,
 )
 from datachart.utils._internal import plot_engine
 from datachart.utils._internal.chart_kinds import (
@@ -99,7 +100,8 @@ class TestSharedParameters(unittest.TestCase):
         for front, params in self.signatures():
             kind = CHART_KINDS[front.lower()]
             for name, row in SHARED_PARAMETERS.items():
-                if name not in params:
+                # a deprecated name keeps the type it had
+                if name not in params or name in kind.renamed:
                     continue
                 with self.subTest(front=front, parameter=name):
                     self.assertEqual(
@@ -261,6 +263,7 @@ GRID = {"z": [[1, 2], [3, 4]]}
 POINTS = {"x": [0, 1, 2], "y": [0, 1, 2]}
 GROUPS = [{"label": "a", "value": v} for v in (1, 2, 3, 5)]
 WIND = [{"label": "N", "y": 1}, {"label": "E", "y": 2}, {"label": "S", "y": 3}]
+NAMED = [{"x": 0, "y": 1, "name": "a"}, {"x": 1, "y": 2, "name": "b"}]
 
 # front, its data, the deprecated name, the new name, and a value for both
 RENAMES = [
@@ -270,6 +273,7 @@ RENAMES = [
     (HexbinChart, POINTS, "valfmt", "value_format", "{x:.2f}"),
     (RidgelinePlot, GROUPS, "normalize", "ridge_scale", "common"),
     (RadialChart, WIND, "type", "mark", "bar"),
+    (ScatterChart, NAMED, "label", "annotation", "name"),
 ]
 
 

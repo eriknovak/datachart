@@ -4463,7 +4463,7 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
     def _point_labels(self, x_data) -> Optional[np.ndarray]:
         """One label per drawn point (None where the key is absent), or None."""
 
-        labels = self._point_column("label", len(x_data))
+        labels = self._point_column("annotation", len(x_data))
         if labels is None:
             return None
         return np.array([None if l is None else str(l) for l in labels], dtype=object)

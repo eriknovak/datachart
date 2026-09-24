@@ -727,8 +727,10 @@ _KINDS = (
         "scatterchart",
         "scatter chart",
         ScatterLayer,
-        record_keys=("x", "y", "size", "hue", "label", "xerr", "yerr"),
+        record_keys=("x", "y", "size", "hue", "annotation", "xerr", "yerr"),
         required_keys=("x", "y"),
+        # `label` is the category key on every other front (ADR 0069)
+        renamed={"label": "annotation"},
         emphasis_units=series_units("y"),
         emphasis_by="mean",
     ),

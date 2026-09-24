@@ -160,13 +160,13 @@ def validate_bracket_endpoint(endpoint, positions: dict) -> float:
     )
 
 
-def validate_point_labels(label, show_values) -> None:
-    """Raise when a scatter chart asks for point labels and value labels at once."""
+def validate_point_labels(annotation, show_values) -> None:
+    """Raise when a scatter chart asks for annotations and value labels at once."""
 
-    if label is not None and show_values:
+    if annotation is not None and show_values:
         raise ValueError(
-            "`label` and `show_values` cannot be combined: a point carries "
-            "either its label or its value."
+            "`annotation` and `show_values` cannot be combined: a point carries "
+            "either its annotation or its value."
         )
 
 

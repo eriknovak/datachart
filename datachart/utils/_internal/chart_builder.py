@@ -3,6 +3,7 @@
 This module provides helper functions to reduce boilerplate in chart definitions.
 """
 
+import warnings
 from typing import Any, Dict, List
 
 from .chart_kinds import ChartKind, chart_kind
@@ -397,8 +398,11 @@ def canonical_records(kind: ChartKind, chart: dict, where: str) -> Any:
     """The chart's records copied under the row's canonical keys (ADR 0069).
 
     Pops the chart's remap parameters: each names the caller's key for one
-    canonical key, which it defaults to. The caller's records are never
+    canonical key, which it defaults to; None in a per-chart list leaves
+    that chart without the key. The caller's records are never
     mutated; keys the row does not declare, like `emphasis`, carry over.
+    Records carrying a key the row has `renamed`, and not its new name,
+    are read under the old name with a warning.
 
     Args:
         kind: The front's row, declaring the record keys.
@@ -411,8 +415,17 @@ def canonical_records(kind: ChartKind, chart: dict, where: str) -> Any:
     Raises:
         ValueError: If a record misses a required key.
     """
-    sources = {key: chart.pop(key, None) or key for key in kind.record_keys}
+    sources = {key: chart.pop(key) if key in chart else key for key in kind.record_keys}
     data = chart["data"]
+    for old, new in kind.renamed.items():
+        if sources.get(new) == new and _carries(data, old) and not _carries(data, new):
+            warnings.warn(
+                f"The `{old}` record key is deprecated and will be removed in "
+                f"the next release; use `{new}` instead.",
+                DeprecationWarning,
+                stacklevel=5,
+            )
+            sources[new] = old
     if isinstance(data, dict):
         return _canonical(data, sources)
     if not isinstance(data, list):
@@ -421,7 +434,7 @@ def canonical_records(kind: ChartKind, chart: dict, where: str) -> Any:
     for index, record in enumerate(data):
         if isinstance(record, dict):
             for key in kind.required_keys:
-                if sources[key] not in record:
+                if sources[key] is not None and sources[key] not in record:
                     raise ValueError(
                         f"{kind.label[0].upper()}{kind.label[1:]} record "
                         f"`{where}[{index}]` has no `{sources[key]}` key."
@@ -431,9 +444,22 @@ def canonical_records(kind: ChartKind, chart: dict, where: str) -> Any:
     return records
 
 
+def _carries(data: Any, key: str) -> bool:
+    # a list of records, or one dict of columns
+    if isinstance(data, dict):
+        return key in data
+    return isinstance(data, list) and any(
+        isinstance(record, dict) and key in record for record in data
+    )
+
+
 def _canonical(record: dict, sources: Dict[str, str]) -> dict:
     # a source key moves to its canonical key; the rest carry over
     moved = set(sources) | set(sources.values())
     canonical = {k: v for k, v in record.items() if k not in moved}
-    canonical.update((k, record[src]) for k, src in sources.items() if src in record)
+    canonical.update(
+        (k, record[src])
+        for k, src in sources.items()
+        if src is not None and src in record
+    )
     return canonical
