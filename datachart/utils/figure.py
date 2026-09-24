@@ -8,16 +8,22 @@ Methods:
 
 """
 
+import copy
 import math
 import os
-from typing import FrozenSet, List, Optional, Tuple, Union, Dict, Any
+from typing import FrozenSet, List, Mapping, Optional, Tuple, Union, Dict, Any
 
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec, SubplotSpec
 
-from ..constants import FIG_FORMAT
-from ._internal.config_helpers import configure_labels, get_text_style
+from ..constants import FIG_FORMAT, FIG_SIZE
+from ._internal.config_helpers import (
+    configure_labels,
+    get_legend_style,
+    get_text_style,
+    resolve_font_family,
+)
 from ._internal.figures import new_figure
 from ._internal.plot_engine import SUBPLOT_FURNITURE_KEYS
 
@@ -107,13 +113,23 @@ def _subplot_node(metadata: Dict[str, Any], panels: List[Any]) -> Dict[str, Any]
     }
 
 
-def _render_cell(owner: plt.Figure, cell: Dict[str, Any], target_ax: plt.Axes) -> None:
-    """Draw one transport cell into its pre-created axes."""
+def _render_cell(
+    owner: plt.Figure,
+    cell: Dict[str, Any],
+    target_ax: plt.Axes,
+    overrides: Optional[Dict[str, Any]] = None,
+) -> Optional[plt.Axes]:
+    """Draw one transport cell into its pre-created axes.
+
+    `overrides` are the enclosing grids' furniture, laid over the cell
+    panel's own settings for this draw only; the stored panel keeps its own.
+    Returns the axes the panel drew into; None for a nested grid.
+    """
     if "grid" in cell:
         subplot_spec = target_ax.get_subplotspec()
         target_ax.remove()
-        _render_grid_node(owner, cell["grid"], subplot_spec)
-        return
+        _render_grid_node(owner, cell["grid"], subplot_spec, overrides)
+        return None
 
     # each cell's axes carries its panel's projection; polar cells swap
     # the pre-created rectilinear axes for a polar one in the same slot
@@ -123,8 +139,13 @@ def _render_cell(owner: plt.Figure, cell: Dict[str, Any], target_ax: plt.Axes) -
         target_ax = owner.add_subplot(subplot_spec, projection="polar")
 
     target_ax.axis("off")
-    if cell["panel"].layers:
-        cell["panel"].render(target_ax)
+    panel = cell["panel"]
+    if panel.layers:
+        if overrides:
+            panel = copy.copy(panel)
+            panel.settings = {**panel.settings, **overrides}
+        panel.render(target_ax)
+    return target_ax
 
 
 def _render_subplot_panels(
@@ -169,9 +190,12 @@ def _apply_figure_labels(
 
 
 def _render_grid_node(
-    owner: plt.Figure, node: Dict[str, Any], subplot_spec: SubplotSpec
+    owner: plt.Figure,
+    node: Dict[str, Any],
+    subplot_spec: Optional[SubplotSpec],
+    overrides: Optional[Dict[str, Any]] = None,
 ) -> None:
-    """Rebuild a nested grid inside one parent cell.
+    """Rebuild a nested grid inside one parent cell, or fill the owner figure.
 
     The node is the nested grid figure's own metadata: its cell tree, layout
     shape, title, axis labels, and sharex/sharey. The subgrid nests in the
@@ -182,8 +206,12 @@ def _render_grid_node(
     the node, anchored on its first shareable axes — or, for a `"col"` x or
     `"row"` y share, on the first one in the cell's column or row. A node
     `legend` — the entries of one cell's axes, for the whole grid — takes the
-    outermost column or row on its `edge` (default right), inside the title.
+    outermost column or row on its `edge` (default right), inside the title;
+    with no `cell`, the first cell whose axes carry entries lends them. The
+    node's `overrides` — and, over them, an enclosing grid's — are laid over
+    every cell's panel settings, to any depth.
     """
+    overrides = {**node.get("overrides", {}), **(overrides or {})}
     nrows, ncols = node["shape"]
     title, xlabel, ylabel = node.get("title"), node.get("xlabel"), node.get("ylabel")
     legend = node.get("legend")
@@ -201,8 +229,12 @@ def _render_grid_node(
         + [1] * ncols
         + ([LEGEND_COLUMN_WIDTH] if edge == "right" else [])
     )
-    sub_gs = subplot_spec.subgridspec(
-        len(heights), len(widths), height_ratios=heights, width_ratios=widths
+    ratios = {"height_ratios": heights, "width_ratios": widths}
+    # with no parent cell the grid lays out on the figure's own gridspec
+    sub_gs = (
+        GridSpec(len(heights), len(widths), figure=owner, **ratios)
+        if subplot_spec is None
+        else subplot_spec.subgridspec(len(heights), len(widths), **ratios)
     )
     row_offset = (1 if title else 0) + (1 if edge == "top" else 0)
     col_offset = (1 if edge == "left" else 0) + (1 if ylabel else 0)
@@ -249,8 +281,10 @@ def _render_grid_node(
             return ("row", layout["row"])
         return ("all", None) if mode else None
 
-    legend_ax = None
-    for index, cell in enumerate(node["cells"]):
+    # every cell's axes exists before any draws: a cell that measures its
+    # text against the layout sees the whole grid
+    placed = []
+    for cell in node["cells"]:
         layout = cell["spec"]
         row = layout["row"] + row_offset
         col = layout["col"] + col_offset
@@ -258,11 +292,10 @@ def _render_grid_node(
             row : row + layout["rowspan"],
             col : col + layout["colspan"],
         ]
-        if "grid" in cell:
-            _render_grid_node(owner, cell["grid"], cell_spec)
-            continue
-        # polar cells swap their axes and share no cartesian limits
-        shareable = not cell["panel"].layers or cell["panel"].projection != "polar"
+        # grid and polar cells swap their axes and share no cartesian limits
+        shareable = "panel" in cell and (
+            not cell["panel"].layers or cell["panel"].projection != "polar"
+        )
         keys = {
             axis: share_key(node[f"share{axis}"], layout) if shareable else None
             for axis in ("x", "y")
@@ -275,12 +308,24 @@ def _render_grid_node(
         for key in keys.values():
             if key is not None:
                 anchors.setdefault(key, ax)
-        _render_cell(owner, cell, ax)
+        placed.append(ax)
+
+    cell_axes = {}
+    for index, (cell, ax) in enumerate(zip(node["cells"], placed)):
+        ax = _render_cell(owner, cell, ax, overrides)
+        if ax is None:
+            continue
         if node.get("box_aspect"):
             ax.set_box_aspect(node["box_aspect"])
-        if legend and index == legend["cell"]:
-            legend_ax = ax
+        cell_axes[index] = ax
 
+    legend_ax = None
+    if legend and legend.get("cell") is not None:
+        legend_ax = cell_axes.get(legend["cell"])
+    elif legend:
+        legend_ax = next(
+            (ax for ax in cell_axes.values() if _legend_entries(ax)[1]), None
+        )
     if legend_ax is not None:
         spec = {
             "right": sub_gs[body_rows, -1],
@@ -318,24 +363,56 @@ def _label_axes(
 def _legend_axes(
     owner: plt.Figure, spec: SubplotSpec, source: plt.Axes, legend: Dict[str, Any]
 ) -> None:
-    """An invisible axes in `spec` carrying the legend of `source`'s entries."""
+    """An invisible axes in `spec` carrying the legend of `source`'s entries.
+
+    A row legend with no column count lays its entries side by side.
+    """
+    handles, labels = _legend_entries(source)
+    if not labels:
+        return
+    ax = owner.add_subplot(spec)
+    ax.axis("off")
+    edge = legend.get("edge", "right")
+    anchor, loc = LEGEND_ANCHORS[edge]
+    style = legend["style"]
+    if edge in ("top", "bottom"):
+        style = {"ncols": len(labels), **style}
+    drawn = ax.legend(handles, labels, **style, loc=loc, bbox_to_anchor=anchor)
+    if legend.get("family"):
+        for text in drawn.get_texts() + [drawn.get_title()]:
+            text.set_fontfamily(legend["family"])
+
+
+def _legend_entries(source: plt.Axes) -> Tuple[list, list]:
+    """The legend handles and labels of a cell's axes and its twins."""
     # the marks may sit on a hidden twin of the cell's axes
     handles, labels = [], []
     for sibling in source._twinned_axes.get_siblings(source):
         entries = sibling.get_legend_handles_labels()
         handles += entries[0]
         labels += entries[1]
-    if not labels:
-        return
-    ax = owner.add_subplot(spec)
-    ax.axis("off")
-    anchor, loc = LEGEND_ANCHORS[legend.get("edge", "right")]
-    drawn = ax.legend(
-        handles, labels, **legend["style"], loc=loc, bbox_to_anchor=anchor
-    )
-    if legend.get("family"):
-        for text in drawn.get_texts() + [drawn.get_title()]:
-            text.set_fontfamily(legend["family"])
+    return handles, labels
+
+
+def node_legend(
+    legend: Optional[Mapping[str, Any]], edge: str, cell: Optional[int] = None, **style
+) -> Dict[str, Any]:
+    """A grid node's `legend`: the themed legend style on one `edge`.
+
+    `style` entries override the resolved legend style; `cell` names the cell
+    lending its entries, or None for the first cell that has any.
+    """
+    resolved = {
+        k: v
+        for k, v in get_legend_style(legend).items()
+        if k not in ("loc", "bbox_to_anchor")
+    }
+    return {
+        "cell": cell,
+        "edge": edge,
+        "style": {**resolved, **style},
+        "family": resolve_font_family(),
+    }
 
 
 def _column_window(subplot_spec: SubplotSpec) -> Tuple[float, float]:
@@ -458,6 +535,19 @@ def _pack_square_cells(figure: plt.Figure) -> bool:
     return moved
 
 
+# the grid legend edge each legend location selects; any other takes the right
+GRID_LEGEND_EDGES = {
+    "outside left": "left",
+    "center left": "left",
+    "outside top": "top",
+    "upper center": "top",
+    "outside bottom": "bottom",
+    "lower center": "bottom",
+}
+# the grid furniture laid over every cell's own panel settings
+CELL_OVERRIDE_KEYS = ("show_grid", "xmin", "xmax", "ymin", "ymax", "aspect_ratio")
+
+
 def _figure_grid_layout_impl(
     figures: List[plt.Figure],
     *,
@@ -465,15 +555,24 @@ def _figure_grid_layout_impl(
     xlabel: Optional[str] = None,
     ylabel: Optional[str] = None,
     layout_specs: Optional[List[Dict[str, int]]] = None,
-    max_cols: int = 4,
-    figsize: Optional[Tuple[float, float]] = None,
-    sharex: bool = False,
-    sharey: bool = False,
+    max_cols: Optional[int] = None,
+    figsize: Optional[Union[FIG_SIZE, Tuple[float, float]]] = None,
+    sharex: Optional[bool] = None,
+    sharey: Optional[bool] = None,
+    show_legend: Optional[bool] = None,
+    legend: Optional[Dict[str, Any]] = None,
+    show_grid: Optional[Any] = None,
+    xmin: Optional[float] = None,
+    xmax: Optional[float] = None,
+    ymin: Optional[float] = None,
+    ymax: Optional[float] = None,
+    aspect_ratio: Optional[str] = None,
 ) -> plt.Figure:
     """Internal implementation for figure grid layout.
 
     The core implementation behind every grid front: `Grid` (nested rows and
-    flat form via `_grid_from_dicts`).
+    flat form via `_grid_from_dicts`). The grid renders as one node, like a
+    nested grid; its title and axis labels stay figure-level.
 
     Args:
         figures: List of matplotlib Figure objects to combine.
@@ -481,10 +580,14 @@ def _figure_grid_layout_impl(
         xlabel: Optional x-axis label for the whole grid.
         ylabel: Optional y-axis label for the whole grid.
         layout_specs: Optional list of layout specifications for custom grid layouts.
-        max_cols: Maximum number of columns in the grid layout.
+        max_cols: Maximum number of columns in the grid layout; default 4.
         figsize: Size of the combined figure (width, height) in inches.
         sharex: Whether to share the x-axis across all subplots.
         sharey: Whether to share the y-axis across all subplots.
+        show_legend: Whether to draw one legend for the whole grid.
+        legend: The legend setting; its location picks the grid edge.
+        show_grid, xmin, xmax, ymin, ymax, aspect_ratio: Laid over every
+            cell's own setting when given.
 
     Returns:
         A new matplotlib Figure containing all charts in a grid layout.
@@ -494,15 +597,12 @@ def _figure_grid_layout_impl(
 
     n_figures = len(figures)
 
-    # Validate layout_specs if provided
     if layout_specs is not None:
         if len(layout_specs) != n_figures:
             raise ValueError(
                 f"layout_specs length ({len(layout_specs)}) must match "
                 f"figures length ({n_figures})"
             )
-
-        # Validate each layout spec
         for idx, spec in enumerate(layout_specs):
             required_keys = {"row", "col", "rowspan", "colspan"}
             if not required_keys.issubset(spec.keys()):
@@ -511,105 +611,73 @@ def _figure_grid_layout_impl(
                     f"layout_specs[{idx}] missing required keys: {missing}"
                 )
 
-    # Create figure with custom or uniform layout
     if layout_specs:
-        # Custom layout using GridSpec
-        # Determine grid size from layout specs
-        max_row = max(spec["row"] + spec["rowspan"] for spec in layout_specs)
-        max_col = max(spec["col"] + spec["colspan"] for spec in layout_specs)
-
-        # Calculate figure size if not provided
-        if figsize is None:
-            base_size = figures[0].get_size_inches()
-            figsize = (base_size[0] * max_col, base_size[1] * max_row)
-
-        # Create figure and GridSpec
-        combined_fig = new_figure(figsize=figsize)
-        gs = GridSpec(max_row, max_col, figure=combined_fig)
-        grid_shape = (max_row, max_col)
-
-        # Create axes based on layout specs
-        axes = []
-        for spec in layout_specs:
-            ax = combined_fig.add_subplot(
-                gs[
-                    spec["row"] : spec["row"] + spec["rowspan"],
-                    spec["col"] : spec["col"] + spec["colspan"],
-                ],
-                # add_subplot shares against an Axes, not a bool
-                sharex=axes[0] if sharex and axes else None,
-                sharey=axes[0] if sharey and axes else None,
-            )
-            axes.append(ax)
+        specs = [dict(spec) for spec in layout_specs]
+        nrows = max(spec["row"] + spec["rowspan"] for spec in specs)
+        ncols = max(spec["col"] + spec["colspan"] for spec in specs)
     else:
-        # Uniform grid layout (original behavior)
-        # Calculate grid layout
+        max_cols = 4 if max_cols is None else max_cols
         nrows = math.ceil(n_figures / max_cols)
         ncols = min(max_cols, n_figures)
+        specs = [
+            {"row": idx // ncols, "col": idx % ncols, "rowspan": 1, "colspan": 1}
+            for idx in range(n_figures)
+        ]
 
-        # Calculate figure size if not provided
-        if figsize is None:
-            # Use the size of the first figure as a base
-            base_size = figures[0].get_size_inches()
-            figsize = (base_size[0] * ncols, base_size[1] * nrows)
+    if figsize is None:
+        base_size = figures[0].get_size_inches()
+        figsize = (base_size[0] * ncols, base_size[1] * nrows)
 
-        # Create new figure with subplots
-        combined_fig = new_figure(figsize=figsize)
-        axes = combined_fig.subplots(
-            nrows=nrows,
-            ncols=ncols,
-            sharex=sharex,
-            sharey=sharey,
-            squeeze=False,
-        )
-
-        axes = axes.flatten()
-        grid_shape = (nrows, ncols)
-
-    # Process each figure: every figure's metadata carries a Panel that can
-    # redraw the chart into any axes (the single drawing seam, ADR 0001),
-    # or — for a nested grid figure — a recursive cell tree (ADR 0006).
+    # every figure's metadata carries a Panel that redraws the chart into any
+    # axes (ADR 0001), or — for a nested grid figure — a cell tree (ADR 0006)
     cells = []
-    for idx, fig in enumerate(figures):
-        if idx >= len(axes):
-            break
-
+    for idx, (fig, spec) in enumerate(zip(figures, specs)):
         cell = _cell_content(fig, idx)
-        cell["spec"] = (
-            dict(layout_specs[idx])
-            if layout_specs
-            else {
-                "row": idx // grid_shape[1],
-                "col": idx % grid_shape[1],
-                "rowspan": 1,
-                "colspan": 1,
-            }
-        )
+        cell["spec"] = spec
         cells.append(cell)
-        _render_cell(combined_fig, cell, axes[idx])
 
-    # Hide unused subplots (only applicable for uniform grid layout)
-    if not layout_specs:
-        for idx in range(n_figures, len(axes)):
-            axes[idx].axis("off")
-
-    # global title and axis labels, one per figure
-    _apply_figure_labels(combined_fig, title, xlabel, ylabel)
-
-    _align_axes_columns(combined_fig)
+    grid_legend = None
+    if show_legend:
+        location = (legend or {}).get("location")
+        grid_legend = node_legend(legend, GRID_LEGEND_EDGES.get(location, "right"))
+    given = {
+        "show_grid": show_grid,
+        "xmin": xmin,
+        "xmax": xmax,
+        "ymin": ymin,
+        "ymax": ymax,
+        "aspect_ratio": aspect_ratio,
+    }
+    overrides = {key: value for key, value in given.items() if value is not None}
+    if "show_grid" in overrides:
+        # an explicit value, as a front's: a polar cell draws only what it names
+        overrides["show_grid_explicit"] = True
 
     # the recursive cell tree lets this grid nest inside another Grid (ADR 0006)
-    combined_fig._chart_metadata = {
+    node = {
         "type": "grid",
         "cells": cells,
-        "shape": grid_shape,
+        "shape": (nrows, ncols),
         "title": title,
         "xlabel": xlabel,
         "ylabel": ylabel,
-        "sharex": sharex,
-        "sharey": sharey,
+        "sharex": bool(sharex),
+        "sharey": bool(sharey),
+        "legend": grid_legend,
+        "overrides": overrides,
     }
 
+    combined_fig = new_figure(figsize=figsize)
+    # the labels are the figure's; nested, the node renders them in its cell
+    _render_grid_node(
+        combined_fig,
+        {**node, "title": None, "xlabel": None, "ylabel": None},
+        None,
+    )
+    _apply_figure_labels(combined_fig, title, xlabel, ylabel)
+    _align_axes_columns(combined_fig)
+
+    combined_fig._chart_metadata = node
     return combined_fig
 
 
@@ -689,10 +757,9 @@ def _grid_from_dicts(
     title: Optional[str] = None,
     xlabel: Optional[str] = None,
     ylabel: Optional[str] = None,
-    max_cols: int = 4,
-    figsize: Optional[Tuple[float, float]] = None,
-    sharex: bool = False,
-    sharey: bool = False,
+    max_cols: Optional[int] = None,
+    figsize: Optional[Union[FIG_SIZE, Tuple[float, float]]] = None,
+    **furniture: Any,
 ) -> plt.Figure:
     """Render chart dicts into a grid figure.
 
@@ -755,6 +822,5 @@ def _grid_from_dicts(
         layout_specs=layout_specs,
         max_cols=max_cols,
         figsize=figsize,
-        sharex=sharex,
-        sharey=sharey,
+        **furniture,
     )

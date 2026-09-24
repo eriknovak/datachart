@@ -519,12 +519,17 @@ class TestNestedGrid:
         )
         inner = Grid([sub, _line_fig(), _line_fig()], sharex=True)
         fig = Grid([inner, _bar_fig()])
-        # creation order inside the subgrid: 2 subplot axes, then 2 line axes
+        # the line cells sit in the node's 1x3 subgrid, the subplots one deeper
         in_axes = _nested_axes(fig)
         assert len(in_axes) == 4
-        line_a, line_b = in_axes[2], in_axes[3]
+        line_a, line_b = [
+            ax
+            for ax in in_axes
+            if ax.get_subplotspec().get_gridspec().get_geometry() == (1, 3)
+        ]
+        subplot = next(ax for ax in in_axes if ax not in (line_a, line_b))
         assert line_a.get_shared_x_axes().joined(line_a, line_b)
-        assert not line_a.get_shared_x_axes().joined(line_a, in_axes[0])
+        assert not line_a.get_shared_x_axes().joined(line_a, subplot)
         plt.close("all")
 
     def test_grid_in_panel_still_raises(self):
