@@ -1,5 +1,7 @@
 """Tests for the typing names (ADRs 0043, 0072)."""
 
+import ast
+import inspect
 import unittest
 import warnings
 
@@ -98,13 +100,32 @@ class TestTypingRoles(unittest.TestCase):
 class TestThemeConformance(unittest.TestCase):
     """Every theme key is declared by exactly one style group, and back."""
 
+    @staticmethod
+    def classes() -> dict:
+        """Each class in the typings source: its base names and own keys."""
+
+        # read from source: before Python 3.12 a TypedDict keeps neither its
+        # bases nor its own annotations apart from inherited ones
+        tree = ast.parse(inspect.getsource(typings))
+        return {
+            node.name: (
+                [base.id for base in node.bases if isinstance(base, ast.Name)],
+                [
+                    item.target.id
+                    for item in node.body
+                    if isinstance(item, ast.AnnAssign)
+                ],
+            )
+            for node in tree.body
+            if isinstance(node, ast.ClassDef)
+        }
+
     def declared(self) -> dict:
-        # a TypedDict's annotations include inherited keys; the union's
-        # direct bases each declare only their own
+        classes = self.classes()
         keys = {}
-        for group in typings.StyleAttrs.__orig_bases__:
-            for key in group.__annotations__:
-                keys.setdefault(key, []).append(group.__name__)
+        for group in classes["StyleAttrs"][0]:
+            for key in classes[group][1]:
+                keys.setdefault(key, []).append(group)
         return keys
 
     def test_every_key_is_declared_once(self):
@@ -119,7 +140,7 @@ class TestThemeConformance(unittest.TestCase):
         self.assertEqual(sorted(declared - set(BASE_THEME)), [])
 
     def test_overlay_group_is_in_the_union(self):
-        self.assertIn(typings.OverlayStyleAttrs, typings.StyleAttrs.__orig_bases__)
+        self.assertIn("OverlayStyleAttrs", self.classes()["StyleAttrs"][0])
         self.assertEqual(len(typings.OverlayStyleAttrs.__annotations__), 11)
 
     def test_subtitle_font_accepts_str(self):
