@@ -10,7 +10,7 @@ from datachart.typings import StyleAttrs
 from datachart.constants import THEME
 
 # import the themes
-from ..themes._base import STYLE_ALIASES, canonical_style
+from ..themes._base import STYLE_ALIASES, canonical_style, warn_aliases
 from ..themes import (
     DEFAULT_THEME,
     GREYSCALE_THEME,
@@ -100,7 +100,7 @@ class Config:
             >>> from datachart.constants import THEME
             >>> from datachart.config import config
             >>> config.set_theme(THEME.DEFAULT)
-            >>> config.get("theme")
+            >>> config.theme
             'default'
 
         Args:
@@ -135,6 +135,7 @@ class Config:
             theme: The style attributes of the theme.
 
         """
+        warn_aliases(theme)
         theme = canonical_style(theme)
         unknown = set(theme) - set(DEFAULT_THEME)
         if unknown:
@@ -152,7 +153,7 @@ class Config:
         Examples:
             >>> from datachart.config import config
             >>> config.reset_config()
-            >>> config.get("theme")
+            >>> config.theme
             'default'
 
         """
@@ -178,6 +179,7 @@ class Config:
 
         """
 
+        warn_aliases(config)
         for key, val in canonical_style(config).items():
             if key not in self.config:
                 print(f"Warning: Attribute '{key}' is not valid. Skipping attribute...")
@@ -374,7 +376,7 @@ class Config:
         Examples:
             >>> from datachart.config import config
             >>> config["font_general_color"]
-            '#FFFFFF'
+            '#000000'
 
         Args:
             attr: The attribute to retrieve.
@@ -396,7 +398,7 @@ class Config:
         Examples:
             >>> from datachart.config import config
             >>> config.get("font_general_color")
-            '#FFFFFF'
+            '#000000'
 
         Args:
             attr: The attribute to retrieve.

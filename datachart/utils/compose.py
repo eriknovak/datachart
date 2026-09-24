@@ -48,6 +48,7 @@ from ._internal.layers import (
     DRAW_ZORDER,
     draw_zorder_key,
     emphasis_rule_roles,
+    theme_default,
     value_axis_grid,
     _rule_summary,
 )
@@ -371,8 +372,7 @@ def Panel(
     if auto_secondary_axis is None:
         auto_secondary_axis = config.get("overlay_auto_threshold", 3.0)
     theme_grid = show_grid is None
-    if theme_grid:
-        show_grid = config.get("chart_default_show_grid")
+    show_grid = theme_default(None, {"show_grid": show_grid}, "show_grid")
     if figsize is None:
         figsize = FIG_SIZE.DEFAULT
 

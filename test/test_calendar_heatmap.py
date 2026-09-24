@@ -149,9 +149,9 @@ class TestTypings(unittest.TestCase):
         self.assertIn("data", typings.CalendarHeatmapSingleChartAttrs.__annotations__)
         keys = typings.CalendarHeatmapStyleAttrs.__annotations__
         self.assertTrue(all(k.startswith("plot_calendar_heatmap_") for k in keys))
-        self.assertIn("plot_calendar_heatmap_week_start", keys)
         self.assertIn(
-            "plot_calendar_heatmap_week_start", typings.StyleAttrs.__annotations__
+            "chart_default_calendar_heatmap_week_start",
+            typings.StyleAttrs.__annotations__,
         )
 
 
@@ -244,11 +244,18 @@ class TestCalendarFront(unittest.TestCase):
 
     def test_theme_week_start_is_the_default(self):
         config.update_config(
-            {"plot_calendar_heatmap_week_start": CALENDAR_WEEKDAY.SUNDAY}
+            {"chart_default_calendar_heatmap_week_start": CALENDAR_WEEKDAY.SUNDAY}
         )
         figure = calendar(date(2024, 1, 1), 3)
         self.assertEqual(_image(figure.axes[0])[1, 0], 1)
         self.assertEqual(_tick_labels(figure.axes[0], "y")[0], "Sun")
+        explicit = calendar(date(2024, 1, 1), 3, week_start=CALENDAR_WEEKDAY.MONDAY)
+        self.assertEqual(_tick_labels(explicit.axes[0], "y")[0], "Mon")
+
+    def test_chart_style_does_not_set_week_start(self):
+        style = {"chart_default_calendar_heatmap_week_start": CALENDAR_WEEKDAY.SUNDAY}
+        figure = calendar(date(2024, 1, 1), 3, style=style)
+        self.assertEqual(_tick_labels(figure.axes[0], "y")[0], "Mon")
 
     def test_missing_days_and_none_values_are_blank(self):
         dates = [date(2023, 1, 1), date(2023, 1, 3)]
@@ -349,7 +356,7 @@ class TestCalendarFront(unittest.TestCase):
         self.assertIn("Greys", own.axes[0].images[0].get_cmap().name)
 
     def test_every_theme_carries_the_calendar_keys(self):
-        self.assertIn("plot_calendar_heatmap_week_start", CALENDAR_KEYS)
+        self.assertNotIn("plot_calendar_heatmap_week_start", CALENDAR_KEYS)
         for theme in THEMES:
             config.set_theme(theme)
             for key in CALENDAR_KEYS:

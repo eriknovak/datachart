@@ -115,7 +115,7 @@ def NetworkChart(
             [`NETWORK_LABEL_POSITION`][datachart.constants.NETWORK_LABEL_POSITION] constant
             (default
             [`NETWORK_LABEL_POSITION.CENTER`][datachart.constants.NETWORK_LABEL_POSITION], or
-            the theme's `chart_default_node_label_position`).
+            the theme's `chart_default_network_label_position`).
         show_values: Whether to write each edge's weight at its midpoint.
         value_format: The format of the edge values: a
             [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT] constant (default

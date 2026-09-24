@@ -736,7 +736,7 @@ class TestChartInkLooks(unittest.TestCase):
         self.assertEqual(centred.get_va(), "center")
         above = NetworkChart(NETWORK, label_position="above").axes[0].texts[0]
         self.assertEqual(above.get_va(), "bottom")
-        config.update_config({"chart_default_node_label_position": "above"})
+        config.update_config({"chart_default_network_label_position": "above"})
         self.assertEqual(NetworkChart(NETWORK).axes[0].texts[0].get_va(), "bottom")
         explicit = NetworkChart(NETWORK, label_position="center").axes[0].texts[0]
         self.assertEqual(explicit.get_va(), "center")

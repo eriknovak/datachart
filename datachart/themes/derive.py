@@ -6,7 +6,7 @@ from typing import Any, List, Union
 import numpy as np
 import matplotlib.colors as mcolors
 
-from ._base import canonical_style
+from ._base import canonical_style, warn_aliases
 from ..typings import StyleAttrs
 from ..utils._internal.colors import get_color_scale, get_colormap, oklab_lightness
 
@@ -122,6 +122,7 @@ def derive_theme(
             }
         )
 
+    warn_aliases(overrides)
     overrides = canonical_style(overrides)
     unknown = set(overrides) - set(theme)
     if unknown:

@@ -786,7 +786,6 @@ class CalendarHeatmapStyleAttrs(TypedDict):
         plot_calendar_heatmap_edge_color (Union[str, None]): The color of the borders drawn between the day cells.
         plot_calendar_heatmap_month_line_width (Union[int, float, None]): The width of the separators drawn between months (0 draws none).
         plot_calendar_heatmap_month_line_color (Union[str, None]): The color of the separators drawn between months; `None` takes the heatmap frame color.
-        plot_calendar_heatmap_week_start (Union[CALENDAR_WEEKDAY, str, None]): The weekday in the top row of every week, the default of `week_start`.
 
     """
 
@@ -805,7 +804,6 @@ class CalendarHeatmapStyleAttrs(TypedDict):
     plot_calendar_heatmap_edge_color: Union[str, None]
     plot_calendar_heatmap_month_line_width: Union[int, float, None]
     plot_calendar_heatmap_month_line_color: Union[str, None]
-    plot_calendar_heatmap_week_start: Union[CALENDAR_WEEKDAY, str, None]
 
 
 class ContourStyleAttrs(TypedDict):
@@ -1057,7 +1055,6 @@ class RidgelineStyleAttrs(TypedDict):
         plot_ridgeline_alpha (Union[float, None]): The alpha value of the ridge fill.
         plot_ridgeline_linewidth (Union[int, float, None]): The line width of the ridge outline.
         plot_ridgeline_edgecolor (Union[str, None]): The color of the ridge outline; defaults to the fill.
-        plot_ridgeline_overlap (Union[float, None]): How far a peak rises into the row above, in `[0, 1]`.
         plot_ridgeline_inner_color (Union[str, None]): The color of the inner marks; defaults to the font color.
         plot_ridgeline_inner_linewidth (Union[int, float, None]): The line width of the inner marks.
         plot_ridgeline_hatch (Union[HATCH_STYLE, str, None]): The hatch pattern of the ridge fill.
@@ -1068,7 +1065,6 @@ class RidgelineStyleAttrs(TypedDict):
     plot_ridgeline_alpha: Union[float, None]
     plot_ridgeline_linewidth: Union[int, float, None]
     plot_ridgeline_edgecolor: Union[str, None]
-    plot_ridgeline_overlap: Union[float, None]
     plot_ridgeline_inner_color: Union[str, None]
     plot_ridgeline_inner_linewidth: Union[int, float, None]
     plot_ridgeline_hatch: Union[HATCH_STYLE, str, None]
@@ -1163,6 +1159,10 @@ class ScatterMatrixStyleAttrs(TypedDict):
 class ThemeDefaultAttrs(TypedDict):
     """The typing for theme-driven defaults and cycles.
 
+    A theme default for a front parameter is `chart_default_<parameter>` when
+    several fronts take the parameter, `chart_default_<chart>_<parameter>`
+    when one front owns it.
+
     Attributes:
         chart_default_show_grid (Union[SHOW_GRID, str, None]): The theme default
             for `show_grid`, applied when a chart call leaves it unset. Never
@@ -1170,7 +1170,13 @@ class ThemeDefaultAttrs(TypedDict):
         chart_default_show_values (Union[bool, None]): The theme default for
             `show_values`, applied to every chart that takes it when the chart
             call leaves it unset. `None` means the theme has no opinion.
-        chart_default_node_label_position (Union[NETWORK_LABEL_POSITION, str, None]):
+        chart_default_calendar_heatmap_week_start (Union[CALENDAR_WEEKDAY, str, None]):
+            The theme default for the calendar heatmap's `week_start`, the
+            weekday in the top row of every week.
+        chart_default_ridgeline_overlap (Union[float, None]): The theme default
+            for the ridgeline plot's `overlap`, how far a peak rises into the
+            row above, in `[0, 1]`.
+        chart_default_network_label_position (Union[NETWORK_LABEL_POSITION, str, None]):
             The theme default for the network chart's `label_position`, applied
             when the chart call leaves it unset. `None` means the theme has no
             opinion.
@@ -1192,7 +1198,9 @@ class ThemeDefaultAttrs(TypedDict):
 
     chart_default_show_grid: Union[SHOW_GRID, str, None]
     chart_default_show_values: Union[bool, None]
-    chart_default_node_label_position: Union[NETWORK_LABEL_POSITION, str, None]
+    chart_default_calendar_heatmap_week_start: Union[CALENDAR_WEEKDAY, str, None]
+    chart_default_ridgeline_overlap: Union[float, None]
+    chart_default_network_label_position: Union[NETWORK_LABEL_POSITION, str, None]
     plot_hatch_cycle: Union[List[str], None]
     plot_linestyle_cycle: Union[List[Union[LINE_STYLE, str]], None]
     plot_marker_cycle: Union[

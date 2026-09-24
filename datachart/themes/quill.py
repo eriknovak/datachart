@@ -40,7 +40,7 @@ QUILL_THEME: StyleAttrs = make_theme(
         "axes_ticks_length": 5,
         "axes_ticks_label_size": 9,
         "chart_default_show_grid": None,
-        "chart_default_node_label_position": NETWORK_LABEL_POSITION.ABOVE,
+        "chart_default_network_label_position": NETWORK_LABEL_POSITION.ABOVE,
         "plot_hatch_cycle": ["/", ".", "\\", "x", "-", "|"],
         # lists, not tuples, so the theme survives a JSON round trip (ADR 0040)
         "plot_linestyle_cycle": [

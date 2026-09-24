@@ -20,6 +20,7 @@ from datachart.charts import (
 )
 from datachart.utils import Grid, Panel
 from datachart.utils._internal import plot_engine
+from datachart.themes._base import BASE_THEME
 from datachart.utils._internal.chart_kinds import (
     CHART_KINDS,
     RECORD_KEYS,
@@ -136,6 +137,48 @@ class TestSharedParameters(unittest.TestCase):
         for name, count in counts.items():
             with self.subTest(parameter=name):
                 self.assertGreaterEqual(count, 2)
+
+
+class TestThemeDefaultKeys(unittest.TestCase):
+    """A theme default is named for its parameter and, if one front's, its chart."""
+
+    def descriptor_keys(self):
+        keys = {
+            f"chart_default_{p.name}": p.theme_default
+            for p in SHARED_PARAMETERS.values()
+            if p.theme_default is not None
+        }
+        for kind in CHART_KINDS.values():
+            for parameter, key in kind.theme_defaults.items():
+                self.assertIn(parameter, inspect.signature(front_of(kind)).parameters)
+                # the chart is named as in its style keys, `plot_<chart>_*`
+                chart = key[len("chart_default_") : -len(parameter) - 1]
+                self.assertTrue(
+                    any(k.startswith(f"plot_{chart}_") for k in BASE_THEME), key
+                )
+                keys[f"chart_default_{chart}_{parameter}"] = key
+        return keys
+
+    def test_keys_follow_the_rule(self):
+        for expected, key in self.descriptor_keys().items():
+            self.assertEqual(key, expected)
+
+    def test_keys_are_the_base_theme_defaults(self):
+        keys = set(self.descriptor_keys().values())
+        self.assertLessEqual(keys, set(BASE_THEME))
+        self.assertEqual(
+            {k for k in BASE_THEME if k.startswith("chart_default_")}, keys
+        )
+
+
+def front_of(kind):
+    """The front rendering under `kind`, found by its one render call."""
+
+    for name in FRONTS:
+        front = getattr(datachart.charts, name)
+        if f'render("{kind.name}"' in inspect.getsource(front):
+            return front
+    raise AssertionError(f"no front renders {kind.name!r}")
 
 
 class TestRenderSplit(unittest.TestCase):

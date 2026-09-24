@@ -1602,7 +1602,6 @@ def get_ridgeline_style(chart_style: dict) -> dict:
         ("alpha", "plot_ridgeline_alpha"),
         ("linewidth", "plot_ridgeline_linewidth"),
         ("edgecolor", "plot_ridgeline_edgecolor"),
-        ("overlap", "plot_ridgeline_overlap"),
         ("inner_color", "plot_ridgeline_inner_color"),
         ("inner_linewidth", "plot_ridgeline_inner_linewidth"),
         ("hatch", "plot_ridgeline_hatch"),
