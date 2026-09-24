@@ -380,7 +380,7 @@ Panel(
             highlight=MEMBERS,
         ),
         ScatterChart(
-            [{"x": lon, "y": lat, "label": city} for city, lat, lon in CAPITALS],
+            [{"x": lon, "y": lat, "annotation": city} for city, lat, lon in CAPITALS],
             style={"plot_scatter_color": "#1d3557", "plot_scatter_size": 18},
         ),
     ],

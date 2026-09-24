@@ -71,7 +71,13 @@ GanttChart(
             TextSettingAttrs | list[TextSettingAttrs] | None
         ]
         | None
-    ) = None
+    ) = None,
+    task: str | list[str | None] | None = None,
+    start: str | list[str | None] | None = None,
+    end: str | list[str | None] | None = None,
+    group: str | list[str | None] | None = None,
+    progress: str | list[str | None] | None = None,
+    depends_on: str | list[str | None] | None = None
 ) -> plt.Figure
 ```
 
@@ -134,6 +140,12 @@ Examples:
 | `vlines`             | Vertical line(s) to plot, at temporal x positions. **TYPE:** \`VLineSettingAttrs                                                                                                                                                                                                                                                                                                                             |
 | `vspans`             | Vertical reference band(s) to shade, between two temporal positions. **TYPE:** \`VSpanSettingAttrs                                                                                                                                                                                                                                                                                                           |
 | `texts`              | Text annotation(s) to draw. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                                                                                                                                                                                     |
+| `task`               | The key name in data for the task names (default: "task"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                   |
+| `start`              | The key name in data for the task starts (default: "start"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                 |
+| `end`                | The key name in data for the task ends (default: "end"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                     |
+| `group`              | The key name in data for the task groups (default: "group"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                 |
+| `progress`           | The key name in data for the task progress (default: "progress"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                            |
+| `depends_on`         | The key name in data for the task dependencies (default: "depends_on"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                      |
 
 | RETURNS      | DESCRIPTION                            |
 | ------------ | -------------------------------------- |

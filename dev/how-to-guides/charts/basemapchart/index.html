@@ -6658,7 +6658,7 @@ Panel(
             <span class="n">highlight</span><span class="o">=</span><span class="n">MEMBERS</span><span class="p">,</span>
         <span class="p">),</span>
         <span class="n">ScatterChart</span><span class="p">(</span>
-            <span class="p">[{</span><span class="s2">"x"</span><span class="p">:</span> <span class="n">lon</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">:</span> <span class="n">lat</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="n">city</span><span class="p">}</span> <span class="k">for</span> <span class="n">city</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span> <span class="ow">in</span> <span class="n">CAPITALS</span><span class="p">],</span>
+            <span class="p">[{</span><span class="s2">"x"</span><span class="p">:</span> <span class="n">lon</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">:</span> <span class="n">lat</span><span class="p">,</span> <span class="s2">"annotation"</span><span class="p">:</span> <span class="n">city</span><span class="p">}</span> <span class="k">for</span> <span class="n">city</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span> <span class="ow">in</span> <span class="n">CAPITALS</span><span class="p">],</span>
             <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">"plot_scatter_color"</span><span class="p">:</span> <span class="s2">"#1d3557"</span><span class="p">,</span> <span class="s2">"plot_scatter_size"</span><span class="p">:</span> <span class="mi">18</span><span class="p">},</span>
         <span class="p">),</span>
     <span class="p">],</span>
@@ -6697,7 +6697,7 @@ Panel(
             highlight=MEMBERS,
         ),
         ScatterChart(
-            [{"x": lon, "y": lat, "label": city} for city, lat, lon in CAPITALS],
+            [{"x": lon, "y": lat, "annotation": city} for city, lat, lon in CAPITALS],
             style={"plot_scatter_color": "#1d3557", "plot_scatter_size": 18},
         ),
     ],

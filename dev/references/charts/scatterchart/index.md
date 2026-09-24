@@ -140,10 +140,11 @@ ScatterChart(
     y: str | list[str | None] | None = None,
     size: str | list[str | None] | None = None,
     hue: str | list[str | None] | None = None,
-    label: str | list[str | None] | None = None,
+    annotation: str | list[str | None] | None = None,
     xerr: str | list[str | None] | None = None,
     yerr: str | list[str | None] | None = None,
-    size_range: tuple[float, float] | None = None
+    size_range: tuple[float, float] | None = None,
+    label: str | list[str | None] | None = None
 ) -> plt.Figure
 ```
 
@@ -203,13 +204,13 @@ Examples:
 ...     show_correlation=True
 ... )
 >>>
->>> # Scatter with a label beside each point
+>>> # Scatter with an annotation beside each point
 >>> figure = ScatterChart(
 ...     data=[
 ...         {"x": 1, "y": 5, "name": "A"},
 ...         {"x": 2, "y": 10, "name": "B"}
 ...     ],
-...     label="name"
+...     annotation="name"
 ... )
 ```
 
@@ -236,7 +237,7 @@ Examples:
 | `show_ci`          | Whether to show the confidence interval around the regression line. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                         |
 | `ci_level`         | The confidence interval level (default 0.95). **TYPE:** \`float                                                                                                                                                                                                                                                                                                                                                              |
 | `show_correlation` | Whether to show the Pearson correlation coefficient (r-value) as an annotation. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                             |
-| `show_values`      | Whether to print each point's y value beside it. Cannot be combined with label: a point carries its label or its value. **TYPE:** \`bool                                                                                                                                                                                                                                                                                     |
+| `show_values`      | Whether to print each point's y value beside it. Cannot be combined with annotation: a point carries its annotation or its value. **TYPE:** \`bool                                                                                                                                                                                                                                                                           |
 | `value_format`     | Format string for the value labels: a VALUE_FORMAT constant or any "{x:.1f}", "{:.1f}%", or "%g" style string. **TYPE:** \`VALUE_FORMAT                                                                                                                                                                                                                                                                                      |
 | `value_step`       | Label every Nth point (1 labels all of them). Defaults to the smallest step that keeps neighbouring labels apart. **TYPE:** \`int                                                                                                                                                                                                                                                                                            |
 | `aspect_ratio`     | The aspect ratio of the axes ("auto" or "equal"). See ASPECT_RATIO. **TYPE:** \`ASPECT_RATIO                                                                                                                                                                                                                                                                                                                                 |
@@ -266,10 +267,11 @@ Examples:
 | `y`                | The key name in data for y-axis values (default: "y"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                       |
 | `size`             | The key name in data for marker size values (for bubble charts). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                             |
 | `hue`              | The key name in data for color grouping (categorical variable). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                              |
-| `label`            | The key name in data for the point labels (default: "label"), aligned like style for multiple charts; None in the list leaves that chart unlabelled. Each label is drawn beside its marker at the spot with the least overlap against the other markers, labels, and the axes edge; points without the key stay unlabelled. **TYPE:** \`str                                                                                  |
+| `annotation`       | The key name in data for the point annotations (default: "annotation"), aligned like style for multiple charts; None in the list leaves that chart unannotated. Each annotation is drawn beside its marker at the spot with the least overlap against the other markers, annotations, and the axes edge; points without the key stay unannotated. **TYPE:** \`str                                                            |
 | `xerr`             | The key name in data for the x-axis error values (default: "xerr"). The value is a distance from the point: one number reaches the same distance both ways, a (low, high) pair reaches low left and high right. A point without the key draws no bar. Each bar runs from the edge of its marker outward, in the point's own color, which plot_scatter_error_color overrides. **TYPE:** \`str                                 |
 | `yerr`             | The key name in data for the y-axis error values (default: "yerr"), read like xerr. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                          |
 | `size_range`       | Tuple of (min_size, max_size) for bubble charts (default: (20, 200)). **TYPE:** \`tuple[float, float]                                                                                                                                                                                                                                                                                                                        |
+| `label`            | Deprecated; use annotation. Removed in the next release. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                     |
 
 | RETURNS      | DESCRIPTION                              |
 | ------------ | ---------------------------------------- |
@@ -285,16 +287,16 @@ Bases: `TypedDict`
 
 The data point attributes for the scatter chart.
 
-| ATTRIBUTE  | DESCRIPTION                                                                                                                                                           |
-| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `x`        | The x-axis value. **TYPE:** \`int                                                                                                                                     |
-| `y`        | The y-axis value. **TYPE:** \`int                                                                                                                                     |
-| `size`     | The marker size (for bubble charts). **TYPE:** \`int                                                                                                                  |
-| `hue`      | The category for color grouping. **TYPE:** \`str                                                                                                                      |
-| `label`    | The label drawn beside the point. **TYPE:** \`str                                                                                                                     |
-| `emphasis` | The point's own emphasis role ("background" or "highlight"); wins over the chart's emphasis and emphasis_rule. **TYPE:** \`EMPHASIS                                   |
-| `xerr`     | The x-axis error, as a distance from the point: one number reaches the same distance both ways, a (low, high) pair reaches low left and high right. **TYPE:** \`float |
-| `yerr`     | The y-axis error, as a distance from the point, read like xerr. **TYPE:** \`float                                                                                     |
+| ATTRIBUTE    | DESCRIPTION                                                                                                                                                           |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `x`          | The x-axis value. **TYPE:** \`int                                                                                                                                     |
+| `y`          | The y-axis value. **TYPE:** \`int                                                                                                                                     |
+| `size`       | The marker size (for bubble charts). **TYPE:** \`int                                                                                                                  |
+| `hue`        | The category for color grouping. **TYPE:** \`str                                                                                                                      |
+| `annotation` | The text drawn beside the point. **TYPE:** \`str                                                                                                                      |
+| `emphasis`   | The point's own emphasis role ("background" or "highlight"); wins over the chart's emphasis and emphasis_rule. **TYPE:** \`EMPHASIS                                   |
+| `xerr`       | The x-axis error, as a distance from the point: one number reaches the same distance both ways, a (low, high) pair reaches low left and high right. **TYPE:** \`float |
+| `yerr`       | The y-axis error, as a distance from the point, read like xerr. **TYPE:** \`float                                                                                     |
 
 ## Style
 

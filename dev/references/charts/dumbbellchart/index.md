@@ -121,7 +121,10 @@ DumbbellChart(
             TextSettingAttrs | list[TextSettingAttrs] | None
         ]
         | None
-    ) = None
+    ) = None,
+    label: str | list[str | None] | None = None,
+    start: str | list[str | None] | None = None,
+    end: str | list[str | None] | None = None
 ) -> plt.Figure
 ```
 
@@ -192,6 +195,9 @@ Examples:
 | `vspans`          | Vertical reference band(s) to shade. **TYPE:** \`VSpanSettingAttrs                                                                                                                                                                                                                                                                          |
 | `hspans`          | Horizontal reference band(s) to shade. **TYPE:** \`HSpanSettingAttrs                                                                                                                                                                                                                                                                        |
 | `texts`           | Text annotation(s) to draw. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                                                                                                                    |
+| `label`           | The key name in data for the category labels (default: "label"). **TYPE:** \`str                                                                                                                                                                                                                                                            |
+| `start`           | The key name in data for the start values (default: "start"). **TYPE:** \`str                                                                                                                                                                                                                                                               |
+| `end`             | The key name in data for the end values (default: "end"). **TYPE:** \`str                                                                                                                                                                                                                                                                   |
 
 | RETURNS      | DESCRIPTION                               |
 | ------------ | ----------------------------------------- |

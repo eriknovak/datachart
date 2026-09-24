@@ -42,7 +42,7 @@ Every customization is either a keyword argument of `ScatterChart` or a `plot_sc
 | change the marker color, shape, size, or edge | `style={"plot_scatter_color": ..., "plot_scatter_marker": ...}` | [Scatter style](#scatter-style)                                                                         |
 | color the points by a category                | `hue`, `show_legend`                                            | [Hue grouping](#hue-grouping)                                                                           |
 | scale the markers by a third value            | `size`, `size_range`                                            | [Bubble chart](#bubble-chart)                                                                           |
-| name some or all of the points                | `label`, the `"label"` key of a data point                      | [Point labels](#point-labels)                                                                           |
+| name some or all of the points                | `annotation`, the `"annotation"` key of a data point            | [Point annotations](#point-annotations)                                                                 |
 | print the value beside each point             | `show_values`, `value_format`, `value_step`                     | [Value labels](#value-labels)                                                                           |
 | show the uncertainty of each point            | `xerr`, `yerr`, `show_xerr`, `show_yerr`                        | [Error bars](#error-bars)                                                                               |
 | fit a trend line and measure the correlation  | `show_regression`, `show_ci`, `ci_level`, `show_correlation`    | [Regression line](#regression-line)                                                                     |
@@ -56,7 +56,7 @@ Every customization is either a keyword argument of `ScatterChart` or a `plot_sc
 | draw each series in its own subplot           | `subplots`, `sharex`, `sharey`, `max_cols`                      | [Subplots](#subplots)                                                                                   |
 | use a logarithmic axis                        | `scalex`, `scaley`                                              | [Axis scales](#axis-scales)                                                                             |
 | plot dates on the x-axis                      | `date` or `datetime` values as `x`, `xticks_format`             | [Datetime axis](#datetime-axis)                                                                         |
-| plot data with other key names                | `x`, `y`, `size`, `hue`, `label`                                | [Custom data keys](#custom-data-keys)                                                                   |
+| plot data with other key names                | `x`, `y`, `size`, `hue`, `annotation`                           | [Custom data keys](#custom-data-keys)                                                                   |
 | save the chart to a file                      | `save_figure`                                                   | [Saving Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md) guide |
 
 The parameters that accept a constant, with the class in [datachart.constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md) that lists its values:
@@ -206,9 +206,9 @@ ScatterChart(
 ).show()
 ```
 
-### Point labels
+### Point annotations
 
-A scatter chart invites the question *which one is that?* `label` names the key that holds each point's label, here `country`. Each label is placed beside its marker at the spot with the least overlap with the other markers, the labels already placed, and the axes edge, so a chart of a dozen points stays readable without hand-placed notes; the labels use the `plot_text_*` font of the theme. The Americas alone show the spread within one region, from Haiti to the United States.
+A scatter chart invites the question *which one is that?* `annotation` names the key that holds each point's annotation, here `country`. Each annotation is placed beside its marker at the spot with the least overlap with the other markers, the annotations already placed, and the axes edge, so a chart of a dozen points stays readable without hand-placed notes; the annotations use the `plot_text_*` font of the theme. The Americas alone show the spread within one region, from Haiti to the United States.
 
 ```
 americas = [point for point in countries if point["region"] == "Americas"]
@@ -216,7 +216,7 @@ americas = [point for point in countries if point["region"] == "Americas"]
 ScatterChart(
     data=americas,
     # name each point after its country
-    label="country",
+    annotation="country",
     title="Life expectancy and income in the Americas, 2019",
     xlabel="GDP per capita (USD, log scale)",
     ylabel="Life expectancy (years)",
@@ -228,19 +228,19 @@ ScatterChart(
 ).show()
 ```
 
-Fifty labels would bury the chart, so label only the points the reader needs. Points without the label key stay unlabeled, and `"label"` is the default key, so adding it to a few records is enough. Here it names the five most populous countries in the chart:
+Fifty annotations would bury the chart, so annotate only the points the reader needs. Points without the annotation key stay unannotated, and `"annotation"` is the default key, so adding it to a few records is enough. Here it names the five most populous countries in the chart:
 
 ```
 most_populous = sorted(countries, key=lambda point: point["population"])[-5:]
 most_populous_names = {point["country"] for point in most_populous}
 
 populous_marked = [
-    {**point, "label": point["country"]} if point["country"] in most_populous_names else point
+    {**point, "annotation": point["country"]} if point["country"] in most_populous_names else point
     for point in countries
 ]
 
 ScatterChart(
-    # only the five most populous countries carry a "label" key
+    # only the five most populous countries carry an "annotation" key
     data=populous_marked,
     hue="region",
     title="Life expectancy and income, 2019",
@@ -353,7 +353,7 @@ from datachart.constants import ASPECT_RATIO
 
 ScatterChart(
     data=cities,
-    label="city",
+    annotation="city",
     title="European capitals",
     xlabel="Longitude (°E)",
     ylabel="Latitude (°N)",
@@ -368,7 +368,7 @@ ScatterChart(
 
 A chart usually makes one point, and emphasis makes it visible. With the data split into several series (the [Multiple Scatter Charts](#multiple-scatter-charts) section covers the list-of-lists form), `emphasis` takes one role per series: `"highlight"` gives the markers a contrasting edge and brings them to the front, `"background"` mutes a series (the theme's muted color at a lower alpha, behind the others, without a legend entry), and `None` leaves it as it is. The roles are also available as the [EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS) constants, and the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/index.md) guide covers emphasis across every chart type and theme.
 
-`label` also takes one entry per series, with `None` for a series left unlabeled, so highlighting and naming go together. Which countries break the pattern? Four sit well below the trend (Nigeria, South Africa, Equatorial Guinea, and the United States among the rich), and three well above it (Cuba, Costa Rica and Sri Lanka).
+`annotation` also takes one entry per series, with `None` for a series left unannotated, so highlighting and naming go together. Which countries break the pattern? Four sit well below the trend (Nigeria, South Africa, Equatorial Guinea, and the United States among the rich), and three well above it (Cuba, Costa Rica and Sri Lanka).
 
 ```
 OUTLIERS = {"Nigeria", "South Africa", "Equatorial Guinea", "United States", "Cuba", "Costa Rica", "Sri Lanka"}
@@ -381,7 +381,7 @@ ScatterChart(
     # mute the rest, highlight the outliers
     emphasis=["background", "highlight"],
     # name the outliers only
-    label=[None, "country"],
+    annotation=[None, "country"],
     title="Countries that break the pattern, 2019",
     xlabel="GDP per capita (USD, log scale)",
     ylabel="Life expectancy (years)",
@@ -672,7 +672,7 @@ ScatterChart(
 
 ### Custom data keys
 
-Data that comes from a file or an API rarely uses the `x` and `y` keys, and renaming every record just to plot it is a chore. The `x` and `y` arguments name the keys to read instead, just as `size`, `hue` and `label` name the keys of the bubble size, the category and the point label. `country_records` stores the countries the way a CSV export would:
+Data that comes from a file or an API rarely uses the `x` and `y` keys, and renaming every record just to plot it is a chore. The `x` and `y` arguments name the keys to read instead, just as `size`, `hue` and `annotation` name the keys of the bubble size, the category and the point annotation. `country_records` stores the countries the way a CSV export would:
 
 ```
 country_records = [
