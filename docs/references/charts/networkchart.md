@@ -14,17 +14,17 @@ Nodes joined by edges, placed by a layout. The [Network Chart guide](../../how-t
 
 ## Data
 
-`data` is one [`NetworkSingleChartAttrs`](#datachart.typings.NetworkSingleChartAttrs), or a list of them for subplots, with [`NetworkNodeAttrs`](#datachart.typings.NetworkNodeAttrs) and [`NetworkEdgeAttrs`](#datachart.typings.NetworkEdgeAttrs) inside.
+`data` is one [`NetworkSingleChartAttrs`](#datachart.typings.NetworkSingleChartAttrs), or a list of them for subplots, with [`NetworkNodeRecordAttrs`](#datachart.typings.NetworkNodeRecordAttrs) and [`NetworkEdgeRecordAttrs`](#datachart.typings.NetworkEdgeRecordAttrs) inside.
 
 ::: datachart.typings.NetworkSingleChartAttrs
     options:
         heading_level: 3
 
-::: datachart.typings.NetworkNodeAttrs
+::: datachart.typings.NetworkNodeRecordAttrs
     options:
         heading_level: 3
 
-::: datachart.typings.NetworkEdgeAttrs
+::: datachart.typings.NetworkEdgeRecordAttrs
     options:
         heading_level: 3
 

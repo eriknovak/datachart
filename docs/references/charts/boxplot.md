@@ -14,9 +14,9 @@ Median, quartiles, whiskers, and outliers per group. The [Box Plot guide](../../
 
 ## Data
 
-Each record in `data` is a [`BoxDataPointAttrs`](#datachart.typings.BoxDataPointAttrs); the `label` and `value` parameters rename its keys.
+Each record in `data` is a [`BoxRecordAttrs`](#datachart.typings.BoxRecordAttrs); the `label` and `value` parameters rename its keys.
 
-::: datachart.typings.BoxDataPointAttrs
+::: datachart.typings.BoxRecordAttrs
     options:
         heading_level: 3
 

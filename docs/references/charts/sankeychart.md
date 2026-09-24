@@ -14,13 +14,13 @@ Weighted flows between categories, as ribbons between node columns. The [Sankey 
 
 ## Data
 
-`data` is one [`SankeySingleChartAttrs`](#datachart.typings.SankeySingleChartAttrs), or a list of them for subplots, with [`SankeyLinkAttrs`](#datachart.typings.SankeyLinkAttrs) inside.
+`data` is one [`SankeySingleChartAttrs`](#datachart.typings.SankeySingleChartAttrs), or a list of them for subplots, with [`SankeyLinkRecordAttrs`](#datachart.typings.SankeyLinkRecordAttrs) inside.
 
 ::: datachart.typings.SankeySingleChartAttrs
     options:
         heading_level: 3
 
-::: datachart.typings.SankeyLinkAttrs
+::: datachart.typings.SankeyLinkRecordAttrs
     options:
         heading_level: 3
 

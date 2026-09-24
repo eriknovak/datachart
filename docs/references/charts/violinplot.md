@@ -14,9 +14,9 @@ The density profile of each group's distribution. The [Violin Plot guide](../../
 
 ## Data
 
-Each record in `data` is a [`ViolinDataPointAttrs`](#datachart.typings.ViolinDataPointAttrs); the `label` and `value` parameters rename its keys.
+Each record in `data` is a [`ViolinRecordAttrs`](#datachart.typings.ViolinRecordAttrs); the `label` and `value` parameters rename its keys.
 
-::: datachart.typings.ViolinDataPointAttrs
+::: datachart.typings.ViolinRecordAttrs
     options:
         heading_level: 3
 

@@ -14,9 +14,9 @@ A value per category as bars; series grouped, stacked, or overlaid. The [Bar Cha
 
 ## Data
 
-Each record in `data` is a [`BarDataPointAttrs`](#datachart.typings.BarDataPointAttrs); the `emphasis`, `label`, `y` and `yerr` parameters rename its keys.
+Each record in `data` is a [`BarRecordAttrs`](#datachart.typings.BarRecordAttrs); the `emphasis`, `label`, `y` and `yerr` parameters rename its keys.
 
-::: datachart.typings.BarDataPointAttrs
+::: datachart.typings.BarRecordAttrs
     options:
         heading_level: 3
 

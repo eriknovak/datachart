@@ -14,7 +14,7 @@ Two series as horizontal bars mirrored around a shared category axis. The [Pyram
 
 ## Data
 
-Each record in `data` is a [`BarDataPointAttrs`](barchart.md#datachart.typings.BarDataPointAttrs); the `label`, `y` and `yerr` parameters rename its keys.
+Each record in `data` is a [`BarRecordAttrs`](barchart.md#datachart.typings.BarRecordAttrs); the `label`, `y` and `yerr` parameters rename its keys.
 
 ## Style
 
