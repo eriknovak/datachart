@@ -5991,7 +5991,7 @@ calendar_figure.show()</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="which-way-did-the-rupture-run">Which way did the rupture run?<a class="anchor-link" href="#which-way-did-the-rupture-run">¶</a></h3><p>A fault is a line, so its aftershocks spread along a direction rather than filling a circle, and the direction is the strike of the fault that broke. The azimuth from the mainshock to each aftershock is an angle, and angles belong on a circular axis: a <a href="../../how-to-guides/charts/radialchart/">radial chart</a> with <code>type=RADIAL_TYPE.HISTOGRAM</code> counts them into sectors and draws the rose diagram that structural geology has used for a century. The chart bins the raw angles itself, so each record carries one azimuth as <code>x</code>, and the default orientation already puts north at the top and runs clockwise, which is the compass convention.</p>
+<h3 id="which-way-did-the-rupture-run">Which way did the rupture run?<a class="anchor-link" href="#which-way-did-the-rupture-run">¶</a></h3><p>A fault is a line, so its aftershocks spread along a direction rather than filling a circle, and the direction is the strike of the fault that broke. The azimuth from the mainshock to each aftershock is an angle, and angles belong on a circular axis: a <a href="../../how-to-guides/charts/radialchart/">radial chart</a> with <code>mark=RADIAL_TYPE.HISTOGRAM</code> counts them into sectors and draws the rose diagram that structural geology has used for a century. The chart bins the raw angles itself, so each record carries one azimuth as <code>x</code>, and the default orientation already puts north at the top and runs clockwise, which is the compass convention.</p>
 </div>
 </div>
 </div>
@@ -6024,7 +6024,7 @@ calendar_figure.show()</div>
 
 <span class="n">rose_figure</span> <span class="o">=</span> <span class="n">RadialChart</span><span class="p">(</span>
     <span class="p">[{</span><span class="s2">"x"</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">bearing</span><span class="p">)}</span> <span class="k">for</span> <span class="n">bearing</span> <span class="ow">in</span> <span class="n">azimuth</span><span class="p">],</span>
-    <span class="nb">type</span><span class="o">=</span><span class="n">RADIAL_TYPE</span><span class="o">.</span><span class="n">HISTOGRAM</span><span class="p">,</span>
+    <span class="n">mark</span><span class="o">=</span><span class="n">RADIAL_TYPE</span><span class="o">.</span><span class="n">HISTOGRAM</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"The aftershocks spread northeast and southwest, along the fault"</span><span class="p">,</span>
     <span class="c1"># 16 sectors of 22.5 degrees, the usual resolution of a rose diagram</span>
     <span class="n">num_bins</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
@@ -6043,7 +6043,7 @@ azimuth = np.degrees(
 
 rose_figure = RadialChart(
     [{"x": float(bearing)} for bearing in azimuth],
-    type=RADIAL_TYPE.HISTOGRAM,
+    mark=RADIAL_TYPE.HISTOGRAM,
     title="The aftershocks spread northeast and southwest, along the fault",
     # 16 sectors of 22.5 degrees, the usual resolution of a rose diagram
     num_bins=16,

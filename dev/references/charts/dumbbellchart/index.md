@@ -24,9 +24,7 @@ DumbbellChart(
     xmax: int | float | None = None,
     ymin: int | float | None = None,
     ymax: int | float | None = None,
-    orientation: (
-        ORIENTATION | str | None
-    ) = ORIENTATION.HORIZONTAL,
+    orientation: ORIENTATION | str | None = None,
     scaley: SCALE | str | None = None,
     subplots: bool | None = None,
     max_cols: int | None = None,
@@ -35,7 +33,8 @@ DumbbellChart(
     show_legend: bool | None = None,
     legend: LegendSettingAttrs | None = None,
     show_grid: SHOW_GRID | str | bool | None = None,
-    show_values: DUMBBELL_VALUE | str | None = None,
+    show_values: bool | None = None,
+    value_kind: DUMBBELL_VALUE | str | None = None,
     show_direction: bool | None = None,
     value_format: VALUE_FORMAT | str | None = None,
     sort: SORT | str | None = None,
@@ -56,27 +55,72 @@ DumbbellChart(
     xtickrotate: int | list[int | None] | None = None,
     ytickrotate: int | list[int | None] | None = None,
     vlines: (
-        VLineSettingAttrs | list[VLineSettingAttrs] | None
+        VLineSettingAttrs
+        | list[VLineSettingAttrs]
+        | list[
+            VLineSettingAttrs
+            | list[VLineSettingAttrs]
+            | None
+        ]
+        | None
     ) = None,
     hlines: (
-        HLineSettingAttrs | list[HLineSettingAttrs] | None
+        HLineSettingAttrs
+        | list[HLineSettingAttrs]
+        | list[
+            HLineSettingAttrs
+            | list[HLineSettingAttrs]
+            | None
+        ]
+        | None
     ) = None,
     dlines: (
-        DLineSettingAttrs | list[DLineSettingAttrs] | None
+        DLineSettingAttrs
+        | list[DLineSettingAttrs]
+        | list[
+            DLineSettingAttrs
+            | list[DLineSettingAttrs]
+            | None
+        ]
+        | None
     ) = None,
     brackets: (
         BracketSettingAttrs
         | list[BracketSettingAttrs]
+        | list[
+            BracketSettingAttrs
+            | list[BracketSettingAttrs]
+            | None
+        ]
         | None
     ) = None,
     vspans: (
-        VSpanSettingAttrs | list[VSpanSettingAttrs] | None
+        VSpanSettingAttrs
+        | list[VSpanSettingAttrs]
+        | list[
+            VSpanSettingAttrs
+            | list[VSpanSettingAttrs]
+            | None
+        ]
+        | None
     ) = None,
     hspans: (
-        HSpanSettingAttrs | list[HSpanSettingAttrs] | None
+        HSpanSettingAttrs
+        | list[HSpanSettingAttrs]
+        | list[
+            HSpanSettingAttrs
+            | list[HSpanSettingAttrs]
+            | None
+        ]
+        | None
     ) = None,
     texts: (
-        TextSettingAttrs | list[TextSettingAttrs] | None
+        TextSettingAttrs
+        | list[TextSettingAttrs]
+        | list[
+            TextSettingAttrs | list[TextSettingAttrs] | None
+        ]
+        | None
     ) = None
 ) -> plt.Figure
 ```
@@ -100,7 +144,8 @@ Examples:
 ...     title="Life Expectancy",
 ...     start_name="2000",
 ...     end_name="2019",
-...     show_values="delta",
+...     show_values=True,
+...     value_kind="delta",
 ... )
 ```
 
@@ -127,7 +172,8 @@ Examples:
 | `show_legend`     | Whether to show the legend. Defaults to on when start_name or end_name is given. **TYPE:** \`bool                                                                                                                                                                                                                                           |
 | `legend`          | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** \`LegendSettingAttrs                                                                                                                                                                      |
 | `show_grid`       | Which grid lines to show ("both", "x", "y"); False draws none. Unset, the theme's grid runs along the value axis, whichever way it points. See SHOW_GRID. **TYPE:** \`SHOW_GRID                                                                                                                                                             |
-| `show_values`     | The value labels: None (none), "endpoints" (each endpoint's value past its dot, away from the connector), or "delta" (end - start at the connector midpoint). See DUMBBELL_VALUE. **TYPE:** \`DUMBBELL_VALUE                                                                                                                                |
+| `show_values`     | Whether to print the value labels value_kind names. **TYPE:** \`bool                                                                                                                                                                                                                                                                        |
+| `value_kind`      | The value labels show_values prints: "endpoints" (default, each endpoint's value past its dot, away from the connector) or "delta" (end - start at the connector midpoint). Ignored while show_values is off. See DUMBBELL_VALUE. **TYPE:** \`DUMBBELL_VALUE                                                                                |
 | `show_direction`  | Whether to draw a thin arrow beside each connector, pointing from start to end: above a horizontal dumbbell, right of a vertical one. Records whose endpoints coincide draw none. **TYPE:** \`bool                                                                                                                                          |
 | `value_format`    | Format string for the value labels: a VALUE_FORMAT constant or any "{x:.1f}", "{:+.1f}", or "%g" style string. **TYPE:** \`VALUE_FORMAT                                                                                                                                                                                                     |
 | `sort`            | The order of the categories: None (input order), "ascending", or "descending" by the key sort_by names. Ties keep input order. See SORT. **TYPE:** \`SORT                                                                                                                                                                                   |
@@ -207,8 +253,10 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 
 | Parameter                                    | Constant                                                                                                                                                                                                                                     |
 | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `show_values`                                | [`DUMBBELL_VALUE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DUMBBELL_VALUE)                                                                                                                       |
+| `value_kind`                                 | [`DUMBBELL_VALUE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DUMBBELL_VALUE)                                                                                                                       |
 | `sort_by`                                    | [`DUMBBELL_SORT_KEY`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DUMBBELL_SORT_KEY)                                                                                                                 |
+| `marker`                                     | [`LINE_MARKER`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_MARKER)                                                                                                                             |
+| `connector_style`                            | [`LINE_STYLE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_STYLE)                                                                                                                               |
 | `figsize`                                    | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                                                                                                                                   |
 | `orientation`                                | [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)                                                                                                                             |
 | `scaley`                                     | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                         |
@@ -216,6 +264,4 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `show_grid`                                  | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                                                                                                                                 |
 | `value_format`                               | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                           |
 | `sort`                                       | [`SORT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT)                                                                                                                                           |
-| `marker`                                     | [`LINE_MARKER`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_MARKER)                                                                                                                             |
-| `connector_style`                            | [`LINE_STYLE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_STYLE)                                                                                                                               |
 | `emphasis`                                   | [`EMPHASIS`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS)                                                                                                                                   |

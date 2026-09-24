@@ -31,14 +31,14 @@ Every customization is either a keyword argument of `BasemapChart` or a `plot_ba
 
 | I want to…                                | Use                                                | See                                                                                               |
 | ----------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| choose coastlines, land, borders or lakes | `features`                                         | [Features](#features)                                                                             |
-| draw rivers or roads                      | `features=RIVERS`, `features=ROADS`, `resolution`  | [Rivers and roads](#rivers-and-roads)                                                             |
+| choose coastlines, land, borders or lakes | `data`                                             | [Features](#features)                                                                             |
+| draw rivers or roads                      | `data=RIVERS`, `data=ROADS`, `resolution`          | [Rivers and roads](#rivers-and-roads)                                                             |
 | add a title and axis labels               | `title`, `xlabel`, `ylabel`                        | [Title, axis labels and limits](#title-axis-labels-and-limits)                                    |
 | show one region                           | `xmin`, `xmax`, `ymin`, `ymax`                     | [Title, axis labels and limits](#title-axis-labels-and-limits)                                    |
 | keep the region at its true proportions   | `aspect_ratio="geographic"`                        | [Geographic aspect](#geographic-aspect)                                                           |
 | change the figure size or add a graticule | `figsize`, `show_grid`                             | [Figure size and grid](#figure-size-and-grid)                                                     |
 | recolor the land, the lines or the lakes  | `style={"plot_basemap_...": ...}`                  | [Colors and lines](#colors-and-lines)                                                             |
-| pick countries out                        | `features=COUNTRIES`, `highlight`                  | [Highlighting countries](#highlighting-countries)                                                 |
+| pick countries out                        | `data=COUNTRIES`, `highlight`                      | [Highlighting countries](#highlighting-countries)                                                 |
 | outline the picked countries              | `style={"plot_basemap_highlight_edge_width": ...}` | [Highlighting countries](#highlighting-countries)                                                 |
 | draw sharper outlines                     | `resolution`                                       | [Resolution](#resolution)                                                                         |
 | draw my own outlines                      | `geometry`                                         | [Your own outlines](#your-own-outlines)                                                           |
@@ -49,7 +49,7 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 
 | Parameter      | Constant                                                                                                                       |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `features`     | [`BASEMAP_FEATURE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BASEMAP_FEATURE)       |
+| `data`         | [`BASEMAP_FEATURE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BASEMAP_FEATURE)       |
 | `resolution`   | [`BASEMAP_RESOLUTION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BASEMAP_RESOLUTION) |
 | `position`     | [`DRAW_POSITION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DRAW_POSITION)           |
 | `figsize`      | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                     |
@@ -60,7 +60,7 @@ The outline keys of `geometry` are listed in [BasemapDataAttrs](https://eriknova
 
 ### Features
 
-A map should carry only what the reader needs to find their way, and which outlines those are depends on the question. `features` takes one [BASEMAP_FEATURE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BASEMAP_FEATURE) member or a list of them: `COASTLINE` and `LAND` by default, `BORDERS` for the lines between countries, `LAKES` for the large lakes, filled with the axes background so they read as water, and `RIVERS` and `ROADS`, which have [a subsection of their own](#rivers-and-roads). The ocean is not a feature: it is the background the land sits on. Below, Europe with its land, borders and lakes: the lakes of Russia and Finland and the Caspian read as the sea does.
+A map should carry only what the reader needs to find their way, and which outlines those are depends on the question. `data` takes one [BASEMAP_FEATURE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BASEMAP_FEATURE) member or a list of them: `COASTLINE` and `LAND` by default, `BORDERS` for the lines between countries, `LAKES` for the large lakes, filled with the axes background so they read as water, and `RIVERS` and `ROADS`, which have [a subsection of their own](#rivers-and-roads). The ocean is not a feature: it is the background the land sits on. Below, Europe with its land, borders and lakes: the lakes of Russia and Finland and the Caspian read as the sea does.
 
 ```
 from datachart.constants import BASEMAP_FEATURE

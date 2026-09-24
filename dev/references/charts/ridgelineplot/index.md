@@ -30,9 +30,7 @@ RidgelinePlot(
     legend: LegendSettingAttrs | None = None,
     show_grid: SHOW_GRID | str | bool | None = None,
     aspect_ratio: ASPECT_RATIO | str | None = None,
-    orientation: (
-        ORIENTATION | str | None
-    ) = ORIENTATION.HORIZONTAL,
+    orientation: ORIENTATION | str | None = None,
     scaley: SCALE | str | None = None,
     subplots: bool | None = None,
     max_cols: int | None = None,
@@ -131,13 +129,12 @@ RidgelinePlot(
     value: str | list[str | None] | None = None,
     bandwidth: BANDWIDTH | str | float | None = None,
     overlap: float | None = None,
-    normalize: (
-        RIDGELINE_SCALE | str | None
-    ) = RIDGELINE_SCALE.PER_ROW,
+    ridge_scale: RIDGELINE_SCALE | str | None = None,
     inner: VIOLIN_INNER | str | None = None,
     fill: bool = True,
     show_outline: bool = True,
-    sort: SORT | str | None = SORT.NONE
+    sort: SORT | str | None = SORT.NONE,
+    normalize: RIDGELINE_SCALE | str | None = None
 ) -> plt.Figure
 ```
 
@@ -208,11 +205,12 @@ Examples:
 | `value`         | The key name in data for numeric values (default: "value"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                         |
 | `bandwidth`     | The KDE bandwidth: None or "scott" (Scott's rule), "silverman", or a scalar factor. See BANDWIDTH. **TYPE:** \`BANDWIDTH                                                                                                                                                                                                                                                                                                            |
 | `overlap`       | How far a ridge's peak rises into the row above, in \[0, 1\]: a ridge rises from its tick and its peak stands 1 + overlap rows above it, so 0 makes rows touch. None takes the theme's plot_ridgeline_overlap. **TYPE:** \`float                                                                                                                                                                                                    |
-| `normalize`     | "per_row" scales every ridge to the same peak so shapes compare; "common" keeps one density scale so heights compare. See RIDGELINE_SCALE. **TYPE:** \`RIDGELINE_SCALE                                                                                                                                                                                                                                                              |
+| `ridge_scale`   | "per_row" (default) scales every ridge to the same peak so shapes compare; "common" keeps one density scale so heights compare. See RIDGELINE_SCALE. **TYPE:** \`RIDGELINE_SCALE                                                                                                                                                                                                                                                    |
 | `inner`         | The marks drawn inside each ridge, up to its height: "median" (one line), "quartiles" (dashed median, dotted Q1/Q3), or None. See VIOLIN_INNER; "box" is not supported. **TYPE:** \`VIOLIN_INNER                                                                                                                                                                                                                                    |
 | `fill`          | Whether to fill each ridge. **TYPE:** `bool` **DEFAULT:** `True`                                                                                                                                                                                                                                                                                                                                                                    |
 | `show_outline`  | Whether to stroke each ridge's density curve. **TYPE:** `bool` **DEFAULT:** `True`                                                                                                                                                                                                                                                                                                                                                  |
 | `sort`          | The row order: None keeps input order, "ascending" or "descending" orders the rows by their median; ties keep input order. See SORT. **TYPE:** \`SORT                                                                                                                                                                                                                                                                               |
+| `normalize`     | Deprecated; use ridge_scale. Removed in the next release. **TYPE:** \`RIDGELINE_SCALE                                                                                                                                                                                                                                                                                                                                               |
 
 | RETURNS      | DESCRIPTION                               |
 | ------------ | ----------------------------------------- |
@@ -264,7 +262,9 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 
 | Parameter                                    | Constant                                                                                                                                                                                                                                     |
 | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `normalize`                                  | [`RIDGELINE_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.RIDGELINE_SCALE)                                                                                                                     |
+| `xticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
+| `ridge_scale`                                | [`RIDGELINE_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.RIDGELINE_SCALE)                                                                                                                     |
+| `inner`                                      | [`VIOLIN_INNER`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VIOLIN_INNER)                                                                                                                           |
 | `emphasis`                                   | [`EMPHASIS`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS)                                                                                                                                   |
 | `figsize`                                    | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                                                                                                                                   |
 | `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN) |
@@ -272,8 +272,6 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `aspect_ratio`                               | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                           |
 | `orientation`                                | [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)                                                                                                                             |
 | `scaley`                                     | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                         |
-| `xticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
 | `yticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
 | `bandwidth`                                  | [`BANDWIDTH`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH)                                                                                                                                 |
-| `inner`                                      | [`VIOLIN_INNER`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VIOLIN_INNER)                                                                                                                           |
 | `sort`                                       | [`SORT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT)                                                                                                                                           |

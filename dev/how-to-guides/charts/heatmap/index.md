@@ -38,7 +38,7 @@ Every customization is either a keyword argument of `Heatmap` or a `plot_heatmap
 | rotate the tick labels                     | `xtickrotate`, `ytickrotate`                                                 | [Ticks and labels](#ticks-and-labels)                                                                   |
 | resize the figure or keep the cells square | `figsize`, `aspect_ratio`                                                    | [Figure size and aspect ratio](#figure-size-and-aspect-ratio)                                           |
 | show the colorbar                          | `show_colorbars`                                                             | [Colorbar and cell values](#colorbar-and-cell-values)                                                   |
-| write the values into the cells            | `show_heatmap_values`, `valfmt`                                              | [Colorbar and cell values](#colorbar-and-cell-values)                                                   |
+| write the values into the cells            | `show_values`, `value_format`                                                | [Colorbar and cell values](#colorbar-and-cell-values)                                                   |
 | caption, move, or format the colorbar      | `colorbar={"label": ..., "location": ..., "format": ..., "ticks": ...}`      | [Colorbar placement](#colorbar-placement)                                                               |
 | change the colormap or transparency        | `style={"plot_heatmap_cmap": ..., "plot_heatmap_alpha": ...}`                | [Heatmap style](#heatmap-style)                                                                         |
 | change the colormap a centred norm uses    | `style={"plot_heatmap_cmap_diverging": ...}`                                 | [Normalization](#normalization)                                                                         |
@@ -59,13 +59,13 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 
 | Parameter                                                       | Constant                                                                                                                                                                                                                                                                                                                                                           |
 | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `xticks_format`                                                 | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)                                                                                                                               |
 | `figsize`                                                       | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                                                                                                                                                                                                                                                         |
 | `legend={"location": ..., "alignment": ...}`                    | [`LEGEND_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN)                                                                                                                       |
 | `show_grid`                                                     | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                                                                                                                                                                                                                                                       |
 | `aspect_ratio`                                                  | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                                                                                                                                                 |
 | `norm`                                                          | [`NORMALIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.NORMALIZE)                                                                                                                                                                                                                                                       |
-| `valfmt`                                                        | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                                                                                                                                                 |
-| `xticks_format`                                                 | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)                                                                                                                               |
+| `value_format`                                                  | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                                                                                                                                                 |
 | `yticks_format`                                                 | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)                                                                                                                               |
 | `colorbar={"location": ..., "format": ..., "orientation": ...}` | [`COLORBAR_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORBAR_LOCATION), [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION) |
 
@@ -125,7 +125,7 @@ Heatmap(
 
 ### Colorbar and cell values
 
-Colors show which cells are warmer, not by how much. `show_colorbars` adds the scale that maps colors back to values, and `show_heatmap_values` writes each value into its cell; a value on a dark cell is written in white, so it stays legible across the colormap. `valfmt` formats the cell values: a [VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) member or a format string that names the value `x`, such as `"{x:.1f}"` (a string without `x`, such as `"{z:.1f}"`, is not valid). The temperatures carry one decimal, so `VALUE_FORMAT.DECIMAL` keeps it. With the values written in, the chart answers both questions: the pattern from the colors, the exact numbers from the cells.
+Colors show which cells are warmer, not by how much. `show_colorbars` adds the scale that maps colors back to values, and `show_values` writes each value into its cell; a value on a dark cell is written in white, so it stays legible across the colormap. `value_format` formats the cell values: a [VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) member or a format string that names the value `x`, such as `"{x:.1f}"` (a string without `x`, such as `"{z:.1f}"`, is not valid). The temperatures carry one decimal, so `VALUE_FORMAT.DECIMAL` keeps it. With the values written in, the chart answers both questions: the pattern from the colors, the exact numbers from the cells.
 
 ```
 from datachart.constants import VALUE_FORMAT
@@ -139,8 +139,8 @@ Heatmap(
     # add the color scale
     show_colorbars=True,
     # write the values into the cells, with one decimal
-    show_heatmap_values=True,
-    valfmt=VALUE_FORMAT.DECIMAL,
+    show_values=True,
+    value_format=VALUE_FORMAT.DECIMAL,
 ).show()
 ```
 
@@ -195,8 +195,8 @@ Heatmap(
     ylabel="City",
     figsize=FIG_SIZE.FULL_MEDIUM,
     show_colorbars=True,
-    show_heatmap_values=True,
-    valfmt=VALUE_FORMAT.DECIMAL,
+    show_values=True,
+    value_format=VALUE_FORMAT.DECIMAL,
 ).show()
 ```
 
@@ -218,8 +218,8 @@ Heatmap(
     ylabel="City",
     figsize=FIG_SIZE.FULL_MEDIUM,
     show_colorbars=True,
-    show_heatmap_values=True,
-    valfmt=VALUE_FORMAT.DECIMAL,
+    show_values=True,
+    value_format=VALUE_FORMAT.DECIMAL,
 ).show()
 ```
 
@@ -240,8 +240,8 @@ for norm in [NORMALIZE.LINEAR, NORMALIZE.SYMLOG]:
         ylabel="City",
         figsize=FIG_SIZE.FULL_MEDIUM,
         show_colorbars=True,
-        show_heatmap_values=True,
-        valfmt=VALUE_FORMAT.INTEGER,
+        show_values=True,
+        value_format=VALUE_FORMAT.INTEGER,
     ).show()
 ```
 
@@ -263,8 +263,8 @@ for centre, label in [(0, "freezing"), (18, "room temperature")]:
         ylabel="City",
         figsize=FIG_SIZE.FULL_MEDIUM,
         show_colorbars=True,
-        show_heatmap_values=True,
-        valfmt=VALUE_FORMAT.DECIMAL,
+        show_values=True,
+        value_format=VALUE_FORMAT.DECIMAL,
     ).show()
 ```
 
@@ -281,8 +281,8 @@ Heatmap(
     xlabel="Month",
     ylabel="City",
     figsize=FIG_SIZE.FULL_MEDIUM,
-    show_heatmap_values=True,
-    valfmt=VALUE_FORMAT.DECIMAL,
+    show_values=True,
+    value_format=VALUE_FORMAT.DECIMAL,
 ).show()
 ```
 
@@ -301,8 +301,8 @@ Heatmap(
     xlabel="Month",
     ylabel="City",
     figsize=FIG_SIZE.FULL_MEDIUM,
-    show_heatmap_values=True,
-    valfmt=VALUE_FORMAT.DECIMAL,
+    show_values=True,
+    value_format=VALUE_FORMAT.DECIMAL,
 ).show()
 ```
 
@@ -333,7 +333,7 @@ Heatmap(
 
 ## Multiple Heatmaps
 
-To compare several tables, pass a list of dictionaries to `data`. Each table gets its own subplot, since two tables cannot share one set of cells, with its `subtitle` above it, while `title`, `xlabel` and `ylabel` stay global. The per-chart parameters (`subtitle`, `style`, `valfmt`, `norm`, `vmin`, `vmax`, `colorbar`, and the tick parameters) take a list with one entry per table, or a single value for all of them; `None` in a list keeps the default for that table. Temperature and rainfall are different quantities, so each table gets its own colormap and its own normalization.
+To compare several tables, pass a list of dictionaries to `data`. Each table gets its own subplot, since two tables cannot share one set of cells, with its `subtitle` above it, while `title`, `xlabel` and `ylabel` stay global. The per-chart parameters (`subtitle`, `style`, `value_format`, `norm`, `vmin`, `vmax`, `colorbar`, and the tick parameters) take a list with one entry per table, or a single value for all of them; `None` in a list keeps the default for that table. Temperature and rainfall are different quantities, so each table gets its own colormap and its own normalization.
 
 ```
 Heatmap(
@@ -355,7 +355,7 @@ Heatmap(
 
 ### Subplot layout and shared axes
 
-Side by side, twelve columns each leave no room for the cell values. `max_cols` limits the subplots per row, so `max_cols=1` stacks the tables and gives each the full width. `sharex` and `sharey` share an axis across subplots and label it once, on the outer subplots; both tables have the same months, so `sharex=True` drops the repeated month labels. `valfmt` as a list keeps the decimal on the temperatures and writes the rainfall as whole numbers.
+Side by side, twelve columns each leave no room for the cell values. `max_cols` limits the subplots per row, so `max_cols=1` stacks the tables and gives each the full width. `sharex` and `sharey` share an axis across subplots and label it once, on the outer subplots; both tables have the same months, so `sharex=True` drops the repeated month labels. `value_format` as a list keeps the decimal on the temperatures and writes the rainfall as whole numbers.
 
 ```
 Heatmap(
@@ -364,13 +364,13 @@ Heatmap(
     style=[{"plot_heatmap_cmap": COLORS.YlOrRd}, {"plot_heatmap_cmap": COLORS.Blues}],
     norm=[None, NORMALIZE.SYMLOG],
     # one format per table
-    valfmt=[VALUE_FORMAT.DECIMAL, VALUE_FORMAT.INTEGER],
+    value_format=[VALUE_FORMAT.DECIMAL, VALUE_FORMAT.INTEGER],
     title="The climate of six cities",
     xlabel="Month",
     ylabel="City",
     figsize=FIG_SIZE.FULL_TALL,
     show_colorbars=True,
-    show_heatmap_values=True,
+    show_values=True,
     # stack the tables, one month axis for both
     max_cols=1,
     sharex=True,
@@ -389,8 +389,8 @@ Heatmap(
     data=monthly_2024,
     title="Monthly mean temperature in 2024 (°C)",
     figsize=FIG_SIZE.FULL_SHORT,
-    show_heatmap_values=True,
-    valfmt=VALUE_FORMAT.DECIMAL,
+    show_values=True,
+    value_format=VALUE_FORMAT.DECIMAL,
 ).show()
 ```
 
@@ -468,8 +468,8 @@ Heatmap(
     aspect_ratio=ASPECT_RATIO.EQUAL,
     show_colorbars=True,
     colorbar={"label": "Pearson r", "ticks": [-1, -0.5, 0, 0.5, 1]},
-    show_heatmap_values=True,
-    valfmt=VALUE_FORMAT.DECIMAL_2,
+    show_values=True,
+    value_format=VALUE_FORMAT.DECIMAL_2,
 ).show()
 ```
 
@@ -494,8 +494,8 @@ Heatmap(
     figsize=FIG_SIZE.SQUARE,
     aspect_ratio=ASPECT_RATIO.EQUAL,
     # write the counts into the cells
-    show_heatmap_values=True,
-    valfmt=VALUE_FORMAT.INTEGER,
+    show_values=True,
+    value_format=VALUE_FORMAT.INTEGER,
 ).show()
 ```
 
@@ -521,8 +521,8 @@ def matrix(data, title, ylabel=None):
         ylabel=ylabel,
         xtickrotate=30,
         aspect_ratio=ASPECT_RATIO.EQUAL,
-        show_heatmap_values=True,
-        valfmt=VALUE_FORMAT.INTEGER,
+        show_values=True,
+        value_format=VALUE_FORMAT.INTEGER,
     )
 
 

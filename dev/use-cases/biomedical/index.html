@@ -6200,7 +6200,7 @@ retention_figure.show()</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="which-markers-moved-with-the-dose">Which markers moved with the dose?<a class="anchor-link" href="#which-markers-moved-with-the-dose">¶</a></h3><p>A trial measures more than its endpoint, and eight markers in three arms is a 24-cell table that a <a href="../../how-to-guides/charts/heatmap/">heatmap</a> reads in one look. The cells hold the percent change from baseline, which is signed, so the colormap has to put zero in the middle: <code>norm=NORMALIZE.CENTERED</code> pins zero to the centre of the theme's diverging colormap and runs the same distance each way, so a cell's hue is its direction and its depth is its size. <code>show_heatmap_values</code> prints the numbers in the cells, and <code>valfmt</code> gives them their sign and unit.</p>
+<h3 id="which-markers-moved-with-the-dose">Which markers moved with the dose?<a class="anchor-link" href="#which-markers-moved-with-the-dose">¶</a></h3><p>A trial measures more than its endpoint, and eight markers in three arms is a 24-cell table that a <a href="../../how-to-guides/charts/heatmap/">heatmap</a> reads in one look. The cells hold the percent change from baseline, which is signed, so the colormap has to put zero in the middle: <code>norm=NORMALIZE.CENTERED</code> pins zero to the centre of the theme's diverging colormap and runs the same distance each way, so a cell's hue is its direction and its depth is its size. <code>show_values</code> prints the numbers in the cells, and <code>value_format</code> gives them their sign and unit.</p>
 </div>
 </div>
 </div>
@@ -6232,9 +6232,9 @@ retention_figure.show()</div>
     <span class="n">title</span><span class="o">=</span><span class="s2">"The whole metabolic panel moves with the dose"</span><span class="p">,</span>
     <span class="c1"># zero in the middle of the diverging colormap, equal reach each way</span>
     <span class="n">norm</span><span class="o">=</span><span class="n">NORMALIZE</span><span class="o">.</span><span class="n">CENTERED</span><span class="p">,</span>
-    <span class="n">show_heatmap_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">show_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">valfmt</span><span class="o">=</span><span class="s2">"</span><span class="si">{x:+.1f}</span><span class="s2">%"</span><span class="p">,</span>
+    <span class="n">value_format</span><span class="o">=</span><span class="s2">"</span><span class="si">{x:+.1f}</span><span class="s2">%"</span><span class="p">,</span>
     <span class="n">colorbar</span><span class="o">=</span><span class="p">{</span><span class="s2">"label"</span><span class="p">:</span> <span class="s2">"Change from baseline (%)"</span><span class="p">},</span>
     <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_MEDIUM</span><span class="p">,</span>
 <span class="p">)</span>
@@ -6249,9 +6249,9 @@ retention_figure.show()</div>
     title="The whole metabolic panel moves with the dose",
     # zero in the middle of the diverging colormap, equal reach each way
     norm=NORMALIZE.CENTERED,
-    show_heatmap_values=True,
+    show_values=True,
     show_colorbars=True,
-    valfmt="{x:+.1f}%",
+    value_format="{x:+.1f}%",
     colorbar={"label": "Change from baseline (%)"},
     figsize=FIG_SIZE.FULL_MEDIUM,
 )
@@ -6291,7 +6291,7 @@ marker_figure.show()</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="where-are-the-safety-signals">Where are the safety signals?<a class="anchor-link" href="#where-are-the-safety-signals">¶</a></h3><p>The safety labs are read differently from the efficacy markers: the safety question is whether any lab moved at all, per arm, from a baseline that should have been the same in every arm. Two values per arm and lab (baseline and week 12) is a <a href="../../how-to-guides/charts/dumbbellchart/">dumbbell chart</a>: a dot at each, a connector between, and <code>show_values="delta"</code> printing the change at the connector. The labs live on four different scales, so <code>subplots=True</code> gives each its own axes, and <code>show_direction</code> draws an arrow from baseline to week 12 so the direction reads without a legend.</p>
+<h3 id="where-are-the-safety-signals">Where are the safety signals?<a class="anchor-link" href="#where-are-the-safety-signals">¶</a></h3><p>The safety labs are read differently from the efficacy markers: the safety question is whether any lab moved at all, per arm, from a baseline that should have been the same in every arm. Two values per arm and lab (baseline and week 12) is a <a href="../../how-to-guides/charts/dumbbellchart/">dumbbell chart</a>: a dot at each, a connector between, and <code>show_values=True, value_kind="delta"</code> printing the change at the connector. The labs live on four different scales, so <code>subplots=True</code> gives each its own axes, and <code>show_direction</code> draws an arrow from baseline to week 12 so the direction reads without a legend.</p>
 </div>
 </div>
 </div>
@@ -6330,7 +6330,7 @@ marker_figure.show()</div>
     <span class="n">start_name</span><span class="o">=</span><span class="s2">"Baseline"</span><span class="p">,</span>
     <span class="n">end_name</span><span class="o">=</span><span class="s2">"Week 12"</span><span class="p">,</span>
     <span class="n">subtitle</span><span class="o">=</span><span class="n">SAFETY</span><span class="p">,</span>
-    <span class="n">show_values</span><span class="o">=</span><span class="s2">"delta"</span><span class="p">,</span>
+    <span class="n">show_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">value_kind</span><span class="o">=</span><span class="s2">"delta"</span><span class="p">,</span>
     <span class="n">show_direction</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">subplots</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">max_cols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
@@ -6353,7 +6353,7 @@ marker_figure.show()</div>
     start_name="Baseline",
     end_name="Week 12",
     subtitle=SAFETY,
-    show_values="delta",
+    show_values=True, value_kind="delta",
     show_direction=True,
     subplots=True,
     max_cols=2,

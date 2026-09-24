@@ -34,9 +34,7 @@ Histogram(
     show_values: bool | None = None,
     value_format: VALUE_FORMAT | str | None = None,
     aspect_ratio: ASPECT_RATIO | str | None = None,
-    orientation: (
-        ORIENTATION | str | None
-    ) = ORIENTATION.VERTICAL,
+    orientation: ORIENTATION | str | None = None,
     bar_mode: BAR_MODE | str | None = None,
     num_bins: int | None = None,
     scalex: SCALE | str | None = None,

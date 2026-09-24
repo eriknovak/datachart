@@ -148,7 +148,7 @@ Weekdays average 75 sign-ups and weekends 28, so the two pale rows at the bottom
 
 ### Do the customers who pay stay?
 
-Revenue can grow while every cohort leaks, as long as new customers arrive faster than old ones leave; the check is to follow each month's new paying customers on their own and count how many are still paying one, two, three months later. Twelve cohorts by twelve months is a triangle (the January cohort has eleven months of history, the December cohort none), and a [heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/index.md) draws it with `None` for the cells that have not happened yet, `show_heatmap_values` printing the retained share in each cell, and `valfmt` giving it a percent sign. Reading down a column compares cohorts at the same age, which is how an onboarding change shows up.
+Revenue can grow while every cohort leaks, as long as new customers arrive faster than old ones leave; the check is to follow each month's new paying customers on their own and count how many are still paying one, two, three months later. Twelve cohorts by twelve months is a triangle (the January cohort has eleven months of history, the December cohort none), and a [heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/index.md) draws it with `None` for the cells that have not happened yet, `show_values` printing the retained share in each cell, and `value_format` giving it a percent sign. Reading down a column compares cohorts at the same age, which is how an onboarding change shows up.
 
 ```
 cohort_figure = Heatmap(
@@ -160,8 +160,8 @@ cohort_figure = Heatmap(
     title="Cohorts after the July onboarding change keep a tenth more of their customers",
     xlabel="Months since first payment",
     ylabel="Cohort",
-    show_heatmap_values=True,
-    valfmt="{x:.0f}%",
+    show_values=True,
+    value_format="{x:.0f}%",
     vmin=40,
     vmax=100,
     figsize=(8.0, 5.5),
@@ -186,7 +186,7 @@ roadmap_figure = GanttChart(
     today=TODAY,
     show_dependencies=True,
     show_group_headers=True,
-    show_values=GANTT_VALUE.PROGRESS,
+    show_values=True, value_kind=GANTT_VALUE.PROGRESS,
     show_legend=True,
     figsize=(9.0, 5.5),
 )

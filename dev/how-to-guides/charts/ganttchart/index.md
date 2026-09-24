@@ -31,39 +31,40 @@ GanttChart(
 
 Every customization is either a keyword argument of `GanttChart`, a key of the task records, or a `plot_gantt_*` (or `plot_bar_*`) attribute of its `style` dictionary. The table maps common tasks to the one you need and links to the subsection that shows it.
 
-| I want to…                                   | Use                                                           | See                                                                                                     |
-| -------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| add a title and axis labels                  | `title`, `xlabel`, `ylabel`, `ytickrotate`                    | [Title and axis labels](#title-and-axis-labels)                                                         |
-| resize the figure or show grid lines         | `figsize`, `show_grid`                                        | [Figure size and grid](#figure-size-and-grid)                                                           |
-| zoom to a date window                        | `xmin`, `xmax`                                                | [Date axis](#date-axis)                                                                                 |
-| change or rotate the date labels             | `xticks_format`, `xtickrotate`                                | [Date axis](#date-axis)                                                                                 |
-| divide the date axis into weeks or months    | `period`                                                      | [Periods](#periods)                                                                                     |
-| order the rows by start or by group          | `sort`, `sort_by`                                             | [Row order](#row-order)                                                                                 |
-| color the tasks by group, place the legend   | the `"group"` key, `show_legend`, `legend`                    | [Groups and legend](#groups-and-legend)                                                                 |
-| give each group a header row and summary bar | `show_group_headers`                                          | [Group headers](#group-headers)                                                                         |
-| mark a milestone                             | a task with `end` equal to `start`                            | [Milestones](#milestones)                                                                               |
-| show how far along each task is              | the `"progress"` key, `show_values`, `value_format`           | [Progress and value labels](#progress-and-value-labels)                                                 |
-| label each bar with its duration             | `show_values`, `value_format`                                 | [Progress and value labels](#progress-and-value-labels)                                                 |
-| draw what blocks what                        | the `"depends_on"` key, `show_dependencies`                   | [Dependencies](#dependencies)                                                                           |
-| choose where the arrows enter a task         | `style={"plot_gantt_dependency_entry": ...}`                  | [Dependencies](#dependencies)                                                                           |
-| mark today                                   | `show_today`, `today`, `today_label`                          | [Today line](#today-line)                                                                               |
-| mark a deadline or shade a period            | `vlines`, `vspans`                                            | [Reference lines and bands](#reference-lines-and-bands)                                                 |
-| put a note on the chart                      | `texts`                                                       | [Text annotations](#text-annotations)                                                                   |
-| change the bar, progress, or arrow look      | `style={"plot_gantt_bar_height": ..., ...}`                   | [Gantt style](#gantt-style)                                                                             |
-| highlight some tasks, mute the rest          | the `"emphasis"` key, `emphasis_rule`                         | [Emphasis](#emphasis)                                                                                   |
-| compare several schedules                    | `data` as a list of lists, `subtitle`, `max_cols`, `emphasis` | [Multiple Gantt Charts](#multiple-gantt-charts)                                                         |
-| place a schedule beside other charts         | `Grid`                                                        | [Composing gantt charts](#composing-gantt-charts)                                                       |
-| schedule by the hour, or use numpy dates     | `datetime` or `numpy.datetime64` values                       | [Other date types](#other-date-types)                                                                   |
-| restyle every chart at once                  | `config.set_theme`                                            | [Themes](#themes)                                                                                       |
-| save the chart to a file                     | `save_figure`                                                 | [Saving Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md) guide |
+| I want to…                                   | Use                                                               | See                                                                                                     |
+| -------------------------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| add a title and axis labels                  | `title`, `xlabel`, `ylabel`, `ytickrotate`                        | [Title and axis labels](#title-and-axis-labels)                                                         |
+| resize the figure or show grid lines         | `figsize`, `show_grid`                                            | [Figure size and grid](#figure-size-and-grid)                                                           |
+| zoom to a date window                        | `xmin`, `xmax`                                                    | [Date axis](#date-axis)                                                                                 |
+| change or rotate the date labels             | `xticks_format`, `xtickrotate`                                    | [Date axis](#date-axis)                                                                                 |
+| divide the date axis into weeks or months    | `period`                                                          | [Periods](#periods)                                                                                     |
+| order the rows by start or by group          | `sort`, `sort_by`                                                 | [Row order](#row-order)                                                                                 |
+| color the tasks by group, place the legend   | the `"group"` key, `show_legend`, `legend`                        | [Groups and legend](#groups-and-legend)                                                                 |
+| give each group a header row and summary bar | `show_group_headers`                                              | [Group headers](#group-headers)                                                                         |
+| mark a milestone                             | a task with `end` equal to `start`                                | [Milestones](#milestones)                                                                               |
+| show how far along each task is              | the `"progress"` key, `show_values`, `value_kind`, `value_format` | [Progress and value labels](#progress-and-value-labels)                                                 |
+| label each bar with its duration             | `show_values`, `value_format`                                     | [Progress and value labels](#progress-and-value-labels)                                                 |
+| draw what blocks what                        | the `"depends_on"` key, `show_dependencies`                       | [Dependencies](#dependencies)                                                                           |
+| choose where the arrows enter a task         | `style={"plot_gantt_dependency_entry": ...}`                      | [Dependencies](#dependencies)                                                                           |
+| mark today                                   | `show_today`, `today`, `today_label`                              | [Today line](#today-line)                                                                               |
+| mark a deadline or shade a period            | `vlines`, `vspans`                                                | [Reference lines and bands](#reference-lines-and-bands)                                                 |
+| put a note on the chart                      | `texts`                                                           | [Text annotations](#text-annotations)                                                                   |
+| change the bar, progress, or arrow look      | `style={"plot_gantt_bar_height": ..., ...}`                       | [Gantt style](#gantt-style)                                                                             |
+| highlight some tasks, mute the rest          | the `"emphasis"` key, `emphasis_rule`                             | [Emphasis](#emphasis)                                                                                   |
+| compare several schedules                    | `data` as a list of lists, `subtitle`, `max_cols`, `emphasis`     | [Multiple Gantt Charts](#multiple-gantt-charts)                                                         |
+| place a schedule beside other charts         | `Grid`                                                            | [Composing gantt charts](#composing-gantt-charts)                                                       |
+| schedule by the hour, or use numpy dates     | `datetime` or `numpy.datetime64` values                           | [Other date types](#other-date-types)                                                                   |
+| restyle every chart at once                  | `config.set_theme`                                                | [Themes](#themes)                                                                                       |
+| save the chart to a file                     | `save_figure`                                                     | [Saving Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md) guide |
 
 The parameters that accept a constant, with the class in [datachart.constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md) that lists its values:
 
 | Parameter                                    | Constant                                                                                                                                                                                                                                     |
 | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `period`                                     | [`GANTT_DATE_PERIOD`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.GANTT_DATE_PERIOD)                                                                                                                 |
-| `show_values`                                | [`GANTT_VALUE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.GANTT_VALUE)                                                                                                                             |
+| `value_kind`                                 | [`GANTT_VALUE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.GANTT_VALUE)                                                                                                                             |
 | `sort_by`                                    | [`GANTT_SORT_KEY`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.GANTT_SORT_KEY)                                                                                                                       |
+| `xticks_format`                              | [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)                                                                                                                             |
 | `style={"plot_gantt_dependency_entry": ...}` | [`GANTT_ARROW_ENTRY`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.GANTT_ARROW_ENTRY)                                                                                                                 |
 | `figsize`                                    | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                                                                                                                                   |
 | `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN) |
@@ -71,7 +72,6 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `value_format`                               | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                           |
 | `sort`                                       | [`SORT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT)                                                                                                                                           |
 | `emphasis`                                   | [`EMPHASIS`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS)                                                                                                                                   |
-| `xticks_format`                              | [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)                                                                                                                             |
 
 The full list of style attributes is in the [datachart.typings.GanttStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/ganttchart/#datachart.typings.GanttStyleAttrs) type, and the task record keys in [datachart.typings.GanttTaskAttrs](https://eriknovak.github.io/datachart/dev/references/charts/ganttchart/#datachart.typings.GanttTaskAttrs); the full list of parameters is in the [datachart.charts.GanttChart](https://eriknovak.github.io/datachart/dev/references/charts/ganttchart/#datachart.charts.GanttChart) reference.
 
@@ -259,7 +259,7 @@ GanttChart(
     xmax=date(2025, 12, 1),
     period=GANTT_DATE_PERIOD.MONTH,
     # a milestone prints its date
-    show_values=GANTT_VALUE.DURATION,
+    show_values=True, value_kind=GANTT_VALUE.DURATION,
     # a larger star
     style={"plot_gantt_milestone_marker": "*", "plot_gantt_milestone_size": 14},
     show_legend=False,
@@ -268,7 +268,7 @@ GanttChart(
 
 ### Progress and value labels
 
-*How far along are we?* is answered by a task's `progress` key, the fraction done in `[0, 1]`, drawn as an inner bar from the task's start. `show_values` prints a label past each bar end ([GANTT_VALUE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.GANTT_VALUE)): `PROGRESS` prints the progress as a percentage (a task without `progress` stays unlabeled), `DURATION` the duration in days. `value_format` formats the number, a [VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) constant or any `"{x:.1f}"` style string: it formats the progress fraction or the days. On 16 June the design and site work are done, the foundations are at 80%, and the kitchen order at 20%:
+*How far along are we?* is answered by a task's `progress` key, the fraction done in `[0, 1]`, drawn as an inner bar from the task's start. `show_values=True` prints a label past each bar end and `value_kind` picks which ([GANTT_VALUE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.GANTT_VALUE)): `PROGRESS` prints the progress as a percentage (a task without `progress` stays unlabeled), `DURATION`, the default, the duration in days. `value_format` formats the number, a [VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) constant or any `"{x:.1f}"` style string: it formats the progress fraction or the days. On 16 June the design and site work are done, the foundations are at 80%, and the kitchen order at 20%:
 
 ```
 GanttChart(
@@ -276,7 +276,7 @@ GanttChart(
     title="House build, progress on 16 June",
     figsize=FIG_SIZE.FULL_MEDIUM,
     # label each bar with its progress
-    show_values=GANTT_VALUE.PROGRESS,
+    show_values=True, value_kind=GANTT_VALUE.PROGRESS,
 ).show()
 ```
 
@@ -288,7 +288,7 @@ GanttChart(
     title="House build, days per task",
     figsize=FIG_SIZE.FULL_MEDIUM,
     # label each bar with its duration, in days
-    show_values=GANTT_VALUE.DURATION,
+    show_values=True, value_kind=GANTT_VALUE.DURATION,
     value_format="{x:.0f} days",
     # room for the labels past the last bar
     xmax=date(2025, 11, 20),
@@ -337,7 +337,7 @@ GanttChart(
     data=house,
     title="House build, where we stand",
     figsize=FIG_SIZE.FULL_MEDIUM,
-    show_values=GANTT_VALUE.PROGRESS,
+    show_values=True, value_kind=GANTT_VALUE.PROGRESS,
     # mark the day the project stands on
     show_today=True,
     today=TODAY,
@@ -491,7 +491,7 @@ GanttChart(
     data=house,
     title="House build, tasks longer than a month",
     figsize=FIG_SIZE.FULL_MEDIUM,
-    show_values=GANTT_VALUE.DURATION,
+    show_values=True, value_kind=GANTT_VALUE.DURATION,
     xmax=date(2025, 11, 10),
     # highlight the tasks longer than 30 days
     emphasis_rule={"above": 30},
@@ -551,7 +551,7 @@ GanttChart(
     title="Foundation slab, the first four weeks",
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.X,
-    show_values=GANTT_VALUE.DURATION,
+    show_values=True, value_kind=GANTT_VALUE.DURATION,
     xmax=date(2025, 7, 23),
     # print the ticks as day and month
     xticks_format="%d %b",
@@ -597,7 +597,7 @@ GanttChart(
     xmax=date(2025, 9, 15),
     # the weekend
     vspans={"xmin": date(2025, 9, 6), "xmax": date(2025, 9, 8)},
-    show_values=GANTT_VALUE.PROGRESS,
+    show_values=True, value_kind=GANTT_VALUE.PROGRESS,
     show_today=True,
     today=SPRINT_TODAY,
     today_label="today",

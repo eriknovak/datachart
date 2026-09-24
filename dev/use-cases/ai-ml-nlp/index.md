@@ -110,7 +110,7 @@ Every line that ends near the top of the last axis passes through a learning rat
 
 ### Which classes does the model confuse?
 
-A confusion matrix is a grid of counts, and a grid of counts is a [heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/index.md). Raw counts make the biggest class the brightest row whatever the model does, so the cells hold the share of each true class (every row sums to 1) and the class sizes move into the row labels, where they belong. `z` is the grid, `x` and `y` are its labels, and `show_heatmap_values` writes each cell into the figure so the matrix reads as a table too.
+A confusion matrix is a grid of counts, and a grid of counts is a [heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/index.md). Raw counts make the biggest class the brightest row whatever the model does, so the cells hold the share of each true class (every row sums to 1) and the class sizes move into the row labels, where they belong. `z` is the grid, `x` and `y` are its labels, and `show_values` writes each cell into the figure so the matrix reads as a table too.
 
 ```
 row_labels = [
@@ -123,9 +123,9 @@ confusion_figure = Heatmap(
     title="Billing and Refunds trade tickets; nothing else leaks",
     xlabel="Predicted class",
     ylabel="True class",
-    show_heatmap_values=True,
+    show_values=True,
     show_colorbars=True,
-    valfmt=VALUE_FORMAT.DECIMAL_2,
+    value_format=VALUE_FORMAT.DECIMAL_2,
     aspect_ratio=ASPECT_RATIO.EQUAL,
     xtickrotate=30,
     colorbar={"label": "Share of the true class"},
@@ -307,7 +307,7 @@ Only one pair crosses: Gemma2-9B leads Qwen2-7B on MMLU, the knowledge benchmark
 
 ### What did a round of post-training change?
 
-Before and after is two numbers per row, which is what a [dumbbell chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/dumbbellchart/index.md) draws: a dot for each, joined by the line whose length is the change. Sorting by `delta` puts the benchmarks that moved at the top, and `show_values="delta"` writes the change rather than the endpoints, since the endpoints are already on the axis.
+Before and after is two numbers per row, which is what a [dumbbell chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/dumbbellchart/index.md) draws: a dot for each, joined by the line whose length is the change. Sorting by `delta` puts the benchmarks that moved at the top, and `show_values=True, value_kind="delta"` writes the change rather than the endpoints, since the endpoints are already on the axis.
 
 ```
 # Llama 3 8B Instruct -> Llama 3.1 8B Instruct, from the Llama 3.1 8B model card
@@ -330,7 +330,7 @@ DumbbellChart(
     end_name="Llama 3.1 8B Instruct",
     sort="descending",
     sort_by="delta",
-    show_values="delta",
+    show_values=True, value_kind="delta",
     show_direction=True,
     show_legend=True,
     value_format=VALUE_FORMAT.DECIMAL,

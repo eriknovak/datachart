@@ -269,7 +269,7 @@ The year is almost empty apart from February, which is dark for its whole length
 
 ### Which way did the rupture run?
 
-A fault is a line, so its aftershocks spread along a direction rather than filling a circle, and the direction is the strike of the fault that broke. The azimuth from the mainshock to each aftershock is an angle, and angles belong on a circular axis: a [radial chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/radialchart/index.md) with `type=RADIAL_TYPE.HISTOGRAM` counts them into sectors and draws the rose diagram that structural geology has used for a century. The chart bins the raw angles itself, so each record carries one azimuth as `x`, and the default orientation already puts north at the top and runs clockwise, which is the compass convention.
+A fault is a line, so its aftershocks spread along a direction rather than filling a circle, and the direction is the strike of the fault that broke. The azimuth from the mainshock to each aftershock is an angle, and angles belong on a circular axis: a [radial chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/radialchart/index.md) with `mark=RADIAL_TYPE.HISTOGRAM` counts them into sectors and draws the rose diagram that structural geology has used for a century. The chart bins the raw angles itself, so each record carries one azimuth as `x`, and the default orientation already puts north at the top and runs clockwise, which is the compass convention.
 
 ```
 # the compass bearing from the mainshock to each aftershock
@@ -282,7 +282,7 @@ azimuth = np.degrees(
 
 rose_figure = RadialChart(
     [{"x": float(bearing)} for bearing in azimuth],
-    type=RADIAL_TYPE.HISTOGRAM,
+    mark=RADIAL_TYPE.HISTOGRAM,
     title="The aftershocks spread northeast and southwest, along the fault",
     # 16 sectors of 22.5 degrees, the usual resolution of a rose diagram
     num_bins=16,

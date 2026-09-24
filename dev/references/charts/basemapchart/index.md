@@ -8,9 +8,7 @@ Coastlines, land, borders, lakes, rivers and roads under a chart of longitude an
 
 ```
 BasemapChart(
-    features: (
-        BASEMAP_FEATURE | str | list[str] | None
-    ) = None,
+    data: BASEMAP_FEATURE | str | list[str] | None = None,
     *,
     resolution: BASEMAP_RESOLUTION | str | None = None,
     highlight: str | list[str] | None = None,
@@ -28,7 +26,10 @@ BasemapChart(
     ymax: int | float | None = None,
     show_grid: SHOW_GRID | str | bool | None = None,
     aspect_ratio: ASPECT_RATIO | str | None = None,
-    style: BasemapStyleAttrs | None = None
+    style: BasemapStyleAttrs | None = None,
+    features: (
+        BASEMAP_FEATURE | str | list[str] | None
+    ) = None
 ) -> plt.Figure
 ```
 
@@ -60,33 +61,34 @@ Examples:
 ... )
 ```
 
-| PARAMETER      | DESCRIPTION                                                                                                                                                                                                              |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `features`     | The features to draw: one name or a list of them, coastline and land by default. See BASEMAP_FEATURE. **TYPE:** \`BASEMAP_FEATURE                                                                                        |
-| `resolution`   | The Natural Earth scale: "110m" (default), "50m" or "10m", each downloaded once on first use. See BASEMAP_RESOLUTION. **TYPE:** \`BASEMAP_RESOLUTION                                                                     |
-| `highlight`    | The countries to pick out, as Natural Earth's three-letter ADM0_A3 codes ("SVN", "FRA"); needs the "countries" feature. A code too small to draw at the chosen resolution warns. **TYPE:** \`str                         |
-| `geometry`     | Your own outlines, drawn in place of Natural Earth's: a {"lon", "lat", "feature"} dict, or a list of them. Cannot be combined with features, resolution or highlight. See BasemapDataAttrs. **TYPE:** \`BasemapDataAttrs |
-| `position`     | Where the map sits in the draw order: "below" (default) under the gridlines and every mark, or "above" over the marks and under the reference lines. See DRAW_POSITION. **TYPE:** \`DRAW_POSITION                        |
-| `title`        | The title of the chart. **TYPE:** \`str                                                                                                                                                                                  |
-| `xlabel`       | The label of the x-axis. **TYPE:** \`str                                                                                                                                                                                 |
-| `ylabel`       | The label of the y-axis. **TYPE:** \`str                                                                                                                                                                                 |
-| `figsize`      | The size of the figure as (width, height) in inches. See FIG_SIZE. **TYPE:** \`FIG_SIZE                                                                                                                                  |
-| `xmin`         | The minimum value of the x-axis. **TYPE:** \`int                                                                                                                                                                         |
-| `xmax`         | The maximum value of the x-axis. **TYPE:** \`int                                                                                                                                                                         |
-| `ymin`         | The minimum value of the y-axis. **TYPE:** \`int                                                                                                                                                                         |
-| `ymax`         | The maximum value of the y-axis. **TYPE:** \`int                                                                                                                                                                         |
-| `show_grid`    | Which grid lines to show ("both", "x", "y"); False draws none. The grid draws over a map placed below. See SHOW_GRID. **TYPE:** \`SHOW_GRID                                                                              |
-| `aspect_ratio` | The aspect ratio of the axes box; "geographic" keeps the region at true proportions. See ASPECT_RATIO. **TYPE:** \`ASPECT_RATIO                                                                                          |
-| `style`        | Style configuration of the map. See BasemapStyleAttrs. **TYPE:** \`BasemapStyleAttrs                                                                                                                                     |
+| PARAMETER      | DESCRIPTION                                                                                                                                                                                                          |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `data`         | The features to draw: one name or a list of them, coastline and land by default. See BASEMAP_FEATURE. **TYPE:** \`BASEMAP_FEATURE                                                                                    |
+| `resolution`   | The Natural Earth scale: "110m" (default), "50m" or "10m", each downloaded once on first use. See BASEMAP_RESOLUTION. **TYPE:** \`BASEMAP_RESOLUTION                                                                 |
+| `highlight`    | The countries to pick out, as Natural Earth's three-letter ADM0_A3 codes ("SVN", "FRA"); needs the "countries" feature. A code too small to draw at the chosen resolution warns. **TYPE:** \`str                     |
+| `geometry`     | Your own outlines, drawn in place of Natural Earth's: a {"lon", "lat", "feature"} dict, or a list of them. Cannot be combined with data, resolution or highlight. See BasemapDataAttrs. **TYPE:** \`BasemapDataAttrs |
+| `position`     | Where the map sits in the draw order: "below" (default) under the gridlines and every mark, or "above" over the marks and under the reference lines. See DRAW_POSITION. **TYPE:** \`DRAW_POSITION                    |
+| `title`        | The title of the chart. **TYPE:** \`str                                                                                                                                                                              |
+| `xlabel`       | The label of the x-axis. **TYPE:** \`str                                                                                                                                                                             |
+| `ylabel`       | The label of the y-axis. **TYPE:** \`str                                                                                                                                                                             |
+| `figsize`      | The size of the figure as (width, height) in inches. See FIG_SIZE. **TYPE:** \`FIG_SIZE                                                                                                                              |
+| `xmin`         | The minimum value of the x-axis. **TYPE:** \`int                                                                                                                                                                     |
+| `xmax`         | The maximum value of the x-axis. **TYPE:** \`int                                                                                                                                                                     |
+| `ymin`         | The minimum value of the y-axis. **TYPE:** \`int                                                                                                                                                                     |
+| `ymax`         | The maximum value of the y-axis. **TYPE:** \`int                                                                                                                                                                     |
+| `show_grid`    | Which grid lines to show ("both", "x", "y"); False draws none. The grid draws over a map placed below. See SHOW_GRID. **TYPE:** \`SHOW_GRID                                                                          |
+| `aspect_ratio` | The aspect ratio of the axes box; "geographic" keeps the region at true proportions. See ASPECT_RATIO. **TYPE:** \`ASPECT_RATIO                                                                                      |
+| `style`        | Style configuration of the map. See BasemapStyleAttrs. **TYPE:** \`BasemapStyleAttrs                                                                                                                                 |
+| `features`     | Deprecated; use data. Removed in the next release. **TYPE:** \`BASEMAP_FEATURE                                                                                                                                       |
 
 | RETURNS      | DESCRIPTION                              |
 | ------------ | ---------------------------------------- |
 | `plt.Figure` | The figure containing the basemap chart. |
 
-| RAISES         | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                     |
-| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ValueError`   | If a feature is not a BASEMAP_FEATURE, resolution is not a BASEMAP_RESOLUTION, geometry is not outlines of matching longitudes and latitudes or comes with features, resolution or highlight, a highlight code is not three letters or comes without the countries feature, a feature is not published at resolution, position is not a DRAW_POSITION, or a geographic aspect meets a y-axis outside -90 to 90. |
-| `RuntimeError` | If a feature is not cached and cannot be downloaded.                                                                                                                                                                                                                                                                                                                                                            |
+| RAISES         | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                 |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ValueError`   | If a feature is not a BASEMAP_FEATURE, resolution is not a BASEMAP_RESOLUTION, geometry is not outlines of matching longitudes and latitudes or comes with data, resolution or highlight, a highlight code is not three letters or comes without the countries feature, a feature is not published at resolution, position is not a DRAW_POSITION, or a geographic aspect meets a y-axis outside -90 to 90. |
+| `RuntimeError` | If a feature is not cached and cannot be downloaded.                                                                                                                                                                                                                                                                                                                                                        |
 
 ## Data
 
@@ -137,7 +139,7 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 
 | Parameter      | Constant                                                                                                                       |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `features`     | [`BASEMAP_FEATURE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BASEMAP_FEATURE)       |
+| `data`         | [`BASEMAP_FEATURE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BASEMAP_FEATURE)       |
 | `resolution`   | [`BASEMAP_RESOLUTION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BASEMAP_RESOLUTION) |
 | `position`     | [`DRAW_POSITION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DRAW_POSITION)           |
 | `figsize`      | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                     |

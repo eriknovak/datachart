@@ -263,7 +263,7 @@ load = {
 figure = Heatmap(
     data=load,
     emphasis_rule={"top": 5},
-    show_heatmap_values=True,
+    show_values=True,
     title="The five busiest hours",
 )
 figure.show()

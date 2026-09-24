@@ -5764,7 +5764,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </tr>
 <tr>
 <td style="text-align:left">caption, move, or hide the colorbar</td>
-<td style="text-align:left"><code>colorbar</code>, <code>valfmt</code>, <code>show_colorbars</code></td>
+<td style="text-align:left"><code>colorbar</code>, <code>value_format</code>, <code>show_colorbars</code></td>
 <td style="text-align:left"><a href="#colorbar">Colorbar</a></td>
 </tr>
 <tr>
@@ -5863,6 +5863,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <td style="text-align:left"><a href="../../../references/constants/#datachart.constants.HEXBIN_REDUCE"><code>HEXBIN_REDUCE</code></a></td>
 </tr>
 <tr>
+<td style="text-align:left"><code>xticks_format</code></td>
+<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.VALUE_FORMAT"><code>VALUE_FORMAT</code></a>, <a href="../../../references/constants/#datachart.constants.DATE_FORMAT"><code>DATE_FORMAT</code></a></td>
+</tr>
+<tr>
 <td style="text-align:left"><code>figsize</code></td>
 <td style="text-align:left"><a href="../../../references/constants/#datachart.constants.FIG_SIZE"><code>FIG_SIZE</code></a></td>
 </tr>
@@ -5891,12 +5895,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <td style="text-align:left"><a href="../../../references/constants/#datachart.constants.NORMALIZE"><code>NORMALIZE</code></a></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>valfmt</code></td>
+<td style="text-align:left"><code>value_format</code></td>
 <td style="text-align:left"><a href="../../../references/constants/#datachart.constants.VALUE_FORMAT"><code>VALUE_FORMAT</code></a></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>xticks_format</code></td>
-<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.VALUE_FORMAT"><code>VALUE_FORMAT</code></a>, <a href="../../../references/constants/#datachart.constants.DATE_FORMAT"><code>DATE_FORMAT</code></a></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>yticks_format</code></td>
@@ -6075,7 +6075,7 @@ HexbinChart(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="colorbar">Colorbar<a class="anchor-link" href="#colorbar">¶</a></h3><p>The colorbar is the legend of a hexbin chart: without a caption, the reader does not know that the colors count listings. <code>colorbar</code> takes a <a href="../../../references/typings/#datachart.typings.ColorbarSettingAttrs">ColorbarSettingAttrs</a> dictionary: <code>label</code> captions the bar, <code>location</code> moves it to any edge with a <a href="../../../references/constants/#datachart.constants.COLORBAR_LOCATION">COLORBAR_LOCATION</a> member, <code>ticks</code> places its ticks, and <code>format</code> formats their labels (the <code>valfmt</code> parameter does the same when <code>format</code> is not set). A bar above a wide chart takes less width from the hexagons than one beside it. <code>show_colorbars=False</code> hides the bar, which suits a chart whose colors are explained elsewhere, as in the <a href="#composing-with-panel">Composing with Panel</a> section.</p>
+<h3 id="colorbar">Colorbar<a class="anchor-link" href="#colorbar">¶</a></h3><p>The colorbar is the legend of a hexbin chart: without a caption, the reader does not know that the colors count listings. <code>colorbar</code> takes a <a href="../../../references/typings/#datachart.typings.ColorbarSettingAttrs">ColorbarSettingAttrs</a> dictionary: <code>label</code> captions the bar, <code>location</code> moves it to any edge with a <a href="../../../references/constants/#datachart.constants.COLORBAR_LOCATION">COLORBAR_LOCATION</a> member, <code>ticks</code> places its ticks, and <code>format</code> formats their labels (the <code>value_format</code> parameter does the same when <code>format</code> is not set). A bar above a wide chart takes less width from the hexagons than one beside it. <code>show_colorbars=False</code> hides the bar, which suits a chart whose colors are explained elsewhere, as in the <a href="#composing-with-panel">Composing with Panel</a> section.</p>
 </div>
 </div>
 </div>
@@ -6942,7 +6942,7 @@ HexbinChart(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="multiple-hexbin-charts">Multiple Hexbin Charts<a class="anchor-link" href="#multiple-hexbin-charts">¶</a></h2><p>To compare several groups of points, pass a list of datasets to <code>data</code> and set <code>subplots=True</code>. Hexagons are opaque, so several datasets on one axes would cover each other; subplots keep each group visible. <code>subtitle</code> titles the subplots, while <code>title</code>, <code>xlabel</code> and <code>ylabel</code> stay global; <code>max_cols</code> limits the subplots per row, and <code>sharex</code> and <code>sharey</code> put the subplots on one axis range. The per-chart parameters (<code>subtitle</code>, <code>style</code>, <code>gridsize</code>, <code>reduce</code>, <code>mincnt</code>, <code>norm</code>, <code>vmin</code>, <code>vmax</code>, <code>valfmt</code>, <code>colorbar</code>) take either one value for every chart or a list with one value per chart. Each subplot scales its colors to its own data, so the same <code>vmin</code> and <code>vmax</code> on every subplot are what makes the shades comparable. <code>points_by_district</code>, defined in a hidden cell, splits the listings by district: the center has fewer listings, and they sit higher on the rent axis.</p>
+<h2 id="multiple-hexbin-charts">Multiple Hexbin Charts<a class="anchor-link" href="#multiple-hexbin-charts">¶</a></h2><p>To compare several groups of points, pass a list of datasets to <code>data</code> and set <code>subplots=True</code>. Hexagons are opaque, so several datasets on one axes would cover each other; subplots keep each group visible. <code>subtitle</code> titles the subplots, while <code>title</code>, <code>xlabel</code> and <code>ylabel</code> stay global; <code>max_cols</code> limits the subplots per row, and <code>sharex</code> and <code>sharey</code> put the subplots on one axis range. The per-chart parameters (<code>subtitle</code>, <code>style</code>, <code>gridsize</code>, <code>reduce</code>, <code>mincnt</code>, <code>norm</code>, <code>vmin</code>, <code>vmax</code>, <code>value_format</code>, <code>colorbar</code>) take either one value for every chart or a list with one value per chart. Each subplot scales its colors to its own data, so the same <code>vmin</code> and <code>vmax</code> on every subplot are what makes the shades comparable. <code>points_by_district</code>, defined in a hidden cell, splits the listings by district: the center has fewer listings, and they sit higher on the rent axis.</p>
 </div>
 </div>
 </div>

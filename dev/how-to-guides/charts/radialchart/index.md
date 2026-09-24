@@ -33,7 +33,7 @@ Every customization is either a keyword argument of `RadialChart` or an attribut
 
 | I want to…                                | Use                                                     | See                                                                                                     |
 | ----------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| pick the visual                           | `type`, `num_bins`                                      | [The radial visuals](#the-radial-visuals)                                                               |
+| pick the visual                           | `mark`, `num_bins`                                      | [The radial visuals](#the-radial-visuals)                                                               |
 | add a title and axis labels               | `title`, `xlabel`, `ylabel`                             | [Title, axis labels and radial range](#title-axis-labels-and-radial-range)                              |
 | fix the radial range                      | `ymin`, `ymax`                                          | [Title, axis labels and radial range](#title-axis-labels-and-radial-range)                              |
 | resize the figure                         | `figsize`                                               | [Figure size and grid](#figure-size-and-grid)                                                           |
@@ -63,12 +63,13 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 
 | Parameter                                    | Constant                                                                                                                                                                                                                                     |
 | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `type`                                       | [`RADIAL_TYPE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.RADIAL_TYPE)                                                                                                                             |
+| `mark`                                       | [`RADIAL_TYPE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.RADIAL_TYPE)                                                                                                                             |
 | `direction`                                  | [`RADIAL_DIRECTION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.RADIAL_DIRECTION)                                                                                                                   |
 | `emphasis`                                   | [`EMPHASIS`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS)                                                                                                                                   |
 | `figsize`                                    | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                                                                                                                                   |
 | `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN) |
 | `show_grid`                                  | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                                                                                                                                 |
+| `value_format`                               | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                           |
 | `bar_mode`                                   | [`BAR_MODE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BAR_MODE)                                                                                                                                   |
 | `sort`                                       | [`SORT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT)                                                                                                                                           |
 | `scaley`                                     | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                         |
@@ -77,7 +78,7 @@ The full lists of style attributes are in the [datachart.typings.LineStyleAttrs]
 
 ### The radial visuals
 
-The first decision is which visual to draw, and the data answers it. `type` takes a [RADIAL_TYPE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.RADIAL_TYPE) member:
+The first decision is which visual to draw, and the data answers it. `mark` takes a [RADIAL_TYPE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.RADIAL_TYPE) member:
 
 - `RADIAL_TYPE.LINE` (the default) connects the values into a closed profile, the radar chart. Use it when the shape is the message: a few entities compared across several metrics on one scale, or a cycle whose continuity matters.
 - `RADIAL_TYPE.BAR` draws one sector per category. Use it for one value per cyclic category (a month, an hour, a direction) when the sizes matter more than the shape; the sectors read like the hours on a clock face.
@@ -92,7 +93,7 @@ from datachart.constants import RADIAL_TYPE
 RadialChart(
     data=sunshine_by_month,
     # one sector per month
-    type=RADIAL_TYPE.BAR,
+    mark=RADIAL_TYPE.BAR,
     title="Monthly sunshine hours",
 ).show()
 ```
@@ -102,7 +103,7 @@ The raw direction readings are a distribution, not one value per category, so th
 ```
 RadialChart(
     data=wind_directions,
-    type=RADIAL_TYPE.HISTOGRAM,
+    mark=RADIAL_TYPE.HISTOGRAM,
     # count the readings in 16 sectors around the full circle
     num_bins=16,
     title="Wind direction frequency",
@@ -138,7 +139,7 @@ from datachart.constants import FIG_SIZE, SHOW_GRID
 
 RadialChart(
     data=sunshine_by_month,
-    type=RADIAL_TYPE.BAR,
+    mark=RADIAL_TYPE.BAR,
     title="Monthly sunshine hours",
     # a small square figure for one column
     figsize=FIG_SIZE.HALF_SQUARE,
@@ -156,7 +157,7 @@ from datachart.constants import RADIAL_DIRECTION
 
 RadialChart(
     data=sunshine_by_month,
-    type=RADIAL_TYPE.BAR,
+    mark=RADIAL_TYPE.BAR,
     title="Monthly sunshine hours",
     # the mathematical convention: start at the right, run counterclockwise
     startangle="E",
@@ -171,7 +172,7 @@ Sectors that meet at the center shrink to slivers there, so the small values, an
 ```
 RadialChart(
     data=sunshine_by_month,
-    type=RADIAL_TYPE.BAR,
+    mark=RADIAL_TYPE.BAR,
     title="Monthly sunshine hours",
     # reserve the middle quarter of the radius for the hole
     innerradius=0.25,
@@ -206,7 +207,7 @@ A chart usually makes one point. On the bar visual, `emphasis_rule` picks the ba
 ```
 RadialChart(
     data=wind_by_direction,
-    type=RADIAL_TYPE.BAR,
+    mark=RADIAL_TYPE.BAR,
     title="Directions averaging above 15 km/h",
     # highlight the strong directions, mute the rest
     emphasis_rule={"above": 15},
@@ -223,7 +224,7 @@ from datachart.constants import SORT
 
 RadialChart(
     data=wind_by_direction,
-    type=RADIAL_TYPE.BAR,
+    mark=RADIAL_TYPE.BAR,
     title="Directions ranked by average wind speed",
     # the strongest direction first, clockwise from the top
     sort=SORT.DESCENDING,
@@ -241,7 +242,7 @@ from datachart.constants import VALUE_FORMAT
 
 RadialChart(
     data=sunshine_by_month,
-    type=RADIAL_TYPE.BAR,
+    mark=RADIAL_TYPE.BAR,
     title="Monthly sunshine hours",
     # a wider hole spreads the short winter labels apart
     innerradius=0.4,
@@ -256,7 +257,7 @@ The category labels sit on a ring around the circle by default, at some distance
 ```
 RadialChart(
     data=sunshine_by_month,
-    type=RADIAL_TYPE.BAR,
+    mark=RADIAL_TYPE.BAR,
     title="Monthly sunshine hours",
     innerradius=0.3,
     # the month names ride the bar tips, and the border circle goes
@@ -315,7 +316,7 @@ RadialChart(
 
 ## Multiple Radial Charts
 
-To compare several series, pass a list of lists to `data`: each inner list is one series, all drawn with the figure's one `type`, and the per-series attributes (`subtitle`, `style`, `emphasis`) become lists aligned with it. `show_legend` names the series by their subtitles. `wind_last_year`, defined in a hidden cell, holds the same station's averages of the year before, and two radar profiles on one circle show where the wind picked up: the western directions grew, the north-east barely moved.
+To compare several series, pass a list of lists to `data`: each inner list is one series, all drawn with the figure's one `mark`, and the per-series attributes (`subtitle`, `style`, `emphasis`) become lists aligned with it. `show_legend` names the series by their subtitles. `wind_last_year`, defined in a hidden cell, holds the same station's averages of the year before, and two radar profiles on one circle show where the wind picked up: the western directions grew, the north-east barely moved.
 
 ```
 RadialChart(
@@ -357,7 +358,7 @@ from datachart.constants import BAR_MODE
 
 RadialChart(
     data=[morning, afternoon],
-    type=RADIAL_TYPE.BAR,
+    mark=RADIAL_TYPE.BAR,
     subtitle=["Morning", "Afternoon"],
     # stack the two halves of the day in each sector
     bar_mode=BAR_MODE.STACK,
@@ -373,7 +374,7 @@ With several series, `sort` orders the sectors by the total across them, and `so
 ```
 RadialChart(
     data=[morning, afternoon],
-    type=RADIAL_TYPE.BAR,
+    mark=RADIAL_TYPE.BAR,
     subtitle=["Morning", "Afternoon"],
     bar_mode=BAR_MODE.STACK,
     title="Months ranked by afternoon sunshine",
@@ -458,7 +459,7 @@ from datachart.constants import SCALE
 
 RadialChart(
     data=lightning_by_month,
-    type=RADIAL_TYPE.SCATTER,
+    mark=RADIAL_TYPE.SCATTER,
     # a log radius: from a handful to thousands on one circle
     scaley=SCALE.LOG,
     # start the radius at one strike, so the winter counts leave the center
@@ -508,7 +509,7 @@ def wind_rose(data, season):
     # a wind rose with 16 sectors on a shared radial range
     return RadialChart(
         data=data,
-        type=RADIAL_TYPE.HISTOGRAM,
+        mark=RADIAL_TYPE.HISTOGRAM,
         num_bins=16,
         title=season,
         show_grid=SHOW_GRID.BOTH,
@@ -558,7 +559,7 @@ from datachart.utils import Panel
 
 this_year = RadialChart(
     data=[weekday_visits, weekend_visits],
-    type=RADIAL_TYPE.BAR,
+    mark=RADIAL_TYPE.BAR,
     subtitle=["Weekdays", "Weekends"],
     # stacked, so the outer edge is the month's total
     bar_mode=BAR_MODE.STACK,

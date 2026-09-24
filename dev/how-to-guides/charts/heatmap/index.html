@@ -5643,7 +5643,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </tr>
 <tr>
 <td style="text-align:left">write the values into the cells</td>
-<td style="text-align:left"><code>show_heatmap_values</code>, <code>valfmt</code></td>
+<td style="text-align:left"><code>show_values</code>, <code>value_format</code></td>
 <td style="text-align:left"><a href="#colorbar-and-cell-values">Colorbar and cell values</a></td>
 </tr>
 <tr>
@@ -5733,6 +5733,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </thead>
 <tbody>
 <tr>
+<td style="text-align:left"><code>xticks_format</code></td>
+<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.VALUE_FORMAT"><code>VALUE_FORMAT</code></a>, <a href="../../../references/constants/#datachart.constants.DATE_FORMAT"><code>DATE_FORMAT</code></a></td>
+</tr>
+<tr>
 <td style="text-align:left"><code>figsize</code></td>
 <td style="text-align:left"><a href="../../../references/constants/#datachart.constants.FIG_SIZE"><code>FIG_SIZE</code></a></td>
 </tr>
@@ -5753,12 +5757,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <td style="text-align:left"><a href="../../../references/constants/#datachart.constants.NORMALIZE"><code>NORMALIZE</code></a></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>valfmt</code></td>
+<td style="text-align:left"><code>value_format</code></td>
 <td style="text-align:left"><a href="../../../references/constants/#datachart.constants.VALUE_FORMAT"><code>VALUE_FORMAT</code></a></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>xticks_format</code></td>
-<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.VALUE_FORMAT"><code>VALUE_FORMAT</code></a>, <a href="../../../references/constants/#datachart.constants.DATE_FORMAT"><code>DATE_FORMAT</code></a></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>yticks_format</code></td>
@@ -5987,7 +5987,7 @@ Heatmap(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="colorbar-and-cell-values">Colorbar and cell values<a class="anchor-link" href="#colorbar-and-cell-values">¶</a></h3><p>Colors show which cells are warmer, not by how much. <code>show_colorbars</code> adds the scale that maps colors back to values, and <code>show_heatmap_values</code> writes each value into its cell; a value on a dark cell is written in white, so it stays legible across the colormap. <code>valfmt</code> formats the cell values: a <a href="../../../references/constants/#datachart.constants.VALUE_FORMAT">VALUE_FORMAT</a> member or a format string that names the value <code>x</code>, such as <code>"{x:.1f}"</code> (a string without <code>x</code>, such as <code>"{z:.1f}"</code>, is not valid). The temperatures carry one decimal, so <code>VALUE_FORMAT.DECIMAL</code> keeps it. With the values written in, the chart answers both questions: the pattern from the colors, the exact numbers from the cells.</p>
+<h3 id="colorbar-and-cell-values">Colorbar and cell values<a class="anchor-link" href="#colorbar-and-cell-values">¶</a></h3><p>Colors show which cells are warmer, not by how much. <code>show_colorbars</code> adds the scale that maps colors back to values, and <code>show_values</code> writes each value into its cell; a value on a dark cell is written in white, so it stays legible across the colormap. <code>value_format</code> formats the cell values: a <a href="../../../references/constants/#datachart.constants.VALUE_FORMAT">VALUE_FORMAT</a> member or a format string that names the value <code>x</code>, such as <code>"{x:.1f}"</code> (a string without <code>x</code>, such as <code>"{z:.1f}"</code>, is not valid). The temperatures carry one decimal, so <code>VALUE_FORMAT.DECIMAL</code> keeps it. With the values written in, the chart answers both questions: the pattern from the colors, the exact numbers from the cells.</p>
 </div>
 </div>
 </div>
@@ -6021,8 +6021,8 @@ Heatmap(
     <span class="c1"># add the color scale</span>
     <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="c1"># write the values into the cells, with one decimal</span>
-    <span class="n">show_heatmap_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">valfmt</span><span class="o">=</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">DECIMAL</span><span class="p">,</span>
+    <span class="n">show_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">value_format</span><span class="o">=</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">DECIMAL</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-7">from datachart.constants import VALUE_FORMAT
@@ -6036,8 +6036,8 @@ Heatmap(
     # add the color scale
     show_colorbars=True,
     # write the values into the cells, with one decimal
-    show_heatmap_values=True,
-    valfmt=VALUE_FORMAT.DECIMAL,
+    show_values=True,
+    value_format=VALUE_FORMAT.DECIMAL,
 ).show()</div>
 </div>
 </div>
@@ -6188,8 +6188,8 @@ Heatmap(
     <span class="n">ylabel</span><span class="o">=</span><span class="s2">"City"</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_MEDIUM</span><span class="p">,</span>
     <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">show_heatmap_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">valfmt</span><span class="o">=</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">DECIMAL</span><span class="p">,</span>
+    <span class="n">show_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">value_format</span><span class="o">=</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">DECIMAL</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-9">from datachart.constants import COLORS, FONT_WEIGHT
@@ -6213,8 +6213,8 @@ Heatmap(
     ylabel="City",
     figsize=FIG_SIZE.FULL_MEDIUM,
     show_colorbars=True,
-    show_heatmap_values=True,
-    valfmt=VALUE_FORMAT.DECIMAL,
+    show_values=True,
+    value_format=VALUE_FORMAT.DECIMAL,
 ).show()</div>
 </div>
 </div>
@@ -6275,8 +6275,8 @@ Heatmap(
     <span class="n">ylabel</span><span class="o">=</span><span class="s2">"City"</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_MEDIUM</span><span class="p">,</span>
     <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">show_heatmap_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">valfmt</span><span class="o">=</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">DECIMAL</span><span class="p">,</span>
+    <span class="n">show_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">value_format</span><span class="o">=</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">DECIMAL</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-10">Heatmap(
@@ -6290,8 +6290,8 @@ Heatmap(
     ylabel="City",
     figsize=FIG_SIZE.FULL_MEDIUM,
     show_colorbars=True,
-    show_heatmap_values=True,
-    valfmt=VALUE_FORMAT.DECIMAL,
+    show_values=True,
+    value_format=VALUE_FORMAT.DECIMAL,
 ).show()</div>
 </div>
 </div>
@@ -6353,8 +6353,8 @@ Heatmap(
         <span class="n">ylabel</span><span class="o">=</span><span class="s2">"City"</span><span class="p">,</span>
         <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_MEDIUM</span><span class="p">,</span>
         <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">show_heatmap_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">valfmt</span><span class="o">=</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">INTEGER</span><span class="p">,</span>
+        <span class="n">show_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">value_format</span><span class="o">=</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">INTEGER</span><span class="p">,</span>
     <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-11">from datachart.constants import NORMALIZE
@@ -6369,8 +6369,8 @@ for norm in [NORMALIZE.LINEAR, NORMALIZE.SYMLOG]:
         ylabel="City",
         figsize=FIG_SIZE.FULL_MEDIUM,
         show_colorbars=True,
-        show_heatmap_values=True,
-        valfmt=VALUE_FORMAT.INTEGER,
+        show_values=True,
+        value_format=VALUE_FORMAT.INTEGER,
     ).show()</div>
 </div>
 </div>
@@ -6438,8 +6438,8 @@ for norm in [NORMALIZE.LINEAR, NORMALIZE.SYMLOG]:
         <span class="n">ylabel</span><span class="o">=</span><span class="s2">"City"</span><span class="p">,</span>
         <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_MEDIUM</span><span class="p">,</span>
         <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">show_heatmap_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">valfmt</span><span class="o">=</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">DECIMAL</span><span class="p">,</span>
+        <span class="n">show_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">value_format</span><span class="o">=</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">DECIMAL</span><span class="p">,</span>
     <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-12">for centre, label in [(0, "freezing"), (18, "room temperature")]:
@@ -6453,8 +6453,8 @@ for norm in [NORMALIZE.LINEAR, NORMALIZE.SYMLOG]:
         ylabel="City",
         figsize=FIG_SIZE.FULL_MEDIUM,
         show_colorbars=True,
-        show_heatmap_values=True,
-        valfmt=VALUE_FORMAT.DECIMAL,
+        show_values=True,
+        value_format=VALUE_FORMAT.DECIMAL,
     ).show()</div>
 </div>
 </div>
@@ -6517,8 +6517,8 @@ for norm in [NORMALIZE.LINEAR, NORMALIZE.SYMLOG]:
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Month"</span><span class="p">,</span>
     <span class="n">ylabel</span><span class="o">=</span><span class="s2">"City"</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_MEDIUM</span><span class="p">,</span>
-    <span class="n">show_heatmap_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">valfmt</span><span class="o">=</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">DECIMAL</span><span class="p">,</span>
+    <span class="n">show_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">value_format</span><span class="o">=</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">DECIMAL</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-13">Heatmap(
@@ -6529,8 +6529,8 @@ for norm in [NORMALIZE.LINEAR, NORMALIZE.SYMLOG]:
     xlabel="Month",
     ylabel="City",
     figsize=FIG_SIZE.FULL_MEDIUM,
-    show_heatmap_values=True,
-    valfmt=VALUE_FORMAT.DECIMAL,
+    show_values=True,
+    value_format=VALUE_FORMAT.DECIMAL,
 ).show()</div>
 </div>
 </div>
@@ -6591,8 +6591,8 @@ for norm in [NORMALIZE.LINEAR, NORMALIZE.SYMLOG]:
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Month"</span><span class="p">,</span>
     <span class="n">ylabel</span><span class="o">=</span><span class="s2">"City"</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_MEDIUM</span><span class="p">,</span>
-    <span class="n">show_heatmap_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">valfmt</span><span class="o">=</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">DECIMAL</span><span class="p">,</span>
+    <span class="n">show_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">value_format</span><span class="o">=</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">DECIMAL</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-14"># each city's warmest month highlighted, every other cell muted
@@ -6607,8 +6607,8 @@ Heatmap(
     xlabel="Month",
     ylabel="City",
     figsize=FIG_SIZE.FULL_MEDIUM,
-    show_heatmap_values=True,
-    valfmt=VALUE_FORMAT.DECIMAL,
+    show_values=True,
+    value_format=VALUE_FORMAT.DECIMAL,
 ).show()</div>
 </div>
 </div>
@@ -6718,7 +6718,7 @@ Heatmap(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="multiple-heatmaps">Multiple Heatmaps<a class="anchor-link" href="#multiple-heatmaps">¶</a></h2><p>To compare several tables, pass a list of dictionaries to <code>data</code>. Each table gets its own subplot, since two tables cannot share one set of cells, with its <code>subtitle</code> above it, while <code>title</code>, <code>xlabel</code> and <code>ylabel</code> stay global. The per-chart parameters (<code>subtitle</code>, <code>style</code>, <code>valfmt</code>, <code>norm</code>, <code>vmin</code>, <code>vmax</code>, <code>colorbar</code>, and the tick parameters) take a list with one entry per table, or a single value for all of them; <code>None</code> in a list keeps the default for that table. Temperature and rainfall are different quantities, so each table gets its own colormap and its own normalization.</p>
+<h2 id="multiple-heatmaps">Multiple Heatmaps<a class="anchor-link" href="#multiple-heatmaps">¶</a></h2><p>To compare several tables, pass a list of dictionaries to <code>data</code>. Each table gets its own subplot, since two tables cannot share one set of cells, with its <code>subtitle</code> above it, while <code>title</code>, <code>xlabel</code> and <code>ylabel</code> stay global. The per-chart parameters (<code>subtitle</code>, <code>style</code>, <code>value_format</code>, <code>norm</code>, <code>vmin</code>, <code>vmax</code>, <code>colorbar</code>, and the tick parameters) take a list with one entry per table, or a single value for all of them; <code>None</code> in a list keeps the default for that table. Temperature and rainfall are different quantities, so each table gets its own colormap and its own normalization.</p>
 </div>
 </div>
 </div>
@@ -6796,7 +6796,7 @@ Heatmap(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="subplot-layout-and-shared-axes">Subplot layout and shared axes<a class="anchor-link" href="#subplot-layout-and-shared-axes">¶</a></h3><p>Side by side, twelve columns each leave no room for the cell values. <code>max_cols</code> limits the subplots per row, so <code>max_cols=1</code> stacks the tables and gives each the full width. <code>sharex</code> and <code>sharey</code> share an axis across subplots and label it once, on the outer subplots; both tables have the same months, so <code>sharex=True</code> drops the repeated month labels. <code>valfmt</code> as a list keeps the decimal on the temperatures and writes the rainfall as whole numbers.</p>
+<h3 id="subplot-layout-and-shared-axes">Subplot layout and shared axes<a class="anchor-link" href="#subplot-layout-and-shared-axes">¶</a></h3><p>Side by side, twelve columns each leave no room for the cell values. <code>max_cols</code> limits the subplots per row, so <code>max_cols=1</code> stacks the tables and gives each the full width. <code>sharex</code> and <code>sharey</code> share an axis across subplots and label it once, on the outer subplots; both tables have the same months, so <code>sharex=True</code> drops the repeated month labels. <code>value_format</code> as a list keeps the decimal on the temperatures and writes the rainfall as whole numbers.</p>
 </div>
 </div>
 </div>
@@ -6825,13 +6825,13 @@ Heatmap(
     <span class="n">style</span><span class="o">=</span><span class="p">[{</span><span class="s2">"plot_heatmap_cmap"</span><span class="p">:</span> <span class="n">COLORS</span><span class="o">.</span><span class="n">YlOrRd</span><span class="p">},</span> <span class="p">{</span><span class="s2">"plot_heatmap_cmap"</span><span class="p">:</span> <span class="n">COLORS</span><span class="o">.</span><span class="n">Blues</span><span class="p">}],</span>
     <span class="n">norm</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">NORMALIZE</span><span class="o">.</span><span class="n">SYMLOG</span><span class="p">],</span>
     <span class="c1"># one format per table</span>
-    <span class="n">valfmt</span><span class="o">=</span><span class="p">[</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">DECIMAL</span><span class="p">,</span> <span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">INTEGER</span><span class="p">],</span>
+    <span class="n">value_format</span><span class="o">=</span><span class="p">[</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">DECIMAL</span><span class="p">,</span> <span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">INTEGER</span><span class="p">],</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"The climate of six cities"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Month"</span><span class="p">,</span>
     <span class="n">ylabel</span><span class="o">=</span><span class="s2">"City"</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_TALL</span><span class="p">,</span>
     <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">show_heatmap_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">show_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="c1"># stack the tables, one month axis for both</span>
     <span class="n">max_cols</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -6843,13 +6843,13 @@ Heatmap(
     style=[{"plot_heatmap_cmap": COLORS.YlOrRd}, {"plot_heatmap_cmap": COLORS.Blues}],
     norm=[None, NORMALIZE.SYMLOG],
     # one format per table
-    valfmt=[VALUE_FORMAT.DECIMAL, VALUE_FORMAT.INTEGER],
+    value_format=[VALUE_FORMAT.DECIMAL, VALUE_FORMAT.INTEGER],
     title="The climate of six cities",
     xlabel="Month",
     ylabel="City",
     figsize=FIG_SIZE.FULL_TALL,
     show_colorbars=True,
-    show_heatmap_values=True,
+    show_values=True,
     # stack the tables, one month axis for both
     max_cols=1,
     sharex=True,
@@ -6920,8 +6920,8 @@ Heatmap(
     <span class="n">data</span><span class="o">=</span><span class="n">monthly_2024</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Monthly mean temperature in 2024 (°C)"</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_SHORT</span><span class="p">,</span>
-    <span class="n">show_heatmap_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">valfmt</span><span class="o">=</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">DECIMAL</span><span class="p">,</span>
+    <span class="n">show_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">value_format</span><span class="o">=</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">DECIMAL</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-18">Heatmap(
@@ -6929,8 +6929,8 @@ Heatmap(
     data=monthly_2024,
     title="Monthly mean temperature in 2024 (°C)",
     figsize=FIG_SIZE.FULL_SHORT,
-    show_heatmap_values=True,
-    valfmt=VALUE_FORMAT.DECIMAL,
+    show_values=True,
+    value_format=VALUE_FORMAT.DECIMAL,
 ).show()</div>
 </div>
 </div>
@@ -7168,8 +7168,8 @@ Heatmap(
     <span class="n">aspect_ratio</span><span class="o">=</span><span class="n">ASPECT_RATIO</span><span class="o">.</span><span class="n">EQUAL</span><span class="p">,</span>
     <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">colorbar</span><span class="o">=</span><span class="p">{</span><span class="s2">"label"</span><span class="p">:</span> <span class="s2">"Pearson r"</span><span class="p">,</span> <span class="s2">"ticks"</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">]},</span>
-    <span class="n">show_heatmap_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">valfmt</span><span class="o">=</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">DECIMAL_2</span><span class="p">,</span>
+    <span class="n">show_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">value_format</span><span class="o">=</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">DECIMAL_2</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-21">Heatmap(
@@ -7195,8 +7195,8 @@ Heatmap(
     aspect_ratio=ASPECT_RATIO.EQUAL,
     show_colorbars=True,
     colorbar={"label": "Pearson r", "ticks": [-1, -0.5, 0, 0.5, 1]},
-    show_heatmap_values=True,
-    valfmt=VALUE_FORMAT.DECIMAL_2,
+    show_values=True,
+    value_format=VALUE_FORMAT.DECIMAL_2,
 ).show()</div>
 </div>
 </div>
@@ -7264,8 +7264,8 @@ Heatmap(
     <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">SQUARE</span><span class="p">,</span>
     <span class="n">aspect_ratio</span><span class="o">=</span><span class="n">ASPECT_RATIO</span><span class="o">.</span><span class="n">EQUAL</span><span class="p">,</span>
     <span class="c1"># write the counts into the cells</span>
-    <span class="n">show_heatmap_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">valfmt</span><span class="o">=</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">INTEGER</span><span class="p">,</span>
+    <span class="n">show_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">value_format</span><span class="o">=</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">INTEGER</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-22"># the business-politics mix-ups, both ways
@@ -7284,8 +7284,8 @@ Heatmap(
     figsize=FIG_SIZE.SQUARE,
     aspect_ratio=ASPECT_RATIO.EQUAL,
     # write the counts into the cells
-    show_heatmap_values=True,
-    valfmt=VALUE_FORMAT.INTEGER,
+    show_values=True,
+    value_format=VALUE_FORMAT.INTEGER,
 ).show()</div>
 </div>
 </div>
@@ -7354,8 +7354,8 @@ Heatmap(
         <span class="n">ylabel</span><span class="o">=</span><span class="n">ylabel</span><span class="p">,</span>
         <span class="n">xtickrotate</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
         <span class="n">aspect_ratio</span><span class="o">=</span><span class="n">ASPECT_RATIO</span><span class="o">.</span><span class="n">EQUAL</span><span class="p">,</span>
-        <span class="n">show_heatmap_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">valfmt</span><span class="o">=</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">INTEGER</span><span class="p">,</span>
+        <span class="n">show_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">value_format</span><span class="o">=</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">INTEGER</span><span class="p">,</span>
     <span class="p">)</span>
 
 
@@ -7400,8 +7400,8 @@ def matrix(data, title, ylabel=None):
         ylabel=ylabel,
         xtickrotate=30,
         aspect_ratio=ASPECT_RATIO.EQUAL,
-        show_heatmap_values=True,
-        valfmt=VALUE_FORMAT.INTEGER,
+        show_values=True,
+        value_format=VALUE_FORMAT.INTEGER,
     )
 
 

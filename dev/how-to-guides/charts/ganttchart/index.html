@@ -5775,7 +5775,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </tr>
 <tr>
 <td style="text-align:left">show how far along each task is</td>
-<td style="text-align:left">the <code>"progress"</code> key, <code>show_values</code>, <code>value_format</code></td>
+<td style="text-align:left">the <code>"progress"</code> key, <code>show_values</code>, <code>value_kind</code>, <code>value_format</code></td>
 <td style="text-align:left"><a href="#progress-and-value-labels">Progress and value labels</a></td>
 </tr>
 <tr>
@@ -5859,12 +5859,16 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <td style="text-align:left"><a href="../../../references/constants/#datachart.constants.GANTT_DATE_PERIOD"><code>GANTT_DATE_PERIOD</code></a></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>show_values</code></td>
+<td style="text-align:left"><code>value_kind</code></td>
 <td style="text-align:left"><a href="../../../references/constants/#datachart.constants.GANTT_VALUE"><code>GANTT_VALUE</code></a></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>sort_by</code></td>
 <td style="text-align:left"><a href="../../../references/constants/#datachart.constants.GANTT_SORT_KEY"><code>GANTT_SORT_KEY</code></a></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>xticks_format</code></td>
+<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.DATE_FORMAT"><code>DATE_FORMAT</code></a></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>style={"plot_gantt_dependency_entry": ...}</code></td>
@@ -5893,10 +5897,6 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <tr>
 <td style="text-align:left"><code>emphasis</code></td>
 <td style="text-align:left"><a href="../../../references/constants/#datachart.constants.EMPHASIS"><code>EMPHASIS</code></a></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>xticks_format</code></td>
-<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.DATE_FORMAT"><code>DATE_FORMAT</code></a></td>
 </tr>
 </tbody>
 </table>
@@ -6593,7 +6593,7 @@ GanttChart(
     <span class="n">xmax</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2025</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
     <span class="n">period</span><span class="o">=</span><span class="n">GANTT_DATE_PERIOD</span><span class="o">.</span><span class="n">MONTH</span><span class="p">,</span>
     <span class="c1"># a milestone prints its date</span>
-    <span class="n">show_values</span><span class="o">=</span><span class="n">GANTT_VALUE</span><span class="o">.</span><span class="n">DURATION</span><span class="p">,</span>
+    <span class="n">show_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">value_kind</span><span class="o">=</span><span class="n">GANTT_VALUE</span><span class="o">.</span><span class="n">DURATION</span><span class="p">,</span>
     <span class="c1"># a larger star</span>
     <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">"plot_gantt_milestone_marker"</span><span class="p">:</span> <span class="s2">"*"</span><span class="p">,</span> <span class="s2">"plot_gantt_milestone_size"</span><span class="p">:</span> <span class="mi">14</span><span class="p">},</span>
     <span class="n">show_legend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -6615,7 +6615,7 @@ GanttChart(
     xmax=date(2025, 12, 1),
     period=GANTT_DATE_PERIOD.MONTH,
     # a milestone prints its date
-    show_values=GANTT_VALUE.DURATION,
+    show_values=True, value_kind=GANTT_VALUE.DURATION,
     # a larger star
     style={"plot_gantt_milestone_marker": "*", "plot_gantt_milestone_size": 14},
     show_legend=False,
@@ -6644,7 +6644,7 @@ GanttChart(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="progress-and-value-labels">Progress and value labels<a class="anchor-link" href="#progress-and-value-labels">¶</a></h3><p><em>How far along are we?</em> is answered by a task's <code>progress</code> key, the fraction done in <code>[0, 1]</code>, drawn as an inner bar from the task's start. <code>show_values</code> prints a label past each bar end (<a href="../../../references/constants/#datachart.constants.GANTT_VALUE">GANTT_VALUE</a>): <code>PROGRESS</code> prints the progress as a percentage (a task without <code>progress</code> stays unlabeled), <code>DURATION</code> the duration in days. <code>value_format</code> formats the number, a <a href="../../../references/constants/#datachart.constants.VALUE_FORMAT">VALUE_FORMAT</a> constant or any <code>"{x:.1f}"</code> style string: it formats the progress fraction or the days. On 16 June the design and site work are done, the foundations are at 80%, and the kitchen order at 20%:</p>
+<h3 id="progress-and-value-labels">Progress and value labels<a class="anchor-link" href="#progress-and-value-labels">¶</a></h3><p><em>How far along are we?</em> is answered by a task's <code>progress</code> key, the fraction done in <code>[0, 1]</code>, drawn as an inner bar from the task's start. <code>show_values=True</code> prints a label past each bar end and <code>value_kind</code> picks which (<a href="../../../references/constants/#datachart.constants.GANTT_VALUE">GANTT_VALUE</a>): <code>PROGRESS</code> prints the progress as a percentage (a task without <code>progress</code> stays unlabeled), <code>DURATION</code>, the default, the duration in days. <code>value_format</code> formats the number, a <a href="../../../references/constants/#datachart.constants.VALUE_FORMAT">VALUE_FORMAT</a> constant or any <code>"{x:.1f}"</code> style string: it formats the progress fraction or the days. On 16 June the design and site work are done, the foundations are at 80%, and the kitchen order at 20%:</p>
 </div>
 </div>
 </div>
@@ -6672,7 +6672,7 @@ GanttChart(
     <span class="n">title</span><span class="o">=</span><span class="s2">"House build, progress on 16 June"</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_MEDIUM</span><span class="p">,</span>
     <span class="c1"># label each bar with its progress</span>
-    <span class="n">show_values</span><span class="o">=</span><span class="n">GANTT_VALUE</span><span class="o">.</span><span class="n">PROGRESS</span><span class="p">,</span>
+    <span class="n">show_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">value_kind</span><span class="o">=</span><span class="n">GANTT_VALUE</span><span class="o">.</span><span class="n">PROGRESS</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-14">GanttChart(
@@ -6680,7 +6680,7 @@ GanttChart(
     title="House build, progress on 16 June",
     figsize=FIG_SIZE.FULL_MEDIUM,
     # label each bar with its progress
-    show_values=GANTT_VALUE.PROGRESS,
+    show_values=True, value_kind=GANTT_VALUE.PROGRESS,
 ).show()</div>
 </div>
 </div>
@@ -6734,7 +6734,7 @@ GanttChart(
     <span class="n">title</span><span class="o">=</span><span class="s2">"House build, days per task"</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_MEDIUM</span><span class="p">,</span>
     <span class="c1"># label each bar with its duration, in days</span>
-    <span class="n">show_values</span><span class="o">=</span><span class="n">GANTT_VALUE</span><span class="o">.</span><span class="n">DURATION</span><span class="p">,</span>
+    <span class="n">show_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">value_kind</span><span class="o">=</span><span class="n">GANTT_VALUE</span><span class="o">.</span><span class="n">DURATION</span><span class="p">,</span>
     <span class="n">value_format</span><span class="o">=</span><span class="s2">"</span><span class="si">{x:.0f}</span><span class="s2"> days"</span><span class="p">,</span>
     <span class="c1"># room for the labels past the last bar</span>
     <span class="n">xmax</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2025</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span>
@@ -6745,7 +6745,7 @@ GanttChart(
     title="House build, days per task",
     figsize=FIG_SIZE.FULL_MEDIUM,
     # label each bar with its duration, in days
-    show_values=GANTT_VALUE.DURATION,
+    show_values=True, value_kind=GANTT_VALUE.DURATION,
     value_format="{x:.0f} days",
     # room for the labels past the last bar
     xmax=date(2025, 11, 20),
@@ -6939,7 +6939,7 @@ GanttChart(
     <span class="n">data</span><span class="o">=</span><span class="n">house</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"House build, where we stand"</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_MEDIUM</span><span class="p">,</span>
-    <span class="n">show_values</span><span class="o">=</span><span class="n">GANTT_VALUE</span><span class="o">.</span><span class="n">PROGRESS</span><span class="p">,</span>
+    <span class="n">show_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">value_kind</span><span class="o">=</span><span class="n">GANTT_VALUE</span><span class="o">.</span><span class="n">PROGRESS</span><span class="p">,</span>
     <span class="c1"># mark the day the project stands on</span>
     <span class="n">show_today</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">today</span><span class="o">=</span><span class="n">TODAY</span><span class="p">,</span>
@@ -6950,7 +6950,7 @@ GanttChart(
     data=house,
     title="House build, where we stand",
     figsize=FIG_SIZE.FULL_MEDIUM,
-    show_values=GANTT_VALUE.PROGRESS,
+    show_values=True, value_kind=GANTT_VALUE.PROGRESS,
     # mark the day the project stands on
     show_today=True,
     today=TODAY,
@@ -7458,7 +7458,7 @@ GanttChart(
     <span class="n">data</span><span class="o">=</span><span class="n">house</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"House build, tasks longer than a month"</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_MEDIUM</span><span class="p">,</span>
-    <span class="n">show_values</span><span class="o">=</span><span class="n">GANTT_VALUE</span><span class="o">.</span><span class="n">DURATION</span><span class="p">,</span>
+    <span class="n">show_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">value_kind</span><span class="o">=</span><span class="n">GANTT_VALUE</span><span class="o">.</span><span class="n">DURATION</span><span class="p">,</span>
     <span class="n">xmax</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2025</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
     <span class="c1"># highlight the tasks longer than 30 days</span>
     <span class="n">emphasis_rule</span><span class="o">=</span><span class="p">{</span><span class="s2">"above"</span><span class="p">:</span> <span class="mi">30</span><span class="p">},</span>
@@ -7468,7 +7468,7 @@ GanttChart(
     data=house,
     title="House build, tasks longer than a month",
     figsize=FIG_SIZE.FULL_MEDIUM,
-    show_values=GANTT_VALUE.DURATION,
+    show_values=True, value_kind=GANTT_VALUE.DURATION,
     xmax=date(2025, 11, 10),
     # highlight the tasks longer than 30 days
     emphasis_rule={"above": 30},
@@ -7689,7 +7689,7 @@ Grid([[schedule], [effort]], title="House build, 2025", figsize=FIG_SIZE.FULL_TA
     <span class="n">title</span><span class="o">=</span><span class="s2">"Foundation slab, the first four weeks"</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_SHORT</span><span class="p">,</span>
     <span class="n">show_grid</span><span class="o">=</span><span class="n">SHOW_GRID</span><span class="o">.</span><span class="n">X</span><span class="p">,</span>
-    <span class="n">show_values</span><span class="o">=</span><span class="n">GANTT_VALUE</span><span class="o">.</span><span class="n">DURATION</span><span class="p">,</span>
+    <span class="n">show_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">value_kind</span><span class="o">=</span><span class="n">GANTT_VALUE</span><span class="o">.</span><span class="n">DURATION</span><span class="p">,</span>
     <span class="n">xmax</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2025</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">23</span><span class="p">),</span>
     <span class="c1"># print the ticks as day and month</span>
     <span class="n">xticks_format</span><span class="o">=</span><span class="s2">"</span><span class="si">%d</span><span class="s2"> %b"</span><span class="p">,</span>
@@ -7700,7 +7700,7 @@ Grid([[schedule], [effort]], title="House build, 2025", figsize=FIG_SIZE.FULL_TA
     title="Foundation slab, the first four weeks",
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.X,
-    show_values=GANTT_VALUE.DURATION,
+    show_values=True, value_kind=GANTT_VALUE.DURATION,
     xmax=date(2025, 7, 23),
     # print the ticks as day and month
     xticks_format="%d %b",
@@ -7850,7 +7850,7 @@ figure.show()</div>
     <span class="n">xmax</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">2025</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">15</span><span class="p">),</span>
     <span class="c1"># the weekend</span>
     <span class="n">vspans</span><span class="o">=</span><span class="p">{</span><span class="s2">"xmin"</span><span class="p">:</span> <span class="n">date</span><span class="p">(</span><span class="mi">2025</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="s2">"xmax"</span><span class="p">:</span> <span class="n">date</span><span class="p">(</span><span class="mi">2025</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">8</span><span class="p">)},</span>
-    <span class="n">show_values</span><span class="o">=</span><span class="n">GANTT_VALUE</span><span class="o">.</span><span class="n">PROGRESS</span><span class="p">,</span>
+    <span class="n">show_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">value_kind</span><span class="o">=</span><span class="n">GANTT_VALUE</span><span class="o">.</span><span class="n">PROGRESS</span><span class="p">,</span>
     <span class="n">show_today</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">today</span><span class="o">=</span><span class="n">SPRINT_TODAY</span><span class="p">,</span>
     <span class="n">today_label</span><span class="o">=</span><span class="s2">"today"</span><span class="p">,</span>
@@ -7867,7 +7867,7 @@ figure.show()</div>
     xmax=date(2025, 9, 15),
     # the weekend
     vspans={"xmin": date(2025, 9, 6), "xmax": date(2025, 9, 8)},
-    show_values=GANTT_VALUE.PROGRESS,
+    show_values=True, value_kind=GANTT_VALUE.PROGRESS,
     show_today=True,
     today=SPRINT_TODAY,
     today_label="today",

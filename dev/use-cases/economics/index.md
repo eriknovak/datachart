@@ -132,7 +132,7 @@ South Korea is the finished path: agriculture was 36% of GDP in 1960 and is 1% n
 
 ### Where and when did inflation bite?
 
-Nineteen countries over nine years of inflation is a table a reader cannot scan for the hot years; a [heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/index.md) colours each cell by its value, so a hot year is a dark column and a chronically inflationary country is a dark row. Two members run inflation in the tens and hundreds of percent, which would leave every other cell the same pale shade on a linear scale, so `norm=NORMALIZE.SYMLOG` gives the colour scale a logarithmic reach that keeps the contrast among the single digits, and `show_heatmap_values` prints the numbers so the extreme cells are read rather than guessed.
+Nineteen countries over nine years of inflation is a table a reader cannot scan for the hot years; a [heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/index.md) colours each cell by its value, so a hot year is a dark column and a chronically inflationary country is a dark row. Two members run inflation in the tens and hundreds of percent, which would leave every other cell the same pale shade on a linear scale, so `norm=NORMALIZE.SYMLOG` gives the colour scale a logarithmic reach that keeps the contrast among the single digits, and `show_values` prints the numbers so the extreme cells are read rather than guessed.
 
 ```
 MEMBERS = sorted(INFLATION, key=lambda country: -INFLATION[country][INFLATION_YEARS.index(2022)])
@@ -143,8 +143,8 @@ inflation_figure = Heatmap(
     xlabel="Year",
     ylabel="Country, by 2022 inflation",
     norm=NORMALIZE.SYMLOG,
-    show_heatmap_values=True,
-    valfmt="{x:.1f}",
+    show_values=True,
+    value_format="{x:.1f}",
     show_colorbars=True,
     colorbar={"label": "Inflation (%)"},
     figsize=(8.0, 6.5),
@@ -185,7 +185,7 @@ China and Türkiye are the only bars to the right of the line, at 2.3 and 1.8%. 
 
 ### Who caught up on income?
 
-Growth rates compound into income levels, and the level is what a household feels. GDP per capita in 2000 and 2023, at purchasing-power parity so the dollars buy the same basket everywhere, is a before-and-after question for a [dumbbell chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/dumbbellchart/index.md): a dot at each year and the connector between them is the gain. `sort_by` the 2023 value puts the richest at the top, and `show_values="delta"` prints each gain at its connector, so a long connector low on the chart is a country catching up and a short one high on it is a rich country growing slowly.
+Growth rates compound into income levels, and the level is what a household feels. GDP per capita in 2000 and 2023, at purchasing-power parity so the dollars buy the same basket everywhere, is a before-and-after question for a [dumbbell chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/dumbbellchart/index.md): a dot at each year and the connector between them is the gain. `sort_by` the 2023 value puts the richest at the top, and `show_values=True, value_kind="delta"` prints each gain at its connector, so a long connector low on the chart is a country catching up and a short one high on it is a rich country growing slowly.
 
 ```
 income_figure = DumbbellChart(
@@ -196,7 +196,7 @@ income_figure = DumbbellChart(
     end_name="2023",
     sort=SORT.DESCENDING,
     sort_by=DUMBBELL_SORT_KEY.END,
-    show_values="delta",
+    show_values=True, value_kind="delta",
     value_format=VALUE_FORMAT.THOUSANDS,
     show_legend=True,
     figsize=(7.0, 6.0),

@@ -103,7 +103,7 @@ Which constants the parameters of each chart accept, by chart family. A constant
 | [BumpChart](https://eriknovak.github.io/datachart/dev/references/charts/bumpchart/#datachart.charts.BumpChart)                      | [`BUMP_RANK`](#datachart.constants.BUMP_RANK), [`BUMP_LABEL_POSITION`](#datachart.constants.BUMP_LABEL_POSITION)                                                                                                                         | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`EMPHASIS`](#datachart.constants.EMPHASIS), [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`VALUE_FORMAT`](#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](#datachart.constants.DATE_FORMAT), [`SHOW_GRID`](#datachart.constants.SHOW_GRID), [`SCALE`](#datachart.constants.SCALE), [`ASPECT_RATIO`](#datachart.constants.ASPECT_RATIO)                                                                                                                                      |
 | [BarChart](https://eriknovak.github.io/datachart/dev/references/charts/barchart/#datachart.charts.BarChart)                         | —                                                                                                                                                                                                                                        | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`EMPHASIS`](#datachart.constants.EMPHASIS), [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`BAR_MODE`](#datachart.constants.BAR_MODE), [`SORT`](#datachart.constants.SORT), [`ORIENTATION`](#datachart.constants.ORIENTATION), [`VALUE_FORMAT`](#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](#datachart.constants.DATE_FORMAT), [`SHOW_GRID`](#datachart.constants.SHOW_GRID), [`SCALE`](#datachart.constants.SCALE), [`ASPECT_RATIO`](#datachart.constants.ASPECT_RATIO) |
 | [PyramidChart](https://eriknovak.github.io/datachart/dev/references/charts/pyramidchart/#datachart.charts.PyramidChart)             | —                                                                                                                                                                                                                                        | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`SORT`](#datachart.constants.SORT), [`VALUE_FORMAT`](#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](#datachart.constants.DATE_FORMAT), [`SHOW_GRID`](#datachart.constants.SHOW_GRID)                                                                                                                                                                                                                                          |
-| [RadialChart](https://eriknovak.github.io/datachart/dev/references/charts/radialchart/#datachart.charts.RadialChart)                | [`RADIAL_TYPE`](#datachart.constants.RADIAL_TYPE), [`RADIAL_DIRECTION`](#datachart.constants.RADIAL_DIRECTION)                                                                                                                           | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`EMPHASIS`](#datachart.constants.EMPHASIS), [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`BAR_MODE`](#datachart.constants.BAR_MODE), [`SORT`](#datachart.constants.SORT), [`SHOW_GRID`](#datachart.constants.SHOW_GRID), [`SCALE`](#datachart.constants.SCALE)                                                                                                                                                                                                                 |
+| [RadialChart](https://eriknovak.github.io/datachart/dev/references/charts/radialchart/#datachart.charts.RadialChart)                | [`RADIAL_TYPE`](#datachart.constants.RADIAL_TYPE), [`RADIAL_DIRECTION`](#datachart.constants.RADIAL_DIRECTION)                                                                                                                           | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`EMPHASIS`](#datachart.constants.EMPHASIS), [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`BAR_MODE`](#datachart.constants.BAR_MODE), [`SORT`](#datachart.constants.SORT), [`VALUE_FORMAT`](#datachart.constants.VALUE_FORMAT), [`SHOW_GRID`](#datachart.constants.SHOW_GRID), [`SCALE`](#datachart.constants.SCALE)                                                                                                                                                            |
 | [CalendarHeatmap](https://eriknovak.github.io/datachart/dev/references/charts/calendarheatmap/#datachart.charts.CalendarHeatmap)    | [`CALENDAR_WEEKDAY`](#datachart.constants.CALENDAR_WEEKDAY)                                                                                                                                                                              | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`NORMALIZE`](#datachart.constants.NORMALIZE), [`ORIENTATION`](#datachart.constants.ORIENTATION), [`VALUE_FORMAT`](#datachart.constants.VALUE_FORMAT), [`ASPECT_RATIO`](#datachart.constants.ASPECT_RATIO), [`COLORBAR_LOCATION`](#datachart.constants.COLORBAR_LOCATION)                                                                                                                                                                                                                                                                           |
 | [GanttChart](https://eriknovak.github.io/datachart/dev/references/charts/ganttchart/#datachart.charts.GanttChart)                   | [`GANTT_DATE_PERIOD`](#datachart.constants.GANTT_DATE_PERIOD), [`GANTT_VALUE`](#datachart.constants.GANTT_VALUE), [`GANTT_SORT_KEY`](#datachart.constants.GANTT_SORT_KEY), [`GANTT_ARROW_ENTRY`](#datachart.constants.GANTT_ARROW_ENTRY) | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`EMPHASIS`](#datachart.constants.EMPHASIS), [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`SORT`](#datachart.constants.SORT), [`VALUE_FORMAT`](#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](#datachart.constants.DATE_FORMAT), [`SHOW_GRID`](#datachart.constants.SHOW_GRID)                                                                                                                                                                                             |
 | [DumbbellChart](https://eriknovak.github.io/datachart/dev/references/charts/dumbbellchart/#datachart.charts.DumbbellChart)          | [`DUMBBELL_VALUE`](#datachart.constants.DUMBBELL_VALUE), [`DUMBBELL_SORT_KEY`](#datachart.constants.DUMBBELL_SORT_KEY)                                                                                                                   | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`LINE_MARKER`](#datachart.constants.LINE_MARKER), [`LINE_STYLE`](#datachart.constants.LINE_STYLE), [`EMPHASIS`](#datachart.constants.EMPHASIS), [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`SORT`](#datachart.constants.SORT), [`ORIENTATION`](#datachart.constants.ORIENTATION), [`VALUE_FORMAT`](#datachart.constants.VALUE_FORMAT), [`SHOW_GRID`](#datachart.constants.SHOW_GRID), [`SCALE`](#datachart.constants.SCALE)                                                  |
@@ -129,7 +129,7 @@ Which constants the parameters of each chart accept, by chart family. A constant
 | [HexbinChart](https://eriknovak.github.io/datachart/dev/references/charts/hexbinchart/#datachart.charts.HexbinChart)          | [`HEXBIN_REDUCE`](#datachart.constants.HEXBIN_REDUCE)                                                                            | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`NORMALIZE`](#datachart.constants.NORMALIZE), [`ORIENTATION`](#datachart.constants.ORIENTATION), [`VALUE_FORMAT`](#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](#datachart.constants.DATE_FORMAT), [`SHOW_GRID`](#datachart.constants.SHOW_GRID), [`SCALE`](#datachart.constants.SCALE), [`ASPECT_RATIO`](#datachart.constants.ASPECT_RATIO), [`COLORBAR_LOCATION`](#datachart.constants.COLORBAR_LOCATION)                                              |
 | [ParallelCoords](https://eriknovak.github.io/datachart/dev/references/charts/parallelcoords/#datachart.charts.ParallelCoords) | —                                                                                                                                | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`EMPHASIS`](#datachart.constants.EMPHASIS), [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`SHOW_GRID`](#datachart.constants.SHOW_GRID), [`ASPECT_RATIO`](#datachart.constants.ASPECT_RATIO)                                                                                                                                                                                                                                                                                                                 |
 | [NetworkChart](https://eriknovak.github.io/datachart/dev/references/charts/networkchart/#datachart.charts.NetworkChart)       | [`NETWORK_LAYOUT`](#datachart.constants.NETWORK_LAYOUT), [`NETWORK_LABEL_POSITION`](#datachart.constants.NETWORK_LABEL_POSITION) | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`VALUE_FORMAT`](#datachart.constants.VALUE_FORMAT)                                                                                                                                                                                                                                                                                                                                                                                                             |
-| [ScatterMatrix](https://eriknovak.github.io/datachart/dev/references/charts/scattermatrix/#datachart.charts.ScatterMatrix)    | [`SCATTER_MATRIX_DIAGONAL`](#datachart.constants.SCATTER_MATRIX_DIAGONAL)                                                        | [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`SHOW_GRID`](#datachart.constants.SHOW_GRID)                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| [ScatterMatrix](https://eriknovak.github.io/datachart/dev/references/charts/scattermatrix/#datachart.charts.ScatterMatrix)    | [`SCATTER_MATRIX_DIAGONAL`](#datachart.constants.SCATTER_MATRIX_DIAGONAL)                                                        | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`SHOW_GRID`](#datachart.constants.SHOW_GRID)                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | [ImageChart](https://eriknovak.github.io/datachart/dev/references/charts/imagechart/#datachart.charts.ImageChart)             | —                                                                                                                                | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`SHOW_GRID`](#datachart.constants.SHOW_GRID), [`ASPECT_RATIO`](#datachart.constants.ASPECT_RATIO), [`DRAW_POSITION`](#datachart.constants.DRAW_POSITION)                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | [BasemapChart](https://eriknovak.github.io/datachart/dev/references/charts/basemapchart/#datachart.charts.BasemapChart)       | [`BASEMAP_FEATURE`](#datachart.constants.BASEMAP_FEATURE), [`BASEMAP_RESOLUTION`](#datachart.constants.BASEMAP_RESOLUTION)       | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`SHOW_GRID`](#datachart.constants.SHOW_GRID), [`ASPECT_RATIO`](#datachart.constants.ASPECT_RATIO), [`DRAW_POSITION`](#datachart.constants.DRAW_POSITION)                                                                                                                                                                                                                                                                                                                                                                                                                       |
 
@@ -600,7 +600,7 @@ None
 
 The supported normalization options.
 
-Passed as the heatmap's `norm` attribute: normalizes the cell values before they are mapped to colors. Distinct from SCALE, which sets an axis scale.
+Passed as the `norm` attribute of a colormapped chart: normalizes the values before they are mapped to colors. Distinct from SCALE, which sets an axis scale.
 
 Examples:
 
@@ -620,7 +620,7 @@ Examples:
 | `CENTERED` | The normalization holding vcenter in the middle of the colormap, the same distance to each side of it. Equals to "centered". **TYPE:** `str`            |
 | `TWOSLOPE` | The normalization holding vcenter in the middle of the colormap, with vmin and vmax at unequal distances from it. Equals to "twoslope". **TYPE:** `str` |
 
-`CENTERED` and `TWOSLOPE` are read by the heatmap and calendar heatmap, which draw them in the theme's diverging colormap; the other charts taking a `norm` support the first five.
+`CENTERED` and `TWOSLOPE` are read by the heatmap, calendar heatmap, contour chart and hexbin chart, which draw them in the theme's diverging colormap; the other charts taking a `norm` support the first five.
 
 ### datachart.constants.ORIENTATION
 
@@ -704,7 +704,7 @@ Examples:
 
 The predefined value formats.
 
-Passed as the `value_format` attribute of every chart that takes `show_values` (the value labels printed beside its marks) or as the heatmap's `valfmt` attribute (the values drawn in the cells).
+Passed as the `value_format` attribute of every chart that takes `show_values`: the value labels printed beside its marks, or the values drawn in a heatmap's cells.
 
 Examples:
 
@@ -1012,7 +1012,7 @@ Examples:
 
 The supported gantt chart value labels.
 
-Passed as the `show_values` setting of the gantt chart: what each bar prints past its end. None prints nothing.
+Passed as the `value_kind` setting of the gantt chart: what each bar prints past its end when `show_values` is on.
 
 Examples:
 
@@ -1024,7 +1024,8 @@ Examples:
 
 | ATTRIBUTE  | DESCRIPTION                                                                |
 | ---------- | -------------------------------------------------------------------------- |
-| `NONE`     | No value labels. Equals to None. **TYPE:** `None`                          |
+| `DEFAULT`  | The default label. Same as GANTT_VALUE.DURATION. **TYPE:** `str`           |
+| `NONE`     | Equals to None, which value_kind reads as DEFAULT. **TYPE:** `None`        |
 | `DURATION` | The task's duration in days. Equals to "duration". **TYPE:** `str`         |
 | `PROGRESS` | The task's progress as a percentage. Equals to "progress". **TYPE:** `str` |
 
@@ -1072,7 +1073,7 @@ Examples:
 
 The supported dumbbell chart value labels.
 
-Passed as the `show_values` setting of the dumbbell chart: what each record prints. None prints nothing.
+Passed as the `value_kind` setting of the dumbbell chart: what each record prints when `show_values` is on.
 
 Examples:
 
@@ -1084,7 +1085,8 @@ Examples:
 
 | ATTRIBUTE   | DESCRIPTION                                                                                          |
 | ----------- | ---------------------------------------------------------------------------------------------------- |
-| `NONE`      | No value labels. Equals to None. **TYPE:** `None`                                                    |
+| `DEFAULT`   | The default label. Same as DUMBBELL_VALUE.ENDPOINTS. **TYPE:** `str`                                 |
+| `NONE`      | Equals to None, which value_kind reads as DEFAULT. **TYPE:** `None`                                  |
 | `ENDPOINTS` | Each endpoint's value, past its dot, away from the connector. Equals to "endpoints". **TYPE:** `str` |
 | `DELTA`     | The record's end - start, at the connector midpoint. Equals to "delta". **TYPE:** `str`              |
 
@@ -1133,7 +1135,7 @@ Examples:
 
 The supported ridgeline density scales.
 
-Passed as the `normalize` setting of ridgeline plots: whether every ridge is scaled to the same peak height, so their shapes compare, or all ridges share one density scale, so their heights compare.
+Passed as the `ridge_scale` setting of ridgeline plots: whether every ridge is scaled to the same peak height, so their shapes compare, or all ridges share one density scale, so their heights compare.
 
 Examples:
 

@@ -5604,7 +5604,7 @@ Grid(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="where-and-when-did-inflation-bite">Where and when did inflation bite?<a class="anchor-link" href="#where-and-when-did-inflation-bite">¶</a></h3><p>Nineteen countries over nine years of inflation is a table a reader cannot scan for the hot years; a <a href="../../how-to-guides/charts/heatmap/">heatmap</a> colours each cell by its value, so a hot year is a dark column and a chronically inflationary country is a dark row. Two members run inflation in the tens and hundreds of percent, which would leave every other cell the same pale shade on a linear scale, so <code>norm=NORMALIZE.SYMLOG</code> gives the colour scale a logarithmic reach that keeps the contrast among the single digits, and <code>show_heatmap_values</code> prints the numbers so the extreme cells are read rather than guessed.</p>
+<h3 id="where-and-when-did-inflation-bite">Where and when did inflation bite?<a class="anchor-link" href="#where-and-when-did-inflation-bite">¶</a></h3><p>Nineteen countries over nine years of inflation is a table a reader cannot scan for the hot years; a <a href="../../how-to-guides/charts/heatmap/">heatmap</a> colours each cell by its value, so a hot year is a dark column and a chronically inflationary country is a dark row. Two members run inflation in the tens and hundreds of percent, which would leave every other cell the same pale shade on a linear scale, so <code>norm=NORMALIZE.SYMLOG</code> gives the colour scale a logarithmic reach that keeps the contrast among the single digits, and <code>show_values</code> prints the numbers so the extreme cells are read rather than guessed.</p>
 </div>
 </div>
 </div>
@@ -5635,8 +5635,8 @@ Grid(
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Year"</span><span class="p">,</span>
     <span class="n">ylabel</span><span class="o">=</span><span class="s2">"Country, by 2022 inflation"</span><span class="p">,</span>
     <span class="n">norm</span><span class="o">=</span><span class="n">NORMALIZE</span><span class="o">.</span><span class="n">SYMLOG</span><span class="p">,</span>
-    <span class="n">show_heatmap_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">valfmt</span><span class="o">=</span><span class="s2">"</span><span class="si">{x:.1f}</span><span class="s2">"</span><span class="p">,</span>
+    <span class="n">show_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">value_format</span><span class="o">=</span><span class="s2">"</span><span class="si">{x:.1f}</span><span class="s2">"</span><span class="p">,</span>
     <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">colorbar</span><span class="o">=</span><span class="p">{</span><span class="s2">"label"</span><span class="p">:</span> <span class="s2">"Inflation (%)"</span><span class="p">},</span>
     <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">8.0</span><span class="p">,</span> <span class="mf">6.5</span><span class="p">),</span>
@@ -5651,8 +5651,8 @@ inflation_figure = Heatmap(
     xlabel="Year",
     ylabel="Country, by 2022 inflation",
     norm=NORMALIZE.SYMLOG,
-    show_heatmap_values=True,
-    valfmt="{x:.1f}",
+    show_values=True,
+    value_format="{x:.1f}",
     show_colorbars=True,
     colorbar={"label": "Inflation (%)"},
     figsize=(8.0, 6.5),
@@ -5792,7 +5792,7 @@ pandemic_figure.show()</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="who-caught-up-on-income">Who caught up on income?<a class="anchor-link" href="#who-caught-up-on-income">¶</a></h3><p>Growth rates compound into income levels, and the level is what a household feels. GDP per capita in 2000 and 2023, at purchasing-power parity so the dollars buy the same basket everywhere, is a before-and-after question for a <a href="../../how-to-guides/charts/dumbbellchart/">dumbbell chart</a>: a dot at each year and the connector between them is the gain. <code>sort_by</code> the 2023 value puts the richest at the top, and <code>show_values="delta"</code> prints each gain at its connector, so a long connector low on the chart is a country catching up and a short one high on it is a rich country growing slowly.</p>
+<h3 id="who-caught-up-on-income">Who caught up on income?<a class="anchor-link" href="#who-caught-up-on-income">¶</a></h3><p>Growth rates compound into income levels, and the level is what a household feels. GDP per capita in 2000 and 2023, at purchasing-power parity so the dollars buy the same basket everywhere, is a before-and-after question for a <a href="../../how-to-guides/charts/dumbbellchart/">dumbbell chart</a>: a dot at each year and the connector between them is the gain. <code>sort_by</code> the 2023 value puts the richest at the top, and <code>show_values=True, value_kind="delta"</code> prints each gain at its connector, so a long connector low on the chart is a country catching up and a short one high on it is a rich country growing slowly.</p>
 </div>
 </div>
 </div>
@@ -5823,7 +5823,7 @@ pandemic_figure.show()</div>
     <span class="n">end_name</span><span class="o">=</span><span class="s2">"2023"</span><span class="p">,</span>
     <span class="n">sort</span><span class="o">=</span><span class="n">SORT</span><span class="o">.</span><span class="n">DESCENDING</span><span class="p">,</span>
     <span class="n">sort_by</span><span class="o">=</span><span class="n">DUMBBELL_SORT_KEY</span><span class="o">.</span><span class="n">END</span><span class="p">,</span>
-    <span class="n">show_values</span><span class="o">=</span><span class="s2">"delta"</span><span class="p">,</span>
+    <span class="n">show_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">value_kind</span><span class="o">=</span><span class="s2">"delta"</span><span class="p">,</span>
     <span class="n">value_format</span><span class="o">=</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">THOUSANDS</span><span class="p">,</span>
     <span class="n">show_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">7.0</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">),</span>
@@ -5838,7 +5838,7 @@ pandemic_figure.show()</div>
     end_name="2023",
     sort=SORT.DESCENDING,
     sort_by=DUMBBELL_SORT_KEY.END,
-    show_values="delta",
+    show_values=True, value_kind="delta",
     value_format=VALUE_FORMAT.THOUSANDS,
     show_legend=True,
     figsize=(7.0, 6.0),

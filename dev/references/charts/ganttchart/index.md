@@ -23,7 +23,8 @@ GanttChart(
     show_legend: bool | None = None,
     legend: LegendSettingAttrs | None = None,
     show_grid: SHOW_GRID | str | bool | None = None,
-    show_values: GANTT_VALUE | str | None = None,
+    show_values: bool | None = None,
+    value_kind: GANTT_VALUE | str | None = None,
     value_format: VALUE_FORMAT | str | None = None,
     show_dependencies: bool | None = None,
     show_today: bool | None = None,
@@ -40,17 +41,36 @@ GanttChart(
         | list[GanttStyleAttrs | None]
         | None
     ) = None,
-    xtickrotate: int | None = None,
-    ytickrotate: int | None = None,
+    xtickrotate: int | list[int | None] | None = None,
+    ytickrotate: int | list[int | None] | None = None,
     xticks_format: DATE_FORMAT | str | None = None,
     vlines: (
-        VLineSettingAttrs | list[VLineSettingAttrs] | None
+        VLineSettingAttrs
+        | list[VLineSettingAttrs]
+        | list[
+            VLineSettingAttrs
+            | list[VLineSettingAttrs]
+            | None
+        ]
+        | None
     ) = None,
     vspans: (
-        VSpanSettingAttrs | list[VSpanSettingAttrs] | None
+        VSpanSettingAttrs
+        | list[VSpanSettingAttrs]
+        | list[
+            VSpanSettingAttrs
+            | list[VSpanSettingAttrs]
+            | None
+        ]
+        | None
     ) = None,
     texts: (
-        TextSettingAttrs | list[TextSettingAttrs] | None
+        TextSettingAttrs
+        | list[TextSettingAttrs]
+        | list[
+            TextSettingAttrs | list[TextSettingAttrs] | None
+        ]
+        | None
     ) = None
 ) -> plt.Figure
 ```
@@ -96,7 +116,8 @@ Examples:
 | `show_legend`        | Whether to show the legend of the task groups. Defaults to on when any task carries a group and the group headers are off. **TYPE:** \`bool                                                                                                                                                                                                                                                                  |
 | `legend`             | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** \`LegendSettingAttrs                                                                                                                                                                                                                                       |
 | `show_grid`          | Which grid lines to show ("both", "x", "y"); False draws none. See SHOW_GRID. **TYPE:** \`SHOW_GRID                                                                                                                                                                                                                                                                                                          |
-| `show_values`        | The label printed past each bar end: None (none), "duration" (the duration in days), or "progress" (the progress as a percentage). A milestone prints its date instead, in the xticks_format or as day and month. See GANTT_VALUE. **TYPE:** \`GANTT_VALUE                                                                                                                                                   |
+| `show_values`        | Whether to print a label past each bar end, the one value_kind names. A milestone prints its date instead, in the xticks_format or as day and month. **TYPE:** \`bool                                                                                                                                                                                                                                        |
+| `value_kind`         | The label show_values prints: "duration" (default, the duration in days) or "progress" (the progress as a percentage). Ignored while show_values is off. See GANTT_VALUE. **TYPE:** \`GANTT_VALUE                                                                                                                                                                                                            |
 | `value_format`       | Format string for the value labels: a VALUE_FORMAT constant or any "{x:.1f}", "{:.1f}%", or "%g" style string. It formats the duration in days, or the progress fraction. **TYPE:** \`VALUE_FORMAT                                                                                                                                                                                                           |
 | `show_dependencies`  | Whether to draw an arrow from the end of each task named in depends_on to the start of the task depending on it. **TYPE:** \`bool                                                                                                                                                                                                                                                                            |
 | `show_today`         | Whether to draw the today line. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                             |
@@ -178,8 +199,9 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | Parameter                                    | Constant                                                                                                                                                                                                                                     |
 | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `period`                                     | [`GANTT_DATE_PERIOD`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.GANTT_DATE_PERIOD)                                                                                                                 |
-| `show_values`                                | [`GANTT_VALUE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.GANTT_VALUE)                                                                                                                             |
+| `value_kind`                                 | [`GANTT_VALUE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.GANTT_VALUE)                                                                                                                             |
 | `sort_by`                                    | [`GANTT_SORT_KEY`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.GANTT_SORT_KEY)                                                                                                                       |
+| `xticks_format`                              | [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)                                                                                                                             |
 | `style={"plot_gantt_dependency_entry": ...}` | [`GANTT_ARROW_ENTRY`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.GANTT_ARROW_ENTRY)                                                                                                                 |
 | `figsize`                                    | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                                                                                                                                   |
 | `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN) |
@@ -187,4 +209,3 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `value_format`                               | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                           |
 | `sort`                                       | [`SORT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT)                                                                                                                                           |
 | `emphasis`                                   | [`EMPHASIS`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS)                                                                                                                                   |
-| `xticks_format`                              | [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)                                                                                                                             |

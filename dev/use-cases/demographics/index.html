@@ -5786,7 +5786,7 @@ migration_figure.show()</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="which-regions-are-ageing-fastest">Which regions are ageing fastest?<a class="anchor-link" href="#which-regions-are-ageing-fastest">¶</a></h3><p>A national median age hides that the regions age at different speeds, since the capital draws the young and the periphery keeps the old, and the check is one number per region per year. Twelve regions by twelve years is a table that a <a href="../../how-to-guides/charts/heatmap/">heatmap</a> reads in one look: each cell coloured by the median age, the rows sorted by the latest year so the oldest region sits at the top, and <code>show_heatmap_values</code> printing the ages so the cells are read rather than guessed. A row that darkens faster than its neighbours is a region ageing faster.</p>
+<h3 id="which-regions-are-ageing-fastest">Which regions are ageing fastest?<a class="anchor-link" href="#which-regions-are-ageing-fastest">¶</a></h3><p>A national median age hides that the regions age at different speeds, since the capital draws the young and the periphery keeps the old, and the check is one number per region per year. Twelve regions by twelve years is a table that a <a href="../../how-to-guides/charts/heatmap/">heatmap</a> reads in one look: each cell coloured by the median age, the rows sorted by the latest year so the oldest region sits at the top, and <code>show_values</code> printing the ages so the cells are read rather than guessed. A row that darkens faster than its neighbours is a region ageing faster.</p>
 </div>
 </div>
 </div>
@@ -5816,8 +5816,8 @@ migration_figure.show()</div>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Every region is older than a decade ago; the capital region stays youngest"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Year"</span><span class="p">,</span>
     <span class="n">ylabel</span><span class="o">=</span><span class="s2">"Statistical region, by median age in 2025"</span><span class="p">,</span>
-    <span class="n">show_heatmap_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">valfmt</span><span class="o">=</span><span class="s2">"</span><span class="si">{x:.1f}</span><span class="s2">"</span><span class="p">,</span>
+    <span class="n">show_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">value_format</span><span class="o">=</span><span class="s2">"</span><span class="si">{x:.1f}</span><span class="s2">"</span><span class="p">,</span>
     <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">colorbar</span><span class="o">=</span><span class="p">{</span><span class="s2">"label"</span><span class="p">:</span> <span class="s2">"Median age (years)"</span><span class="p">},</span>
     <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">9.0</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">),</span>
@@ -5831,8 +5831,8 @@ region_figure = Heatmap(
     title="Every region is older than a decade ago; the capital region stays youngest",
     xlabel="Year",
     ylabel="Statistical region, by median age in 2025",
-    show_heatmap_values=True,
-    valfmt="{x:.1f}",
+    show_values=True,
+    value_format="{x:.1f}",
     show_colorbars=True,
     colorbar={"label": "Median age (years)"},
     figsize=(9.0, 5.5),
@@ -5884,7 +5884,7 @@ region_figure.show()</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="who-gained-the-most-years-since-1990">Who gained the most years since 1990?<a class="anchor-link" href="#who-gained-the-most-years-since-1990">¶</a></h3><p>Life expectancy in two years for a dozen countries is a before-and-after comparison, and a <a href="../../how-to-guides/charts/dumbbellchart/">dumbbell chart</a> is its figure: a dot at 1990, a dot at 2022, and the connector between them is the gain. <code>sort</code> and <code>sort_by</code> order the rows so the longest-lived countries sit at the top, <code>show_values="delta"</code> prints each gain at the connector, and the country of the page takes the <code>"highlight"</code> role through its record's own <code>emphasis</code>, so it stands out among its neighbours without a second chart.</p>
+<h3 id="who-gained-the-most-years-since-1990">Who gained the most years since 1990?<a class="anchor-link" href="#who-gained-the-most-years-since-1990">¶</a></h3><p>Life expectancy in two years for a dozen countries is a before-and-after comparison, and a <a href="../../how-to-guides/charts/dumbbellchart/">dumbbell chart</a> is its figure: a dot at 1990, a dot at 2022, and the connector between them is the gain. <code>sort</code> and <code>sort_by</code> order the rows so the longest-lived countries sit at the top, <code>show_values=True, value_kind="delta"</code> prints each gain at the connector, and the country of the page takes the <code>"highlight"</code> role through its record's own <code>emphasis</code>, so it stands out among its neighbours without a second chart.</p>
 </div>
 </div>
 </div>
@@ -5925,7 +5925,7 @@ region_figure.show()</div>
     <span class="n">end_name</span><span class="o">=</span><span class="s2">"2022"</span><span class="p">,</span>
     <span class="n">sort</span><span class="o">=</span><span class="n">SORT</span><span class="o">.</span><span class="n">DESCENDING</span><span class="p">,</span>
     <span class="n">sort_by</span><span class="o">=</span><span class="n">DUMBBELL_SORT_KEY</span><span class="o">.</span><span class="n">END</span><span class="p">,</span>
-    <span class="n">show_values</span><span class="o">=</span><span class="s2">"delta"</span><span class="p">,</span>
+    <span class="n">show_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">value_kind</span><span class="o">=</span><span class="s2">"delta"</span><span class="p">,</span>
     <span class="n">value_format</span><span class="o">=</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">DECIMAL</span><span class="p">,</span>
     <span class="n">show_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_MEDIUM</span><span class="p">,</span>
@@ -5950,7 +5950,7 @@ span_figure = DumbbellChart(
     end_name="2022",
     sort=SORT.DESCENDING,
     sort_by=DUMBBELL_SORT_KEY.END,
-    show_values="delta",
+    show_values=True, value_kind="delta",
     value_format=VALUE_FORMAT.DECIMAL,
     show_legend=True,
     figsize=FIG_SIZE.FULL_MEDIUM,
@@ -5991,7 +5991,7 @@ span_figure.show()</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="is-the-world-converging">Is the world converging?<a class="anchor-link" href="#is-the-world-converging">¶</a></h3><p>A dozen countries suggest convergence; the claim needs all of them. The life expectancy of every country in one year is a distribution, and four years give four distributions that a <a href="../../how-to-guides/charts/ridgelineplot/">ridgeline plot</a> stacks one above the other, each a smoothed density over the countries, so a shift to the right and a narrowing are both visible at a glance. The rows are years, given as each record's <code>label</code>, and <code>normalize=RIDGELINE_SCALE.COMMON</code> draws every row to the same height, so a narrower, taller ridge means more countries clustered at one value.</p>
+<h3 id="is-the-world-converging">Is the world converging?<a class="anchor-link" href="#is-the-world-converging">¶</a></h3><p>A dozen countries suggest convergence; the claim needs all of them. The life expectancy of every country in one year is a distribution, and four years give four distributions that a <a href="../../how-to-guides/charts/ridgelineplot/">ridgeline plot</a> stacks one above the other, each a smoothed density over the countries, so a shift to the right and a narrowing are both visible at a glance. The rows are years, given as each record's <code>label</code>, and <code>ridge_scale=RIDGELINE_SCALE.COMMON</code> draws every row to the same height, so a narrower, taller ridge means more countries clustered at one value.</p>
 </div>
 </div>
 </div>
@@ -6023,7 +6023,7 @@ span_figure.show()</div>
     <span class="n">title</span><span class="o">=</span><span class="s2">"The world's countries move right and bunch together"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Life expectancy at birth (years)"</span><span class="p">,</span>
     <span class="n">ylabel</span><span class="o">=</span><span class="s2">"Year"</span><span class="p">,</span>
-    <span class="n">normalize</span><span class="o">=</span><span class="n">RIDGELINE_SCALE</span><span class="o">.</span><span class="n">COMMON</span><span class="p">,</span>
+    <span class="n">ridge_scale</span><span class="o">=</span><span class="n">RIDGELINE_SCALE</span><span class="o">.</span><span class="n">COMMON</span><span class="p">,</span>
     <span class="n">overlap</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
     <span class="n">xmin</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_MEDIUM</span><span class="p">,</span>
@@ -6039,7 +6039,7 @@ span_figure.show()</div>
     title="The world's countries move right and bunch together",
     xlabel="Life expectancy at birth (years)",
     ylabel="Year",
-    normalize=RIDGELINE_SCALE.COMMON,
+    ridge_scale=RIDGELINE_SCALE.COMMON,
     overlap=0.5,
     xmin=30,
     figsize=FIG_SIZE.FULL_MEDIUM,

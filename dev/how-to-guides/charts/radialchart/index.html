@@ -5683,7 +5683,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <tbody>
 <tr>
 <td style="text-align:left">pick the visual</td>
-<td style="text-align:left"><code>type</code>, <code>num_bins</code></td>
+<td style="text-align:left"><code>mark</code>, <code>num_bins</code></td>
 <td style="text-align:left"><a href="#the-radial-visuals">The radial visuals</a></td>
 </tr>
 <tr>
@@ -5818,7 +5818,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><code>type</code></td>
+<td style="text-align:left"><code>mark</code></td>
 <td style="text-align:left"><a href="../../../references/constants/#datachart.constants.RADIAL_TYPE"><code>RADIAL_TYPE</code></a></td>
 </tr>
 <tr>
@@ -5840,6 +5840,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <tr>
 <td style="text-align:left"><code>show_grid</code></td>
 <td style="text-align:left"><a href="../../../references/constants/#datachart.constants.SHOW_GRID"><code>SHOW_GRID</code></a></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>value_format</code></td>
+<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.VALUE_FORMAT"><code>VALUE_FORMAT</code></a></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>bar_mode</code></td>
@@ -5866,7 +5870,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="the-radial-visuals">The radial visuals<a class="anchor-link" href="#the-radial-visuals">¶</a></h3><p>The first decision is which visual to draw, and the data answers it. <code>type</code> takes a <a href="../../../references/constants/#datachart.constants.RADIAL_TYPE">RADIAL_TYPE</a> member:</p>
+<h3 id="the-radial-visuals">The radial visuals<a class="anchor-link" href="#the-radial-visuals">¶</a></h3><p>The first decision is which visual to draw, and the data answers it. <code>mark</code> takes a <a href="../../../references/constants/#datachart.constants.RADIAL_TYPE">RADIAL_TYPE</a> member:</p>
 <ul>
 <li><code>RADIAL_TYPE.LINE</code> (the default) connects the values into a closed profile, the radar chart. Use it when the shape is the message: a few entities compared across several metrics on one scale, or a cycle whose continuity matters.</li>
 <li><code>RADIAL_TYPE.BAR</code> draws one sector per category. Use it for one value per cyclic category (a month, an hour, a direction) when the sizes matter more than the shape; the sectors read like the hours on a clock face.</li>
@@ -5901,7 +5905,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="n">RadialChart</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">sunshine_by_month</span><span class="p">,</span>
     <span class="c1"># one sector per month</span>
-    <span class="nb">type</span><span class="o">=</span><span class="n">RADIAL_TYPE</span><span class="o">.</span><span class="n">BAR</span><span class="p">,</span>
+    <span class="n">mark</span><span class="o">=</span><span class="n">RADIAL_TYPE</span><span class="o">.</span><span class="n">BAR</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Monthly sunshine hours"</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
@@ -5910,7 +5914,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 RadialChart(
     data=sunshine_by_month,
     # one sector per month
-    type=RADIAL_TYPE.BAR,
+    mark=RADIAL_TYPE.BAR,
     title="Monthly sunshine hours",
 ).show()</div>
 </div>
@@ -5962,7 +5966,7 @@ RadialChart(
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">RadialChart</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">wind_directions</span><span class="p">,</span>
-    <span class="nb">type</span><span class="o">=</span><span class="n">RADIAL_TYPE</span><span class="o">.</span><span class="n">HISTOGRAM</span><span class="p">,</span>
+    <span class="n">mark</span><span class="o">=</span><span class="n">RADIAL_TYPE</span><span class="o">.</span><span class="n">HISTOGRAM</span><span class="p">,</span>
     <span class="c1"># count the readings in 16 sectors around the full circle</span>
     <span class="n">num_bins</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Wind direction frequency"</span><span class="p">,</span>
@@ -5970,7 +5974,7 @@ RadialChart(
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-5">RadialChart(
     data=wind_directions,
-    type=RADIAL_TYPE.HISTOGRAM,
+    mark=RADIAL_TYPE.HISTOGRAM,
     # count the readings in 16 sectors around the full circle
     num_bins=16,
     title="Wind direction frequency",
@@ -6097,7 +6101,7 @@ RadialChart(
 
 <span class="n">RadialChart</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">sunshine_by_month</span><span class="p">,</span>
-    <span class="nb">type</span><span class="o">=</span><span class="n">RADIAL_TYPE</span><span class="o">.</span><span class="n">BAR</span><span class="p">,</span>
+    <span class="n">mark</span><span class="o">=</span><span class="n">RADIAL_TYPE</span><span class="o">.</span><span class="n">BAR</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Monthly sunshine hours"</span><span class="p">,</span>
     <span class="c1"># a small square figure for one column</span>
     <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">HALF_SQUARE</span><span class="p">,</span>
@@ -6109,7 +6113,7 @@ RadialChart(
 
 RadialChart(
     data=sunshine_by_month,
-    type=RADIAL_TYPE.BAR,
+    mark=RADIAL_TYPE.BAR,
     title="Monthly sunshine hours",
     # a small square figure for one column
     figsize=FIG_SIZE.HALF_SQUARE,
@@ -6167,7 +6171,7 @@ RadialChart(
 
 <span class="n">RadialChart</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">sunshine_by_month</span><span class="p">,</span>
-    <span class="nb">type</span><span class="o">=</span><span class="n">RADIAL_TYPE</span><span class="o">.</span><span class="n">BAR</span><span class="p">,</span>
+    <span class="n">mark</span><span class="o">=</span><span class="n">RADIAL_TYPE</span><span class="o">.</span><span class="n">BAR</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Monthly sunshine hours"</span><span class="p">,</span>
     <span class="c1"># the mathematical convention: start at the right, run counterclockwise</span>
     <span class="n">startangle</span><span class="o">=</span><span class="s2">"E"</span><span class="p">,</span>
@@ -6178,7 +6182,7 @@ RadialChart(
 
 RadialChart(
     data=sunshine_by_month,
-    type=RADIAL_TYPE.BAR,
+    mark=RADIAL_TYPE.BAR,
     title="Monthly sunshine hours",
     # the mathematical convention: start at the right, run counterclockwise
     startangle="E",
@@ -6233,7 +6237,7 @@ RadialChart(
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">RadialChart</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">sunshine_by_month</span><span class="p">,</span>
-    <span class="nb">type</span><span class="o">=</span><span class="n">RADIAL_TYPE</span><span class="o">.</span><span class="n">BAR</span><span class="p">,</span>
+    <span class="n">mark</span><span class="o">=</span><span class="n">RADIAL_TYPE</span><span class="o">.</span><span class="n">BAR</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Monthly sunshine hours"</span><span class="p">,</span>
     <span class="c1"># reserve the middle quarter of the radius for the hole</span>
     <span class="n">innerradius</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
@@ -6241,7 +6245,7 @@ RadialChart(
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-9">RadialChart(
     data=sunshine_by_month,
-    type=RADIAL_TYPE.BAR,
+    mark=RADIAL_TYPE.BAR,
     title="Monthly sunshine hours",
     # reserve the middle quarter of the radius for the hole
     innerradius=0.25,
@@ -6371,7 +6375,7 @@ RadialChart(
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">RadialChart</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">wind_by_direction</span><span class="p">,</span>
-    <span class="nb">type</span><span class="o">=</span><span class="n">RADIAL_TYPE</span><span class="o">.</span><span class="n">BAR</span><span class="p">,</span>
+    <span class="n">mark</span><span class="o">=</span><span class="n">RADIAL_TYPE</span><span class="o">.</span><span class="n">BAR</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Directions averaging above 15 km/h"</span><span class="p">,</span>
     <span class="c1"># highlight the strong directions, mute the rest</span>
     <span class="n">emphasis_rule</span><span class="o">=</span><span class="p">{</span><span class="s2">"above"</span><span class="p">:</span> <span class="mi">15</span><span class="p">},</span>
@@ -6382,7 +6386,7 @@ RadialChart(
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-11">RadialChart(
     data=wind_by_direction,
-    type=RADIAL_TYPE.BAR,
+    mark=RADIAL_TYPE.BAR,
     title="Directions averaging above 15 km/h",
     # highlight the strong directions, mute the rest
     emphasis_rule={"above": 15},
@@ -6441,7 +6445,7 @@ RadialChart(
 
 <span class="n">RadialChart</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">wind_by_direction</span><span class="p">,</span>
-    <span class="nb">type</span><span class="o">=</span><span class="n">RADIAL_TYPE</span><span class="o">.</span><span class="n">BAR</span><span class="p">,</span>
+    <span class="n">mark</span><span class="o">=</span><span class="n">RADIAL_TYPE</span><span class="o">.</span><span class="n">BAR</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Directions ranked by average wind speed"</span><span class="p">,</span>
     <span class="c1"># the strongest direction first, clockwise from the top</span>
     <span class="n">sort</span><span class="o">=</span><span class="n">SORT</span><span class="o">.</span><span class="n">DESCENDING</span><span class="p">,</span>
@@ -6453,7 +6457,7 @@ RadialChart(
 
 RadialChart(
     data=wind_by_direction,
-    type=RADIAL_TYPE.BAR,
+    mark=RADIAL_TYPE.BAR,
     title="Directions ranked by average wind speed",
     # the strongest direction first, clockwise from the top
     sort=SORT.DESCENDING,
@@ -6511,7 +6515,7 @@ RadialChart(
 
 <span class="n">RadialChart</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">sunshine_by_month</span><span class="p">,</span>
-    <span class="nb">type</span><span class="o">=</span><span class="n">RADIAL_TYPE</span><span class="o">.</span><span class="n">BAR</span><span class="p">,</span>
+    <span class="n">mark</span><span class="o">=</span><span class="n">RADIAL_TYPE</span><span class="o">.</span><span class="n">BAR</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Monthly sunshine hours"</span><span class="p">,</span>
     <span class="c1"># a wider hole spreads the short winter labels apart</span>
     <span class="n">innerradius</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span>
@@ -6524,7 +6528,7 @@ RadialChart(
 
 RadialChart(
     data=sunshine_by_month,
-    type=RADIAL_TYPE.BAR,
+    mark=RADIAL_TYPE.BAR,
     title="Monthly sunshine hours",
     # a wider hole spreads the short winter labels apart
     innerradius=0.4,
@@ -6581,7 +6585,7 @@ RadialChart(
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">RadialChart</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">sunshine_by_month</span><span class="p">,</span>
-    <span class="nb">type</span><span class="o">=</span><span class="n">RADIAL_TYPE</span><span class="o">.</span><span class="n">BAR</span><span class="p">,</span>
+    <span class="n">mark</span><span class="o">=</span><span class="n">RADIAL_TYPE</span><span class="o">.</span><span class="n">BAR</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Monthly sunshine hours"</span><span class="p">,</span>
     <span class="n">innerradius</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
     <span class="c1"># the month names ride the bar tips, and the border circle goes</span>
@@ -6592,7 +6596,7 @@ RadialChart(
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-14">RadialChart(
     data=sunshine_by_month,
-    type=RADIAL_TYPE.BAR,
+    mark=RADIAL_TYPE.BAR,
     title="Monthly sunshine hours",
     innerradius=0.3,
     # the month names ride the bar tips, and the border circle goes
@@ -6786,7 +6790,7 @@ RadialChart(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="multiple-radial-charts">Multiple Radial Charts<a class="anchor-link" href="#multiple-radial-charts">¶</a></h2><p>To compare several series, pass a list of lists to <code>data</code>: each inner list is one series, all drawn with the figure's one <code>type</code>, and the per-series attributes (<code>subtitle</code>, <code>style</code>, <code>emphasis</code>) become lists aligned with it. <code>show_legend</code> names the series by their subtitles. <code>wind_last_year</code>, defined in a hidden cell, holds the same station's averages of the year before, and two radar profiles on one circle show where the wind picked up: the western directions grew, the north-east barely moved.</p>
+<h2 id="multiple-radial-charts">Multiple Radial Charts<a class="anchor-link" href="#multiple-radial-charts">¶</a></h2><p>To compare several series, pass a list of lists to <code>data</code>: each inner list is one series, all drawn with the figure's one <code>mark</code>, and the per-series attributes (<code>subtitle</code>, <code>style</code>, <code>emphasis</code>) become lists aligned with it. <code>show_legend</code> names the series by their subtitles. <code>wind_last_year</code>, defined in a hidden cell, holds the same station's averages of the year before, and two radar profiles on one circle show where the wind picked up: the western directions grew, the north-east barely moved.</p>
 </div>
 </div>
 </div>
@@ -6961,7 +6965,7 @@ RadialChart(
 
 <span class="n">RadialChart</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">morning</span><span class="p">,</span> <span class="n">afternoon</span><span class="p">],</span>
-    <span class="nb">type</span><span class="o">=</span><span class="n">RADIAL_TYPE</span><span class="o">.</span><span class="n">BAR</span><span class="p">,</span>
+    <span class="n">mark</span><span class="o">=</span><span class="n">RADIAL_TYPE</span><span class="o">.</span><span class="n">BAR</span><span class="p">,</span>
     <span class="n">subtitle</span><span class="o">=</span><span class="p">[</span><span class="s2">"Morning"</span><span class="p">,</span> <span class="s2">"Afternoon"</span><span class="p">],</span>
     <span class="c1"># stack the two halves of the day in each sector</span>
     <span class="n">bar_mode</span><span class="o">=</span><span class="n">BAR_MODE</span><span class="o">.</span><span class="n">STACK</span><span class="p">,</span>
@@ -6975,7 +6979,7 @@ RadialChart(
 
 RadialChart(
     data=[morning, afternoon],
-    type=RADIAL_TYPE.BAR,
+    mark=RADIAL_TYPE.BAR,
     subtitle=["Morning", "Afternoon"],
     # stack the two halves of the day in each sector
     bar_mode=BAR_MODE.STACK,
@@ -7033,7 +7037,7 @@ RadialChart(
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">RadialChart</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">morning</span><span class="p">,</span> <span class="n">afternoon</span><span class="p">],</span>
-    <span class="nb">type</span><span class="o">=</span><span class="n">RADIAL_TYPE</span><span class="o">.</span><span class="n">BAR</span><span class="p">,</span>
+    <span class="n">mark</span><span class="o">=</span><span class="n">RADIAL_TYPE</span><span class="o">.</span><span class="n">BAR</span><span class="p">,</span>
     <span class="n">subtitle</span><span class="o">=</span><span class="p">[</span><span class="s2">"Morning"</span><span class="p">,</span> <span class="s2">"Afternoon"</span><span class="p">],</span>
     <span class="n">bar_mode</span><span class="o">=</span><span class="n">BAR_MODE</span><span class="o">.</span><span class="n">STACK</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Months ranked by afternoon sunshine"</span><span class="p">,</span>
@@ -7047,7 +7051,7 @@ RadialChart(
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-20">RadialChart(
     data=[morning, afternoon],
-    type=RADIAL_TYPE.BAR,
+    mark=RADIAL_TYPE.BAR,
     subtitle=["Morning", "Afternoon"],
     bar_mode=BAR_MODE.STACK,
     title="Months ranked by afternoon sunshine",
@@ -7385,7 +7389,7 @@ RadialChart(
 
 <span class="n">RadialChart</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">lightning_by_month</span><span class="p">,</span>
-    <span class="nb">type</span><span class="o">=</span><span class="n">RADIAL_TYPE</span><span class="o">.</span><span class="n">SCATTER</span><span class="p">,</span>
+    <span class="n">mark</span><span class="o">=</span><span class="n">RADIAL_TYPE</span><span class="o">.</span><span class="n">SCATTER</span><span class="p">,</span>
     <span class="c1"># a log radius: from a handful to thousands on one circle</span>
     <span class="n">scaley</span><span class="o">=</span><span class="n">SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
     <span class="c1"># start the radius at one strike, so the winter counts leave the center</span>
@@ -7398,7 +7402,7 @@ RadialChart(
 
 RadialChart(
     data=lightning_by_month,
-    type=RADIAL_TYPE.SCATTER,
+    mark=RADIAL_TYPE.SCATTER,
     # a log radius: from a handful to thousands on one circle
     scaley=SCALE.LOG,
     # start the radius at one strike, so the winter counts leave the center
@@ -7588,7 +7592,7 @@ station_records[:2]</div>
     <span class="c1"># a wind rose with 16 sectors on a shared radial range</span>
     <span class="k">return</span> <span class="n">RadialChart</span><span class="p">(</span>
         <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
-        <span class="nb">type</span><span class="o">=</span><span class="n">RADIAL_TYPE</span><span class="o">.</span><span class="n">HISTOGRAM</span><span class="p">,</span>
+        <span class="n">mark</span><span class="o">=</span><span class="n">RADIAL_TYPE</span><span class="o">.</span><span class="n">HISTOGRAM</span><span class="p">,</span>
         <span class="n">num_bins</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
         <span class="n">title</span><span class="o">=</span><span class="n">season</span><span class="p">,</span>
         <span class="n">show_grid</span><span class="o">=</span><span class="n">SHOW_GRID</span><span class="o">.</span><span class="n">BOTH</span><span class="p">,</span>
@@ -7610,7 +7614,7 @@ def wind_rose(data, season):
     # a wind rose with 16 sectors on a shared radial range
     return RadialChart(
         data=data,
-        type=RADIAL_TYPE.HISTOGRAM,
+        mark=RADIAL_TYPE.HISTOGRAM,
         num_bins=16,
         title=season,
         show_grid=SHOW_GRID.BOTH,
@@ -7765,7 +7769,7 @@ Grid(
 
 <span class="n">this_year</span> <span class="o">=</span> <span class="n">RadialChart</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">weekday_visits</span><span class="p">,</span> <span class="n">weekend_visits</span><span class="p">],</span>
-    <span class="nb">type</span><span class="o">=</span><span class="n">RADIAL_TYPE</span><span class="o">.</span><span class="n">BAR</span><span class="p">,</span>
+    <span class="n">mark</span><span class="o">=</span><span class="n">RADIAL_TYPE</span><span class="o">.</span><span class="n">BAR</span><span class="p">,</span>
     <span class="n">subtitle</span><span class="o">=</span><span class="p">[</span><span class="s2">"Weekdays"</span><span class="p">,</span> <span class="s2">"Weekends"</span><span class="p">],</span>
     <span class="c1"># stacked, so the outer edge is the month's total</span>
     <span class="n">bar_mode</span><span class="o">=</span><span class="n">BAR_MODE</span><span class="o">.</span><span class="n">STACK</span><span class="p">,</span>
@@ -7792,7 +7796,7 @@ Grid(
 
 this_year = RadialChart(
     data=[weekday_visits, weekend_visits],
-    type=RADIAL_TYPE.BAR,
+    mark=RADIAL_TYPE.BAR,
     subtitle=["Weekdays", "Weekends"],
     # stacked, so the outer edge is the month's total
     bar_mode=BAR_MODE.STACK,

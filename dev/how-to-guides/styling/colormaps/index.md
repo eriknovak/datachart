@@ -69,7 +69,7 @@ BARS = [[{"label": f"Q{q}", "y": 30 + 12 * s + 7 * q} for q in range(1, 5)] for 
 with config.override(plot_heatmap_cmap=COLORS.Cividis, color_general_multiple=COLORS.OkabeIto):
     Grid(
         [[
-            Heatmap(data=CELLS, title="Cividis cells", show_heatmap_values=True),
+            Heatmap(data=CELLS, title="Cividis cells", show_values=True),
             BarChart(data=BARS, title="Okabe-Ito series", subtitle=["A", "B", "C", "D"], show_legend=True),
         ]],
         figsize=(9, 3.2),

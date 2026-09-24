@@ -223,13 +223,13 @@ The per-figure colorbar setting, passed to a chart front as `colorbar`.
 
 Every field is optional. `location` is the control: it places the bar on any edge of the chart. With no `location`, `orientation` derives the edge: vertical means right, horizontal means top. When both are given `location` wins.
 
-| ATTRIBUTE     | DESCRIPTION                                                                                                                                                        |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `label`       | The caption beside the bar, reading along it; drawn in the font_ylabel\_\* theme font. **TYPE:** \`str                                                             |
-| `location`    | The chart edge the bar sits on. **TYPE:** \`COLORBAR_LOCATION                                                                                                      |
-| `format`      | The format of the bar's tick labels, with the value named x (e.g. "{x:.0f}"). On a hexbin chart, valfmt still applies when this is unset. **TYPE:** \`VALUE_FORMAT |
-| `ticks`       | Explicit tick positions on the bar; positions outside the mapped value range are not drawn. **TYPE:** \`list\[int                                                  |
-| `orientation` | The orientation; derives the edge when location is unset. **TYPE:** \`ORIENTATION                                                                                  |
+| ATTRIBUTE     | DESCRIPTION                                                                                                                                                              |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `label`       | The caption beside the bar, reading along it; drawn in the font_ylabel\_\* theme font. **TYPE:** \`str                                                                   |
+| `location`    | The chart edge the bar sits on. **TYPE:** \`COLORBAR_LOCATION                                                                                                            |
+| `format`      | The format of the bar's tick labels, with the value named x (e.g. "{x:.0f}"). On a hexbin chart, value_format still applies when this is unset. **TYPE:** \`VALUE_FORMAT |
+| `ticks`       | Explicit tick positions on the bar; positions outside the mapped value range are not drawn. **TYPE:** \`list\[int                                                        |
+| `orientation` | The orientation; derives the edge when location is unset. **TYPE:** \`ORIENTATION                                                                                        |
 
 ## Shared Style
 

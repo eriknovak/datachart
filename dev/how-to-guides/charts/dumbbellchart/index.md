@@ -62,8 +62,10 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 
 | Parameter                                    | Constant                                                                                                                                                                                                                                     |
 | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `show_values`                                | [`DUMBBELL_VALUE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DUMBBELL_VALUE)                                                                                                                       |
+| `value_kind`                                 | [`DUMBBELL_VALUE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DUMBBELL_VALUE)                                                                                                                       |
 | `sort_by`                                    | [`DUMBBELL_SORT_KEY`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DUMBBELL_SORT_KEY)                                                                                                                 |
+| `marker`                                     | [`LINE_MARKER`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_MARKER)                                                                                                                             |
+| `connector_style`                            | [`LINE_STYLE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_STYLE)                                                                                                                               |
 | `figsize`                                    | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                                                                                                                                   |
 | `orientation`                                | [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)                                                                                                                             |
 | `scaley`                                     | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                         |
@@ -71,8 +73,6 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `show_grid`                                  | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                                                                                                                                 |
 | `value_format`                               | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                           |
 | `sort`                                       | [`SORT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT)                                                                                                                                           |
-| `marker`                                     | [`LINE_MARKER`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_MARKER)                                                                                                                             |
-| `connector_style`                            | [`LINE_STYLE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_STYLE)                                                                                                                               |
 | `emphasis`                                   | [`EMPHASIS`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS)                                                                                                                                   |
 
 The full list of style attributes is in the [datachart.typings.DumbbellStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/dumbbellchart/#datachart.typings.DumbbellStyleAttrs) type; the full list of parameters is in the [datachart.charts.DumbbellChart](https://eriknovak.github.io/datachart/dev/references/charts/dumbbellchart/#datachart.charts.DumbbellChart) reference.
@@ -176,7 +176,7 @@ DumbbellChart(
 
 ### Value labels
 
-When the exact numbers matter, `show_values` prints them ([DUMBBELL_VALUE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DUMBBELL_VALUE)): `ENDPOINTS` prints each endpoint's value past its dot, on the side away from the connector, and `DELTA` prints the change `end - start` at the connector midpoint. `value_format` formats the numbers: a [VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) constant or any `"{x:.1f}"`, `"{:+.1f}"` or `"%g"` style string, and the label font size, color and padding are the `plot_value_*` style attributes ([ValueLabelStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ValueLabelStyleAttrs)). Endpoint labels answer *what were the values*; the value axis is widened a little so the outer labels have room.
+When the exact numbers matter, `show_values=True` prints them and `value_kind` picks which ([DUMBBELL_VALUE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DUMBBELL_VALUE)): `ENDPOINTS`, the default, prints each endpoint's value past its dot, on the side away from the connector, and `DELTA` prints the change `end - start` at the connector midpoint. `value_format` formats the numbers: a [VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) constant or any `"{x:.1f}"`, `"{:+.1f}"` or `"%g"` style string, and the label font size, color and padding are the `plot_value_*` style attributes ([ValueLabelStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ValueLabelStyleAttrs)). Endpoint labels answer *what were the values*; the value axis is widened a little so the outer labels have room.
 
 ```
 from datachart.constants import DUMBBELL_VALUE
@@ -189,7 +189,7 @@ DumbbellChart(
     start_name="2000",
     end_name="2019",
     # print both endpoint values, with one decimal
-    show_values=DUMBBELL_VALUE.ENDPOINTS,
+    show_values=True, value_kind=DUMBBELL_VALUE.ENDPOINTS,
     value_format="{:.1f}",
     legend={"title": "Year", "location": LEGEND_LOCATION.LOWER_RIGHT},
     # room for the labels on both sides
@@ -209,7 +209,7 @@ DumbbellChart(
     sort=SORT.DESCENDING,
     sort_by=DUMBBELL_SORT_KEY.DELTA,
     # print the signed change at every connector
-    show_values=DUMBBELL_VALUE.DELTA,
+    show_values=True, value_kind=DUMBBELL_VALUE.DELTA,
     value_format="{:+.1f}",
 ).show()
 ```
@@ -229,7 +229,7 @@ DumbbellChart(
     legend={"title": "Year", "location": LEGEND_LOCATION.LOWER_RIGHT},
     # an arrow beside every connector, from start to end
     show_direction=True,
-    show_values=DUMBBELL_VALUE.DELTA,
+    show_values=True, value_kind=DUMBBELL_VALUE.DELTA,
     value_format="{:+.1f}",
     xmin=55,
     xmax=90,
@@ -318,7 +318,7 @@ DumbbellChart(
     legend={"title": "Year", "location": LEGEND_LOCATION.LOWER_RIGHT},
     # highlight the three largest changes, mute the rest
     emphasis_rule={"top": 3},
-    show_values=DUMBBELL_VALUE.DELTA,
+    show_values=True, value_kind=DUMBBELL_VALUE.DELTA,
     value_format="{:+.1f}",
 ).show()
 ```
@@ -568,7 +568,7 @@ DumbbellChart(
     sort=SORT.DESCENDING,
     sort_by=DUMBBELL_SORT_KEY.DELTA,
     # the width of each gap, in years
-    show_values=DUMBBELL_VALUE.DELTA,
+    show_values=True, value_kind=DUMBBELL_VALUE.DELTA,
     value_format="{:.1f} y",
     # the gaps above six years
     emphasis_rule={"above": 6},
@@ -599,7 +599,7 @@ DumbbellChart(
     sort_by=DUMBBELL_SORT_KEY.DELTA,
     # which way each department moved, and by how much
     show_direction=True,
-    show_values=DUMBBELL_VALUE.DELTA,
+    show_values=True, value_kind=DUMBBELL_VALUE.DELTA,
     value_format="{:+.0f} min",
     # the departments that cut more than fifteen minutes
     emphasis_rule={"below": -15},
@@ -639,7 +639,7 @@ gap = DumbbellChart(
     sort=SORT.DESCENDING,
     sort_by=DUMBBELL_SORT_KEY.DELTA,
     # the colors carry the direction, the labels the size
-    show_values=DUMBBELL_VALUE.DELTA,
+    show_values=True, value_kind=DUMBBELL_VALUE.DELTA,
     value_format="{:+.1f}",
     legend={"location": LEGEND_LOCATION.OUTSIDE_RIGHT},
     xmin=0,

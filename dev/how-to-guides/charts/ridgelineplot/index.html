@@ -5752,7 +5752,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </tr>
 <tr>
 <td style="text-align:left">compare the ridge heights, not only shapes</td>
-<td style="text-align:left"><code>normalize</code></td>
+<td style="text-align:left"><code>ridge_scale</code></td>
 <td style="text-align:left"><a href="#ridge-scale">Ridge scale</a></td>
 </tr>
 <tr>
@@ -5847,8 +5847,16 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><code>normalize</code></td>
+<td style="text-align:left"><code>xticks_format</code></td>
+<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.VALUE_FORMAT"><code>VALUE_FORMAT</code></a>, <a href="../../../references/constants/#datachart.constants.DATE_FORMAT"><code>DATE_FORMAT</code></a></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>ridge_scale</code></td>
 <td style="text-align:left"><a href="../../../references/constants/#datachart.constants.RIDGELINE_SCALE"><code>RIDGELINE_SCALE</code></a></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>inner</code></td>
+<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.VIOLIN_INNER"><code>VIOLIN_INNER</code></a></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>emphasis</code></td>
@@ -5879,20 +5887,12 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <td style="text-align:left"><a href="../../../references/constants/#datachart.constants.SCALE"><code>SCALE</code></a></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>xticks_format</code></td>
-<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.VALUE_FORMAT"><code>VALUE_FORMAT</code></a>, <a href="../../../references/constants/#datachart.constants.DATE_FORMAT"><code>DATE_FORMAT</code></a></td>
-</tr>
-<tr>
 <td style="text-align:left"><code>yticks_format</code></td>
 <td style="text-align:left"><a href="../../../references/constants/#datachart.constants.VALUE_FORMAT"><code>VALUE_FORMAT</code></a>, <a href="../../../references/constants/#datachart.constants.DATE_FORMAT"><code>DATE_FORMAT</code></a></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>bandwidth</code></td>
 <td style="text-align:left"><a href="../../../references/constants/#datachart.constants.BANDWIDTH"><code>BANDWIDTH</code></a></td>
-</tr>
-<tr>
-<td style="text-align:left"><code>inner</code></td>
-<td style="text-align:left"><a href="../../../references/constants/#datachart.constants.VIOLIN_INNER"><code>VIOLIN_INNER</code></a></td>
 </tr>
 <tr>
 <td style="text-align:left"><code>sort</code></td>
@@ -6199,7 +6199,7 @@ Grid(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="ridge-scale">Ridge scale<a class="anchor-link" href="#ridge-scale">¶</a></h3><p>Summer days in Ljubljana vary less than winter days, so a summer month's values are packed more tightly. The default scale hides that: every ridge is stretched to the same peak height, so the chart compares shapes and positions, the honest choice when the question is <em>where</em> each row sits. <code>normalize</code> picks the scale from <a href="../../../references/constants/#datachart.constants.RIDGELINE_SCALE">RIDGELINE_SCALE</a>: <code>RIDGELINE_SCALE.PER_ROW</code> (the default) or <code>RIDGELINE_SCALE.COMMON</code>, where every ridge shares one density scale, the tallest reaches the peak height and the rest stay in proportion. The common scale is the honest choice when the question is <em>how concentrated</em> each row is: the narrow summer months stand tall and the variable winter months flatten. Neither scale shows how many values a row holds, since every ridge is a density with the same area; when the row sizes differ a lot, say so in the labels.</p>
+<h3 id="ridge-scale">Ridge scale<a class="anchor-link" href="#ridge-scale">¶</a></h3><p>Summer days in Ljubljana vary less than winter days, so a summer month's values are packed more tightly. The default scale hides that: every ridge is stretched to the same peak height, so the chart compares shapes and positions, the honest choice when the question is <em>where</em> each row sits. <code>ridge_scale</code> picks the scale from <a href="../../../references/constants/#datachart.constants.RIDGELINE_SCALE">RIDGELINE_SCALE</a>: <code>RIDGELINE_SCALE.PER_ROW</code> (the default) or <code>RIDGELINE_SCALE.COMMON</code>, where every ridge shares one density scale, the tallest reaches the peak height and the rest stay in proportion. The common scale is the honest choice when the question is <em>how concentrated</em> each row is: the narrow summer months stand tall and the variable winter months flatten. Neither scale shows how many values a row holds, since every ridge is a density with the same area; when the row sizes differ a lot, say so in the labels.</p>
 </div>
 </div>
 </div>
@@ -6227,7 +6227,7 @@ Grid(
 <span class="n">RidgelinePlot</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">temperatures</span><span class="p">,</span>
     <span class="c1"># one density scale for every ridge</span>
-    <span class="n">normalize</span><span class="o">=</span><span class="n">RIDGELINE_SCALE</span><span class="o">.</span><span class="n">COMMON</span><span class="p">,</span>
+    <span class="n">ridge_scale</span><span class="o">=</span><span class="n">RIDGELINE_SCALE</span><span class="o">.</span><span class="n">COMMON</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Daily mean temperature in Ljubljana, on a common scale"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Temperature (°C)"</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_MEDIUM</span><span class="p">,</span>
@@ -6238,7 +6238,7 @@ Grid(
 RidgelinePlot(
     data=temperatures,
     # one density scale for every ridge
-    normalize=RIDGELINE_SCALE.COMMON,
+    ridge_scale=RIDGELINE_SCALE.COMMON,
     title="Daily mean temperature in Ljubljana, on a common scale",
     xlabel="Temperature (°C)",
     figsize=FIG_SIZE.FULL_MEDIUM,
@@ -7686,7 +7686,7 @@ records[:2]</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="example-2-does-training-make-the-model-more-confident-common-density-scale-outlines-and-quartiles">Example 2: Does Training Make the Model More Confident? (Common Density Scale, Outlines, and Quartiles)<a class="anchor-link" href="#example-2-does-training-make-the-model-more-confident-common-density-scale-outlines-and-quartiles">¶</a></h3><p>A research figure tracks how confident a classifier is on its validation set after each epoch. <code>confidence</code> holds 500 illustrative predicted probabilities of the true class per epoch, drawn from beta distributions that move toward 1 as training goes on. With <code>normalize=RIDGELINE_SCALE.COMMON</code> the ridges share one density scale, so the distribution visibly narrows and grows taller as training sharpens it; a per-row scale would draw every epoch at the same height and hide exactly that. Outlines alone keep the later epochs visible through the overlap, the quartile marks show the middle half of each epoch moving right, and <code>xmin</code> and <code>xmax</code> bound the ridges to the valid range of a probability.</p>
+<h3 id="example-2-does-training-make-the-model-more-confident-common-density-scale-outlines-and-quartiles">Example 2: Does Training Make the Model More Confident? (Common Density Scale, Outlines, and Quartiles)<a class="anchor-link" href="#example-2-does-training-make-the-model-more-confident-common-density-scale-outlines-and-quartiles">¶</a></h3><p>A research figure tracks how confident a classifier is on its validation set after each epoch. <code>confidence</code> holds 500 illustrative predicted probabilities of the true class per epoch, drawn from beta distributions that move toward 1 as training goes on. With <code>ridge_scale=RIDGELINE_SCALE.COMMON</code> the ridges share one density scale, so the distribution visibly narrows and grows taller as training sharpens it; a per-row scale would draw every epoch at the same height and hide exactly that. Outlines alone keep the later epochs visible through the overlap, the quartile marks show the middle half of each epoch moving right, and <code>xmin</code> and <code>xmax</code> bound the ridges to the valid range of a probability.</p>
 </div>
 </div>
 </div>
@@ -7715,7 +7715,7 @@ records[:2]</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">RidgelinePlot</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">confidence</span><span class="p">,</span>
     <span class="c1"># one density scale, so the heights compare</span>
-    <span class="n">normalize</span><span class="o">=</span><span class="n">RIDGELINE_SCALE</span><span class="o">.</span><span class="n">COMMON</span><span class="p">,</span>
+    <span class="n">ridge_scale</span><span class="o">=</span><span class="n">RIDGELINE_SCALE</span><span class="o">.</span><span class="n">COMMON</span><span class="p">,</span>
     <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">inner</span><span class="o">=</span><span class="n">VIOLIN_INNER</span><span class="o">.</span><span class="n">QUARTILES</span><span class="p">,</span>
     <span class="c1"># a probability lives between 0 and 1</span>
@@ -7729,7 +7729,7 @@ records[:2]</div>
 <div class="clipboard-copy-txt" id="cell-28">RidgelinePlot(
     data=confidence,
     # one density scale, so the heights compare
-    normalize=RIDGELINE_SCALE.COMMON,
+    ridge_scale=RIDGELINE_SCALE.COMMON,
     fill=False,
     inner=VIOLIN_INNER.QUARTILES,
     # a probability lives between 0 and 1

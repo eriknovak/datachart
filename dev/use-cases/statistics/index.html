@@ -5980,9 +5980,9 @@ Histogram(
     <span class="n">title</span><span class="o">=</span><span class="s2">"Flipper length and body mass are near-interchangeable"</span><span class="p">,</span>
     <span class="c1"># zero in the middle of the diverging colormap, equal reach each way</span>
     <span class="n">norm</span><span class="o">=</span><span class="n">NORMALIZE</span><span class="o">.</span><span class="n">CENTERED</span><span class="p">,</span>
-    <span class="n">show_heatmap_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">show_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">valfmt</span><span class="o">=</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">DECIMAL_2</span><span class="p">,</span>
+    <span class="n">value_format</span><span class="o">=</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">DECIMAL_2</span><span class="p">,</span>
     <span class="n">aspect_ratio</span><span class="o">=</span><span class="n">ASPECT_RATIO</span><span class="o">.</span><span class="n">EQUAL</span><span class="p">,</span>
     <span class="n">colorbar</span><span class="o">=</span><span class="p">{</span><span class="s2">"label"</span><span class="p">:</span> <span class="s2">"Pearson correlation"</span><span class="p">},</span>
     <span class="n">xtickrotate</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
@@ -6011,9 +6011,9 @@ correlation_figure = Heatmap(
     title="Flipper length and body mass are near-interchangeable",
     # zero in the middle of the diverging colormap, equal reach each way
     norm=NORMALIZE.CENTERED,
-    show_heatmap_values=True,
+    show_values=True,
     show_colorbars=True,
-    valfmt=VALUE_FORMAT.DECIMAL_2,
+    value_format=VALUE_FORMAT.DECIMAL_2,
     aspect_ratio=ASPECT_RATIO.EQUAL,
     colorbar={"label": "Pearson correlation"},
     xtickrotate=20,

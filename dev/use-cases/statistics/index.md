@@ -248,9 +248,9 @@ correlation_figure = Heatmap(
     title="Flipper length and body mass are near-interchangeable",
     # zero in the middle of the diverging colormap, equal reach each way
     norm=NORMALIZE.CENTERED,
-    show_heatmap_values=True,
+    show_values=True,
     show_colorbars=True,
-    valfmt=VALUE_FORMAT.DECIMAL_2,
+    value_format=VALUE_FORMAT.DECIMAL_2,
     aspect_ratio=ASPECT_RATIO.EQUAL,
     colorbar={"label": "Pearson correlation"},
     xtickrotate=20,

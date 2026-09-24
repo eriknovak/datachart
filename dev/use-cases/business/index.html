@@ -5752,7 +5752,7 @@ signups_figure.show()</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="do-the-customers-who-pay-stay">Do the customers who pay stay?<a class="anchor-link" href="#do-the-customers-who-pay-stay">¶</a></h3><p>Revenue can grow while every cohort leaks, as long as new customers arrive faster than old ones leave; the check is to follow each month's new paying customers on their own and count how many are still paying one, two, three months later. Twelve cohorts by twelve months is a triangle (the January cohort has eleven months of history, the December cohort none), and a <a href="../../how-to-guides/charts/heatmap/">heatmap</a> draws it with <code>None</code> for the cells that have not happened yet, <code>show_heatmap_values</code> printing the retained share in each cell, and <code>valfmt</code> giving it a percent sign. Reading down a column compares cohorts at the same age, which is how an onboarding change shows up.</p>
+<h3 id="do-the-customers-who-pay-stay">Do the customers who pay stay?<a class="anchor-link" href="#do-the-customers-who-pay-stay">¶</a></h3><p>Revenue can grow while every cohort leaks, as long as new customers arrive faster than old ones leave; the check is to follow each month's new paying customers on their own and count how many are still paying one, two, three months later. Twelve cohorts by twelve months is a triangle (the January cohort has eleven months of history, the December cohort none), and a <a href="../../how-to-guides/charts/heatmap/">heatmap</a> draws it with <code>None</code> for the cells that have not happened yet, <code>show_values</code> printing the retained share in each cell, and <code>value_format</code> giving it a percent sign. Reading down a column compares cohorts at the same age, which is how an onboarding change shows up.</p>
 </div>
 </div>
 </div>
@@ -5784,8 +5784,8 @@ signups_figure.show()</div>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Cohorts after the July onboarding change keep a tenth more of their customers"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Months since first payment"</span><span class="p">,</span>
     <span class="n">ylabel</span><span class="o">=</span><span class="s2">"Cohort"</span><span class="p">,</span>
-    <span class="n">show_heatmap_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">valfmt</span><span class="o">=</span><span class="s2">"</span><span class="si">{x:.0f}</span><span class="s2">%"</span><span class="p">,</span>
+    <span class="n">show_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">value_format</span><span class="o">=</span><span class="s2">"</span><span class="si">{x:.0f}</span><span class="s2">%"</span><span class="p">,</span>
     <span class="n">vmin</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
     <span class="n">vmax</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">8.0</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">),</span>
@@ -5801,8 +5801,8 @@ signups_figure.show()</div>
     title="Cohorts after the July onboarding change keep a tenth more of their customers",
     xlabel="Months since first payment",
     ylabel="Cohort",
-    show_heatmap_values=True,
-    valfmt="{x:.0f}%",
+    show_values=True,
+    value_format="{x:.0f}%",
     vmin=40,
     vmax=100,
     figsize=(8.0, 5.5),
@@ -5885,7 +5885,7 @@ cohort_figure.show()</div>
     <span class="n">today</span><span class="o">=</span><span class="n">TODAY</span><span class="p">,</span>
     <span class="n">show_dependencies</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">show_group_headers</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">show_values</span><span class="o">=</span><span class="n">GANTT_VALUE</span><span class="o">.</span><span class="n">PROGRESS</span><span class="p">,</span>
+    <span class="n">show_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">value_kind</span><span class="o">=</span><span class="n">GANTT_VALUE</span><span class="o">.</span><span class="n">PROGRESS</span><span class="p">,</span>
     <span class="n">show_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">9.0</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">),</span>
 <span class="p">)</span>
@@ -5899,7 +5899,7 @@ cohort_figure.show()</div>
     today=TODAY,
     show_dependencies=True,
     show_group_headers=True,
-    show_values=GANTT_VALUE.PROGRESS,
+    show_values=True, value_kind=GANTT_VALUE.PROGRESS,
     show_legend=True,
     figsize=(9.0, 5.5),
 )

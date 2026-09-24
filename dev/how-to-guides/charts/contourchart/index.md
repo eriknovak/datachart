@@ -40,7 +40,7 @@ Every customization is either a keyword argument of `ContourChart` or a `plot_co
 | keep one unit equal on both axes         | `aspect_ratio`                                                      | [Figure size, grid and aspect ratio](#figure-size-grid-and-aspect-ratio)                                |
 | fill the bands between the levels        | `filled`                                                            | [Filled contours and colorbar](#filled-contours-and-colorbar)                                           |
 | add and caption a colorbar               | `show_colorbars`, `colorbar`                                        | [Filled contours and colorbar](#filled-contours-and-colorbar)                                           |
-| write the level values on the lines      | `show_labels`, `valfmt`                                             | [Inline labels](#inline-labels)                                                                         |
+| write the level values on the lines      | `show_labels`, `value_format`                                       | [Inline labels](#inline-labels)                                                                         |
 | choose the values that cut the surface   | `levels`                                                            | [Levels](#levels)                                                                                       |
 | change the line color, width, or style   | `style={"plot_contour_color": ..., "plot_contour_line_width": ...}` | [Contour style](#contour-style)                                                                         |
 | color the lines or bands with a colormap | `style={"plot_contour_cmap": ...}`                                  | [Contour style](#contour-style)                                                                         |
@@ -62,6 +62,7 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | Parameter                                                       | Constant                                                                                                                                                                                                                                                                                                                                                           |
 | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `levels`                                                        | [`CONTOUR_LEVELS`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.CONTOUR_LEVELS)                                                                                                                                                                                                                                             |
+| `xticks_format`                                                 | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)                                                                                                                               |
 | `emphasis`                                                      | [`EMPHASIS`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS)                                                                                                                                                                                                                                                         |
 | `figsize`                                                       | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                                                                                                                                                                                                                                                         |
 | `legend={"location": ..., "alignment": ...}`                    | [`LEGEND_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN)                                                                                                                       |
@@ -70,8 +71,7 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `scalex`                                                        | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                                                                                                                                               |
 | `scaley`                                                        | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                                                                                                                                               |
 | `norm`                                                          | [`NORMALIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.NORMALIZE)                                                                                                                                                                                                                                                       |
-| `valfmt`                                                        | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                                                                                                                                                 |
-| `xticks_format`                                                 | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)                                                                                                                               |
+| `value_format`                                                  | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                                                                                                                                                 |
 | `yticks_format`                                                 | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)                                                                                                                               |
 | `colorbar={"location": ..., "format": ..., "orientation": ...}` | [`COLORBAR_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORBAR_LOCATION), [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION) |
 
@@ -149,14 +149,14 @@ ContourChart(
 
 ### Inline labels
 
-A reader of a map wants the elevation of a line without looking it up. `show_labels=True` writes the value of each level along its iso-line, and `valfmt` formats it: a [VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) member or any `"{x:.1f}"` style string with the value named `x`. The labels take the line color and a font smaller than the general font; the `plot_contour_label_font_size` and `plot_contour_label_font_color` style attributes change them (see [Contour style](#contour-style)).
+A reader of a map wants the elevation of a line without looking it up. `show_labels=True` writes the value of each level along its iso-line, and `value_format` formats it: a [VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) member or any `"{x:.1f}"` style string with the value named `x`. The labels take the line color and a font smaller than the general font; the `plot_contour_label_font_size` and `plot_contour_label_font_color` style attributes change them (see [Contour style](#contour-style)).
 
 ```
 ContourChart(
     data=terrain,
     # write the elevation along each line, with its unit
     show_labels=True,
-    valfmt="{x:.0f} m",
+    value_format="{x:.0f} m",
     title="Elevation of the hill",
     xlabel="Distance east (km)",
     ylabel="Distance north (km)",
@@ -204,7 +204,7 @@ ContourChart(
     data=terrain,
     levels=SADDLE_LEVELS,
     show_labels=True,
-    valfmt="{x:.0f} m",
+    value_format="{x:.0f} m",
     title="The saddle lies between 1000 m and 1150 m",
     xlabel="Distance east (km)",
     ylabel="Distance north (km)",
@@ -221,7 +221,7 @@ ContourChart(
     # the number of levels follows the grid resolution
     levels=CONTOUR_LEVELS.RICE,
     show_labels=True,
-    valfmt="{x:.0f}",
+    value_format="{x:.0f}",
     title="Elevation of the hill, Rice rule",
     xlabel="Distance east (km)",
     ylabel="Distance north (km)",
@@ -249,7 +249,7 @@ ContourChart(
     },
     levels=list(range(400, 1800, 100)),
     show_labels=True,
-    valfmt="{x:.0f}",
+    value_format="{x:.0f}",
     title="Elevation of the hill",
     xlabel="Distance east (km)",
     ylabel="Distance north (km)",
@@ -408,7 +408,7 @@ ContourChart(
 
 ## Multiple Contour Charts
 
-To compare several surfaces on one map, pass a list of them to `data`: each is drawn as its own set of iso-lines in its own color, and the per-chart attributes (`subtitle`, `style`, `emphasis`, `valfmt`, `norm`, `vmin`, `vmax`, `colorbar`) become lists aligned with it. `subtitle` names each surface in the legend that `show_legend` draws. Filled surfaces would cover each other, so fills belong in [subplots](#subplots-and-shared-axes).
+To compare several surfaces on one map, pass a list of them to `data`: each is drawn as its own set of iso-lines in its own color, and the per-chart attributes (`subtitle`, `style`, `emphasis`, `value_format`, `norm`, `vmin`, `vmax`, `colorbar`) become lists aligned with it. `subtitle` names each surface in the legend that `show_legend` draws. Filled surfaces would cover each other, so fills belong in [subplots](#subplots-and-shared-axes).
 
 The surfaces here come from an illustrative survey of chamois (a mountain goat-antelope) on the hill: `sightings` holds the GPS position of every sighting by season (`SEASONS`), and `season_density` one density surface per season, estimated with [datachart.utils.stats.kde2d](https://eriknovak.github.io/datachart/dev/references/utils/stats/#datachart.utils.stats.kde2d) (see [Density of scattered points](#density-of-scattered-points)) on the extent of the map, so the surfaces line up. The story is a seasonal migration: the herd grazes near the West Peak in summer, splits over both peaks in autumn, and moves down to the southern slopes in winter.
 
@@ -573,7 +573,7 @@ Grid(
                 data=terrain,
                 levels=[400, 600, 800, 1000, 1200, 1400, 1600],
                 show_labels=True,
-                valfmt="{x:.0f}",
+                value_format="{x:.0f}",
                 title="Elevation (m)",
                 aspect_ratio=ASPECT_RATIO.EQUAL,
             ),
@@ -704,7 +704,7 @@ Panel(
             # dense levels, so the narrow valley gets its own lines
             levels=CONTOUR_LEVELS.FD,
             show_labels=True,
-            valfmt=VALUE_FORMAT.DECIMAL,
+            value_format=VALUE_FORMAT.DECIMAL,
             style={"plot_contour_cmap": COLORS.Viridis, "plot_contour_line_width": 0.8},
             # point at the minimum
             texts={"text": "minimum (1, 1)", "x": 1.0, "y": -0.6, "target": (1, 1)},
@@ -745,7 +745,7 @@ thresholds = ContourChart(
     levels=FROSTBITE,
     emphasis=EMPHASIS.HIGHLIGHT,
     show_labels=True,
-    valfmt="{x:.0f} °C",
+    value_format="{x:.0f} °C",
     style={"plot_contour_color": "#1d3557"},
     texts={"text": "-20 °C at 40 km/h\nfeels like -34 °C", "x": -8, "y": 70, "target": (-20, 40)},
 )

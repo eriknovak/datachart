@@ -994,7 +994,7 @@ def radial_type():
     figs = [
         RadialChart(
             data=degrees if value == RADIAL_TYPE.HISTOGRAM else compass,
-            type=value,
+            mark=value,
             num_bins=16,
             title=f"RADIAL_TYPE.{label}",
         )
@@ -1021,7 +1021,7 @@ def direction():
     figs = [
         RadialChart(
             data=months,
-            type=RADIAL_TYPE.BAR,
+            mark=RADIAL_TYPE.BAR,
             direction=value,
             title=f"RADIAL_DIRECTION.{label}",
         )
@@ -1277,7 +1277,7 @@ def ridgeline_scale():
     ]
     figs = [
         RidgelinePlot(
-            data=_violin_data(), normalize=value, title=f"RIDGELINE_SCALE.{label}"
+            data=_violin_data(), ridge_scale=value, title=f"RIDGELINE_SCALE.{label}"
         )
         for label, value in members
     ]

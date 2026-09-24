@@ -310,7 +310,7 @@ Nine placebo subjects left against two and three on the doses, and the placebo c
 
 ### Which markers moved with the dose?
 
-A trial measures more than its endpoint, and eight markers in three arms is a 24-cell table that a [heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/index.md) reads in one look. The cells hold the percent change from baseline, which is signed, so the colormap has to put zero in the middle: `norm=NORMALIZE.CENTERED` pins zero to the centre of the theme's diverging colormap and runs the same distance each way, so a cell's hue is its direction and its depth is its size. `show_heatmap_values` prints the numbers in the cells, and `valfmt` gives them their sign and unit.
+A trial measures more than its endpoint, and eight markers in three arms is a 24-cell table that a [heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/index.md) reads in one look. The cells hold the percent change from baseline, which is signed, so the colormap has to put zero in the middle: `norm=NORMALIZE.CENTERED` pins zero to the centre of the theme's diverging colormap and runs the same distance each way, so a cell's hue is its direction and its depth is its size. `show_values` prints the numbers in the cells, and `value_format` gives them their sign and unit.
 
 ```
 marker_figure = Heatmap(
@@ -322,9 +322,9 @@ marker_figure = Heatmap(
     title="The whole metabolic panel moves with the dose",
     # zero in the middle of the diverging colormap, equal reach each way
     norm=NORMALIZE.CENTERED,
-    show_heatmap_values=True,
+    show_values=True,
     show_colorbars=True,
-    valfmt="{x:+.1f}%",
+    value_format="{x:+.1f}%",
     colorbar={"label": "Change from baseline (%)"},
     figsize=FIG_SIZE.FULL_MEDIUM,
 )
@@ -335,7 +335,7 @@ The placebo column is near white throughout, the columns darken left to right, a
 
 ### Where are the safety signals?
 
-The safety labs are read differently from the efficacy markers: the safety question is whether any lab moved at all, per arm, from a baseline that should have been the same in every arm. Two values per arm and lab (baseline and week 12) is a [dumbbell chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/dumbbellchart/index.md): a dot at each, a connector between, and `show_values="delta"` printing the change at the connector. The labs live on four different scales, so `subplots=True` gives each its own axes, and `show_direction` draws an arrow from baseline to week 12 so the direction reads without a legend.
+The safety labs are read differently from the efficacy markers: the safety question is whether any lab moved at all, per arm, from a baseline that should have been the same in every arm. Two values per arm and lab (baseline and week 12) is a [dumbbell chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/dumbbellchart/index.md): a dot at each, a connector between, and `show_values=True, value_kind="delta"` printing the change at the connector. The labs live on four different scales, so `subplots=True` gives each its own axes, and `show_direction` draws an arrow from baseline to week 12 so the direction reads without a legend.
 
 ```
 DumbbellChart(
@@ -354,7 +354,7 @@ DumbbellChart(
     start_name="Baseline",
     end_name="Week 12",
     subtitle=SAFETY,
-    show_values="delta",
+    show_values=True, value_kind="delta",
     show_direction=True,
     subplots=True,
     max_cols=2,

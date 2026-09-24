@@ -38,7 +38,7 @@ Every customization is either a keyword argument of `RidgelinePlot` or a `plot_r
 | resize the figure or show the grid         | `figsize`, `show_grid`                                      | [Figure size and grid](#figure-size-and-grid)                                                           |
 | change the ridge fill, outline, or alpha   | `style={"plot_ridgeline_color": ...}`                       | [Ridge style](#ridge-style)                                                                             |
 | make the rows overlap more or less         | `overlap`                                                   | [Row overlap](#row-overlap)                                                                             |
-| compare the ridge heights, not only shapes | `normalize`                                                 | [Ridge scale](#ridge-scale)                                                                             |
+| compare the ridge heights, not only shapes | `ridge_scale`                                               | [Ridge scale](#ridge-scale)                                                                             |
 | mark the median or the quartiles           | `inner`                                                     | [Inner marks](#inner-marks)                                                                             |
 | draw only the outlines or only the fills   | `fill`, `show_outline`                                      | [Fill and outline](#fill-and-outline)                                                                   |
 | order the rows by their median             | `sort`                                                      | [Row order](#row-order)                                                                                 |
@@ -60,7 +60,9 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 
 | Parameter                                    | Constant                                                                                                                                                                                                                                     |
 | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `normalize`                                  | [`RIDGELINE_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.RIDGELINE_SCALE)                                                                                                                     |
+| `xticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
+| `ridge_scale`                                | [`RIDGELINE_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.RIDGELINE_SCALE)                                                                                                                     |
+| `inner`                                      | [`VIOLIN_INNER`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VIOLIN_INNER)                                                                                                                           |
 | `emphasis`                                   | [`EMPHASIS`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS)                                                                                                                                   |
 | `figsize`                                    | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                                                                                                                                   |
 | `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN) |
@@ -68,10 +70,8 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `aspect_ratio`                               | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                           |
 | `orientation`                                | [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)                                                                                                                             |
 | `scaley`                                     | [`SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SCALE)                                                                                                                                         |
-| `xticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
 | `yticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
 | `bandwidth`                                  | [`BANDWIDTH`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH)                                                                                                                                 |
-| `inner`                                      | [`VIOLIN_INNER`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VIOLIN_INNER)                                                                                                                           |
 | `sort`                                       | [`SORT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT)                                                                                                                                           |
 
 The full list of style attributes is in the [datachart.typings.RidgelineStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/ridgelineplot/#datachart.typings.RidgelineStyleAttrs) type; the full list of parameters is in the [datachart.charts.RidgelinePlot](https://eriknovak.github.io/datachart/dev/references/charts/ridgelineplot/#datachart.charts.RidgelinePlot) reference.
@@ -154,7 +154,7 @@ Grid(
 
 ### Ridge scale
 
-Summer days in Ljubljana vary less than winter days, so a summer month's values are packed more tightly. The default scale hides that: every ridge is stretched to the same peak height, so the chart compares shapes and positions, the honest choice when the question is *where* each row sits. `normalize` picks the scale from [RIDGELINE_SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.RIDGELINE_SCALE): `RIDGELINE_SCALE.PER_ROW` (the default) or `RIDGELINE_SCALE.COMMON`, where every ridge shares one density scale, the tallest reaches the peak height and the rest stay in proportion. The common scale is the honest choice when the question is *how concentrated* each row is: the narrow summer months stand tall and the variable winter months flatten. Neither scale shows how many values a row holds, since every ridge is a density with the same area; when the row sizes differ a lot, say so in the labels.
+Summer days in Ljubljana vary less than winter days, so a summer month's values are packed more tightly. The default scale hides that: every ridge is stretched to the same peak height, so the chart compares shapes and positions, the honest choice when the question is *where* each row sits. `ridge_scale` picks the scale from [RIDGELINE_SCALE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.RIDGELINE_SCALE): `RIDGELINE_SCALE.PER_ROW` (the default) or `RIDGELINE_SCALE.COMMON`, where every ridge shares one density scale, the tallest reaches the peak height and the rest stay in proportion. The common scale is the honest choice when the question is *how concentrated* each row is: the narrow summer months stand tall and the variable winter months flatten. Neither scale shows how many values a row holds, since every ridge is a density with the same area; when the row sizes differ a lot, say so in the labels.
 
 ```
 from datachart.constants import RIDGELINE_SCALE
@@ -162,7 +162,7 @@ from datachart.constants import RIDGELINE_SCALE
 RidgelinePlot(
     data=temperatures,
     # one density scale for every ridge
-    normalize=RIDGELINE_SCALE.COMMON,
+    ridge_scale=RIDGELINE_SCALE.COMMON,
     title="Daily mean temperature in Ljubljana, on a common scale",
     xlabel="Temperature (°C)",
     figsize=FIG_SIZE.FULL_MEDIUM,
@@ -550,13 +550,13 @@ RidgelinePlot(
 
 ### Example 2: Does Training Make the Model More Confident? (Common Density Scale, Outlines, and Quartiles)
 
-A research figure tracks how confident a classifier is on its validation set after each epoch. `confidence` holds 500 illustrative predicted probabilities of the true class per epoch, drawn from beta distributions that move toward 1 as training goes on. With `normalize=RIDGELINE_SCALE.COMMON` the ridges share one density scale, so the distribution visibly narrows and grows taller as training sharpens it; a per-row scale would draw every epoch at the same height and hide exactly that. Outlines alone keep the later epochs visible through the overlap, the quartile marks show the middle half of each epoch moving right, and `xmin` and `xmax` bound the ridges to the valid range of a probability.
+A research figure tracks how confident a classifier is on its validation set after each epoch. `confidence` holds 500 illustrative predicted probabilities of the true class per epoch, drawn from beta distributions that move toward 1 as training goes on. With `ridge_scale=RIDGELINE_SCALE.COMMON` the ridges share one density scale, so the distribution visibly narrows and grows taller as training sharpens it; a per-row scale would draw every epoch at the same height and hide exactly that. Outlines alone keep the later epochs visible through the overlap, the quartile marks show the middle half of each epoch moving right, and `xmin` and `xmax` bound the ridges to the valid range of a probability.
 
 ```
 RidgelinePlot(
     data=confidence,
     # one density scale, so the heights compare
-    normalize=RIDGELINE_SCALE.COMMON,
+    ridge_scale=RIDGELINE_SCALE.COMMON,
     fill=False,
     inner=VIOLIN_INNER.QUARTILES,
     # a probability lives between 0 and 1

@@ -6242,7 +6242,7 @@ These include figure size, format, style, and other figure manipulation values.<
 <tr>
 <td style="text-align: left;"><a href="../charts/radialchart/#datachart.charts.RadialChart">RadialChart</a></td>
 <td style="text-align: left;"><a href="#datachart.constants.RADIAL_TYPE"><code>RADIAL_TYPE</code></a>, <a href="#datachart.constants.RADIAL_DIRECTION"><code>RADIAL_DIRECTION</code></a></td>
-<td style="text-align: left;"><a href="#datachart.constants.FIG_SIZE"><code>FIG_SIZE</code></a>, <a href="#datachart.constants.EMPHASIS"><code>EMPHASIS</code></a>, <a href="#datachart.constants.LEGEND_ALIGN"><code>LEGEND_ALIGN</code></a>, <a href="#datachart.constants.LEGEND_LOCATION"><code>LEGEND_LOCATION</code></a>, <a href="#datachart.constants.BAR_MODE"><code>BAR_MODE</code></a>, <a href="#datachart.constants.SORT"><code>SORT</code></a>, <a href="#datachart.constants.SHOW_GRID"><code>SHOW_GRID</code></a>, <a href="#datachart.constants.SCALE"><code>SCALE</code></a></td>
+<td style="text-align: left;"><a href="#datachart.constants.FIG_SIZE"><code>FIG_SIZE</code></a>, <a href="#datachart.constants.EMPHASIS"><code>EMPHASIS</code></a>, <a href="#datachart.constants.LEGEND_ALIGN"><code>LEGEND_ALIGN</code></a>, <a href="#datachart.constants.LEGEND_LOCATION"><code>LEGEND_LOCATION</code></a>, <a href="#datachart.constants.BAR_MODE"><code>BAR_MODE</code></a>, <a href="#datachart.constants.SORT"><code>SORT</code></a>, <a href="#datachart.constants.VALUE_FORMAT"><code>VALUE_FORMAT</code></a>, <a href="#datachart.constants.SHOW_GRID"><code>SHOW_GRID</code></a>, <a href="#datachart.constants.SCALE"><code>SCALE</code></a></td>
 </tr>
 <tr>
 <td style="text-align: left;"><a href="../charts/calendarheatmap/#datachart.charts.CalendarHeatmap">CalendarHeatmap</a></td>
@@ -6346,7 +6346,7 @@ These include figure size, format, style, and other figure manipulation values.<
 <tr>
 <td style="text-align: left;"><a href="../charts/scattermatrix/#datachart.charts.ScatterMatrix">ScatterMatrix</a></td>
 <td style="text-align: left;"><a href="#datachart.constants.SCATTER_MATRIX_DIAGONAL"><code>SCATTER_MATRIX_DIAGONAL</code></a></td>
-<td style="text-align: left;"><a href="#datachart.constants.LEGEND_ALIGN"><code>LEGEND_ALIGN</code></a>, <a href="#datachart.constants.LEGEND_LOCATION"><code>LEGEND_LOCATION</code></a>, <a href="#datachart.constants.SHOW_GRID"><code>SHOW_GRID</code></a></td>
+<td style="text-align: left;"><a href="#datachart.constants.FIG_SIZE"><code>FIG_SIZE</code></a>, <a href="#datachart.constants.LEGEND_ALIGN"><code>LEGEND_ALIGN</code></a>, <a href="#datachart.constants.LEGEND_LOCATION"><code>LEGEND_LOCATION</code></a>, <a href="#datachart.constants.SHOW_GRID"><code>SHOW_GRID</code></a></td>
 </tr>
 <tr>
 <td style="text-align: left;"><a href="../charts/imagechart/#datachart.charts.ImageChart">ImageChart</a></td>
@@ -9852,7 +9852,7 @@ ties keep input order.</p>
 
 
         <p>The supported normalization options.</p>
-<p>Passed as the heatmap's <code>norm</code> attribute: normalizes the cell values
+<p>Passed as the <code>norm</code> attribute of a colormapped chart: normalizes the values
 before they are mapped to colors. Distinct from
 <a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.SCALE&lt;/span&gt;" href="#datachart.constants.SCALE"><code>SCALE</code></a>, which sets an axis scale.</p>
 <p><img alt="NORMALIZE at a glance" src="../../assets/imgs/const-normalize.svg" width="100%" /></p>
@@ -9976,9 +9976,9 @@ Equals to <code>"twoslope"</code>.</p>
           </tr>
       </tbody>
     </table>
-        <p><code>CENTERED</code> and <code>TWOSLOPE</code> are read by the heatmap and calendar heatmap,
-which draw them in the theme's diverging colormap; the other charts
-taking a <code>norm</code> support the first five.</p>
+        <p><code>CENTERED</code> and <code>TWOSLOPE</code> are read by the heatmap, calendar heatmap,
+contour chart and hexbin chart, which draw them in the theme's diverging
+colormap; the other charts taking a <code>norm</code> support the first five.</p>
 
 
 
@@ -10446,8 +10446,8 @@ the marker size. Equals to <code>"swarm"</code>.</p>
 
         <p>The predefined value formats.</p>
 <p>Passed as the <code>value_format</code> attribute of every chart that takes
-<code>show_values</code> (the value labels printed beside its marks) or as the
-heatmap's <code>valfmt</code> attribute (the values drawn in the cells).</p>
+<code>show_values</code>: the value labels printed beside its marks, or the values
+drawn in a heatmap's cells.</p>
 <p><img alt="VALUE_FORMAT at a glance" src="../../assets/imgs/const-value-format.svg" width="100%" /></p>
 
 
@@ -12344,8 +12344,8 @@ given, else the earliest task start. Equals to <code>"project_month"</code>.</p>
 
 
         <p>The supported gantt chart value labels.</p>
-<p>Passed as the <code>show_values</code> setting of the gantt chart: what each bar
-prints past its end. None prints nothing.</p>
+<p>Passed as the <code>value_kind</code> setting of the gantt chart: what each bar
+prints past its end when <code>show_values</code> is on.</p>
 <p><img alt="GANTT_VALUE at a glance" src="../../assets/imgs/const-gantt-value.svg" width="100%" /></p>
 
 
@@ -12365,10 +12365,24 @@ prints past its end. None prints nothing.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.GANTT_VALUE.DEFAULT">DEFAULT</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The default label. Same as <code>GANTT_VALUE.DURATION</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
             <td><code><span title="datachart.constants.GANTT_VALUE.NONE">NONE</span></code></td>
             <td class="doc-attribute-details">
               <div class="doc-md-description">
-                <p>No value labels. Equals to <code>None</code>.</p>
+                <p>Equals to <code>None</code>, which <code>value_kind</code> reads as <code>DEFAULT</code>.</p>
               </div>
               <p>
                   <span class="doc-attribute-annotation">
@@ -12677,8 +12691,8 @@ dependent bar's start from the left. Equals to <code>"left"</code>.</p>
 
 
         <p>The supported dumbbell chart value labels.</p>
-<p>Passed as the <code>show_values</code> setting of the dumbbell chart: what each
-record prints. None prints nothing.</p>
+<p>Passed as the <code>value_kind</code> setting of the dumbbell chart: what each
+record prints when <code>show_values</code> is on.</p>
 <p><img alt="DUMBBELL_VALUE at a glance" src="../../assets/imgs/const-dumbbell-value.svg" width="100%" /></p>
 
 
@@ -12698,10 +12712,24 @@ record prints. None prints nothing.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.DUMBBELL_VALUE.DEFAULT">DEFAULT</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The default label. Same as <code>DUMBBELL_VALUE.ENDPOINTS</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
             <td><code><span title="datachart.constants.DUMBBELL_VALUE.NONE">NONE</span></code></td>
             <td class="doc-attribute-details">
               <div class="doc-md-description">
-                <p>No value labels. Equals to <code>None</code>.</p>
+                <p>Equals to <code>None</code>, which <code>value_kind</code> reads as <code>DEFAULT</code>.</p>
               </div>
               <p>
                   <span class="doc-attribute-annotation">
@@ -13026,7 +13054,7 @@ needs area. Equals to <code>"step"</code>.</p>
 
 
         <p>The supported ridgeline density scales.</p>
-<p>Passed as the <code>normalize</code> setting of ridgeline plots: whether every ridge
+<p>Passed as the <code>ridge_scale</code> setting of ridgeline plots: whether every ridge
 is scaled to the same peak height, so their shapes compare, or all
 ridges share one density scale, so their heights compare.</p>
 <p><img alt="RIDGELINE_SCALE at a glance" src="../../assets/imgs/const-ridgeline-scale.svg" width="100%" /></p>

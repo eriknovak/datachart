@@ -32,9 +32,11 @@ PyramidChart(
     xticks: list[int | float] | None = None,
     xticklabels: list[str] | None = None,
     xtickrotate: int | None = None,
-    yticks: list[int | float] | None = None,
-    yticklabels: list[str] | None = None,
-    ytickrotate: int | None = None,
+    yticks: (
+        list[int | float] | list[list[int | float]] | None
+    ) = None,
+    yticklabels: list[str] | list[list[str]] | None = None,
+    ytickrotate: int | list[int | None] | None = None,
     xticks_format: (
         VALUE_FORMAT | DATE_FORMAT | str | None
     ) = None,
@@ -42,27 +44,72 @@ PyramidChart(
         VALUE_FORMAT | DATE_FORMAT | str | None
     ) = None,
     vlines: (
-        VLineSettingAttrs | list[VLineSettingAttrs] | None
+        VLineSettingAttrs
+        | list[VLineSettingAttrs]
+        | list[
+            VLineSettingAttrs
+            | list[VLineSettingAttrs]
+            | None
+        ]
+        | None
     ) = None,
     hlines: (
-        HLineSettingAttrs | list[HLineSettingAttrs] | None
+        HLineSettingAttrs
+        | list[HLineSettingAttrs]
+        | list[
+            HLineSettingAttrs
+            | list[HLineSettingAttrs]
+            | None
+        ]
+        | None
     ) = None,
     dlines: (
-        DLineSettingAttrs | list[DLineSettingAttrs] | None
+        DLineSettingAttrs
+        | list[DLineSettingAttrs]
+        | list[
+            DLineSettingAttrs
+            | list[DLineSettingAttrs]
+            | None
+        ]
+        | None
     ) = None,
     brackets: (
         BracketSettingAttrs
         | list[BracketSettingAttrs]
+        | list[
+            BracketSettingAttrs
+            | list[BracketSettingAttrs]
+            | None
+        ]
         | None
     ) = None,
     vspans: (
-        VSpanSettingAttrs | list[VSpanSettingAttrs] | None
+        VSpanSettingAttrs
+        | list[VSpanSettingAttrs]
+        | list[
+            VSpanSettingAttrs
+            | list[VSpanSettingAttrs]
+            | None
+        ]
+        | None
     ) = None,
     hspans: (
-        HSpanSettingAttrs | list[HSpanSettingAttrs] | None
+        HSpanSettingAttrs
+        | list[HSpanSettingAttrs]
+        | list[
+            HSpanSettingAttrs
+            | list[HSpanSettingAttrs]
+            | None
+        ]
+        | None
     ) = None,
     texts: (
-        TextSettingAttrs | list[TextSettingAttrs] | None
+        TextSettingAttrs
+        | list[TextSettingAttrs]
+        | list[
+            TextSettingAttrs | list[TextSettingAttrs] | None
+        ]
+        | None
     ) = None,
     label: str | list[str | None] | None = None,
     y: str | list[str | None] | None = None,
@@ -156,10 +203,10 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 
 | Parameter                                    | Constant                                                                                                                                                                                                                                     |
 | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `xticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
 | `figsize`                                    | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                                                                                                                                   |
 | `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN) |
 | `show_grid`                                  | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                                                                                                                                 |
 | `value_format`                               | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                           |
 | `sort`                                       | [`SORT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT)                                                                                                                                           |
-| `xticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
 | `yticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |

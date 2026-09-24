@@ -176,7 +176,7 @@ migration_figure.show()
 
 ### Which regions are ageing fastest?
 
-A national median age hides that the regions age at different speeds, since the capital draws the young and the periphery keeps the old, and the check is one number per region per year. Twelve regions by twelve years is a table that a [heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/index.md) reads in one look: each cell coloured by the median age, the rows sorted by the latest year so the oldest region sits at the top, and `show_heatmap_values` printing the ages so the cells are read rather than guessed. A row that darkens faster than its neighbours is a region ageing faster.
+A national median age hides that the regions age at different speeds, since the capital draws the young and the periphery keeps the old, and the check is one number per region per year. Twelve regions by twelve years is a table that a [heatmap](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/index.md) reads in one look: each cell coloured by the median age, the rows sorted by the latest year so the oldest region sits at the top, and `show_values` printing the ages so the cells are read rather than guessed. A row that darkens faster than its neighbours is a region ageing faster.
 
 ```
 REGIONS = sorted(REGION_AGE, key=lambda region: -REGION_AGE[region][-1])
@@ -186,8 +186,8 @@ region_figure = Heatmap(
     title="Every region is older than a decade ago; the capital region stays youngest",
     xlabel="Year",
     ylabel="Statistical region, by median age in 2025",
-    show_heatmap_values=True,
-    valfmt="{x:.1f}",
+    show_values=True,
+    value_format="{x:.1f}",
     show_colorbars=True,
     colorbar={"label": "Median age (years)"},
     figsize=(9.0, 5.5),
@@ -201,7 +201,7 @@ Every row darkens from left to right, so no region got younger, and the rows kee
 
 ### Who gained the most years since 1990?
 
-Life expectancy in two years for a dozen countries is a before-and-after comparison, and a [dumbbell chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/dumbbellchart/index.md) is its figure: a dot at 1990, a dot at 2022, and the connector between them is the gain. `sort` and `sort_by` order the rows so the longest-lived countries sit at the top, `show_values="delta"` prints each gain at the connector, and the country of the page takes the `"highlight"` role through its record's own `emphasis`, so it stands out among its neighbours without a second chart.
+Life expectancy in two years for a dozen countries is a before-and-after comparison, and a [dumbbell chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/dumbbellchart/index.md) is its figure: a dot at 1990, a dot at 2022, and the connector between them is the gain. `sort` and `sort_by` order the rows so the longest-lived countries sit at the top, `show_values=True, value_kind="delta"` prints each gain at the connector, and the country of the page takes the `"highlight"` role through its record's own `emphasis`, so it stands out among its neighbours without a second chart.
 
 ```
 HOME = "Slovenia"
@@ -222,7 +222,7 @@ span_figure = DumbbellChart(
     end_name="2022",
     sort=SORT.DESCENDING,
     sort_by=DUMBBELL_SORT_KEY.END,
-    show_values="delta",
+    show_values=True, value_kind="delta",
     value_format=VALUE_FORMAT.DECIMAL,
     show_legend=True,
     figsize=FIG_SIZE.FULL_MEDIUM,
@@ -234,7 +234,7 @@ No connector points left: every country in the set lives longer than in 1990. Th
 
 ### Is the world converging?
 
-A dozen countries suggest convergence; the claim needs all of them. The life expectancy of every country in one year is a distribution, and four years give four distributions that a [ridgeline plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/ridgelineplot/index.md) stacks one above the other, each a smoothed density over the countries, so a shift to the right and a narrowing are both visible at a glance. The rows are years, given as each record's `label`, and `normalize=RIDGELINE_SCALE.COMMON` draws every row to the same height, so a narrower, taller ridge means more countries clustered at one value.
+A dozen countries suggest convergence; the claim needs all of them. The life expectancy of every country in one year is a distribution, and four years give four distributions that a [ridgeline plot](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/ridgelineplot/index.md) stacks one above the other, each a smoothed density over the countries, so a shift to the right and a narrowing are both visible at a glance. The rows are years, given as each record's `label`, and `ridge_scale=RIDGELINE_SCALE.COMMON` draws every row to the same height, so a narrower, taller ridge means more countries clustered at one value.
 
 ```
 world_figure = RidgelinePlot(
@@ -246,7 +246,7 @@ world_figure = RidgelinePlot(
     title="The world's countries move right and bunch together",
     xlabel="Life expectancy at birth (years)",
     ylabel="Year",
-    normalize=RIDGELINE_SCALE.COMMON,
+    ridge_scale=RIDGELINE_SCALE.COMMON,
     overlap=0.5,
     xmin=30,
     figsize=FIG_SIZE.FULL_MEDIUM,
