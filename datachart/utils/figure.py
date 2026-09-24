@@ -640,14 +640,9 @@ def _figure_grid_layout_impl(
     if show_legend:
         location = (legend or {}).get("location")
         grid_legend = node_legend(legend, GRID_LEGEND_EDGES.get(location, "right"))
-    given = {
-        "show_grid": show_grid,
-        "xmin": xmin,
-        "xmax": xmax,
-        "ymin": ymin,
-        "ymax": ymax,
-        "aspect_ratio": aspect_ratio,
-    }
+    given = dict(
+        zip(CELL_OVERRIDE_KEYS, (show_grid, xmin, xmax, ymin, ymax, aspect_ratio))
+    )
     overrides = {key: value for key, value in given.items() if value is not None}
     if "show_grid" in overrides:
         # an explicit value, as a front's: a polar cell draws only what it names

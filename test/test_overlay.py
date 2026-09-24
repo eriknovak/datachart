@@ -651,7 +651,7 @@ class TestPanelFurniture:
             emphasis_rule={"top": 1},
         )
         panel = fig._chart_metadata["panel"]
-        roles = [g.layer_role(l) for g in panel.groups for l in g.layers]
+        roles = [g.layer_role(layer) for g in panel.groups for layer in g.layers]
         assert roles == ["highlight", "highlight"]
         plt.close("all")
 
@@ -727,4 +727,10 @@ class TestGridFurniture:
         fig = Grid([_lines(0, "a"), _lines(5, "b")], aspect_ratio="equal")
         for ax in _data_axes(fig):
             assert ax.get_aspect() == 1.0
+        plt.close("all")
+
+    def test_invalid_furniture_raises_at_the_call(self):
+        for bad in ({"show_grid": "bogus"}, {"aspect_ratio": "bogus"}):
+            with pytest.raises(ValueError, match="bogus"):
+                Grid([_lines(0, "a")], **bad)
         plt.close("all")

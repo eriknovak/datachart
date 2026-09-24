@@ -861,6 +861,7 @@ def Grid(
         ValueError: If charts is empty, rows are mixed with flat items, a cell
             is invalid, or a figure cannot be composed (missing metadata).
     """
+    check_domains(locals(), {})
     if not charts:
         raise ValueError("At least one chart is required")
     furniture = {

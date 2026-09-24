@@ -123,8 +123,9 @@ class TestSharedParameters(unittest.TestCase):
 
     def test_grid_takes_the_figure_furniture(self):
         params = inspect.signature(Grid).parameters
-        furniture = {"show_legend", "legend", "show_grid", "aspect_ratio", "ymin"}
-        self.assertLessEqual(furniture | {"ymax", "xmin", "xmax"}, set(params))
+        furniture = {"show_legend", "legend", "show_grid", "aspect_ratio"}
+        limits = {"xmin", "xmax", "ymin", "ymax"}
+        self.assertLessEqual(furniture | limits, set(params))
 
     def test_every_row_is_shared(self):
         # a remap parameter is shared by its row, however many fronts take it
