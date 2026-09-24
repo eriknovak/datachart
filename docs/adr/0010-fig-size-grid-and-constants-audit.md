@@ -1,5 +1,6 @@
 ---
 status: accepted
+amended-by: [0068]
 ---
 
 # FIG_SIZE becomes a small A4-anchored grid; constants audit fixes
