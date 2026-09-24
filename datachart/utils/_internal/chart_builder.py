@@ -3,9 +3,9 @@
 This module provides helper functions to reduce boilerplate in chart definitions.
 """
 
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List
 
-from .chart_kinds import chart_kind
+from .chart_kinds import ChartKind, chart_kind
 
 # extra attrs whose single value is itself a list, like the tick positions
 LIST_TYPE_EXTRA_ATTRS = {"dimensions"}
@@ -310,11 +310,12 @@ def build_charts_structure(
     hspans: Any = None,
     texts: Any = None,
     **extra_attrs: Any,
-) -> Union[Dict[str, Any], List[Dict[str, Any]]]:
-    """Build the charts structure for internal API.
+) -> List[Dict[str, Any]]:
+    """Build the canonical chart dicts: the one record-reading seam (ADR 0069).
 
-    This handles both single-chart and multi-chart data formats; the front's
-    `ChartKind` row says which shape one chart's data takes.
+    The data shape and the front's `ChartKind` row alone decide how many
+    charts there are; a record front's records come out under the row's
+    canonical keys.
 
     Args:
         chart_type: The chart type whose row the data is read against.
@@ -337,11 +338,11 @@ def build_charts_structure(
         **extra_attrs: Extra chart-specific attributes.
 
     Returns:
-        Either a single chart dict or a list of chart dicts.
+        One chart dict per dataset.
 
     Raises:
-        ValueError: If the chart type has no row, or the data misses the
-            row's dict shape.
+        ValueError: If the chart type has no row, the data misses the row's
+            dict shape, or a record misses a required key.
     """
     kind = chart_kind(chart_type)
     if kind.data_keys is not None:
@@ -379,9 +380,60 @@ def build_charts_structure(
     }
 
     if is_multi_chart:
-        return [
+        charts = [
             build_chart_dict_multi(i, chart_data, **common_args)
             for i, chart_data in enumerate(data)
         ]
     else:
-        return build_chart_dict_single(data, **common_args)
+        charts = [build_chart_dict_single(data, **common_args)]
+    if kind.record_keys:
+        for index, chart in enumerate(charts):
+            where = f"data[{index}]" if is_multi_chart else "data"
+            chart["data"] = canonical_records(kind, chart, where)
+    return charts
+
+
+def canonical_records(kind: ChartKind, chart: dict, where: str) -> Any:
+    """The chart's records copied under the row's canonical keys (ADR 0069).
+
+    Pops the chart's remap parameters: each names the caller's key for one
+    canonical key, which it defaults to. The caller's records are never
+    mutated; keys the row does not declare, like `emphasis`, carry over.
+
+    Args:
+        kind: The front's row, declaring the record keys.
+        chart: One chart dict, its `data` a list of records or of columns.
+        where: How the error names the chart's records, e.g. `"data[1]"`.
+
+    Returns:
+        The chart's data under canonical keys.
+
+    Raises:
+        ValueError: If a record misses a required key.
+    """
+    sources = {key: chart.pop(key, None) or key for key in kind.record_keys}
+    data = chart["data"]
+    if isinstance(data, dict):
+        return _canonical(data, sources)
+    if not isinstance(data, list):
+        return data
+    records = []
+    for index, record in enumerate(data):
+        if isinstance(record, dict):
+            for key in kind.required_keys:
+                if sources[key] not in record:
+                    raise ValueError(
+                        f"{kind.label[0].upper()}{kind.label[1:]} record "
+                        f"`{where}[{index}]` has no `{sources[key]}` key."
+                    )
+            record = _canonical(record, sources)
+        records.append(record)
+    return records
+
+
+def _canonical(record: dict, sources: Dict[str, str]) -> dict:
+    # a source key moves to its canonical key; the rest carry over
+    moved = set(sources) | set(sources.values())
+    canonical = {k: v for k, v in record.items() if k not in moved}
+    canonical.update((k, record[src]) for k, src in sources.items() if src in record)
+    return canonical

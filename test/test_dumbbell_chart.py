@@ -76,7 +76,7 @@ class TestDumbbellValidation(unittest.TestCase):
         self.assertRaisesWith("non-empty list", data=[])
 
     def test_missing_label_raises(self):
-        self.assertRaisesWith("string `label`", data=[{"start": 1, "end": 2}])
+        self.assertRaisesWith("has no `label` key", data=[{"start": 1, "end": 2}])
 
     def test_non_numeric_endpoint_raises(self):
         self.assertRaisesWith("`start`", data=[{"label": "A", "start": "1", "end": 2}])

@@ -8,7 +8,7 @@ consume.
 """
 
 import warnings
-from typing import Callable, Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Union
 
 import matplotlib.pyplot as plt
 
@@ -29,9 +29,6 @@ from ...constants import COLORBAR_LOCATION, FIG_SIZE, ORIENTATION
 # ================================================
 # Chart Rendering
 # ================================================
-
-# rewrites a front's built charts and settings before assembly
-Expand = Callable[[Union[dict, List[dict]], dict], Tuple[Union[dict, List[dict]], dict]]
 
 # the figure-level settings a subplots figure carries into a grid cell
 SUBPLOT_FURNITURE_KEYS = ("title", "xlabel", "ylabel", "sharex", "sharey")
@@ -116,9 +113,7 @@ def rename_deprecated(kind: ChartKind, params: dict) -> dict:
     return params
 
 
-def render(
-    chart_type: str, params: dict, expand: Optional[Expand] = None
-) -> plt.Figure:
+def render(chart_type: str, params: dict) -> plt.Figure:
     """Render a chart front's arguments, split by its row (ADR 0066).
 
     Deprecated names move to their new ones, rejected parameters raise, and
@@ -129,8 +124,6 @@ def render(
     Args:
         chart_type: The chart type, e.g. `"linechart"`.
         params: The front's arguments by name, `data` among them.
-        expand: Rewrites the built charts and settings before assembly, for a
-            front whose charts are not one per dataset.
 
     Returns:
         The rendered figure.
@@ -151,11 +144,12 @@ def render(
             settings[key] = value
 
     charts = build_charts_structure(chart_type, params["data"], **per_chart)
+    if kind.check_records is not None:
+        kind.check_records(charts, settings)
+    if kind.expand is not None:
+        charts, settings = kind.expand(charts, settings)
     if kind.legend_default is not None and settings.get("show_legend") is None:
-        chart_list = charts if isinstance(charts, list) else [charts]
-        settings["show_legend"] = kind.legend_default(chart_list, settings)
-    if expand is not None:
-        charts, settings = expand(charts, settings)
+        settings["show_legend"] = kind.legend_default(charts, settings)
     return render_chart(chart_type, charts, settings)
 
 

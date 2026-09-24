@@ -13,9 +13,6 @@ from ..constants import (
     SHOW_GRID,
 )
 
-# the settings the map layer reads from its chart's data
-_MAP_KEYS = ("resolution", "highlight", "geometry")
-
 # ================================================
 # Main Chart Definition
 # ================================================
@@ -141,11 +138,4 @@ def BasemapChart(
     """
     params = dict(locals())
 
-    return render("basemapchart", params, expand=_basemap_chart)
-
-
-def _basemap_chart(chart: dict, settings: dict) -> tuple:
-    # the basemap's one chart is its features and overlay geometry
-    data = {"features": chart["data"]}
-    data.update((key, settings.pop(key)) for key in _MAP_KEYS)
-    return {**chart, "data": data}, settings
+    return render("basemapchart", params)

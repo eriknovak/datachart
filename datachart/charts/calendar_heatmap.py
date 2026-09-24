@@ -1,14 +1,8 @@
-import math
 from typing import Union, List, Optional, Tuple
 
 import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render
-from ..utils._internal.validate import (
-    validate_calendar_dates,
-    validate_calendar_year,
-    validate_unique_dates,
-)
 from ..typings import (
     CalendarHeatmapDataAttrs,
     CalendarHeatmapStyleAttrs,
@@ -22,10 +16,6 @@ from ..constants import (
     VALUE_FORMAT,
     CALENDAR_WEEKDAY,
 )
-
-# a calendar is wide and short: the default figure keeps the default width
-# and stacks this much height per row of calendars
-CALENDAR_ROW_HEIGHT = 1.9
 
 # ================================================
 # Main Chart Definition
@@ -153,81 +143,4 @@ def CalendarHeatmap(
 
     """
     params = dict(locals())
-    return render("calendarheatmap", params, expand=_year_panels)
-
-
-def _year_panels(
-    charts: Union[dict, List[dict]], settings: dict
-) -> Tuple[List[dict], dict]:
-    """One chart per calendar year, on a figure tall enough for their rows."""
-
-    charts = charts if isinstance(charts, list) else [charts]
-    year = settings.get("year")
-    charts = [panel for chart in charts for panel in _year_charts(chart, year)]
-    if settings.get("figsize") is None:
-        rows = math.ceil(len(charts) / settings["max_cols"])
-        figsize = (FIG_SIZE.DEFAULT[0], CALENDAR_ROW_HEIGHT * rows)
-        settings = {**settings, "figsize": figsize}
-    return charts, settings
-
-
-def _year_charts(chart: dict, year: Optional[int]) -> List[dict]:
-    """One chart per year of a dataset, in year order; `year` keeps one.
-
-    The years of one dataset share its value range unless `vmin`/`vmax`
-    pin one, so the same value takes the same color on every calendar.
-    """
-
-    data = chart["data"]
-    dates = validate_calendar_dates(data["date"])
-    values = list(data["value"])
-    if len(values) != len(dates):
-        raise ValueError(
-            "CalendarHeatmap `data` needs one value per date: "
-            f"{len(dates)} dates, {len(values)} values."
-        )
-    if not dates:
-        raise ValueError("CalendarHeatmap `data` needs at least one date.")
-    validate_unique_dates(dates)
-    years = {day.year for day in dates}
-    validate_calendar_year(year, years)
-    if year is not None:
-        years = {year}
-
-    by_year = {y: ([], []) for y in sorted(years)}
-    for day, value in zip(dates, values):
-        if day.year in by_year:
-            by_year[day.year][0].append(day)
-            by_year[day.year][1].append(value)
-
-    shared = _shared_range(values, chart.get("norm"))
-    charts = []
-    for y, (year_dates, year_values) in by_year.items():
-        panel = dict(chart)
-        panel["data"] = {"date": year_dates, "value": year_values}
-        panel["year"] = y
-        if len(by_year) > 1:
-            subtitle = chart.get("subtitle")
-            panel["subtitle"] = str(y) if subtitle is None else f"{subtitle} {y}"
-            for key, bound in zip(("vmin", "vmax"), shared or ()):
-                if panel.get(key) is None:
-                    panel[key] = bound
-        charts.append(panel)
-    return charts
-
-
-def _shared_range(values: list, norm) -> Optional[Tuple[float, float]]:
-    """The (min, max) of the values a normalization can show; None without any.
-
-    A log norm shows the positive values, a logit norm those inside (0, 1);
-    the range skips what the norm would mask, as its own autoscale does.
-    """
-
-    numbers = [v for v in values if v is not None and not math.isnan(v)]
-    if norm == "log":
-        numbers = [v for v in numbers if v > 0]
-    elif norm == "logit":
-        numbers = [v for v in numbers if 0 < v < 1]
-    if not numbers:
-        return None
-    return min(numbers), max(numbers)
+    return render("calendarheatmap", params)

@@ -69,7 +69,7 @@ class TestSketchTheme(unittest.TestCase):
         self.assertFalse(ax.get_xticklabels()[0].get_path_effects())
         self.assertFalse(BarChart(BAR).axes[0].patches[0].get_path_effects())
         self.assertEqual(len(data_lines(figure)[0].get_path_effects()), 1)
-        box = BoxPlot([{"y": [1.0, 2.0, 3.0, 4.0, 9.0]}])
+        box = BoxPlot([{"label": "a", "value": v} for v in (1.0, 2.0, 3.0, 4.0, 9.0)])
         for line in data_lines(box):
             self.assertFalse(line.get_path_effects())
 

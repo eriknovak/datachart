@@ -17,7 +17,11 @@ from datachart.charts import (
     RidgelinePlot,
 )
 from datachart.utils._internal import plot_engine
-from datachart.utils._internal.chart_kinds import CHART_KINDS, SHARED_PARAMETERS
+from datachart.utils._internal.chart_kinds import (
+    CHART_KINDS,
+    RECORD_KEYS,
+    SHARED_PARAMETERS,
+)
 
 # the fronts that draw one panel through `render`; ScatterMatrix builds a grid
 FRONTS = [name for name in datachart.charts.__all__ if name != "ScatterMatrix"]
@@ -60,6 +64,13 @@ class TestRowKeys(unittest.TestCase):
             with self.subTest(front=front):
                 self.assertLessEqual(kind.chart_keys | kind.figure_keys, set(params))
 
+    def test_every_record_key_is_a_remap_parameter(self):
+        for front in FRONTS:
+            kind = CHART_KINDS[front.lower()]
+            params = inspect.signature(getattr(datachart.charts, front)).parameters
+            with self.subTest(front=front):
+                self.assertLessEqual(set(kind.record_keys), set(params))
+
     def test_front_body_is_one_render_call(self):
         for front in FRONTS:
             source = inspect.getsource(getattr(datachart.charts, front))
@@ -97,7 +108,8 @@ class TestSharedParameters(unittest.TestCase):
                     self.assertEqual(params[name].default, row.default)
 
     def test_every_row_is_shared(self):
-        counts = {name: 0 for name in SHARED_PARAMETERS}
+        # a remap parameter is shared by its row, however many fronts take it
+        counts = {name: 0 for name in SHARED_PARAMETERS if name not in RECORD_KEYS}
         for _, params in self.signatures():
             for name in counts.keys() & params.keys():
                 counts[name] += 1
@@ -125,7 +137,6 @@ class TestRenderSplit(unittest.TestCase):
             show_area=True,
         )
         self.assertEqual(chart_type, "linechart")
-        shared = {"x": "x", "y": "y", "yerr": "e"}
         self.assertEqual(
             charts,
             [
@@ -135,7 +146,6 @@ class TestRenderSplit(unittest.TestCase):
                     "emphasis": "highlight",
                     "xticks": [0, 1],
                     "xtickrotate": 10,
-                    **shared,
                 },
                 {
                     "data": [{"x": 0, "y": 2}],
@@ -143,7 +153,6 @@ class TestRenderSplit(unittest.TestCase):
                     "emphasis": None,
                     "xticks": [2],
                     "xtickrotate": 20,
-                    **shared,
                 },
             ],
         )
@@ -180,13 +189,13 @@ class TestRenderSplit(unittest.TestCase):
         self.assertEqual(chart_type, "boxplot")
         self.assertEqual(
             charts,
-            {
-                "data": [{"label": "a", "value": 1}],
-                "hlines": {"y": 1},
-                "label": "label",
-                "style": {"plot_box_color": "red"},
-                "value": "value",
-            },
+            [
+                {
+                    "data": [{"label": "a", "value": 1}],
+                    "hlines": {"y": 1},
+                    "style": {"plot_box_color": "red"},
+                }
+            ],
         )
         self.assertEqual(
             settings,
@@ -222,15 +231,17 @@ class TestRenderSplit(unittest.TestCase):
         self.assertEqual(chart_type, "heatmap")
         self.assertEqual(
             charts,
-            {
-                "data": {"z": [[1, 2], [3, 4]]},
-                "subtitle": "s",
-                "vmin": 0,
-                "vmax": 4,
-                "value_format": "{x:.1f}",
-                "colorbar": {"location": "right"},
-                "xticklabels": ["a", "b"],
-            },
+            [
+                {
+                    "data": {"z": [[1, 2], [3, 4]]},
+                    "subtitle": "s",
+                    "vmin": 0,
+                    "vmax": 4,
+                    "value_format": "{x:.1f}",
+                    "colorbar": {"location": "right"},
+                    "xticklabels": ["a", "b"],
+                }
+            ],
         )
         self.assertEqual(
             settings,

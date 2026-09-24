@@ -512,13 +512,11 @@ ERROR_AXIS_SWAP = {"xerr": "yerr", "yerr": "xerr"}
 def _chart_column(attr: str, chart: dict):
     """A data column's raw values: the dict form's sequence, else one per point."""
 
-    attr_label = get_attr_value(attr, chart, attr)
-
     if isinstance(chart["data"], dict):
-        return chart["data"][attr_label] if attr_label in chart["data"] else None
+        return chart["data"][attr] if attr in chart["data"] else None
 
     if isinstance(chart["data"], list):
-        filtered = [d[attr_label] for d in chart["data"] if attr_label in d]
+        filtered = [d[attr] for d in chart["data"] if attr in d]
         return filtered or None
 
     return None
@@ -2655,11 +2653,10 @@ def _is_bar_record(record, y_key: str) -> bool:
 def _keyed_records(chart: dict, column: str) -> list:
     """The chart's records carrying the `column` key; empty for columnar data."""
 
-    key = get_attr_value(column, chart, column)
     data = chart.get("data")
     if not isinstance(data, list):
         return []
-    return [record for record in data if _is_bar_record(record, key)]
+    return [record for record in data if _is_bar_record(record, column)]
 
 
 def _bar_records(chart: dict) -> list:
@@ -4466,8 +4463,7 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
     def _point_labels(self, x_data) -> Optional[np.ndarray]:
         """One label per drawn point (None where the key is absent), or None."""
 
-        label_attr = get_attr_value("label", self.chart, "label")
-        labels = self._point_column(label_attr, len(x_data))
+        labels = self._point_column("label", len(x_data))
         if labels is None:
             return None
         return np.array([None if l is None else str(l) for l in labels], dtype=object)
@@ -4477,11 +4473,10 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
 
         if not self.show_errors[axis]:
             return None
-        key = get_attr_value(axis, self.chart, axis)
-        values = self._point_column(key, n)
+        values = self._point_column(axis, n)
         if values is None:
             return None
-        pairs = validate_error_distances(values, key)
+        pairs = validate_error_distances(values, axis)
         return np.array(
             [(np.nan, np.nan) if pair is None else pair for pair in pairs], dtype=float
         ).T
@@ -4776,23 +4771,20 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
 def grouped_records(chart: dict) -> dict:
     """A group chart's drawn records keyed by label, in first-seen label order."""
 
-    label_attr = get_attr_value("label", chart, "label")
-    value_attr = get_attr_value("value", chart, "value")
     grouped = {}
     data = chart.get("data", [])
     if isinstance(data, list):
         for d in data:
-            if d.get(label_attr) is not None and d.get(value_attr) is not None:
-                grouped.setdefault(d[label_attr], []).append(d)
+            if d.get("label") is not None and d.get("value") is not None:
+                grouped.setdefault(d["label"], []).append(d)
     return grouped
 
 
 def grouped_values(chart: dict) -> dict:
     """A group chart's values keyed by label, in first-seen label order."""
 
-    value_attr = get_attr_value("value", chart, "value")
     return {
-        label: [d[value_attr] for d in records]
+        label: [d["value"] for d in records]
         for label, records in grouped_records(chart).items()
     }
 
@@ -5889,13 +5881,11 @@ class ViolinLayer(GroupLayer):
     def _group(self) -> tuple:
         """Values per label (and per split value) in first-seen order."""
 
-        label_attr = get_attr_value("label", self.chart, "label")
-        value_attr = get_attr_value("value", self.chart, "value")
         data = self.chart.get("data", [])
         grouped, split_values = {}, []
         if isinstance(data, list):
             for d in data:
-                lbl, val = d.get(label_attr), d.get(value_attr)
+                lbl, val = d.get("label"), d.get("value")
                 if lbl is None or val is None:
                     continue
                 side = d.get(self.split) if self.split else None
@@ -10421,13 +10411,11 @@ def _bar_record_values(charts: List[dict], magnitude: bool) -> list:
                 "`sort` and `emphasis_rule` read bar records; pass `data` as a "
                 "list of `{label, y}` dicts, not columns."
             )
-        label_key = get_attr_value("label", chart, "label")
-        y_key = get_attr_value("y", chart, "y")
         columns.append(
             [
                 (
-                    record.get(label_key),
-                    abs(record[y_key]) if magnitude else record[y_key],
+                    record.get("label"),
+                    abs(record["y"]) if magnitude else record["y"],
                 )
                 for record in _bar_records(chart)
             ]
@@ -10473,11 +10461,10 @@ def sort_bar_charts(charts: List[dict], settings: dict) -> List[dict]:
 
     sorted_charts = []
     for chart in charts:
-        label_key = get_attr_value("label", chart, "label")
         data = sorted(
             chart["data"],
             key=lambda r: rank.get(
-                r.get(label_key) if isinstance(r, dict) else None, len(rank)
+                r.get("label") if isinstance(r, dict) else None, len(rank)
             ),
         )
         sorted_charts.append({**chart, "data": data})
@@ -10551,12 +10538,11 @@ def bar_units(charts: List[dict], settings: dict, by) -> tuple:
     columns = _bar_record_values(charts, bool(settings.get("pyramid")))
     filled, units = [], []
     for chart, column in zip(charts, columns):
-        y_key = get_attr_value("y", chart, "y")
         data = [
-            {"emphasis": None, **r} if _is_bar_record(r, y_key) else r
+            {"emphasis": None, **r} if _is_bar_record(r, "y") else r
             for r in chart["data"]
         ]
-        records = [r for r in data if _is_bar_record(r, y_key)]
+        records = [r for r in data if _is_bar_record(r, "y")]
         units += [
             (value, _fill_role(record, "emphasis"))
             for record, (_, value) in zip(records, column)
