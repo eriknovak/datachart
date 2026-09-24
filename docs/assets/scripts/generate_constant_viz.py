@@ -77,12 +77,12 @@ from datachart.constants import (
     LINE_STYLE,
     NETWORK_LAYOUT,
     NETWORK_LABEL_POSITION,
-    NORMALIZE,
+    COLOR_NORM,
     ORIENTATION,
     RADIAL_DIRECTION,
     RADIAL_TYPE,
     RIDGELINE_SCALE,
-    SCALE,
+    AXIS_SCALE,
     SCATTER_MATRIX_DIAGONAL,
     SHOW_GRID,
     SORT,
@@ -193,7 +193,7 @@ def font_weight():
 
 def line_marker():
     members = [
-        ("NONE", LINE_MARKER.NONE),
+        ("NO_MARKER", LINE_MARKER.NO_MARKER),
         ("PIXEL", LINE_MARKER.PIXEL),
         ("POINT", LINE_MARKER.POINT),
         ("CIRCLE", LINE_MARKER.CIRCLE),
@@ -237,7 +237,7 @@ def line_marker():
 
 def line_style():
     members = [
-        ("NONE", LINE_STYLE.NONE),
+        ("NO_LINE", LINE_STYLE.NO_LINE),
         ("SOLID", LINE_STYLE.SOLID),
         ("DASHED", LINE_STYLE.DASHED),
         ("DASHDOT", LINE_STYLE.DASHDOT),
@@ -1066,14 +1066,14 @@ def show_grid():
 
 def scale():
     members = [
-        ("LINEAR", SCALE.LINEAR),
-        ("LOG", SCALE.LOG),
-        ("SYMLOG", SCALE.SYMLOG),
-        ("ASINH", SCALE.ASINH),
+        ("LINEAR", AXIS_SCALE.LINEAR),
+        ("LOG", AXIS_SCALE.LOG),
+        ("SYMLOG", AXIS_SCALE.SYMLOG),
+        ("ASINH", AXIS_SCALE.ASINH),
     ]
     data = [{"x": x, "y": 10**x} for x in range(6)]
     figs = [
-        LineChart(data=data, scaley=value, title=f"SCALE.{label}")
+        LineChart(data=data, scaley=value, title=f"AXIS_SCALE.{label}")
         for label, value in members
     ]
     chart_grid(
@@ -1087,11 +1087,11 @@ def scale():
 
 def normalize():
     members = [
-        ("LINEAR", NORMALIZE.LINEAR),
-        ("LOG", NORMALIZE.LOG),
-        ("SYMLOG", NORMALIZE.SYMLOG),
-        ("ASINH", NORMALIZE.ASINH),
-        ("LOGIT", NORMALIZE.LOGIT),
+        ("LINEAR", COLOR_NORM.LINEAR),
+        ("LOG", COLOR_NORM.LOG),
+        ("SYMLOG", COLOR_NORM.SYMLOG),
+        ("ASINH", COLOR_NORM.ASINH),
+        ("LOGIT", COLOR_NORM.LOGIT),
     ]
     # values in (0, 1) with a wide dynamic range, legal for every norm
     data = {"z": np.geomspace(0.001, 0.95, 16).reshape(4, 4).tolist()}
@@ -1100,7 +1100,7 @@ def normalize():
             data=data,
             norm=value,
             show_colorbars=False,
-            title=f"NORMALIZE.{label}",
+            title=f"COLOR_NORM.{label}",
         )
         for label, value in members
     ]
@@ -1113,11 +1113,11 @@ def normalize():
             vmin=-0.6,
             vmax=0.95,
             show_colorbars=False,
-            title=f"NORMALIZE.{label}",
+            title=f"COLOR_NORM.{label}",
         )
         for label, value in (
-            ("CENTERED", NORMALIZE.CENTERED),
-            ("TWOSLOPE", NORMALIZE.TWOSLOPE),
+            ("CENTERED", COLOR_NORM.CENTERED),
+            ("TWOSLOPE", COLOR_NORM.TWOSLOPE),
         )
     ]
     chart_grid(
@@ -1581,7 +1581,7 @@ def diagonal():
     members = [
         ("HIST", SCATTER_MATRIX_DIAGONAL.HIST),
         ("KDE", SCATTER_MATRIX_DIAGONAL.KDE),
-        ("NONE", SCATTER_MATRIX_DIAGONAL.NONE),
+        ("BLANK", SCATTER_MATRIX_DIAGONAL.BLANK),
     ]
     rng = np.random.default_rng(3)
     a = rng.normal(0, 1, 120)

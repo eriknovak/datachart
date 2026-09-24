@@ -23,7 +23,7 @@ from ..utils._internal.layers import (
 )
 from ..utils._internal.chart_kinds import build_chart_panel_settings
 from ..utils._internal.plot_engine import composition_panel
-from ..utils._internal.validate import validate_diagonal
+from ..utils._internal.chart_kinds import chart_kind, check_domains
 from ..typings import (
     LegendSettingAttrs,
     ScatterMatrixDataPointAttrs,
@@ -351,10 +351,11 @@ def ScatterMatrix(
             an outside edge.
 
     """
+    check_domains(locals(), chart_kind("scattermatrix").domains)
     columns = _columns(data)
     dims = _resolve_dimensions(columns, dimensions, hue)
     groups = _resolve_groups(columns, hue)
-    diagonal = validate_diagonal(diagonal)
+    diagonal = SCATTER_MATRIX_DIAGONAL.DEFAULT if diagonal is None else diagonal
     sharex = True if sharex is None else sharex
     sharey = True if sharey is None else sharey
     show_legend = hue is not None if show_legend is None else show_legend
@@ -373,7 +374,7 @@ def ScatterMatrix(
     n = len(dims)
     blank = [
         [
-            (i == j and diagonal == SCATTER_MATRIX_DIAGONAL.NONE)
+            (i == j and diagonal == SCATTER_MATRIX_DIAGONAL.BLANK)
             or (i < j and bool(lower_only))
             for j in range(n)
         ]
@@ -386,7 +387,9 @@ def ScatterMatrix(
     ]
     left = [min((j for j in range(n) if drawn[i][j]), default=0) for i in range(n)]
     # a blank diagonal under lower_only leaves the top row and right column empty
-    trim = 1 if lower_only and diagonal == SCATTER_MATRIX_DIAGONAL.NONE and n > 1 else 0
+    trim = (
+        1 if lower_only and diagonal == SCATTER_MATRIX_DIAGONAL.BLANK and n > 1 else 0
+    )
     cells, kinds = [], []
     for i in range(trim, n):
         for j in range(n - trim):

@@ -11,7 +11,7 @@ from matplotlib import colors
 
 from datachart.charts import Heatmap
 from datachart.config import config
-from datachart.constants import NORMALIZE, THEME
+from datachart.constants import COLOR_NORM, THEME
 
 Z = [[1, 2, 3], [4, 5, 6]]
 SIGNED = [[-3, -1, 0], [1, 2, 3]]
@@ -141,23 +141,23 @@ class TestCenteredNorm(unittest.TestCase):
         plt.close("all")
 
     def test_centered_norm_builds_a_centered_norm(self):
-        image = Heatmap({"z": SIGNED}, norm=NORMALIZE.CENTERED).axes[0].images[0]
+        image = Heatmap({"z": SIGNED}, norm=COLOR_NORM.CENTERED).axes[0].images[0]
         self.assertIsInstance(image.norm, colors.CenteredNorm)
         self.assertEqual(image.norm.vcenter, 0)
 
     def test_vcenter_moves_the_centre(self):
         image = (
-            Heatmap({"z": SIGNED}, norm=NORMALIZE.CENTERED, vcenter=2).axes[0].images[0]
+            Heatmap({"z": SIGNED}, norm=COLOR_NORM.CENTERED, vcenter=2).axes[0].images[0]
         )
         self.assertEqual(image.norm.vcenter, 2)
 
     def test_autoscaled_halfrange_is_symmetric_about_the_centre(self):
-        image = Heatmap({"z": SIGNED}, norm=NORMALIZE.CENTERED).axes[0].images[0]
+        image = Heatmap({"z": SIGNED}, norm=COLOR_NORM.CENTERED).axes[0].images[0]
         self.assertEqual((image.norm.vmin, image.norm.vmax), (-3, 3))
 
     def test_bounds_fold_into_the_larger_half_range(self):
         image = (
-            Heatmap({"z": SIGNED}, norm=NORMALIZE.CENTERED, vmin=-1, vmax=4)
+            Heatmap({"z": SIGNED}, norm=COLOR_NORM.CENTERED, vmin=-1, vmax=4)
             .axes[0]
             .images[0]
         )
@@ -165,7 +165,7 @@ class TestCenteredNorm(unittest.TestCase):
 
     def test_twoslope_norm_keeps_the_bounds_apart(self):
         image = (
-            Heatmap({"z": SIGNED}, norm=NORMALIZE.TWOSLOPE, vmin=-1, vmax=4)
+            Heatmap({"z": SIGNED}, norm=COLOR_NORM.TWOSLOPE, vmin=-1, vmax=4)
             .axes[0]
             .images[0]
         )
@@ -175,13 +175,13 @@ class TestCenteredNorm(unittest.TestCase):
         )
 
     def test_other_norms_still_pass_through_with_their_bounds(self):
-        image = Heatmap({"z": Z}, norm=NORMALIZE.LOG, vmin=1, vmax=6).axes[0].images[0]
+        image = Heatmap({"z": Z}, norm=COLOR_NORM.LOG, vmin=1, vmax=6).axes[0].images[0]
         self.assertIsInstance(image.norm, colors.LogNorm)
         self.assertEqual((image.norm.vmin, image.norm.vmax), (1, 6))
 
     def test_twoslope_bounds_missing_the_centre_raise(self):
         with self.assertRaises(ValueError) as cm:
-            Heatmap({"z": Z}, norm=NORMALIZE.TWOSLOPE, vmin=1, vmax=6)
+            Heatmap({"z": Z}, norm=COLOR_NORM.TWOSLOPE, vmin=1, vmax=6)
         self.assertIn("vcenter", str(cm.exception))
 
 
@@ -200,24 +200,24 @@ class TestDivergingColormap(unittest.TestCase):
 
     def test_centered_norm_takes_the_theme_diverging_colormap(self):
         self.assertEqual(
-            self._cmap(norm=NORMALIZE.CENTERED), config["plot_heatmap_cmap_diverging"]
+            self._cmap(norm=COLOR_NORM.CENTERED), config["plot_heatmap_cmap_diverging"]
         )
 
     def test_twoslope_norm_takes_the_theme_diverging_colormap(self):
         self.assertEqual(
-            self._cmap(norm=NORMALIZE.TWOSLOPE), config["plot_heatmap_cmap_diverging"]
+            self._cmap(norm=COLOR_NORM.TWOSLOPE), config["plot_heatmap_cmap_diverging"]
         )
 
     def test_chart_colormap_wins_over_the_theme_diverging_one(self):
         self.assertEqual(
-            self._cmap(norm=NORMALIZE.CENTERED, style={"plot_heatmap_cmap": "Greens"}),
+            self._cmap(norm=COLOR_NORM.CENTERED, style={"plot_heatmap_cmap": "Greens"}),
             "Greens",
         )
 
     def test_chart_diverging_colormap_wins_over_the_theme(self):
         self.assertEqual(
             self._cmap(
-                norm=NORMALIZE.CENTERED,
+                norm=COLOR_NORM.CENTERED,
                 style={"plot_heatmap_cmap_diverging": "Spectral"},
             ),
             "Spectral",
@@ -225,13 +225,13 @@ class TestDivergingColormap(unittest.TestCase):
 
     def test_theme_sequential_colormap_never_applies_under_a_centred_norm(self):
         config.update_config({"plot_heatmap_cmap": "Greens"})
-        self.assertNotEqual(self._cmap(norm=NORMALIZE.CENTERED), "Greens")
+        self.assertNotEqual(self._cmap(norm=COLOR_NORM.CENTERED), "Greens")
 
     def test_a_config_without_a_diverging_map_falls_back_to_the_sequential_one(self):
         config.update_config(
             {"plot_heatmap_cmap": "Greens", "plot_heatmap_cmap_diverging": None}
         )
-        self.assertEqual(self._cmap(norm=NORMALIZE.CENTERED), "Greens")
+        self.assertEqual(self._cmap(norm=COLOR_NORM.CENTERED), "Greens")
 
 
 class TestCenteredColorbar(unittest.TestCase):
@@ -248,13 +248,13 @@ class TestCenteredColorbar(unittest.TestCase):
 
     def test_user_ticks_replace_the_centre_tick(self):
         ticks = self._bar_ticks(
-            norm=NORMALIZE.CENTERED, vcenter=1, colorbar={"ticks": [-2, 2]}
+            norm=COLOR_NORM.CENTERED, vcenter=1, colorbar={"ticks": [-2, 2]}
         )
         self.assertEqual(ticks, [-2.0, 2.0])
 
     def test_colorbar_ticks_include_the_centre(self):
         figure = Heatmap(
-            {"z": SIGNED}, norm=NORMALIZE.CENTERED, vcenter=1, show_colorbars=True
+            {"z": SIGNED}, norm=COLOR_NORM.CENTERED, vcenter=1, show_colorbars=True
         )
         figure.canvas.draw()
         bar = [ax for ax in figure.axes if ax is not figure.axes[0]][0]
@@ -276,7 +276,7 @@ class TestCenteredValueSteps(unittest.TestCase):
         return [t.get_text() for t in legend.get_texts()]
 
     def test_a_step_edge_lands_on_the_centre(self):
-        ranges = self._step_ranges(norm=NORMALIZE.CENTERED)
+        ranges = self._step_ranges(norm=COLOR_NORM.CENTERED)
         self.assertTrue(any(r.startswith("0 ") for r in ranges), ranges)
 
     def test_even_steps_stay_even_without_a_centre(self):

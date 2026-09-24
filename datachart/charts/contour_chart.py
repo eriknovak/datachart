@@ -21,11 +21,12 @@ from ..typings import (
 from ..constants import (
     DATE_FORMAT,
     ASPECT_RATIO,
+    COLOR_NORM,
     CONTOUR_LEVELS,
     EMPHASIS,
     FIG_SIZE,
     SHOW_GRID,
-    SCALE,
+    AXIS_SCALE,
     VALUE_FORMAT,
 )
 
@@ -56,14 +57,14 @@ def ContourChart(
     show_labels: Optional[bool] = None,
     show_colorbars: Optional[bool] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
-    scalex: Optional[Union[SCALE, str]] = None,
-    scaley: Optional[Union[SCALE, str]] = None,
+    scalex: Optional[Union[AXIS_SCALE, str]] = None,
+    scaley: Optional[Union[AXIS_SCALE, str]] = None,
     subplots: Optional[bool] = None,
     max_cols: Optional[int] = None,
     sharex: Optional[bool] = None,
     sharey: Optional[bool] = None,
     style: Optional[Union[ContourStyleAttrs, List[Optional[ContourStyleAttrs]]]] = None,
-    norm: Optional[Union[str, List[Optional[str]]]] = None,
+    norm: Optional[Union[COLOR_NORM, str, List[Optional[str]]]] = None,
     vmin: Optional[Union[float, List[Optional[float]]]] = None,
     vmax: Optional[Union[float, List[Optional[float]]]] = None,
     vcenter: Optional[Union[float, List[Optional[float]]]] = None,
@@ -218,7 +219,7 @@ def ContourChart(
         style: Style configuration(s) for the contour chart(s).
         norm: Value normalization method(s) of the colormap. `"centered"` and `"twoslope"`
             hold `vcenter` in the middle of the theme's diverging colormap;
-            see [`NORMALIZE`][datachart.constants.NORMALIZE].
+            see [`COLOR_NORM`][datachart.constants.COLOR_NORM].
         vmin: Minimum value(s) for normalization.
         vmax: Maximum value(s) for normalization.
         vcenter: The value(s) a centred normalization holds in the middle of

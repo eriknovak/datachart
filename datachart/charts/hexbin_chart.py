@@ -21,10 +21,11 @@ from ..typings import (
 from ..constants import (
     DATE_FORMAT,
     ASPECT_RATIO,
+    COLOR_NORM,
     FIG_SIZE,
     HEXBIN_REDUCE,
     SHOW_GRID,
-    SCALE,
+    AXIS_SCALE,
     VALUE_FORMAT,
 )
 
@@ -52,8 +53,8 @@ def HexbinChart(
     show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
     show_colorbars: Optional[bool] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
-    scalex: Optional[Union[SCALE, str]] = None,
-    scaley: Optional[Union[SCALE, str]] = None,
+    scalex: Optional[Union[AXIS_SCALE, str]] = None,
+    scaley: Optional[Union[AXIS_SCALE, str]] = None,
     subplots: Optional[bool] = None,
     max_cols: Optional[int] = None,
     sharex: Optional[bool] = None,
@@ -62,7 +63,7 @@ def HexbinChart(
     gridsize: Optional[Union[int, List[Optional[int]]]] = None,
     reduce: Optional[Union[HEXBIN_REDUCE, str, List[Optional[str]]]] = None,
     mincnt: Optional[Union[int, List[Optional[int]]]] = None,
-    norm: Optional[Union[str, List[Optional[str]]]] = None,
+    norm: Optional[Union[COLOR_NORM, str, List[Optional[str]]]] = None,
     vmin: Optional[Union[float, List[Optional[float]]]] = None,
     vmax: Optional[Union[float, List[Optional[float]]]] = None,
     vcenter: Optional[Union[float, List[Optional[float]]]] = None,
@@ -210,7 +211,7 @@ def HexbinChart(
         norm: Value normalization method(s) of the colormap; `"log"` spreads
             heavy-tailed counts. `"centered"` and `"twoslope"`
             hold `vcenter` in the middle of the theme's diverging colormap;
-            see [`NORMALIZE`][datachart.constants.NORMALIZE].
+            see [`COLOR_NORM`][datachart.constants.COLOR_NORM].
         vmin: Minimum value(s) for normalization.
         vmax: Maximum value(s) for normalization.
         vcenter: The value(s) a centred normalization holds in the middle of

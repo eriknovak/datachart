@@ -22,41 +22,23 @@ from ...constants import (
     BANDWIDTH,
     BASEMAP_FEATURE,
     BASEMAP_RESOLUTION,
-    BUMP_LABEL_POSITION,
-    BUMP_RANK,
-    CALENDAR_WEEKDAY,
     DATE_FORMAT,
     DUMBBELL_SORT_KEY,
     DUMBBELL_VALUE,
     EMPHASIS,
     GANTT_ARROW_ENTRY,
-    GANTT_DATE_PERIOD,
     GANTT_SORT_KEY,
     GANTT_VALUE,
-    DRAW_POSITION,
     NETWORK_LAYOUT,
-    NETWORK_LABEL_POSITION,
-    NORMALIZE,
-    RIDGELINE_SCALE,
-    SCALE,
-    SCATTER_MATRIX_DIAGONAL,
-    SORT,
-    STACKED_AREA_BASELINE,
+    COLOR_NORM,
+    AXIS_SCALE,
     VIOLIN_INNER,
 )
 
-BANDWIDTH_RULES = (BANDWIDTH.SCOTT, BANDWIDTH.SILVERMAN)
-DIAGONAL_CELLS = (
-    SCATTER_MATRIX_DIAGONAL.HIST,
-    SCATTER_MATRIX_DIAGONAL.KDE,
-    SCATTER_MATRIX_DIAGONAL.NONE,
-)
 # the kinds of axis a data column asks for (ADR 0037)
 AXIS_TEMPORAL = "temporal"
 AXIS_NUMERIC = "numeric"
 AXIS_CATEGORICAL = "categorical"
-EMPHASIS_ROLES = (EMPHASIS.BACKGROUND, EMPHASIS.HIGHLIGHT)
-DRAW_POSITIONS = (DRAW_POSITION.BELOW, DRAW_POSITION.ABOVE)
 # in draw order, bottom up: a lake sits on the land and a line on both
 BASEMAP_FEATURES = (
     BASEMAP_FEATURE.LAND,
@@ -72,33 +54,11 @@ BASEMAP_FILLED = (
     BASEMAP_FEATURE.COUNTRIES,
     BASEMAP_FEATURE.LAKES,
 )
-BASEMAP_RESOLUTIONS = (
-    BASEMAP_RESOLUTION.LOW,
-    BASEMAP_RESOLUTION.MEDIUM,
-    BASEMAP_RESOLUTION.HIGH,
-)
+BASEMAP_RESOLUTIONS = BASEMAP_RESOLUTION.members()
 # the scales Natural Earth publishes a feature at; unlisted means every one
 BASEMAP_FEATURE_RESOLUTIONS = {BASEMAP_FEATURE.ROADS: (BASEMAP_RESOLUTION.HIGH,)}
 # PIL modes an array keeps as is: grey levels read through the colormap
 IMAGE_ARRAY_MODES = ("L", "I", "F", "RGB", "RGBA")
-RANK_RULES = (BUMP_RANK.VALUE_DESCENDING, BUMP_RANK.VALUE_ASCENDING, BUMP_RANK.GIVEN)
-LABEL_POSITIONS = (
-    BUMP_LABEL_POSITION.START,
-    BUMP_LABEL_POSITION.END,
-    BUMP_LABEL_POSITION.BOTH,
-)
-NETWORK_LABEL_POSITIONS = (
-    NETWORK_LABEL_POSITION.CENTER,
-    NETWORK_LABEL_POSITION.ABOVE,
-    NETWORK_LABEL_POSITION.BEST,
-)
-STACK_BASELINES = (
-    STACKED_AREA_BASELINE.ZERO,
-    STACKED_AREA_BASELINE.PERCENT,
-    STACKED_AREA_BASELINE.SYM,
-    STACKED_AREA_BASELINE.WIGGLE,
-    STACKED_AREA_BASELINE.WEIGHTED_WIGGLE,
-)
 
 
 def is_number(value) -> bool:
@@ -109,14 +69,15 @@ def is_number(value) -> bool:
 
 
 def validate_bandwidth(bandwidth) -> None:
-    """Raise unless `bandwidth` is None, a bandwidth rule, or a number."""
+    """Raise unless `bandwidth` is None, a rule name, or a number.
 
-    if bandwidth is not None and not (
-        bandwidth in BANDWIDTH_RULES or is_number(bandwidth)
-    ):
+    A rule name is checked against `BANDWIDTH` where the value is read.
+    """
+
+    if not (bandwidth is None or isinstance(bandwidth, str) or is_number(bandwidth)):
         raise ValueError(
             f"Invalid `bandwidth` value {bandwidth!r}. "
-            f"Must be None, one of {BANDWIDTH_RULES}, or a number."
+            f"Must be None, one of {BANDWIDTH.members()}, or a number."
         )
 
 
@@ -135,10 +96,6 @@ def validate_single_dataset(datasets, name: str, subplots=None) -> None:
         )
 
 
-RIDGELINE_SCALES = (RIDGELINE_SCALE.PER_ROW, RIDGELINE_SCALE.COMMON)
-RIDGELINE_INNERS = (VIOLIN_INNER.MEDIAN, VIOLIN_INNER.QUARTILES)
-
-
 def validate_overlap(overlap) -> float:
     """Validate a ridgeline row overlap: a number in `[0, 1]` (ADR 0047)."""
 
@@ -151,28 +108,15 @@ def validate_overlap(overlap) -> float:
     return float(overlap)
 
 
-def validate_ridgeline_scale(ridge_scale):
-    """Validate a ridgeline density scale; None means `PER_ROW`."""
+def validate_ridgeline_inner(inner) -> None:
+    """Raise for the box, the one violin inner mark a ridge has no room for."""
 
-    if ridge_scale is None:
-        return RIDGELINE_SCALE.DEFAULT
-    if ridge_scale not in RIDGELINE_SCALES:
+    if inner == VIOLIN_INNER.BOX:
         raise ValueError(
-            f"Invalid `ridge_scale` value {ridge_scale!r}. "
-            f"Must be one of {RIDGELINE_SCALES} or None."
+            f"RidgelinePlot does not draw `inner` {inner!r}: a ridge has no "
+            f"room for a box. Pass {VIOLIN_INNER.QUARTILES!r}, "
+            f"{VIOLIN_INNER.MEDIAN!r}, or None."
         )
-    return ridge_scale
-
-
-def validate_ridgeline_inner(inner):
-    """Validate the ridgeline inner marks: the violin's marks without the box."""
-
-    if inner is not None and inner not in RIDGELINE_INNERS:
-        raise ValueError(
-            f"Invalid `inner` value {inner!r}. "
-            f"Must be one of {RIDGELINE_INNERS} or None."
-        )
-    return inner
 
 
 def validate_ridge_marks(fill: bool, show_outline: bool) -> None:
@@ -291,70 +235,6 @@ def validate_filled_levels(levels) -> None:
         )
 
 
-def validate_baseline(baseline):
-    """Validate a stacked area baseline; None means the zero baseline."""
-
-    if baseline is None:
-        return STACKED_AREA_BASELINE.ZERO
-    if baseline not in STACK_BASELINES:
-        raise ValueError(
-            f"Invalid `baseline` value {baseline!r}. "
-            f"Must be one of {STACK_BASELINES} or None."
-        )
-    return baseline
-
-
-def validate_diagonal(diagonal):
-    """Validate a scatter matrix diagonal; None means a histogram."""
-
-    if diagonal is None:
-        return SCATTER_MATRIX_DIAGONAL.DEFAULT
-    if diagonal not in DIAGONAL_CELLS:
-        raise ValueError(
-            f"Invalid `diagonal` value {diagonal!r}. "
-            f"Must be one of {DIAGONAL_CELLS} or None."
-        )
-    return diagonal
-
-
-def validate_rank_by(rank_by):
-    """Validate a bump chart ranking rule; None means highest value first."""
-
-    if rank_by is None:
-        return BUMP_RANK.DEFAULT
-    if rank_by not in RANK_RULES:
-        raise ValueError(
-            f"Invalid `rank_by` value {rank_by!r}. Must be one of {RANK_RULES} or None."
-        )
-    return rank_by
-
-
-def validate_label_position(position):
-    """Validate an end label position; None means beside the last point."""
-
-    if position is None:
-        return BUMP_LABEL_POSITION.DEFAULT
-    if position not in LABEL_POSITIONS:
-        raise ValueError(
-            f"Invalid `label_position` value {position!r}. "
-            f"Must be one of {LABEL_POSITIONS} or None."
-        )
-    return position
-
-
-def validate_node_label_position(position):
-    """Validate a node label position; None means on the marker."""
-
-    if position is None:
-        return NETWORK_LABEL_POSITION.DEFAULT
-    if position not in NETWORK_LABEL_POSITIONS:
-        raise ValueError(
-            f"Invalid `label_position` value {position!r}. "
-            f"Must be one of {NETWORK_LABEL_POSITIONS} or None."
-        )
-    return position
-
-
 def validate_line_curve(curve) -> float:
     """Validate a bump line curve: None (straight) or a number in [0, 1]."""
 
@@ -421,7 +301,7 @@ def validate_log_values(parameter: str, role: str, scale, values, hint=None) -> 
     are skipped; every other scale accepts any value.
     """
 
-    if scale != SCALE.LOG or values is None:
+    if scale != AXIS_SCALE.LOG or values is None:
         return
     values = np.asarray(values, dtype=float).ravel()
     offending = values[np.isfinite(values) & (values <= 0)]
@@ -445,10 +325,10 @@ def validate_two_slope_bounds(vcenter, vmin, vmax) -> None:
     if (vmin is None or vmin < vcenter) and (vmax is None or vmax > vcenter):
         return
     raise ValueError(
-        f"`norm` '{NORMALIZE.TWOSLOPE}' needs `vcenter` strictly between "
+        f"`norm` '{COLOR_NORM.TWOSLOPE}' needs `vcenter` strictly between "
         f"`vmin` and `vmax`, but got vmin={vmin}, vcenter={vcenter}, "
         f"vmax={vmax}. Move `vcenter` into the range, or drop the bound that "
-        f"excludes it. Use '{NORMALIZE.CENTERED}' for one symmetric range."
+        f"excludes it. Use '{COLOR_NORM.CENTERED}' for one symmetric range."
     )
 
 
@@ -487,27 +367,12 @@ def validate_ticks_format(value, axis: str, dated: bool) -> None:
 
 
 def validate_emphasis(value, context: str = "emphasis"):
-    """Validate a single emphasis role; None means no emphasis."""
+    """Validate an emphasis role set in the data; None means no emphasis."""
 
-    if value is not None and value not in EMPHASIS_ROLES:
+    if not EMPHASIS.accepts(value):
         raise ValueError(
             f"Invalid {context} value {value!r}. "
-            f"Must be '{EMPHASIS.BACKGROUND}', '{EMPHASIS.HIGHLIGHT}', or None."
-        )
-    return value
-
-
-SORT_ORDERS = (SORT.ASCENDING, SORT.DESCENDING)
-
-
-def validate_sort(value):
-    """Validate a category sort order; None (`SORT.NONE`) means input order."""
-
-    if value is None:
-        return None
-    if value not in SORT_ORDERS:
-        raise ValueError(
-            f"Invalid `sort` value {value!r}. Must be one of {SORT_ORDERS} or None."
+            f"Must be one of {EMPHASIS.members()}."
         )
     return value
 
@@ -796,13 +661,6 @@ def _validate_treemap_record(record, name: str, depth: int) -> None:
             )
 
 
-NETWORK_LAYOUTS = (
-    NETWORK_LAYOUT.SPRING,
-    NETWORK_LAYOUT.WEIGHTED,
-    NETWORK_LAYOUT.GROUPED,
-    NETWORK_LAYOUT.CIRCULAR,
-    NETWORK_LAYOUT.FIXED,
-)
 # the headless connector looks; directedness owns the arrowhead (ADR 0029)
 NETWORK_EDGE_STYLES = (ARROW_STYLE.CURVE, ARROW_STYLE.STRAIGHT)
 
@@ -824,11 +682,6 @@ def validate_network_records(nodes, edges, layout) -> None:
     never `None` here (ADR 0029).
     """
 
-    if layout not in NETWORK_LAYOUTS:
-        raise ValueError(
-            f"Invalid network `layout` value {layout!r}. "
-            f"Must be one of {NETWORK_LAYOUTS}."
-        )
     if not isinstance(edges, list):
         raise ValueError("A network chart requires an `edges` list of records.")
     for i, record in enumerate(edges):
@@ -909,7 +762,6 @@ def validate_network_edge_style(value):
 
 # the temporal types a calendar date may be (ADR 0037); strings never parse
 CALENDAR_DATE_TYPES = "`date`, `datetime`, `numpy.datetime64`, or pandas `Timestamp`"
-WEEK_STARTS = (CALENDAR_WEEKDAY.MONDAY, CALENDAR_WEEKDAY.SUNDAY)
 
 
 def validate_calendar_dates(dates) -> List[date]:
@@ -956,59 +808,15 @@ def validate_calendar_year(year, years) -> None:
         )
 
 
-def validate_week_start(value):
-    """Validate a calendar week start; None means the theme default."""
-
-    if value is not None and value not in WEEK_STARTS:
-        raise ValueError(
-            f"Invalid `week_start` value {value!r}. Must be one of {WEEK_STARTS} or None."
-        )
-    return value
-
-
-GANTT_VALUES = (GANTT_VALUE.DURATION, GANTT_VALUE.PROGRESS)
-GANTT_SORT_KEYS = (GANTT_SORT_KEY.START, GANTT_SORT_KEY.GROUP)
-DUMBBELL_VALUES = (DUMBBELL_VALUE.ENDPOINTS, DUMBBELL_VALUE.DELTA)
-DUMBBELL_SORT_KEYS = (
-    DUMBBELL_SORT_KEY.START,
-    DUMBBELL_SORT_KEY.END,
-    DUMBBELL_SORT_KEY.DELTA,
-)
-GANTT_ARROW_ENTRIES = (GANTT_ARROW_ENTRY.TOP, GANTT_ARROW_ENTRY.LEFT)
-DATE_PERIODS = (
-    GANTT_DATE_PERIOD.DAY,
-    GANTT_DATE_PERIOD.WEEK,
-    GANTT_DATE_PERIOD.MONTH,
-    GANTT_DATE_PERIOD.QUARTER,
-    GANTT_DATE_PERIOD.YEAR,
-    GANTT_DATE_PERIOD.PROJECT_MONTH,
-)
-
-
-def validate_date_period(value):
-    """Validate a date axis period; None keeps the concise date ticks."""
-
-    if value is not None and value not in DATE_PERIODS:
-        raise ValueError(
-            f"Invalid `period` value {value!r}. Must be one of {DATE_PERIODS} or None."
-        )
-    return value
-
-
 def validate_gantt_arrow_entry(value):
-    """Validate a dependency arrow entry; None enters from the top."""
+    """Validate the dependency arrow entry style; None enters from the top."""
 
     if value is None:
         return GANTT_ARROW_ENTRY.DEFAULT
-    if value not in GANTT_ARROW_ENTRIES:
-        raise ValueError(
-            f"Invalid `plot_gantt_dependency_entry` value {value!r}. "
-            f"Must be one of {GANTT_ARROW_ENTRIES} or None."
-        )
-    return value
+    return GANTT_ARROW_ENTRY.check(value, "plot_gantt_dependency_entry")
 
 
-def _validate_value_kind(show_values, value_kind, kinds: tuple, default: str):
+def _validate_value_kind(show_values, value_kind, default: str):
     """`show_values` and the value label kind of a range front.
 
     A kind passed as `show_values` warns at the front's caller and moves to
@@ -1027,24 +835,14 @@ def _validate_value_kind(show_values, value_kind, kinds: tuple, default: str):
         if value_kind is not None:
             raise ValueError("Pass the label kind as `value_kind` only.")
         show_values, value_kind = True, show_values
-    if value_kind is None:
-        return show_values, default
-    if value_kind not in kinds:
-        raise ValueError(
-            f"Invalid `value_kind` value {value_kind!r}. Must be one of {kinds} or None."
-        )
-    return show_values, value_kind
+    return show_values, default if value_kind is None else value_kind
 
 
-def _validate_sort_key(sort, sort_by, keys: tuple, default: str) -> str:
-    """Validate the key `sort` orders a range front's rows by; None means `default`."""
+def _validate_sort_key(sort, sort_by, default: str) -> str:
+    """The key `sort` orders a range front's rows by; None means `default`."""
 
     if sort_by is None:
         return default
-    if sort_by not in keys:
-        raise ValueError(
-            f"Invalid `sort_by` value {sort_by!r}. Must be one of {keys} or None."
-        )
     if sort is None:
         raise ValueError("`sort_by` names the key to sort by; pass `sort` as well.")
     return sort_by
@@ -1053,31 +851,25 @@ def _validate_sort_key(sort, sort_by, keys: tuple, default: str) -> str:
 def validate_gantt_value_kind(show_values, value_kind) -> tuple:
     """`show_values` and the gantt value label kind; None means `DEFAULT`."""
 
-    return _validate_value_kind(
-        show_values, value_kind, GANTT_VALUES, GANTT_VALUE.DEFAULT
-    )
+    return _validate_value_kind(show_values, value_kind, GANTT_VALUE.DEFAULT)
 
 
 def validate_gantt_sort_by(sort, sort_by) -> str:
-    """Validate a gantt sort key; None means by start."""
+    """The gantt sort key; None means by start."""
 
-    return _validate_sort_key(sort, sort_by, GANTT_SORT_KEYS, GANTT_SORT_KEY.DEFAULT)
+    return _validate_sort_key(sort, sort_by, GANTT_SORT_KEY.DEFAULT)
 
 
 def validate_dumbbell_value_kind(show_values, value_kind) -> tuple:
     """`show_values` and the dumbbell value label kind; None means `DEFAULT`."""
 
-    return _validate_value_kind(
-        show_values, value_kind, DUMBBELL_VALUES, DUMBBELL_VALUE.DEFAULT
-    )
+    return _validate_value_kind(show_values, value_kind, DUMBBELL_VALUE.DEFAULT)
 
 
 def validate_dumbbell_sort_by(sort, sort_by) -> str:
-    """Validate a dumbbell sort key; None means by start."""
+    """The dumbbell sort key; None means by start."""
 
-    return _validate_sort_key(
-        sort, sort_by, DUMBBELL_SORT_KEYS, DUMBBELL_SORT_KEY.DEFAULT
-    )
+    return _validate_sort_key(sort, sort_by, DUMBBELL_SORT_KEY.DEFAULT)
 
 
 def validate_dumbbell_records(records) -> None:
@@ -1218,19 +1010,6 @@ def validate_gantt_groups(records, sort_by, show_group_headers=False) -> None:
         )
 
 
-def validate_draw_position(position):
-    """Validate an image or basemap draw position; None means below the marks."""
-
-    if position is None:
-        return DRAW_POSITION.DEFAULT
-    if position not in DRAW_POSITIONS:
-        raise ValueError(
-            f"Invalid `position` value {position!r}. "
-            f"Must be one of {DRAW_POSITIONS} or None."
-        )
-    return position
-
-
 def validate_image_extent(extent) -> tuple:
     """The extent as four floats; raise unless it spans a real rectangle."""
 
@@ -1343,19 +1122,6 @@ def validate_basemap_highlight(highlight, features) -> tuple:
     return tuple(c.upper() for c in codes)
 
 
-def validate_basemap_resolution(resolution) -> str:
-    """The Natural Earth scale; None means 1:110m."""
-
-    if resolution is None:
-        return BASEMAP_RESOLUTION.DEFAULT
-    if resolution not in BASEMAP_RESOLUTIONS:
-        raise ValueError(
-            f"Invalid basemap `resolution` {resolution!r}. "
-            f"Must be one of {BASEMAP_RESOLUTIONS} or None."
-        )
-    return resolution
-
-
 def validate_basemap_availability(features, resolution) -> None:
     """Raise when Natural Earth publishes a feature at another scale only."""
 
@@ -1399,11 +1165,10 @@ def validate_basemap_features(features) -> tuple:
     if isinstance(features, str):
         features = (features,)
     features = tuple(features)
-    unknown = [f for f in features if f not in BASEMAP_FEATURES]
-    if unknown or not features:
+    if not features:
         raise ValueError(
-            f"Invalid basemap `data` features {unknown or list(features)!r}. "
-            f"Must be one or more of {BASEMAP_FEATURES}."
+            "Invalid basemap `data` features []. "
+            f"Must be one or more of {BASEMAP_FEATURE.members()}."
         )
     return features
 
@@ -1432,10 +1197,10 @@ def validate_basemap_geometry(geometry) -> list:
                 f"Invalid {where}: {feature!r} needs Natural Earth's country "
                 "codes; draw your own areas as 'land'."
             )
-        if feature not in BASEMAP_FEATURES:
+        if not BASEMAP_FEATURE.accepts(feature):
             raise ValueError(
                 f"Invalid {where}: `feature` {feature!r} must be one of "
-                f"{BASEMAP_FEATURES}."
+                f"{BASEMAP_FEATURE.members()}."
             )
         try:
             lon = np.asarray(entry["lon"], dtype=float)

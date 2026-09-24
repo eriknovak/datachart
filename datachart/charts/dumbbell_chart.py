@@ -8,7 +8,6 @@ from ..utils._internal.validate import (
     validate_dumbbell_value_kind,
     validate_dumbbell_sort_by,
     validate_marker_pair,
-    validate_sort,
 )
 from ..typings import (
     DLineSettingAttrs,
@@ -31,7 +30,7 @@ from ..constants import (
     LINE_MARKER,
     LINE_STYLE,
     ORIENTATION,
-    SCALE,
+    AXIS_SCALE,
     SHOW_GRID,
     SORT,
     VALUE_FORMAT,
@@ -57,7 +56,7 @@ def DumbbellChart(
     ymin: Optional[Union[int, float]] = None,
     ymax: Optional[Union[int, float]] = None,
     orientation: Optional[Union[ORIENTATION, str]] = None,
-    scaley: Optional[Union[SCALE, str]] = None,
+    scaley: Optional[Union[AXIS_SCALE, str]] = None,
     subplots: Optional[bool] = None,
     max_cols: Optional[int] = None,
     sharex: Optional[bool] = None,
@@ -185,7 +184,7 @@ def DumbbellChart(
             column per category). See [`ORIENTATION`][datachart.constants.ORIENTATION].
         scaley: The scale of the value axis ("linear", "log", "symlog", "logit"),
             whichever way it runs, as on the box plot. See
-            [`SCALE`][datachart.constants.SCALE].
+            [`AXIS_SCALE`][datachart.constants.AXIS_SCALE].
         subplots: Whether to draw each data list in its own subplot.
         max_cols: The maximum number of subplot columns.
         sharex: Whether the subplots share the x-axis.
@@ -252,7 +251,7 @@ def DumbbellChart(
     charts_data = data if nested else [data]
     for records in charts_data:
         validate_dumbbell_records(records)
-    validate_dumbbell_sort_by(validate_sort(sort), sort_by)
+    validate_dumbbell_sort_by(sort, sort_by)
     params["show_values"], params["value_kind"] = validate_dumbbell_value_kind(
         show_values, value_kind
     )

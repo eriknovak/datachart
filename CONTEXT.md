@@ -212,7 +212,7 @@ _Avoid_: scale (for this), spacing, height
 Whether ridges share one density scale (`RIDGELINE_SCALE.COMMON`: the
 tallest ridge reaches the peak height, the rest in proportion) or each is
 scaled to the same peak (`PER_ROW`, the default: shapes compare). Passed
-as `ridge_scale`; distinct from the heatmap's `NORMALIZE` colormap norm.
+as `ridge_scale`; distinct from the heatmap's `COLOR_NORM` colormap norm.
 _Avoid_: normalization, normalize (for the parameter), common scale (for
 the enum)
 
@@ -416,8 +416,8 @@ _Avoid_: contributions graph, GitHub calendar, date heatmap
 
 **Centred norm**:
 A heatmap value norm that fixes one value (`vcenter`, default `0`) to the
-middle of the colormap: `NORMALIZE.CENTERED` spans the same distance to each
-side of it, `NORMALIZE.TWOSLOPE` lets `vmin` and `vmax` sit at unequal
+middle of the colormap: `COLOR_NORM.CENTERED` spans the same distance to each
+side of it, `COLOR_NORM.TWOSLOPE` lets `vmin` and `vmax` sit at unequal
 distances. Both draw with the theme's diverging colormap, so the sign of a
 correlation or a difference reads as a hue and the centre as its neutral.
 _Avoid_: diverging norm, symmetric norm, midpoint norm

@@ -23,7 +23,7 @@ import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 
 from ..config import config
-from ..constants import ASPECT_RATIO, BAR_MODE, FIG_SIZE, SCALE, SHOW_GRID
+from ..constants import ASPECT_RATIO, BAR_MODE, FIG_SIZE, AXIS_SCALE, SHOW_GRID
 from ..typings import LegendSettingAttrs, TextSettingAttrs
 from .figure import (
     _grid_from_dicts,
@@ -36,7 +36,7 @@ from ._internal.config_helpers import (
     get_legend_panel_settings,
     get_text_style,
 )
-from ._internal.chart_kinds import CHART_KINDS
+from ._internal.chart_kinds import CHART_KINDS, check_domains
 from ._internal.figures import new_figure
 from ._internal.layers import (
     Panel as _PanelSeam,
@@ -158,9 +158,9 @@ def Panel(
     ymax: Optional[float] = None,
     ymin_right: Optional[float] = None,
     ymax_right: Optional[float] = None,
-    scalex: Optional[Union[SCALE, str]] = None,
-    scaley: Optional[Union[SCALE, str]] = None,
-    scaley_right: Optional[Union[SCALE, str]] = None,
+    scalex: Optional[Union[AXIS_SCALE, str]] = None,
+    scaley: Optional[Union[AXIS_SCALE, str]] = None,
+    scaley_right: Optional[Union[AXIS_SCALE, str]] = None,
     bar_mode: Optional[Union[BAR_MODE, str]] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
 ) -> plt.Figure:
@@ -285,7 +285,7 @@ def Panel(
         ymax_right: Maximum value for the secondary value-axis limits.
         scalex: The category-axis scale ("linear", "log", "symlog", "asinh").
             Default: the scale of the first figure that was built with one.
-                See [`SCALE`][datachart.constants.SCALE].
+                See [`AXIS_SCALE`][datachart.constants.AXIS_SCALE].
         scaley: The primary value-axis scale. Default: the scale of the first
             figure on that axis that was built with one.
         scaley_right: The secondary value-axis scale. Default: the scale of
@@ -308,6 +308,7 @@ def Panel(
             a figure cannot be overlaid (missing metadata, Grid figure), or the
             figures mix horizontal and vertical orientations.
     """
+    check_domains(locals(), {"scaley_right": AXIS_SCALE})
     items = []
     for i, item in enumerate(charts):
         if isinstance(item, plt.Figure):
@@ -315,6 +316,7 @@ def Panel(
         elif isinstance(item, dict):
             if "figure" not in item:
                 raise ValueError(f"Chart at index {i} is missing 'figure' key")
+            check_domains(item, {})
             items.append(item)
         else:
             raise ValueError(f"Item at index {i} is not a matplotlib Figure or a dict")

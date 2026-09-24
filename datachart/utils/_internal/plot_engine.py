@@ -20,6 +20,7 @@ from .chart_kinds import (
     build_chart_panel_settings,
     build_layers,
     chart_kind,
+    check_domains,
 )
 from .layers import Layer, Panel, LayerGroup, group_from_chart, layers_per_chart
 from .validate import validate_single_dataset
@@ -120,7 +121,8 @@ def render(
 ) -> plt.Figure:
     """Render a chart front's arguments, split by its row (ADR 0066).
 
-    Deprecated names move to their new ones and rejected parameters raise.
+    Deprecated names move to their new ones, rejected parameters raise, and
+    every constant-typed value is checked against its class (ADR 0068).
     Per-chart keys are indexed against the charts; every other argument is a
     figure-level setting, with the row's defaults filling what was left unset.
 
@@ -140,6 +142,7 @@ def render(
     for name, reason in kind.rejects.items():
         if params.get(name) is not None:
             raise ValueError(reason)
+    check_domains(params, kind.domains)
     chart_keys = kind.per_chart_keys
     per_chart = {k: v for k, v in params.items() if k in chart_keys}
     settings = {k: v for k, v in params.items() if k not in chart_keys and k != "data"}

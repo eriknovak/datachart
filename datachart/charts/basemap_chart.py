@@ -3,7 +3,6 @@ from typing import Union, List, Optional, Tuple
 import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render
-from ..utils._internal.validate import validate_draw_position
 from ..typings import BasemapDataAttrs, BasemapStyleAttrs
 from ..constants import (
     ASPECT_RATIO,
@@ -141,8 +140,6 @@ def BasemapChart(
 
     """
     params = dict(locals())
-
-    validate_draw_position(position)
 
     return render("basemapchart", params, expand=_basemap_chart)
 

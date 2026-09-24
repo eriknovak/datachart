@@ -43,5 +43,5 @@ The parameters that accept a constant, with the class in [datachart.constants](.
 | `aspect_ratio` | [`ASPECT_RATIO`](../constants.md#datachart.constants.ASPECT_RATIO) |
 | `orientation` | [`ORIENTATION`](../constants.md#datachart.constants.ORIENTATION) |
 | `bar_mode` | [`BAR_MODE`](../constants.md#datachart.constants.BAR_MODE) |
-| `scalex` | [`SCALE`](../constants.md#datachart.constants.SCALE) |
-| `scaley` | [`SCALE`](../constants.md#datachart.constants.SCALE) |
+| `scalex` | [`AXIS_SCALE`](../constants.md#datachart.constants.AXIS_SCALE) |
+| `scaley` | [`AXIS_SCALE`](../constants.md#datachart.constants.AXIS_SCALE) |

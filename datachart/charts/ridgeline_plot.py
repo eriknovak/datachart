@@ -3,7 +3,7 @@ from typing import Union, List, Optional, Tuple
 import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render
-from ..utils._internal.validate import validate_bandwidth
+from ..utils._internal.validate import validate_bandwidth, validate_ridgeline_inner
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
@@ -25,7 +25,7 @@ from ..constants import (
     FIG_SIZE,
     SHOW_GRID,
     ORIENTATION,
-    SCALE,
+    AXIS_SCALE,
     SORT,
     VIOLIN_INNER,
     BANDWIDTH,
@@ -56,7 +56,7 @@ def RidgelinePlot(
     show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     orientation: Optional[Union[ORIENTATION, str]] = None,
-    scaley: Optional[Union[SCALE, str]] = None,
+    scaley: Optional[Union[AXIS_SCALE, str]] = None,
     subplots: Optional[bool] = None,
     max_cols: Optional[int] = None,
     sharex: Optional[bool] = None,
@@ -257,5 +257,6 @@ def RidgelinePlot(
     params = dict(locals())
 
     validate_bandwidth(bandwidth)
+    validate_ridgeline_inner(inner)
 
     return render("ridgelineplot", params)

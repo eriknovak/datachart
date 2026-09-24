@@ -16,6 +16,7 @@ from typing import (
     Tuple,
     Type,
     Union,
+    get_args,
 )
 
 from .config_helpers import (
@@ -71,23 +72,46 @@ from .layers import (
     value_axis_grid,
     value_label_font,
 )
-from .validate import validate_baseline, validate_date_period, validate_emphasis_rule
+from .validate import validate_emphasis_rule
 from ...config import config
 from ...constants import (
     ASPECT_RATIO,
+    AXIS_SCALE,
     BANDWIDTH,
     BAR_MODE,
+    BASEMAP_FEATURE,
+    BASEMAP_RESOLUTION,
+    BUMP_LABEL_POSITION,
+    BUMP_RANK,
+    CALENDAR_WEEKDAY,
+    COLOR_NORM,
+    CONTOUR_LEVELS,
     DATE_FORMAT,
     DRAW_POSITION,
+    DUMBBELL_SORT_KEY,
+    DUMBBELL_VALUE,
+    Domain,
     EMPHASIS,
     FIG_SIZE,
+    GANTT_DATE_PERIOD,
+    GANTT_SORT_KEY,
+    GANTT_VALUE,
+    HEXBIN_REDUCE,
+    LINE_MARKER,
+    LINE_STYLE,
+    NETWORK_LABEL_POSITION,
+    NETWORK_LAYOUT,
     ORIENTATION,
+    RADIAL_DIRECTION,
     RADIAL_TYPE,
-    SCALE,
+    RIDGELINE_SCALE,
+    SCATTER_MATRIX_DIAGONAL,
     SHOW_GRID,
     SORT,
+    STACKED_AREA_BASELINE,
     SWARM_MODE,
     VALUE_FORMAT,
+    VIOLIN_INNER,
 )
 from ...typings import (
     BracketSettingAttrs,
@@ -190,6 +214,9 @@ class ChartKind:
             a value raises.
         renamed: Deprecated parameter names the front still takes, mapped
             to their new names; each is removed one release after it ships.
+        domains: The constant class each of the front's own constant-typed
+            parameters takes (ADR 0068); a shared parameter's comes from its
+            `SharedParameter` annotation.
         group: Categories run along one axis and values along the other, so
             the scale keys name the value axis, not a literal one.
         overlayable: `Panel` may overlay the front's figures.
@@ -228,6 +255,7 @@ class ChartKind:
     single_dataset: bool = False
     rejects: Mapping[str, str] = field(default_factory=dict)
     renamed: Mapping[str, str] = field(default_factory=dict)
+    domains: Mapping[str, Type[Domain]] = field(default_factory=dict)
     group: bool = False
     overlayable: bool = True
     gridless: Callable[[dict], bool] = _never
@@ -269,13 +297,8 @@ def _parallel_layers(charts: List[dict], settings: dict) -> List[Layer]:
 
 
 def _radial_mark(charts: List[dict], settings: dict) -> List[dict]:
-    # the visual is checked before the emphasis rule and the sort read bars
-    visual = settings.get("mark") or RADIAL_TYPE.LINE
-    if visual not in RADIAL_LAYER_TYPES:
-        raise ValueError(
-            f"Invalid `mark` value {visual!r}. "
-            f"Must be one of {tuple(RADIAL_LAYER_TYPES)}."
-        )
+    # the visual is read before the emphasis rule and the sort read bars
+    visual = settings.get("mark") or RADIAL_TYPE.DEFAULT
     if visual != RADIAL_TYPE.BAR and any(
         settings.get(key) is not None for key in ("sort", "sort_by", "emphasis_rule")
     ):
@@ -287,7 +310,7 @@ def _radial_mark(charts: List[dict], settings: dict) -> List[dict]:
 
 
 def _radial_layers(charts: List[dict], settings: dict) -> List[Layer]:
-    visual = settings.get("mark") or RADIAL_TYPE.LINE
+    visual = settings.get("mark") or RADIAL_TYPE.DEFAULT
     return [RADIAL_LAYER_TYPES[visual](chart, settings) for chart in charts]
 
 
@@ -332,6 +355,7 @@ _KINDS = (
         "stackedareachart",
         "stacked area chart",
         StackedAreaLayer,
+        domains={"baseline": STACKED_AREA_BASELINE},
         chart_keys=frozenset({"x", "y"}),
         tighten_xlim=True,
         emphasis_units=series_units("y"),
@@ -341,6 +365,7 @@ _KINDS = (
         "bumpchart",
         "bump chart",
         BumpLayer,
+        domains={"rank_by": BUMP_RANK, "label_position": BUMP_LABEL_POSITION},
         chart_keys=frozenset({"x", "y"}),
         legend_default=_bump_legend,
         # a bump chart's ranks read from the lines and labels
@@ -383,6 +408,7 @@ _KINDS = (
         "radialchart",
         "radial chart",
         RadialLayer,
+        domains={"mark": RADIAL_TYPE, "direction": RADIAL_DIRECTION},
         chart_keys=frozenset({"label", "x", "y", "yerr"}),
         build=_radial_layers,
         projection="polar",
@@ -405,6 +431,7 @@ _KINDS = (
         "calendarheatmap",
         "calendar heatmap",
         CalendarHeatmapLayer,
+        domains={"week_start": CALENDAR_WEEKDAY},
         chart_keys=frozenset({"colorbar", "norm", "vcenter", "vmax", "vmin"}),
         defaults={"aspect_ratio": ASPECT_RATIO.EQUAL, "max_cols": 1},
         dict_data=True,
@@ -422,6 +449,11 @@ _KINDS = (
         "ganttchart",
         "gantt",
         GanttLayer,
+        domains={
+            "period": GANTT_DATE_PERIOD,
+            "value_kind": GANTT_VALUE,
+            "sort_by": GANTT_SORT_KEY,
+        },
         defaults={"max_cols": 1, "orientation": ORIENTATION.HORIZONTAL},
         legend_default=_gantt_legend,
         multiplot=False,
@@ -434,6 +466,12 @@ _KINDS = (
         "dumbbellchart",
         "dumbbell chart",
         DumbbellLayer,
+        domains={
+            "value_kind": DUMBBELL_VALUE,
+            "sort_by": DUMBBELL_SORT_KEY,
+            "marker": LINE_MARKER,
+            "connector_style": LINE_STYLE,
+        },
         defaults={"orientation": ORIENTATION.HORIZONTAL},
         legend_default=_dumbbell_legend,
         group=True,
@@ -471,6 +509,7 @@ _KINDS = (
         "violinplot",
         "violin plot",
         ViolinLayer,
+        domains={"inner": VIOLIN_INNER},
         chart_keys=frozenset({"label", "value"}),
         defaults={"orientation": ORIENTATION.VERTICAL},
         multiplot=False,
@@ -509,6 +548,7 @@ _KINDS = (
         "ridgelineplot",
         "ridgeline plot",
         RidgelineLayer,
+        domains={"inner": VIOLIN_INNER, "ridge_scale": RIDGELINE_SCALE},
         chart_keys=frozenset({"label", "value"}),
         defaults={"orientation": ORIENTATION.HORIZONTAL},
         build=_ridgeline_layers,
@@ -552,6 +592,7 @@ _KINDS = (
         "contourchart",
         "contour chart",
         ContourLayer,
+        domains={"levels": CONTOUR_LEVELS},
         chart_keys=frozenset(
             {"colorbar", "norm", "value_format", "vcenter", "vmax", "vmin"}
         ),
@@ -566,6 +607,7 @@ _KINDS = (
         "hexbinchart",
         "hexbin chart",
         HexbinLayer,
+        domains={"reduce": HEXBIN_REDUCE},
         chart_keys=frozenset(
             {
                 "colorbar",
@@ -603,6 +645,7 @@ _KINDS = (
         "networkchart",
         "network",
         NetworkLayer,
+        domains={"layout": NETWORK_LAYOUT, "label_position": NETWORK_LABEL_POSITION},
         dict_data=True,
         data_keys=("edges",),
         multiplot=False,
@@ -618,6 +661,7 @@ _KINDS = (
         "scattermatrix",
         "scatter matrix",
         ScatterLayer,
+        domains={"diagonal": SCATTER_MATRIX_DIAGONAL},
         multiplot=False,
         overlayable=False,
     ),
@@ -626,6 +670,7 @@ _KINDS = (
         "basemapchart",
         "basemap chart",
         BasemapLayer,
+        domains={"data": BASEMAP_FEATURE, "resolution": BASEMAP_RESOLUTION},
         dict_data=True,
         multiplot=False,
         subplots=False,
@@ -749,8 +794,8 @@ _SHARED = (
     SharedParameter("ymin", _Number),
     SharedParameter("ymax", _Number),
     SharedParameter("yticks_format", Union[VALUE_FORMAT, DATE_FORMAT, str]),
-    SharedParameter("scalex", Union[SCALE, str]),
-    SharedParameter("scaley", Union[SCALE, str]),
+    SharedParameter("scalex", Union[AXIS_SCALE, str]),
+    SharedParameter("scaley", Union[AXIS_SCALE, str]),
     SharedParameter("orientation", Union[ORIENTATION, str]),
     SharedParameter("sort", Union[SORT, str]),
     SharedParameter("bar_mode", Union[BAR_MODE, str]),
@@ -801,13 +846,62 @@ _SHARED = (
     SharedParameter("vmin", float, per_chart=_each(float)),
     SharedParameter("vmax", float, per_chart=_each(float)),
     SharedParameter("vcenter", float, per_chart=_each(float)),
-    SharedParameter("norm", str, per_chart=_each(str)),
+    SharedParameter(
+        "norm",
+        Union[COLOR_NORM, str],
+        per_chart=Union[COLOR_NORM, str, List[Optional[str]]],
+    ),
     SharedParameter(
         "colorbar", ColorbarSettingAttrs, per_chart=_each(ColorbarSettingAttrs)
     ),
 )
 
 SHARED_PARAMETERS = {parameter.name: parameter for parameter in _SHARED}
+
+
+# the x-axis format stays out of the table (ADR 0067) but takes these classes
+_X_TICKS_FORMAT_DOMAINS = (VALUE_FORMAT, DATE_FORMAT)
+
+
+def parameter_domains(name: str, domains: Mapping[str, type]) -> tuple:
+    """The constant classes a parameter takes; empty when it takes none.
+
+    A name in `domains` takes that class; a shared parameter takes the
+    constant classes in its `SharedParameter` annotation (ADR 0068).
+    """
+
+    if name in domains:
+        return (domains[name],)
+    if name == "xticks_format":
+        return _X_TICKS_FORMAT_DOMAINS
+    shared = SHARED_PARAMETERS.get(name)
+    if shared is None:
+        return ()
+    return tuple(
+        arg
+        for arg in get_args(shared.annotation) or (shared.annotation,)
+        if isinstance(arg, type) and issubclass(arg, Domain)
+    )
+
+
+def check_domains(params: Mapping[str, Any], domains: Mapping[str, type]) -> None:
+    """Raise `ValueError` for a string no constant class of its parameter takes.
+
+    Only strings are checked: a number, bool, pair or callable is another
+    type the parameter takes. A list or tuple is checked element-wise, and
+    the message names the element, e.g. `emphasis[1]`.
+    """
+
+    for name, value in params.items():
+        classes = parameter_domains(name, domains)
+        if not classes:
+            continue
+        items = (
+            enumerate(value) if isinstance(value, (list, tuple)) else [(None, value)]
+        )
+        for index, item in items:
+            if isinstance(item, str) and not any(c.accepts(item) for c in classes):
+                classes[0].check(item, name if index is None else f"{name}[{index}]")
 
 
 # ================================================
@@ -891,7 +985,7 @@ def build_chart_panel_settings(
         "ymin": settings.get("ymin"),
         "ymax": settings.get("ymax"),
         "xticks_format": settings.get("xticks_format"),
-        "date_period": validate_date_period(settings.get("period")),
+        "date_period": settings.get("period"),
         "yticks_format": settings.get("yticks_format"),
         "aspect_ratio": (
             ASPECT_RATIO.AUTO
@@ -903,8 +997,7 @@ def build_chart_panel_settings(
         # the caller's own mode, unresolved, for a panel to adopt (ADR 0005)
         "source_bar_mode": settings.get("bar_mode"),
         "tighten_xlim": kind.tighten_xlim,
-        # validated here so a bad value fails at the front, like the emphasis roles
-        "baseline": validate_baseline(settings.get("baseline")),
+        "baseline": settings.get("baseline") or STACKED_AREA_BASELINE.DEFAULT,
         # radial furniture; only polar panels read these
         "startangle": settings.get("startangle"),
         "direction": settings.get("direction"),

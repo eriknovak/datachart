@@ -25,13 +25,11 @@ from ..constants import (
     FIG_SIZE,
     SHOW_GRID,
     ORIENTATION,
-    SCALE,
+    AXIS_SCALE,
     SORT,
     VIOLIN_INNER,
     BANDWIDTH,
 )
-
-INNER_OPTIONS = (VIOLIN_INNER.BOX, VIOLIN_INNER.QUARTILES, VIOLIN_INNER.MEDIAN, None)
 
 # ================================================
 # Main Chart Definition
@@ -60,7 +58,7 @@ def ViolinPlot(
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     orientation: Optional[Union[ORIENTATION, str]] = None,
     sort: Optional[Union[SORT, str]] = None,
-    scaley: Optional[Union[SCALE, str]] = None,
+    scaley: Optional[Union[AXIS_SCALE, str]] = None,
     subplots: Optional[bool] = None,
     max_cols: Optional[int] = None,
     sharex: Optional[bool] = None,
@@ -245,10 +243,5 @@ def ViolinPlot(
     """
     params = dict(locals())
 
-    if inner not in INNER_OPTIONS:
-        raise ValueError(
-            f"Invalid `inner` value {inner!r}. Must be one of {INNER_OPTIONS}."
-        )
     validate_bandwidth(bandwidth)
-
     return render("violinplot", params)

@@ -44,6 +44,6 @@ The parameters that accept a constant, with the class in [datachart.constants](.
 | `aspect_ratio` | [`ASPECT_RATIO`](../constants.md#datachart.constants.ASPECT_RATIO) |
 | `orientation` | [`ORIENTATION`](../constants.md#datachart.constants.ORIENTATION) |
 | `sort` | [`SORT`](../constants.md#datachart.constants.SORT) |
-| `scaley` | [`SCALE`](../constants.md#datachart.constants.SCALE) |
+| `scaley` | [`AXIS_SCALE`](../constants.md#datachart.constants.AXIS_SCALE) |
 | `yticks_format` | [`VALUE_FORMAT`](../constants.md#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](../constants.md#datachart.constants.DATE_FORMAT) |
 | `bandwidth` | [`BANDWIDTH`](../constants.md#datachart.constants.BANDWIDTH) |

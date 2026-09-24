@@ -24,7 +24,7 @@ from ..constants import (
     FIG_SIZE,
     SHOW_GRID,
     ORIENTATION,
-    SCALE,
+    AXIS_SCALE,
     SWARM_MODE,
 )
 
@@ -56,7 +56,7 @@ def SwarmPlot(
     value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     orientation: Optional[Union[ORIENTATION, str]] = None,
-    scaley: Optional[Union[SCALE, str]] = None,
+    scaley: Optional[Union[AXIS_SCALE, str]] = None,
     subplots: Optional[bool] = None,
     max_cols: Optional[int] = None,
     sharex: Optional[bool] = None,

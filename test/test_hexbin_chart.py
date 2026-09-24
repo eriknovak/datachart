@@ -11,7 +11,7 @@ from matplotlib.collections import PolyCollection
 
 from datachart.charts import HexbinChart, ScatterChart, LineChart
 from datachart.config import config
-from datachart.constants import HEXBIN_REDUCE, NORMALIZE, COLORS, THEME
+from datachart.constants import HEXBIN_REDUCE, COLOR_NORM, COLORS, THEME
 from datachart.utils import Panel, Grid
 from datachart.utils._internal.config_helpers import get_hexbin_style
 from datachart.utils._internal.chart_kinds import build_layers
@@ -119,10 +119,8 @@ class TestHexbinLayer(unittest.TestCase):
             self.assertIs(layer.reduce, fn)
 
     def test_invalid_reduce_raises(self):
-        with self.assertRaises(ValueError):
-            build_layers(
-                "hexbinchart", [{"data": points_with_c(), "reduce": "mode"}], {}
-            )
+        with self.assertRaisesRegex(ValueError, "reduce"):
+            HexbinChart(data=points_with_c(), reduce="mode")
 
     def test_missing_columns_raise(self):
         with self.assertRaises(ValueError):
@@ -171,7 +169,7 @@ class TestHexbinChart(unittest.TestCase):
         self.assertTrue(any(l.get_visible() for l in ax.get_xgridlines()))
 
     def test_log_norm(self):
-        figure = HexbinChart(data=points(), norm=NORMALIZE.LOG)
+        figure = HexbinChart(data=points(), norm=COLOR_NORM.LOG)
         hexes = _hexbins(figure.axes[0])[0]
         self.assertIsInstance(hexes.norm, matplotlib.colors.LogNorm)
 
@@ -370,7 +368,7 @@ class TestHexbinCentredNorm(unittest.TestCase):
     """A centred norm holds `vcenter` mid-colormap, as on the heatmap."""
 
     def test_vcenter_moves_the_centre(self):
-        ax = HexbinChart(points_with_c(), norm=NORMALIZE.CENTERED, vcenter=0.5).axes[0]
+        ax = HexbinChart(points_with_c(), norm=COLOR_NORM.CENTERED, vcenter=0.5).axes[0]
         tiles = _hexbins(ax)[0]
         self.assertIsInstance(tiles.norm, matplotlib.colors.CenteredNorm)
         self.assertEqual(tiles.norm.vcenter, 0.5)

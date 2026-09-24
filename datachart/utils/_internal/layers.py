@@ -83,16 +83,12 @@ from .validate import (
     infer_sankey_columns,
     is_number,
     treemap_record_total,
-    validate_baseline,
     validate_contour_levels,
     validate_filled_levels,
     validate_emphasis,
     validate_error_distances,
     validate_given_ranks,
-    validate_label_position,
-    validate_node_label_position,
     validate_line_curve,
-    validate_rank_by,
     validate_emphasis_rule,
     validate_dumbbell_sort_by,
     validate_marker_pair,
@@ -105,19 +101,14 @@ from .validate import (
     validate_basemap_features,
     validate_basemap_geometry,
     validate_basemap_highlight,
-    validate_basemap_resolution,
     validate_basemap_source,
     validate_geographic_latitudes,
     validate_image,
     validate_image_extent,
-    validate_draw_position,
     validate_log_values,
     validate_overlap,
     validate_ridge_marks,
-    validate_ridgeline_inner,
-    validate_ridgeline_scale,
     validate_single_dataset,
-    validate_sort,
     validate_sort_by,
     validate_network_edge_style,
     validate_sankey_link_color,
@@ -129,7 +120,6 @@ from .validate import (
     validate_ticks_format,
     validate_two_slope_bounds,
     validate_value_step,
-    validate_week_start,
 )
 from .config_helpers import (
     get_heatmap_cmap,
@@ -221,16 +211,18 @@ from ...constants import (
     HEXBIN_REDUCE,
     HISTOGRAM_TYPE,
     BASEMAP_FEATURE,
+    BASEMAP_RESOLUTION,
+    BAR_MODE,
     DRAW_POSITION,
     LEGEND_LOCATION,
     NETWORK_LAYOUT,
     NETWORK_LABEL_POSITION,
-    NORMALIZE,
+    COLOR_NORM,
     ORIENTATION,
     RADIAL_DIRECTION,
     RADIAL_TYPE,
     RIDGELINE_SCALE,
-    SCALE,
+    AXIS_SCALE,
     SORT,
     STACKED_AREA_BASELINE,
     SWARM_MODE,
@@ -495,7 +487,7 @@ LEGEND_HEADROOM_PAD_PT = 4.0
 # cell luminance below which heatmap value text switches to white
 HEATMAP_TEXT_DARK_LUMINANCE = 0.5
 # the norms that hold `vcenter` in the middle of a diverging cmap (ADR 0056)
-CENTRED_NORMS = (NORMALIZE.CENTERED, NORMALIZE.TWOSLOPE)
+CENTRED_NORMS = (COLOR_NORM.CENTERED, COLOR_NORM.TWOSLOPE)
 # the low end of a sequential cmap vanishes on white: iso-lines sample from here
 CONTOUR_LINE_CMAP_START = 0.3
 # the cmap sample that stands in for a cmap-colored contour in the legend
@@ -2250,7 +2242,7 @@ class Layer:
         self._resolve_style()
 
     def _resolve_emphasis(self, value):
-        return validate_emphasis(value)
+        return value
 
     @property
     def zorder_key(self) -> str:
@@ -3116,7 +3108,7 @@ def rank_bump_charts(charts: List[dict], settings: dict) -> List[dict]:
     ranks without knowing their siblings.
     """
 
-    rank_by = validate_rank_by(settings.get("rank_by"))
+    rank_by = settings.get("rank_by") or BUMP_RANK.DEFAULT
     xs, ys = [], []
     for chart in charts:
         x, y = get_chart_data("x", chart), get_chart_data("y", chart)
@@ -3181,8 +3173,8 @@ class BumpLayer(LineLayer):
         self.show_area = False
         self.line_curve = validate_line_curve(self.settings.get("line_curve"))
         self.show_labels = self.settings.get("show_labels") is not False
-        self.label_position = validate_label_position(
-            self.settings.get("label_position")
+        self.label_position = (
+            self.settings.get("label_position") or BUMP_LABEL_POSITION.DEFAULT
         )
         self._resolve_value_labels()
         self._init_point_labels()
@@ -3407,7 +3399,6 @@ def stack_first_line(y: np.ndarray, baseline: str) -> np.ndarray:
     m = y.shape[0]
     if baseline == STACKED_AREA_BASELINE.WIGGLE:
         return (y * (m - 0.5 - np.arange(m)[:, None])).sum(0) / -m
-    validate_baseline(baseline)
     total = np.sum(y, 0)
     inv_total = np.zeros_like(total)
     mask = total > 0
@@ -3604,7 +3595,7 @@ def sort_gantt_charts(charts: List[dict], settings: dict) -> List[dict]:
     A task without a group forms its own cluster. Ties keep input order.
     """
 
-    sort = validate_sort(settings.get("sort"))
+    sort = settings.get("sort")
     sort_by = validate_gantt_sort_by(sort, settings.get("sort_by"))
     if sort is None:
         return charts
@@ -4229,7 +4220,7 @@ class HistogramLayer(Layer):
         vertices = np.array(outline.get_xy(), dtype=float)
         if self.show_cumulative:
             vertices = vertices[:-1]
-        if ctx.value_scale == SCALE.LOG:
+        if ctx.value_scale == AXIS_SCALE.LOG:
             vertices[vertices[:, value_axis] == 0, value_axis] = np.nan
         outline.set_xy(vertices)
 
@@ -4579,8 +4570,8 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
         plot, fill, _ = _oriented(ax, ctx.transpose)
 
         # a log axis fits and samples its data as log10 values
-        x_log = ctx.category_scale == SCALE.LOG
-        y_log = ctx.value_scale == SCALE.LOG
+        x_log = ctx.category_scale == AXIS_SCALE.LOG
+        y_log = ctx.value_scale == AXIS_SCALE.LOG
         x = np.log10(x) if x_log else x
         y = np.log10(y) if y_log else y
         slope, intercept, _, _, _ = scipy_stats.linregress(x, y)
@@ -4816,17 +4807,9 @@ class GroupLayer(Layer):
     legend_body = None
     legend_label = None
 
-    def _resolve_emphasis(self, value):
-        # group layers never dodge; emphasis aligns with the group labels
-        if isinstance(value, list):
-            for item in value:
-                validate_emphasis(item)
-            return value
-        return validate_emphasis(value)
-
     def _resolve_style(self):
         if self.sorts_by_median:
-            self.sort = validate_sort(self.settings.get("sort"))
+            self.sort = self.settings.get("sort")
         self.orientation = self.settings.get("orientation") or DEFAULT_ORIENTATION
         self.is_horizontal = self.orientation == ORIENTATION.HORIZONTAL
         # a raincloud colors its groups from the multiple palette (ADR 0021);
@@ -5205,11 +5188,6 @@ class SwarmLayer(UnclippedMarksMixin, PointLabelMixin, GroupLayer):
                 else POINT_LABEL_SPOTS_VERTICAL
             )
         self.mode = self.settings.get("mode") or DEFAULT_SWARM_MODE
-        if self.mode not in (SWARM_MODE.SWARM, SWARM_MODE.STRIP):
-            raise ValueError(
-                f"Invalid swarm mode '{self.mode}'. "
-                f"Must be one of ['{SWARM_MODE.SWARM}', '{SWARM_MODE.STRIP}']."
-            )
         jitter = self.settings.get("jitter")
         self.jitter = DEFAULT_SWARM_JITTER if jitter is None else float(jitter)
         # a raincloud's rain sits off-center in a narrower cell (ADR 0021)
@@ -5512,7 +5490,7 @@ def sort_dumbbell_charts(charts: List[dict], settings: dict) -> List[dict]:
     labels must name every subplot's rows. Ties keep input order.
     """
 
-    sort = validate_sort(settings.get("sort"))
+    sort = settings.get("sort")
     key = DUMBBELL_SORT_KEYS[validate_dumbbell_sort_by(sort, settings.get("sort_by"))]
     if sort is None:
         return charts
@@ -5995,7 +5973,7 @@ class ViolinLayer(GroupLayer):
             showmedians=False,
             showmeans=False,
         )
-        if scale == SCALE.LOG:
+        if scale == AXIS_SCALE.LOG:
             parts = ax.violin([self._log_stats(values)], **options)
         else:
             parts = ax.violinplot([values], bw_method=self.bandwidth, **options)
@@ -6120,8 +6098,8 @@ class RidgelineLayer(GroupLayer):
             self.orientation = ORIENTATION.HORIZONTAL
             self.is_horizontal = True
         self.bandwidth = self.settings.get("bandwidth")
-        self.inner = validate_ridgeline_inner(self.settings.get("inner"))
-        self.ridge_scale = validate_ridgeline_scale(self.settings.get("ridge_scale"))
+        self.inner = self.settings.get("inner")
+        self.ridge_scale = self.settings.get("ridge_scale") or RIDGELINE_SCALE.DEFAULT
         self.fill = self.settings.get("fill") is not False
         self.show_outline = self.settings.get("show_outline") is not False
         validate_ridge_marks(self.fill, self.show_outline)
@@ -6142,7 +6120,7 @@ class RidgelineLayer(GroupLayer):
         """
 
         if log is None:
-            log = self.settings.get("scaley") == SCALE.LOG
+            log = self.settings.get("scaley") == AXIS_SCALE.LOG
         ends = [
             (curve[0]["x"], curve[-1]["x"])
             for curve in (
@@ -6190,7 +6168,7 @@ class RidgelineLayer(GroupLayer):
         roles = self.label_roles(ctx.emphasis)
 
         # on a log value axis the densities are estimated on log10 values
-        log = ctx.value_scale == SCALE.LOG
+        log = ctx.value_scale == AXIS_SCALE.LOG
         lo, hi = self._grid_bounds(log)
         if log:
             grouped_fit = {k: np.log10(v) for k, v in grouped.items()}
@@ -6497,7 +6475,7 @@ def colormap_scaling(chart: dict) -> dict:
         return {"norm": norm, "vmin": vmin, "vmax": vmax}
     vcenter = chart.get("vcenter")
     vcenter = 0.0 if vcenter is None else vcenter
-    if norm == NORMALIZE.TWOSLOPE:
+    if norm == COLOR_NORM.TWOSLOPE:
         validate_two_slope_bounds(vcenter, vmin, vmax)
         return {"norm": TwoSlopeNorm(vcenter, vmin, vmax)}
     halfrange = max(
@@ -6838,7 +6816,7 @@ class CalendarHeatmapLayer(HeatmapLayer):
             week_start = get_attr_value(
                 "plot_calendar_heatmap_week_start", self.style, config
             )
-        self.week_start = validate_week_start(week_start) or CALENDAR_WEEKDAY.MONDAY
+        self.week_start = week_start or CALENDAR_WEEKDAY.DEFAULT
         self.month_line_style = get_calendar_month_line_style(self.style)
         self.show_month_labels = _resolve_flag(self.settings, "show_month_labels")
         self.show_weekday_labels = _resolve_flag(self.settings, "show_weekday_labels")
@@ -6988,12 +6966,6 @@ def contour_levels(
         return validate_contour_levels(rule)
     if rule == CONTOUR_LEVELS.AUTO:
         return None
-    if rule not in (CONTOUR_LEVELS.RICE, CONTOUR_LEVELS.FD):
-        raise ValueError(
-            f"Invalid contour `levels` rule {rule!r}. Must be one of "
-            f"{[CONTOUR_LEVELS.AUTO, CONTOUR_LEVELS.RICE, CONTOUR_LEVELS.FD]}, "
-            "an integer, or a list of level values."
-        )
 
     values = np.asarray(z, dtype=float).ravel()
     values = values[np.isfinite(values)]
@@ -7289,11 +7261,6 @@ class HexbinLayer(Layer):
             name = self.chart.get("reduce")
             if name is None:
                 name = HEXBIN_REDUCE.DEFAULT
-            if name not in HEXBIN_REDUCERS:
-                raise ValueError(
-                    f"Invalid hexbin `reduce` value {name!r}. "
-                    f"Must be one of {sorted(HEXBIN_REDUCERS)}."
-                )
             self.reduce = HEXBIN_REDUCERS[name]
             self.value_name = str(name)
 
@@ -7347,8 +7314,8 @@ class HexbinLayer(Layer):
             C=self.c,
             gridsize=self.gridsize,
             # hexagons bin in the axes' scale; a later log scale would warp them
-            xscale="log" if ctx.category_scale == SCALE.LOG else "linear",
-            yscale="log" if ctx.value_scale == SCALE.LOG else "linear",
+            xscale="log" if ctx.category_scale == AXIS_SCALE.LOG else "linear",
+            yscale="log" if ctx.value_scale == AXIS_SCALE.LOG else "linear",
             reduce_C_function=self.reduce,
             mincnt=self.mincnt,
             **self.scaling,
@@ -7486,7 +7453,7 @@ class ImageLayer(DrawPositionLayer):
         data = self.chart.get("data") or {}
         self.image = validate_image(data.get("image"))
         self.extent = validate_image_extent(data.get("extent"))
-        self.position = validate_draw_position(self.settings.get("position"))
+        self.position = self.settings.get("position") or DRAW_POSITION.DEFAULT
         style = get_image_style(self.style)
         if self.image.ndim == 2:
             style["cmap"] = get_colormap(style["cmap"])
@@ -7538,7 +7505,7 @@ class BasemapLayer(DrawPositionLayer):
         self.highlight = ()
         if geometry is None:
             features = validate_basemap_features(data.get("features"))
-            resolution = validate_basemap_resolution(data.get("resolution"))
+            resolution = data.get("resolution") or BASEMAP_RESOLUTION.DEFAULT
             validate_basemap_availability(features, resolution)
             outlines = [(f, load_basemap(f, resolution)) for f in features]
             self.highlight = validate_basemap_highlight(data.get("highlight"), features)
@@ -7549,7 +7516,7 @@ class BasemapLayer(DrawPositionLayer):
             outlines = validate_basemap_geometry(geometry)
         # bottom up, the caller's order kept within one feature
         self.outlines = sorted(outlines, key=lambda o: BASEMAP_FEATURES.index(o[0]))
-        self.position = validate_draw_position(self.settings.get("position"))
+        self.position = self.settings.get("position") or DRAW_POSITION.DEFAULT
         self.feature_style = get_basemap_style(self.style)
         lakes = self.feature_style[BASEMAP_FEATURE.LAKES]
         lakes.setdefault("facecolor", self.ground)
@@ -7659,11 +7626,8 @@ class ParallelCoordsLayer(Layer):
             if roles is None:
                 self.row_emphasis.extend([None] * n_rows)
             elif isinstance(roles, str):
-                validate_emphasis(roles)
                 self.row_emphasis.extend([roles] * n_rows)
             else:
-                for item in roles:
-                    validate_emphasis(item)
                 if len(roles) != n_rows:
                     raise ValueError(
                         f"`emphasis` length ({len(roles)}) must match the "
@@ -10083,9 +10047,10 @@ class NetworkLayer(PointLabelMixin, Layer):
                 for i, g in enumerate(self.group_names)
             }
         self.node_markers = [self.group_markers.get(g, plain) for g in groups]
-        self.label_position = validate_node_label_position(
+        self.label_position = (
             self.settings.get("label_position")
             or config.get("chart_default_node_label_position")
+            or NETWORK_LABEL_POSITION.DEFAULT
         )
         roles = [node.get("emphasis") for node in self.nodes]
         self.muted = [role == EMPHASIS_BACKGROUND for role in roles]
@@ -10479,7 +10444,7 @@ def sort_bar_charts(charts: List[dict], settings: dict) -> List[dict]:
     negated left side sorts by magnitude.
     """
 
-    sort, sort_by = validate_sort(settings.get("sort")), settings.get("sort_by")
+    sort, sort_by = settings.get("sort"), settings.get("sort_by")
     magnitude = bool(settings.get("pyramid"))
     validate_sort_by(sort, sort_by, [chart.get("subtitle") for chart in charts])
     if sort is None:
@@ -10839,7 +10804,7 @@ class LayerGroup:
         self.y_axis = y_axis
         self.z_order = z_order
         self.legend_label = legend_label
-        self.emphasis = validate_emphasis(emphasis)
+        self.emphasis = emphasis
         # the source figure's scales, by role: they follow the group (ADR 0041)
         self.value_scale = value_scale
         self.category_scale = category_scale
@@ -11406,13 +11371,7 @@ class Panel:
         bar_layers = [
             l for l in self.layers if isinstance(l, (BarLayer, RadialBarLayer))
         ]
-        bar_mode = s.get("bar_mode") or "group"
-        if bar_mode not in ["group", "stack", "overlay"]:
-            warnings.warn(
-                f"Invalid bar_mode '{bar_mode}'. Using 'group' instead. "
-                "Valid options are: 'group', 'stack', 'overlay'."
-            )
-            bar_mode = "group"
+        bar_mode = s.get("bar_mode") or BAR_MODE.DEFAULT
 
         bar_slots = {}
         # the group spans the widest layer; each layer keeps its own
@@ -11494,7 +11453,7 @@ class Panel:
         stack_slots = {}
         if stack_layers:
             stack_slots = _stack_slots(
-                stack_layers, validate_baseline(s.get("baseline"))
+                stack_layers, s.get("baseline") or STACKED_AREA_BASELINE.DEFAULT
             )
 
         zorder_defaults = s.get("zorder_defaults", {})
@@ -11808,12 +11767,12 @@ class Panel:
         for group, group_ax in zip(self.groups, group_axes):
             on_twin = ax_right is not None and group_ax is ax_right
             for axis in axes:
-                if axis.scale != SCALE.LOG or axis.twin not in (None, on_twin):
+                if axis.scale != AXIS_SCALE.LOG or axis.twin not in (None, on_twin):
                     continue
                 category = axis.twin is None
                 stamp = group.category_scale if category else group.value_scale
                 hint = None
-                if not s.get(axis.key) and stamp != SCALE.LOG:
+                if not s.get(axis.key) and stamp != AXIS_SCALE.LOG:
                     hint = (
                         "The figure was built on another scale and inherited "
                         f"'log' from the first figure on this axis. {axis.remedy}"
@@ -11864,7 +11823,7 @@ class Panel:
         if (
             splits < 2
             or self.settings["show_grid"] not in (name, "both")
-            or value_scale not in (None, SCALE.LINEAR)
+            or value_scale not in (None, AXIS_SCALE.LINEAR)
         ):
             return
         axis = ax.xaxis if horizontal else ax.yaxis
@@ -12053,7 +12012,7 @@ class Panel:
         # a log value axis cannot reach zero, so it keeps its own floor
         if (
             any(isinstance(l, StackedAreaLayer) for l in layers)
-            and validate_baseline(s.get("baseline"))
+            and (s.get("baseline") or STACKED_AREA_BASELINE.DEFAULT)
             in (STACKED_AREA_BASELINE.ZERO, STACKED_AREA_BASELINE.PERCENT)
             and value_scale != "log"
         ):

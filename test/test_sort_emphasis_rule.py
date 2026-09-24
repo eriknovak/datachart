@@ -10,7 +10,7 @@ from datachart.charts import BarChart, BoxPlot, PyramidChart, RadialChart, Violi
 from datachart.config import config
 from datachart.constants import EMPHASIS, RADIAL_TYPE, SORT
 from datachart.utils._internal.layers import emphasis_rule_roles
-from datachart.utils._internal.validate import validate_emphasis_rule, validate_sort
+from datachart.utils._internal.validate import validate_emphasis_rule
 
 BAR1 = [{"label": c, "y": v} for c, v in zip("ABCD", [3.0, 5.0, 4.0, 1.0])]
 BAR2 = [{"label": c, "y": v} for c, v in zip("ABCD", [2.0, 1.0, 6.0, 1.0])]
@@ -58,11 +58,9 @@ class TestSortConstant:
         assert SORT.ASCENDING == "ascending"
         assert SORT.DESCENDING == "descending"
 
-    def test_validate_sort(self):
-        assert validate_sort(None) is None
-        assert validate_sort(SORT.ASCENDING) == "ascending"
+    def test_front_rejects_an_unknown_sort(self):
         with pytest.raises(ValueError, match="sort"):
-            validate_sort("up")
+            BarChart(BAR1, sort="up")
 
 
 class TestValidateEmphasisRule:

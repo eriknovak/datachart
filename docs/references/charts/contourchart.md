@@ -41,9 +41,9 @@ The parameters that accept a constant, with the class in [datachart.constants](.
 | `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](../constants.md#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](../constants.md#datachart.constants.LEGEND_ALIGN) |
 | `show_grid` | [`SHOW_GRID`](../constants.md#datachart.constants.SHOW_GRID) |
 | `aspect_ratio` | [`ASPECT_RATIO`](../constants.md#datachart.constants.ASPECT_RATIO) |
-| `scalex` | [`SCALE`](../constants.md#datachart.constants.SCALE) |
-| `scaley` | [`SCALE`](../constants.md#datachart.constants.SCALE) |
-| `norm` | [`NORMALIZE`](../constants.md#datachart.constants.NORMALIZE) |
+| `scalex` | [`AXIS_SCALE`](../constants.md#datachart.constants.AXIS_SCALE) |
+| `scaley` | [`AXIS_SCALE`](../constants.md#datachart.constants.AXIS_SCALE) |
+| `norm` | [`COLOR_NORM`](../constants.md#datachart.constants.COLOR_NORM) |
 | `value_format` | [`VALUE_FORMAT`](../constants.md#datachart.constants.VALUE_FORMAT) |
 | `yticks_format` | [`VALUE_FORMAT`](../constants.md#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](../constants.md#datachart.constants.DATE_FORMAT) |
 | `colorbar={"location": ..., "format": ..., "orientation": ...}` | [`COLORBAR_LOCATION`](../constants.md#datachart.constants.COLORBAR_LOCATION), [`VALUE_FORMAT`](../constants.md#datachart.constants.VALUE_FORMAT), [`ORIENTATION`](../constants.md#datachart.constants.ORIENTATION) |

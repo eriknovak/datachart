@@ -24,7 +24,7 @@ from ..constants import (
     FIG_SIZE,
     SHOW_GRID,
     ORIENTATION,
-    SCALE,
+    AXIS_SCALE,
     SORT,
     VALUE_FORMAT,
 )
@@ -59,8 +59,8 @@ def BarChart(
     sort: Optional[Union[SORT, str]] = None,
     sort_by: Optional[str] = None,
     emphasis_rule: Optional[EmphasisRuleAttrs] = None,
-    scalex: Optional[Union[SCALE, str]] = None,
-    scaley: Optional[Union[SCALE, str]] = None,
+    scalex: Optional[Union[AXIS_SCALE, str]] = None,
+    scaley: Optional[Union[AXIS_SCALE, str]] = None,
     subplots: Optional[bool] = None,
     max_cols: Optional[int] = None,
     sharex: Optional[bool] = None,
@@ -203,9 +203,9 @@ def BarChart(
         orientation: The orientation of the bars ("vertical" or "horizontal").
             See [`ORIENTATION`][datachart.constants.ORIENTATION].
         scalex: The x-axis scale ("linear", "log", "symlog", "asinh"). Useful
-            for horizontal bars. See [`SCALE`][datachart.constants.SCALE].
+            for horizontal bars. See [`AXIS_SCALE`][datachart.constants.AXIS_SCALE].
         scaley: The y-axis scale ("linear", "log", "symlog", "asinh"). Useful
-            for vertical bars. See [`SCALE`][datachart.constants.SCALE].
+            for vertical bars. See [`AXIS_SCALE`][datachart.constants.AXIS_SCALE].
         subplots: Whether to create separate subplots for each chart.
         max_cols: Maximum number of columns in subplots (when subplots=True).
         sharex: Whether to share the x-axis in subplots.

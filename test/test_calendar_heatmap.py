@@ -15,7 +15,7 @@ from datachart.charts import CalendarHeatmap, LineChart
 from datachart.config import config
 from datachart.constants import (
     COLORBAR_LOCATION,
-    NORMALIZE,
+    COLOR_NORM,
     THEME,
     VALUE_FORMAT,
     CALENDAR_WEEKDAY,
@@ -503,21 +503,21 @@ class TestCalendarCenteredNorm(unittest.TestCase):
         return CalendarHeatmap({"date": dates, "value": values}, **kwargs)
 
     def test_centered_norm_builds_a_centered_norm(self):
-        image = self._anomaly(norm=NORMALIZE.CENTERED).axes[0].images[0]
+        image = self._anomaly(norm=COLOR_NORM.CENTERED).axes[0].images[0]
         self.assertIsInstance(image.norm, matplotlib.colors.CenteredNorm)
 
     def test_vcenter_moves_the_centre(self):
-        image = self._anomaly(norm=NORMALIZE.CENTERED, vcenter=-1).axes[0].images[0]
+        image = self._anomaly(norm=COLOR_NORM.CENTERED, vcenter=-1).axes[0].images[0]
         self.assertEqual(image.norm.vcenter, -1)
 
     def test_diverging_colormap_derives_from_the_heatmap_key(self):
-        image = self._anomaly(norm=NORMALIZE.CENTERED).axes[0].images[0]
+        image = self._anomaly(norm=COLOR_NORM.CENTERED).axes[0].images[0]
         self.assertEqual(image.cmap.name, config["plot_heatmap_cmap_diverging"])
 
     def test_calendar_diverging_style_wins_over_the_heatmap_one(self):
         image = (
             self._anomaly(
-                norm=NORMALIZE.CENTERED,
+                norm=COLOR_NORM.CENTERED,
                 style={"plot_calendar_heatmap_cmap_diverging": "Spectral"},
             )
             .axes[0]
@@ -529,7 +529,7 @@ class TestCalendarCenteredNorm(unittest.TestCase):
         dates = days(date(2023, 12, 1), 70)
         values = [i - 35 for i in range(70)]
         figure = CalendarHeatmap(
-            {"date": dates, "value": values}, norm=NORMALIZE.CENTERED
+            {"date": dates, "value": values}, norm=COLOR_NORM.CENTERED
         )
         halfranges = {ax.images[0].norm.halfrange for ax in figure.axes if ax.images}
         self.assertEqual(len(halfranges), 1)
