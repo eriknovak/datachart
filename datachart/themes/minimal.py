@@ -4,13 +4,16 @@ from ..constants import COLORS
 
 MINIMAL_THEME: StyleAttrs = make_theme(
     {
-        # one violet accent, then greys stepped wide enough to stay apart
+        # one violet accent, then five greys 0.16 apart in lightness, dark and
+        # light interleaved so neighbours never look alike
         "color_general_singular": COLORS.Purples,
         "color_general_multiple": [
             "#7048E8",
-            "#1F2933",
-            "#8A97A3",
-            "#C5CDD4",
+            "#1B242C",
+            "#A2AEB9",
+            "#414C58",
+            "#D3E0EA",
+            "#6D7983",
         ],
         "color_parallel_hue_continuous": [
             "#DCD3F7",
@@ -36,7 +39,7 @@ MINIMAL_THEME: StyleAttrs = make_theme(
         "plot_line_width": 2.0,
         "plot_scatter_edge_color": "#FFFFFF",
         "plot_swarm_edge_color": "#FFFFFF",
-        "plot_dumbbell_start_color": "#C5CDD4",
+        "plot_dumbbell_start_color": "#A2AEB9",
         "plot_dumbbell_end_color": "#7048E8",
         "plot_dumbbell_connector_color": "#DDE3E8",
         "plot_text_box_edgecolor": "#CFD8DC",

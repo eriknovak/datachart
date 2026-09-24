@@ -42,13 +42,13 @@ DEFAULT_MAX_COLOR = 5
 
 # datachart-defined palettes, consulted before pypalettes
 CUSTOM_PALETTES: Dict[str, List[str]] = {
+    # five YlGnBu samples 0.15 apart in lightness, darkest and lightest first
     COLORS.PaperYlGnBu: [
-        "#0C2C84",
-        "#7FCDBB",
-        "#1D91C0",
-        "#C7E9B4",
-        "#225EA8",
-        "#41B6C4",
+        "#1E2E85",
+        "#EAF7B1",
+        "#2165AB",
+        "#85CFBA",
+        "#299DC1",
     ],
     COLORS.PaperAccent: ["#5B84C4", "#C85450"],
 }
@@ -81,6 +81,76 @@ def is_plain_color(name: str) -> bool:
     return False
 
 
+# Machado, Oliveira and Fernandes (2009) at full severity, linear RGB (ADR 0073)
+_CVD_TRANSFORMS: Dict[str, np.ndarray] = {
+    "deutan": np.array(
+        [
+            [0.367322, 0.860646, -0.227968],
+            [0.280085, 0.672501, 0.047413],
+            [-0.011820, 0.042940, 0.968881],
+        ]
+    ),
+    "protan": np.array(
+        [
+            [0.152286, 1.052583, -0.204868],
+            [0.114503, 0.786281, 0.099216],
+            [-0.003882, -0.048116, 1.051998],
+        ]
+    ),
+    "tritan": np.array(
+        [
+            [1.255528, -0.076749, -0.178779],
+            [-0.078411, 0.930809, 0.147602],
+            [0.004733, 0.691367, 0.303900],
+        ]
+    ),
+}
+_RGB_TO_LMS = np.array(
+    [
+        [0.4122214708, 0.5363325363, 0.0514459929],
+        [0.2119034982, 0.6806995451, 0.1073969566],
+        [0.0883024619, 0.2817188376, 0.6299787005],
+    ]
+)
+_LMS_TO_OKLAB = np.array(
+    [
+        [0.2104542553, 0.7936177850, -0.0040720468],
+        [1.9779984951, -2.4285922050, 0.4505937099],
+        [0.0259040371, 0.7827717662, -0.8086757660],
+    ]
+)
+
+
+def linear_rgb(color) -> np.ndarray:
+    """A color as linear (gamma-expanded) RGB, each channel 0 to 1."""
+
+    return np.array(
+        [
+            c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
+            for c in colors.to_rgb(color)
+        ]
+    )
+
+
+def oklab(color, deficiency: Union[str, None] = None) -> np.ndarray:
+    """A color in OKLab, as seen with a color-vision deficiency when named.
+
+    Args:
+        color: Any matplotlib color.
+        deficiency: `"deutan"`, `"protan"`, `"tritan"`, or `None` for normal
+            vision.
+
+    Returns:
+        The `(L, a, b)` triple, lightness 0 (black) to 1 (white).
+
+    """
+
+    linear = linear_rgb(color)
+    if deficiency is not None:
+        linear = np.clip(_CVD_TRANSFORMS[deficiency] @ linear, 0.0, 1.0)
+    return _LMS_TO_OKLAB @ np.cbrt(_RGB_TO_LMS @ linear)
+
+
 def oklab_lightness(color) -> float:
     """The OKLab lightness of a color, 0 (black) to 1 (white).
 
@@ -92,21 +162,21 @@ def oklab_lightness(color) -> float:
 
     """
 
-    linear = [
-        c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
-        for c in colors.to_rgb(color)
-    ]
-    lms = np.cbrt(
-        np.array(
-            [
-                [0.4122214708, 0.5363325363, 0.0514459929],
-                [0.2119034982, 0.6806995451, 0.1073969566],
-                [0.0883024619, 0.2817188376, 0.6299787005],
-            ]
-        )
-        @ linear
-    )
-    return float(np.array([0.2104542553, 0.7936177850, -0.0040720468]) @ lms)
+    return float(oklab(color)[0])
+
+
+def delta_e(a, b, deficiency: Union[str, None] = None) -> float:
+    """The distance between two colors in OKLab ×100, under a deficiency when named."""
+
+    return float(100 * np.linalg.norm(oklab(a, deficiency) - oklab(b, deficiency)))
+
+
+def wcag_contrast(a, b) -> float:
+    """The WCAG 2 contrast ratio of two colors, 1 (equal) to 21 (black on white)."""
+
+    weights = np.array([0.2126, 0.7152, 0.0722])
+    la, lb = (float(weights @ linear_rgb(c)) for c in (a, b))
+    return (max(la, lb) + 0.05) / (min(la, lb) + 0.05)
 
 
 # ===============================================

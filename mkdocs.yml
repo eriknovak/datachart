@@ -227,7 +227,7 @@ plugins:
           - references/utils/index.md: Panel, Grid, Annotate, and save_figure signatures, with a table of which utility fits which task.
           - references/utils/stats.md: Statistical function signatures, grouped by center, spread, shape, association, trend line, intervals, binning, smoothing, and density.
           - references/config.md: The Config class and the global config instance, with a table of which method fits which task.
-          - references/themes.md: The predefined theme dictionaries, with a table of each theme's look and its THEME member.
+          - references/themes.md: The predefined theme dictionaries, with a table of each theme's look and its THEME member, derive_theme, and score_palette for checking a palette for colour-blind readers.
           - references/constants.md: Enums and constants (THEME, FIG_SIZE, ORIENTATION, COLORS, ...).
           - references/typings.md: The shared TypedDict contracts, per-figure settings, shared style groups, and theme style, with a table pointing to each chart's own typings.
 

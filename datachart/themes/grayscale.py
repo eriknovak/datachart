@@ -2,13 +2,13 @@ from ._base import make_theme
 from ..typings import StyleAttrs
 from ..constants import LINE_STYLE, COLORS
 
+# five slate greys 0.16 apart: six of one hue cannot pass the gate (ADR 0073)
 GREYS = [
-    "#2C3E50",  # dark slate
-    "#5D6D7E",  # medium gray
-    "#85929E",  # light gray
-    "#ABB2B9",  # lighter gray
-    "#D5DBDB",  # very light gray
-    "#34495E",  # charcoal
+    "#1A232B",  # near-black slate
+    "#424B55",  # dark grey
+    "#6F7983",  # medium grey
+    "#9EA9B4",  # light grey
+    "#D1DCE8",  # very light grey
 ]
 
 GREYSCALE_THEME: StyleAttrs = make_theme(
@@ -22,6 +22,9 @@ GREYSCALE_THEME: StyleAttrs = make_theme(
             "#525252",
             "#000000",
         ],
+        "plot_hatch_cycle": ["", "//", "..", "xx", "\\"],
+        "plot_linestyle_cycle": ["-", "--", "-.", ":", "-"],
+        "plot_marker_cycle": ["o", "s", "^", "D", "v"],
         "plot_bar_edge_width": 0.8,
         "plot_bar_edge_color": "#000000",
         "plot_stackedarea_edge_color": "#000000",
@@ -42,8 +45,8 @@ GREYSCALE_THEME: StyleAttrs = make_theme(
         "plot_text_arrow_color": "#5D6D7E",
         "plot_gantt_dependency_color": "#2C3E50",
         "plot_gantt_today_color": "#2C3E50",
-        "plot_dumbbell_start_color": "#ABB2B9",
-        "plot_dumbbell_end_color": "#2C3E50",
+        "plot_dumbbell_start_color": "#9EA9B4",
+        "plot_dumbbell_end_color": "#1A232B",
         "plot_dumbbell_edge_color": "#000000",
         "plot_dumbbell_connector_color": "#85929E",
         "plot_dumbbell_arrow_color": "#5D6D7E",
@@ -58,5 +61,9 @@ GREYSCALE_THEME: StyleAttrs = make_theme(
         "plot_ridgeline_inner_color": "#000000",
     }
 )
-"""The greyscale theme: shades of grey for print or colorblind-safe output.
+"""The greyscale theme: five slate greys, hatches, dashes and markers, for print.
+
+The greys sit 0.16 apart in lightness, so every pair reads apart on paper and
+for every colour-blind reader alike; bars carry a hatch cycle, lines a dash
+cycle and scatter points a marker cycle, so a sixth series still differs.
 """

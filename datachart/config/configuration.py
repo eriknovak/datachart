@@ -11,6 +11,7 @@ from datachart.constants import THEME
 
 # import the themes
 from ..themes._base import STYLE_ALIASES, canonical_style, warn_aliases
+from ..themes.score import warn_failing_palette
 from ..themes import (
     DEFAULT_THEME,
     GREYSCALE_THEME,
@@ -141,6 +142,7 @@ class Config:
         if unknown:
             raise ValueError(f"Unknown theme attributes: {sorted(unknown)}")
         THEMES[name] = {**copy.deepcopy(DEFAULT_THEME), **copy.deepcopy(theme)}
+        warn_failing_palette(THEMES[name])
 
     def reset_config(self) -> None:
         """Resets the global configuration.

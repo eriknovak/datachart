@@ -7,6 +7,7 @@ import numpy as np
 import matplotlib.colors as mcolors
 
 from ._base import canonical_style, warn_aliases
+from .score import warn_failing_palette
 from ..typings import StyleAttrs
 from ..utils._internal.colors import get_color_scale, get_colormap, oklab_lightness
 
@@ -94,8 +95,9 @@ def derive_theme(
     if len(swatches) < 2:
         raise ValueError("The lead must hold at least two colors.")
     cmap = get_colormap(lead)
+    sequential = _is_sequential(cmap)
 
-    if _is_sequential(cmap):
+    if sequential:
         # positions run from the lead's dark end whichever way it is written
         dark_first = oklab_lightness(cmap(0.0)) < oklab_lightness(cmap(1.0))
         stops = DARK_PAGE_STOPS if _is_dark_page(theme) else LIGHT_PAGE_STOPS
@@ -128,4 +130,7 @@ def derive_theme(
     if unknown:
         raise ValueError(f"Unknown theme attributes: {sorted(unknown)}")
     theme.update(copy.deepcopy(overrides))
+    # a ramp's samples never clear the normal-vision floor (ADR 0073)
+    if not sequential:
+        warn_failing_palette(theme)
     return theme

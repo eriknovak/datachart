@@ -4,14 +4,15 @@ from ..constants import COLORS, FONT_WEIGHT
 
 SKETCH_THEME: StyleAttrs = make_theme(
     {
-        # marker-pen tones, vermilion first; green never sits next to red
+        # marker-pen tones, vermilion first; the green is greyed towards sage
+        # so it stays apart from vermilion for deutan readers
         "color_general_singular": COLORS.YlOrRd,
         "color_general_multiple": [
             "#E4572E",
-            "#2E86AB",
-            "#F5B700",
-            "#7E5AAB",
-            "#76B041",
+            "#3F84A3",
+            "#F4BA2D",
+            "#784AAD",
+            "#90B376",
         ],
         "color_parallel_hue_continuous": [
             "#FDD49E",
@@ -36,7 +37,7 @@ SKETCH_THEME: StyleAttrs = make_theme(
         "plot_bar_edge_width": 1.0,
         "plot_hist_edge_width": 1.0,
         "plot_scatter_edge_color": "#222222",
-        "plot_dumbbell_start_color": "#2E86AB",
+        "plot_dumbbell_start_color": "#3F84A3",
         "plot_dumbbell_end_color": "#E4572E",
         "plot_dumbbell_edge_color": "#222222",
         "plot_dumbbell_connector_color": "#8A8A8A",

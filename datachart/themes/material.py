@@ -5,14 +5,15 @@ from ..constants import COLORS
 MATERIAL_THEME: StyleAttrs = make_theme(
     {
         "color_general_singular": COLORS.Blues,
-        # Google's 700 tones in brand order: blue, red, yellow, green
+        # Google's hues in brand order, blue, red, yellow, green, stepped in
+        # lightness so red and green stay apart for deutan readers
         "color_general_multiple": [
             "#1A73E8",
-            "#D93025",
-            "#F9AB00",
-            "#1E8E3E",
-            "#12B5CB",
-            "#9334E6",
+            "#BC261D",
+            "#EFB04E",
+            "#269F47",
+            "#19ACC1",
+            "#7C48B5",
         ],
         "color_parallel_hue_continuous": [
             "#C6DAFC",
@@ -34,7 +35,7 @@ MATERIAL_THEME: StyleAttrs = make_theme(
         "plot_line_width": 2.0,
         "plot_text_box_edgecolor": "#757575",
         "plot_text_arrow_color": "#757575",
-        "plot_dumbbell_start_color": "#F9AB00",
+        "plot_dumbbell_start_color": "#EFB04E",
         "plot_dumbbell_end_color": "#1A73E8",
         "plot_dumbbell_edge_width": 0,
         "plot_heatmap_cmap": COLORS.Blues,

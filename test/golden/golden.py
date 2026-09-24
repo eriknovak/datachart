@@ -129,6 +129,8 @@ EXPECTED_CHANGES = {
     "theme_dark_heatmap",
     # new derived theme case (#245)
     "theme_derived_minimal_greens_bar",
+    # palettes re-stepped so every predefined theme passes the gate (ADR 0073)
+    "theme_greyscale_bar",
     # one lead hue per theme: DEFAULT reordered, PaperYlGnBu navy first, SKETCH vermilion first
     "line_multi",
     "bar_multi_grouped",
