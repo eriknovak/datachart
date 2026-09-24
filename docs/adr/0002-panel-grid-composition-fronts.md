@@ -1,6 +1,6 @@
 ---
 status: accepted
-amended-by: [0006]
+amended-by: [0006, 0070]
 ---
 
 # Public Panel/Grid composition fronts over the drawing seam

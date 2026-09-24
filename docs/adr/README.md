@@ -44,12 +44,13 @@ adds no tag; one that reverses, narrows, widens or replaces a commitment does.
 
 ## Composition: Panel and Grid
 
-- [0002](0002-panel-grid-composition-fronts.md) — Public Panel/Grid composition fronts over the drawing seam (amended by [0006](0006-grid-in-grid-nesting.md))
+- [0002](0002-panel-grid-composition-fronts.md) — Public Panel/Grid composition fronts over the drawing seam (amended by [0006](0006-grid-in-grid-nesting.md), [0070](0070-composition-furniture-vocabulary.md))
 - [0005](0005-nested-panel-flattening.md) — Nested Panel figures flatten losslessly into the outer Panel
 - [0006](0006-grid-in-grid-nesting.md) — Grid figures nest inside Grid via a recursive cell-tree transport (amended by [0007](0007-nested-grid-alignment.md))
 - [0007](0007-nested-grid-alignment.md) — Nested grids render in the parent gridspec, with a reserved heading row
 - [0012](0012-orientation-aware-panel.md) — A Panel has an orientation, inferred from its layers, and its value axis follows it (amended by [0017](0017-pyramid-chart.md))
 - [0041](0041-panel-axis-scales.md) — Panel takes axis scales, and a layer group carries its source figure's scale
+- [0070](0070-composition-furniture-vocabulary.md) — Panel and Grid take the chart fronts' furniture vocabulary; one grid layout path
 
 ## Emphasis and category order
 
