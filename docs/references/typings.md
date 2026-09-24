@@ -18,38 +18,38 @@ The records a chart's `data` takes and the keys its `style` accepts are document
 
 | Chart | Shows | Data | Style |
 | :-- | :-- | :-- | :-- |
-| [LineChart](charts/linechart.md) | A value along an ordered axis, one line per series. | [`LineDataPointAttrs`](charts/linechart.md#datachart.typings.LineDataPointAttrs) | [`LineStyleAttrs`](charts/linechart.md#datachart.typings.LineStyleAttrs) |
-| [StackedAreaChart](charts/stackedareachart.md) | Parts of a total along an ordered axis, filled on top of each other. | [`LineDataPointAttrs`](charts/linechart.md#datachart.typings.LineDataPointAttrs) | [`StackedAreaStyleAttrs`](charts/stackedareachart.md#datachart.typings.StackedAreaStyleAttrs) |
-| [BumpChart](charts/bumpchart.md) | Rank over time, one line per series. | [`LineDataPointAttrs`](charts/linechart.md#datachart.typings.LineDataPointAttrs) | [`BumpStyleAttrs`](charts/bumpchart.md#datachart.typings.BumpStyleAttrs) |
-| [BarChart](charts/barchart.md) | A value per category as bars; series grouped, stacked, or overlaid. | [`BarDataPointAttrs`](charts/barchart.md#datachart.typings.BarDataPointAttrs) | [`BarStyleAttrs`](charts/barchart.md#datachart.typings.BarStyleAttrs) |
-| [PyramidChart](charts/pyramidchart.md) | Two series as horizontal bars mirrored around a shared category axis. | [`BarDataPointAttrs`](charts/barchart.md#datachart.typings.BarDataPointAttrs) | [`BarStyleAttrs`](charts/barchart.md#datachart.typings.BarStyleAttrs) |
-| [RadialChart](charts/radialchart.md) | Series on polar axes, as a radar line, an area, bars, or a histogram. | [`RadialDataPointAttrs`](charts/radialchart.md#datachart.typings.RadialDataPointAttrs) | [`LineStyleAttrs`](charts/linechart.md#datachart.typings.LineStyleAttrs), [`BarStyleAttrs`](charts/barchart.md#datachart.typings.BarStyleAttrs), [`HistStyleAttrs`](charts/histogram.md#datachart.typings.HistStyleAttrs), [`ScatterStyleAttrs`](charts/scatterchart.md#datachart.typings.ScatterStyleAttrs) |
+| [LineChart](charts/linechart.md) | A value along an ordered axis, one line per series. | [`LineRecordAttrs`](charts/linechart.md#datachart.typings.LineRecordAttrs) | [`LineStyleAttrs`](charts/linechart.md#datachart.typings.LineStyleAttrs) |
+| [StackedAreaChart](charts/stackedareachart.md) | Parts of a total along an ordered axis, filled on top of each other. | [`LineRecordAttrs`](charts/linechart.md#datachart.typings.LineRecordAttrs) | [`StackedAreaStyleAttrs`](charts/stackedareachart.md#datachart.typings.StackedAreaStyleAttrs) |
+| [BumpChart](charts/bumpchart.md) | Rank over time, one line per series. | [`LineRecordAttrs`](charts/linechart.md#datachart.typings.LineRecordAttrs) | [`BumpStyleAttrs`](charts/bumpchart.md#datachart.typings.BumpStyleAttrs) |
+| [BarChart](charts/barchart.md) | A value per category as bars; series grouped, stacked, or overlaid. | [`BarRecordAttrs`](charts/barchart.md#datachart.typings.BarRecordAttrs) | [`BarStyleAttrs`](charts/barchart.md#datachart.typings.BarStyleAttrs) |
+| [PyramidChart](charts/pyramidchart.md) | Two series as horizontal bars mirrored around a shared category axis. | [`BarRecordAttrs`](charts/barchart.md#datachart.typings.BarRecordAttrs) | [`BarStyleAttrs`](charts/barchart.md#datachart.typings.BarStyleAttrs) |
+| [RadialChart](charts/radialchart.md) | Series on polar axes, as a radar line, an area, bars, or a histogram. | [`RadialRecordAttrs`](charts/radialchart.md#datachart.typings.RadialRecordAttrs) | [`LineStyleAttrs`](charts/linechart.md#datachart.typings.LineStyleAttrs), [`BarStyleAttrs`](charts/barchart.md#datachart.typings.BarStyleAttrs), [`HistStyleAttrs`](charts/histogram.md#datachart.typings.HistStyleAttrs), [`ScatterStyleAttrs`](charts/scatterchart.md#datachart.typings.ScatterStyleAttrs) |
 | [CalendarHeatmap](charts/calendarheatmap.md) | One colored cell per day, weeks as columns and weekdays as rows. | [`CalendarHeatmapDataAttrs`](charts/calendarheatmap.md#datachart.typings.CalendarHeatmapDataAttrs) | [`CalendarHeatmapStyleAttrs`](charts/calendarheatmap.md#datachart.typings.CalendarHeatmapStyleAttrs) |
-| [GanttChart](charts/ganttchart.md) | A schedule: one bar per task from its start to its end over a date axis. | [`GanttTaskAttrs`](charts/ganttchart.md#datachart.typings.GanttTaskAttrs) | [`GanttStyleAttrs`](charts/ganttchart.md#datachart.typings.GanttStyleAttrs) |
+| [GanttChart](charts/ganttchart.md) | A schedule: one bar per task from its start to its end over a date axis. | [`GanttTaskRecordAttrs`](charts/ganttchart.md#datachart.typings.GanttTaskRecordAttrs) | [`GanttStyleAttrs`](charts/ganttchart.md#datachart.typings.GanttStyleAttrs) |
 | [DumbbellChart](charts/dumbbellchart.md) | Two values per category, a dot at each and a connector between them. | [`DumbbellRecordAttrs`](charts/dumbbellchart.md#datachart.typings.DumbbellRecordAttrs) | [`DumbbellStyleAttrs`](charts/dumbbellchart.md#datachart.typings.DumbbellStyleAttrs) |
 
 ### Distributions
 
 | Chart | Shows | Data | Style |
 | :-- | :-- | :-- | :-- |
-| [Histogram](charts/histogram.md) | The distribution of one numeric variable, binned. | [`HistDataPointAttrs`](charts/histogram.md#datachart.typings.HistDataPointAttrs) | [`HistStyleAttrs`](charts/histogram.md#datachart.typings.HistStyleAttrs) |
-| [BoxPlot](charts/boxplot.md) | Median, quartiles, whiskers, and outliers per group. | [`BoxDataPointAttrs`](charts/boxplot.md#datachart.typings.BoxDataPointAttrs) | [`BoxStyleAttrs`](charts/boxplot.md#datachart.typings.BoxStyleAttrs) |
-| [ViolinPlot](charts/violinplot.md) | The density profile of each group's distribution. | [`ViolinDataPointAttrs`](charts/violinplot.md#datachart.typings.ViolinDataPointAttrs) | [`ViolinStyleAttrs`](charts/violinplot.md#datachart.typings.ViolinStyleAttrs) |
-| [SwarmPlot](charts/swarmplot.md) | Every observation as a point, spread within its group. | [`SwarmDataPointAttrs`](charts/swarmplot.md#datachart.typings.SwarmDataPointAttrs) | [`SwarmStyleAttrs`](charts/swarmplot.md#datachart.typings.SwarmStyleAttrs) |
-| [RaincloudPlot](charts/raincloudplot.md) | A half violin, the raw points, and a box per group. | [`RaincloudDataPointAttrs`](charts/raincloudplot.md#datachart.typings.RaincloudDataPointAttrs) | [`RaincloudStyleAttrs`](charts/raincloudplot.md#datachart.typings.RaincloudStyleAttrs) |
-| [RidgelinePlot](charts/ridgelineplot.md) | One density ridge per group, stacked and partly overlapping. | [`RidgelineDataPointAttrs`](charts/ridgelineplot.md#datachart.typings.RidgelineDataPointAttrs) | [`RidgelineStyleAttrs`](charts/ridgelineplot.md#datachart.typings.RidgelineStyleAttrs) |
+| [Histogram](charts/histogram.md) | The distribution of one numeric variable, binned. | [`HistRecordAttrs`](charts/histogram.md#datachart.typings.HistRecordAttrs) | [`HistStyleAttrs`](charts/histogram.md#datachart.typings.HistStyleAttrs) |
+| [BoxPlot](charts/boxplot.md) | Median, quartiles, whiskers, and outliers per group. | [`BoxRecordAttrs`](charts/boxplot.md#datachart.typings.BoxRecordAttrs) | [`BoxStyleAttrs`](charts/boxplot.md#datachart.typings.BoxStyleAttrs) |
+| [ViolinPlot](charts/violinplot.md) | The density profile of each group's distribution. | [`ViolinRecordAttrs`](charts/violinplot.md#datachart.typings.ViolinRecordAttrs) | [`ViolinStyleAttrs`](charts/violinplot.md#datachart.typings.ViolinStyleAttrs) |
+| [SwarmPlot](charts/swarmplot.md) | Every observation as a point, spread within its group. | [`SwarmRecordAttrs`](charts/swarmplot.md#datachart.typings.SwarmRecordAttrs) | [`SwarmStyleAttrs`](charts/swarmplot.md#datachart.typings.SwarmStyleAttrs) |
+| [RaincloudPlot](charts/raincloudplot.md) | A half violin, the raw points, and a box per group. | [`RaincloudRecordAttrs`](charts/raincloudplot.md#datachart.typings.RaincloudRecordAttrs) | [`RaincloudStyleAttrs`](charts/raincloudplot.md#datachart.typings.RaincloudStyleAttrs) |
+| [RidgelinePlot](charts/ridgelineplot.md) | One density ridge per group, stacked and partly overlapping. | [`RidgelineRecordAttrs`](charts/ridgelineplot.md#datachart.typings.RidgelineRecordAttrs) | [`RidgelineStyleAttrs`](charts/ridgelineplot.md#datachart.typings.RidgelineStyleAttrs) |
 
 ### Relationships
 
 | Chart | Shows | Data | Style |
 | :-- | :-- | :-- | :-- |
-| [ScatterChart](charts/scatterchart.md) | One point per observation, placed by two numeric variables. | [`ScatterDataPointAttrs`](charts/scatterchart.md#datachart.typings.ScatterDataPointAttrs) | [`ScatterStyleAttrs`](charts/scatterchart.md#datachart.typings.ScatterStyleAttrs) |
+| [ScatterChart](charts/scatterchart.md) | One point per observation, placed by two numeric variables. | [`ScatterRecordAttrs`](charts/scatterchart.md#datachart.typings.ScatterRecordAttrs) | [`ScatterStyleAttrs`](charts/scatterchart.md#datachart.typings.ScatterStyleAttrs) |
 | [Heatmap](charts/heatmap.md) | A two-dimensional matrix as colored cells. | [`HeatmapDataAttrs`](charts/heatmap.md#datachart.typings.HeatmapDataAttrs) | [`HeatmapStyleAttrs`](charts/heatmap.md#datachart.typings.HeatmapStyleAttrs) |
 | [ContourChart](charts/contourchart.md) | A surface sampled on a grid, as iso-lines or filled bands. | [`ContourDataAttrs`](charts/contourchart.md#datachart.typings.ContourDataAttrs) | [`ContourStyleAttrs`](charts/contourchart.md#datachart.typings.ContourStyleAttrs) |
 | [HexbinChart](charts/hexbinchart.md) | Point density on the plane, as colored hexagons. | [`HexbinDataAttrs`](charts/hexbinchart.md#datachart.typings.HexbinDataAttrs) | [`HexbinStyleAttrs`](charts/hexbinchart.md#datachart.typings.HexbinStyleAttrs) |
-| [ParallelCoords](charts/parallelcoords.md) | Each record as a polyline across one axis per dimension. | [`ParallelCoordsDataPointAttrs`](charts/parallelcoords.md#datachart.typings.ParallelCoordsDataPointAttrs) | [`ParallelCoordsStyleAttrs`](charts/parallelcoords.md#datachart.typings.ParallelCoordsStyleAttrs) |
+| [ParallelCoords](charts/parallelcoords.md) | Each record as a polyline across one axis per dimension. | [`ParallelCoordsRecordAttrs`](charts/parallelcoords.md#datachart.typings.ParallelCoordsRecordAttrs) | [`ParallelCoordsStyleAttrs`](charts/parallelcoords.md#datachart.typings.ParallelCoordsStyleAttrs) |
 | [NetworkChart](charts/networkchart.md) | Nodes joined by edges, placed by a layout. | [`NetworkSingleChartAttrs`](charts/networkchart.md#datachart.typings.NetworkSingleChartAttrs) | [`NetworkStyleAttrs`](charts/networkchart.md#datachart.typings.NetworkStyleAttrs) |
-| [ScatterMatrix](charts/scattermatrix.md) | A scatter chart for every pair of dimensions, distributions on the diagonal. | [`ScatterMatrixDataPointAttrs`](charts/scattermatrix.md#datachart.typings.ScatterMatrixDataPointAttrs) | [`StyleAttrs`](#datachart.typings.StyleAttrs) |
+| [ScatterMatrix](charts/scattermatrix.md) | A scatter chart for every pair of dimensions, distributions on the diagonal. | [`ScatterMatrixRecordAttrs`](charts/scattermatrix.md#datachart.typings.ScatterMatrixRecordAttrs) | [`StyleAttrs`](#datachart.typings.StyleAttrs) |
 | [ImageChart](charts/imagechart.md) | A picture in data coordinates, under or over the other charts. | [`ImageDataAttrs`](charts/imagechart.md#datachart.typings.ImageDataAttrs) | [`ImageStyleAttrs`](charts/imagechart.md#datachart.typings.ImageStyleAttrs) |
 | [BasemapChart](charts/basemapchart.md) | Coastlines, land, borders, lakes, rivers and roads under a chart of longitude and latitude. | [`BasemapDataAttrs`](charts/basemapchart.md#datachart.typings.BasemapDataAttrs) | [`BasemapStyleAttrs`](charts/basemapchart.md#datachart.typings.BasemapStyleAttrs) |
 
@@ -166,7 +166,7 @@ Style groups several charts read from their `style` dictionary: the value labels
 
 ## Theme Style
 
-The keys a theme defines and [`config`](config.md) holds: colors, fonts, axes, legend, grid, the theme-driven defaults, and the sketch and ink looks. `StyleAttrs` is their union together with every chart's own style keys; the [config methods](config.md#datachart.config.Config) and [`register_theme`](config.md#datachart.config.Config.register_theme) take it, and the [Themes guide](../how-to-guides/styling/themes.ipynb) shows how a theme is built from it.
+The keys a theme defines and [`config`](config.md) holds: colors, fonts, axes, legend, grid, the theme-driven defaults, the sketch and ink looks, and how a `Panel` overlays charts. `StyleAttrs` is their union together with every chart's own style keys; the [config methods](config.md#datachart.config.Config) and [`register_theme`](config.md#datachart.config.Config.register_theme) take it, and the [Themes guide](../how-to-guides/styling/themes.ipynb) shows how a theme is built from it.
 
 ::: datachart.typings.StyleAttrs
     options:
@@ -201,5 +201,9 @@ The keys a theme defines and [`config`](config.md) holds: colors, fonts, axes, l
         heading_level: 3
 
 ::: datachart.typings.InkStyleAttrs
+    options:
+        heading_level: 3
+
+::: datachart.typings.OverlayStyleAttrs
     options:
         heading_level: 3

@@ -6,7 +6,7 @@ from ..utils._internal.plot_engine import render
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
-    RadialDataPointAttrs,
+    RadialRecordAttrs,
     LineStyleAttrs,
     BarStyleAttrs,
     HistStyleAttrs,
@@ -39,7 +39,7 @@ _RadialStyleAttrs = Union[
 
 
 def RadialChart(
-    data: Union[List[RadialDataPointAttrs], List[List[RadialDataPointAttrs]]],
+    data: Union[List[RadialRecordAttrs], List[List[RadialRecordAttrs]]],
     *,
     mark: Optional[Union[RADIAL_TYPE, str]] = None,
     title: Optional[str] = None,

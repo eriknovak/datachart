@@ -14,9 +14,9 @@ Each record as a polyline across one axis per dimension. The [Parallel Coordinat
 
 ## Data
 
-Each record in `data` is a [`ParallelCoordsDataPointAttrs`](#datachart.typings.ParallelCoordsDataPointAttrs); the `hue` parameter renames its keys.
+Each record in `data` is a [`ParallelCoordsRecordAttrs`](#datachart.typings.ParallelCoordsRecordAttrs); the `hue` parameter renames its keys.
 
-::: datachart.typings.ParallelCoordsDataPointAttrs
+::: datachart.typings.ParallelCoordsRecordAttrs
     options:
         heading_level: 3
 

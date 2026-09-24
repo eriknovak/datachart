@@ -14,9 +14,9 @@ A schedule: one bar per task from its start to its end over a date axis. The [Ga
 
 ## Data
 
-Each record in `data` is a [`GanttTaskAttrs`](#datachart.typings.GanttTaskAttrs); the `emphasis`, `task`, `start`, `end`, `group`, `progress` and `depends_on` parameters rename its keys.
+Each record in `data` is a [`GanttTaskRecordAttrs`](#datachart.typings.GanttTaskRecordAttrs); the `emphasis`, `task`, `start`, `end`, `group`, `progress` and `depends_on` parameters rename its keys.
 
-::: datachart.typings.GanttTaskAttrs
+::: datachart.typings.GanttTaskRecordAttrs
     options:
         heading_level: 3
 

@@ -6,7 +6,7 @@ from ..utils._internal.plot_engine import render
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
-    BarDataPointAttrs,
+    BarRecordAttrs,
     BarStyleAttrs,
     VLineSettingAttrs,
     HLineSettingAttrs,
@@ -30,7 +30,7 @@ from ..constants import (
 
 
 def PyramidChart(
-    data: List[List[BarDataPointAttrs]],
+    data: List[List[BarRecordAttrs]],
     *,
     title: Optional[str] = None,
     xlabel: Optional[str] = None,

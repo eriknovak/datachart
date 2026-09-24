@@ -7,7 +7,7 @@ from ..utils._internal.plot_engine import render
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
-    LineDataPointAttrs,
+    LineRecordAttrs,
     StackedAreaStyleAttrs,
     VLineSettingAttrs,
     HLineSettingAttrs,
@@ -34,7 +34,7 @@ from ..constants import (
 
 
 def StackedAreaChart(
-    data: Union[List[LineDataPointAttrs], List[List[LineDataPointAttrs]]],
+    data: Union[List[LineRecordAttrs], List[List[LineRecordAttrs]]],
     *,
     baseline: Optional[Union[STACKED_AREA_BASELINE, str]] = None,
     title: Optional[str] = None,

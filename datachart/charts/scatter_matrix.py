@@ -27,7 +27,7 @@ from ..utils._internal.plot_engine import composition_panel
 from ..utils._internal.chart_kinds import chart_kind, check_domains
 from ..typings import (
     LegendSettingAttrs,
-    ScatterMatrixDataPointAttrs,
+    ScatterMatrixRecordAttrs,
     StyleAttrs,
 )
 from ..constants import (
@@ -245,7 +245,7 @@ def _correlation_panel(x, y, groups, colors, style, settings) -> Panel:
 
 
 def ScatterMatrix(
-    data: Union[Dict[str, List[Any]], List[ScatterMatrixDataPointAttrs]],
+    data: Union[Dict[str, List[Any]], List[ScatterMatrixRecordAttrs]],
     *,
     dimensions: Optional[List[str]] = None,
     hue: Optional[str] = None,

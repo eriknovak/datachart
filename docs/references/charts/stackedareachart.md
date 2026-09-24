@@ -14,7 +14,7 @@ Parts of a total along an ordered axis, filled on top of each other. The [Stacke
 
 ## Data
 
-Each record in `data` is a [`LineDataPointAttrs`](linechart.md#datachart.typings.LineDataPointAttrs); the `x` and `y` parameters rename its keys.
+Each record in `data` is a [`LineRecordAttrs`](linechart.md#datachart.typings.LineRecordAttrs); the `x` and `y` parameters rename its keys.
 
 ## Style
 

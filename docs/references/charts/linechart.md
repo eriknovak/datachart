@@ -14,9 +14,9 @@ A value along an ordered axis, one line per series. The [Line Chart guide](../..
 
 ## Data
 
-Each record in `data` is a [`LineDataPointAttrs`](#datachart.typings.LineDataPointAttrs); the `x`, `y` and `yerr` parameters rename its keys.
+Each record in `data` is a [`LineRecordAttrs`](#datachart.typings.LineRecordAttrs); the `x`, `y` and `yerr` parameters rename its keys.
 
-::: datachart.typings.LineDataPointAttrs
+::: datachart.typings.LineRecordAttrs
     options:
         heading_level: 3
 

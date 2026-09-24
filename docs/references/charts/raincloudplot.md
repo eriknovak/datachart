@@ -14,9 +14,9 @@ A half violin, the raw points, and a box per group. The [Raincloud Plot guide](.
 
 ## Data
 
-Each record in `data` is a [`RaincloudDataPointAttrs`](#datachart.typings.RaincloudDataPointAttrs); the `label` and `value` parameters rename its keys.
+Each record in `data` is a [`RaincloudRecordAttrs`](#datachart.typings.RaincloudRecordAttrs); the `label` and `value` parameters rename its keys.
 
-::: datachart.typings.RaincloudDataPointAttrs
+::: datachart.typings.RaincloudRecordAttrs
     options:
         heading_level: 3
 

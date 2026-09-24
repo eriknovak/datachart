@@ -14,9 +14,9 @@ Every observation as a point, spread within its group. The [Swarm Plot guide](..
 
 ## Data
 
-Each record in `data` is a [`SwarmDataPointAttrs`](#datachart.typings.SwarmDataPointAttrs); the `emphasis`, `label` and `value` parameters rename its keys.
+Each record in `data` is a [`SwarmRecordAttrs`](#datachart.typings.SwarmRecordAttrs); the `emphasis`, `label` and `value` parameters rename its keys.
 
-::: datachart.typings.SwarmDataPointAttrs
+::: datachart.typings.SwarmRecordAttrs
     options:
         heading_level: 3
 

@@ -3801,12 +3801,12 @@ class GanttLayer(BarLayer):
             position += 1
         self.tick_rows, self.tick_labels = ticks, labels
 
-    def apply_row_ticks(self, ax) -> None:
+    def apply_row_ticks(self, ax, rotation: float) -> None:
         """Label the task rows; group header labels print bold."""
 
         ax.set_yticks(self.tick_rows, self.tick_labels)
         ax.yaxis.set_major_locator(mticker.FixedLocator(self.tick_rows))
-        ax.set_yticklabels(self.tick_labels, rotation=self.chart.get("ytickrotate", 0))
+        ax.set_yticklabels(self.tick_labels, rotation=rotation)
         headers = {position for _, position in self.header_rows}
         for position, label in zip(self.tick_rows, ax.get_yticklabels()):
             if position in headers:
@@ -11238,6 +11238,11 @@ class Panel:
                 "labelsize": config["axes_ticks_label_size"],
                 "labelcolor": config["font_general_color"],
             },
+            # None keeps matplotlib's rotation
+            "label_rotate": {
+                "xaxis": config.get("axes_xticks_label_rotate"),
+                "yaxis": config.get("axes_yticks_label_rotate"),
+            },
             # ground and furniture colors (ADR 0048); None keeps matplotlib's
             "colors": {
                 "figure": config.get("figure_facecolor"),
@@ -11298,8 +11303,11 @@ class Panel:
         ticks = dict(furniture["ticks"])
         if colors.get("ticks") is not None:
             ticks["color"] = colors["ticks"]
+        rotate = furniture.get("label_rotate") or {}
         for axis_type in axes_types:
             getattr(ax, axis_type).set_tick_params(which="major", **ticks)
+            if rotate.get(axis_type) is not None:
+                getattr(ax, axis_type).set_tick_params(labelrotation=rotate[axis_type])
 
     # ---------------- rendering ----------------
 
@@ -11644,16 +11652,27 @@ class Panel:
             return labels
         return date_labels(labels, self.settings.get(f"{axis}ticks_format"))
 
+    def _tick_rotation(self, axis: str, rotation, default: float = 0) -> float:
+        """The tick-label rotation: the chart's, else the theme's, else `default`."""
+
+        if rotation is not None:
+            return rotation
+        furniture = self.settings.get("furniture") or {}
+        themed = (furniture.get("label_rotate") or {}).get(f"{axis}axis")
+        return default if themed is None else themed
+
     def _apply_category_ticks(self, ax, index, group_layers, horizontal) -> None:
         # the first group layer's rotation applies; user ticks override later
         chart = group_layers[0].chart
         labels = self._category_labels(index.keys(), "y" if horizontal else "x")
         if horizontal:
             ax.set_yticks(list(index.values()))
-            ax.set_yticklabels(labels, rotation=chart.get("ytickrotate", 0))
+            rotation = self._tick_rotation("y", chart.get("ytickrotate"))
+            ax.set_yticklabels(labels, rotation=rotation)
         else:
             ax.set_xticks(list(index.values()))
-            ax.set_xticklabels(labels, rotation=chart.get("xtickrotate", 0))
+            rotation = self._tick_rotation("x", chart.get("xtickrotate"))
+            ax.set_xticklabels(labels, rotation=rotation)
 
     def _resolve_scales(self, ax_right, group_axes) -> tuple:
         """The literal x, y and twin value-axis scales (ADR 0041).
@@ -12655,7 +12674,9 @@ class Panel:
         gantt = next((l for l in bar_layers if isinstance(l, GanttLayer)), None)
         if gantt is not None:
             # task rows skip the header and gap rows, so they place themselves
-            gantt.apply_row_ticks(ax)
+            gantt.apply_row_ticks(
+                ax, self._tick_rotation("y", gantt.chart.get("ytickrotate"))
+            )
             return
         # the widest layer supplies the labels when category counts differ
         layer = max(bar_layers, key=lambda l: len(l.labels()))
@@ -12673,13 +12694,14 @@ class Panel:
         if layer.is_horizontal:
             ax.set_yticks(ticks_loc, labels)
             ax.yaxis.set_major_locator(mticker.FixedLocator(list(ticks_loc)))
-            ax.set_yticklabels(labels, rotation=layer.chart.get("ytickrotate", 0))
+            rotation = self._tick_rotation("y", layer.chart.get("ytickrotate"))
+            ax.set_yticklabels(labels, rotation=rotation)
         else:
             ax.set_xticks(ticks_loc, labels)
             ax.xaxis.set_major_locator(mticker.FixedLocator(list(ticks_loc)))
-            rotation = layer.chart.get("xtickrotate")
-            if rotation is None:
-                rotation = rotation_default
+            rotation = self._tick_rotation(
+                "x", layer.chart.get("xtickrotate"), rotation_default
+            )
             ax.set_xticklabels(labels, rotation=rotation)
 
     def _apply_radial_furniture(self, ax) -> None:

@@ -6,7 +6,7 @@ from ..utils._internal.plot_engine import render
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
-    ParallelCoordsDataPointAttrs,
+    ParallelCoordsRecordAttrs,
     ParallelCoordsStyleAttrs,
     TextSettingAttrs,
 )
@@ -18,9 +18,7 @@ from ..constants import ASPECT_RATIO, EMPHASIS, FIG_SIZE, SHOW_GRID
 
 
 def ParallelCoords(
-    data: Union[
-        List[ParallelCoordsDataPointAttrs], List[List[ParallelCoordsDataPointAttrs]]
-    ],
+    data: Union[List[ParallelCoordsRecordAttrs], List[List[ParallelCoordsRecordAttrs]]],
     *,
     title: Optional[str] = None,
     xlabel: Optional[str] = None,

@@ -89,8 +89,8 @@ class FontStyleAttrs(TypedDict):
 
         font_subtitle_size (Union[int, float, str, None]): The subtitle font size.
         font_subtitle_color (Union[str, None]): The subtitle font color.
-        font_subtitle_style (Union[FONT_STYLE, None]): The subtitle font style.
-        font_subtitle_weight (Union[FONT_WEIGHT, None]): The subtitle font weight.
+        font_subtitle_style (Union[FONT_STYLE, str, None]): The subtitle font style.
+        font_subtitle_weight (Union[FONT_WEIGHT, str, None]): The subtitle font weight.
 
         font_xlabel_size (Union[int, float, str, None]): The xlabel font size.
         font_xlabel_color (Union[str, None]): The xlabel font color.
@@ -120,8 +120,8 @@ class FontStyleAttrs(TypedDict):
     # subtitle font style
     font_subtitle_size: Union[int, float, str, None]
     font_subtitle_color: Union[str, None]
-    font_subtitle_style: Union[FONT_STYLE, None]
-    font_subtitle_weight: Union[FONT_WEIGHT, None]
+    font_subtitle_style: Union[FONT_STYLE, str, None]
+    font_subtitle_weight: Union[FONT_WEIGHT, str, None]
     # xlabel font style
     font_xlabel_size: Union[int, float, str, None]
     font_xlabel_color: Union[str, None]
@@ -154,6 +154,10 @@ class AxesStyleAttrs(TypedDict):
             keeps matplotlib's.
         axes_ticks_color (Union[str, None]): The color of the tick marks. `None`
             keeps matplotlib's.
+        axes_xticks_label_rotate (Union[int, float, None]): The rotation of the
+            x tick labels, in degrees. `None` keeps matplotlib's.
+        axes_yticks_label_rotate (Union[int, float, None]): The rotation of the
+            y tick labels, in degrees. `None` keeps matplotlib's.
     """
 
     axes_spines_top_visible: Union[bool, None]
@@ -168,6 +172,8 @@ class AxesStyleAttrs(TypedDict):
     axes_facecolor: Union[str, None]
     axes_spines_color: Union[str, None]
     axes_ticks_color: Union[str, None]
+    axes_xticks_label_rotate: Union[int, float, None]
+    axes_yticks_label_rotate: Union[int, float, None]
 
 
 class LegendStyleAttrs(TypedDict):
@@ -251,8 +257,6 @@ class LineStyleAttrs(TypedDict):
         plot_line_width (Union[int, float, None]): The line width.
         plot_line_drawstyle (Union[LINE_DRAW_STYLE, str, None]): The line draw style.
         plot_line_zorder (Union[int, float, None]): The zorder of the line.
-        plot_xticks_label_rotate (Union[int, float, None]): The label rotation of the xticks in the line chart.
-        plot_yticks_label_rotate (Union[int, float, None]): The label rotation of the yticks in the line chart.
 
     """
 
@@ -263,8 +267,6 @@ class LineStyleAttrs(TypedDict):
     plot_line_alpha: Union[float, None]
     plot_line_drawstyle: Union[LINE_DRAW_STYLE, str, None]
     plot_line_zorder: Union[int, float, None]
-    plot_xticks_label_rotate: Union[int, float, None]
-    plot_yticks_label_rotate: Union[int, float, None]
 
 
 class StackedAreaStyleAttrs(TypedDict):
@@ -419,11 +421,6 @@ class BarStyleAttrs(TypedDict):
         plot_bar_edge_width (Union[int, float, None]): The edge width of the bar.
         plot_bar_edge_color (Union[str, None]): The edge color of the bar.
         plot_bar_error_color (Union[str, None]): The color of the error line of the bar.
-        plot_bar_value_fontsize (Union[int, float, None]): Alias of `plot_value_fontsize`.
-        plot_bar_value_color (Union[str, None]): Alias of `plot_value_color`.
-        plot_bar_value_padding (Union[int, float, None]): Alias of `plot_value_padding`.
-        plot_xticks_label_rotate (Union[int, float, None]): The label rotation of the xticks in the bar chart.
-        plot_yticks_label_rotate (Union[int, float, None]): The label rotation of the yticks in the bar chart.
 
     """
 
@@ -435,17 +432,12 @@ class BarStyleAttrs(TypedDict):
     plot_bar_edge_width: Union[int, float, None]
     plot_bar_edge_color: Union[str, None]
     plot_bar_error_color: Union[str, None]
-    plot_bar_value_fontsize: Union[int, float, None]
-    plot_bar_value_color: Union[str, None]
-    plot_bar_value_padding: Union[int, float, None]
-    plot_xticks_label_rotate: Union[int, float, None]
-    plot_yticks_label_rotate: Union[int, float, None]
 
 
 class ValueLabelStyleAttrs(TypedDict):
     """The typing for the value labels: the numbers a chart prints beside its
     marks when `show_values` is on. One style serves every chart that takes
-    `show_values`; the `plot_bar_value_*` keys of `BarStyleAttrs` are aliases.
+    `show_values`; the `plot_bar_value_*` style keys are aliases of these.
 
     Attributes:
         plot_value_fontsize (Union[int, float, None]): The font size of the value labels.
@@ -476,8 +468,6 @@ class HistStyleAttrs(TypedDict):
         plot_hist_align (Union[str, None]): The alignment of the histogram.
         plot_hist_edge_width (Union[int, float, None]): The edge width of the histogram.
         plot_hist_edge_color (Union[str, None]): The edge color of the histogram.
-        plot_xticks_label_rotate (Union[int, float, None]): The label rotation of the xticks in the histogram chart.
-        plot_yticks_label_rotate (Union[int, float, None]): The label rotation of the yticks in the histogram chart.
 
     """
 
@@ -490,8 +480,6 @@ class HistStyleAttrs(TypedDict):
     plot_hist_align: Union[str, None]
     plot_hist_edge_width: Union[int, float, None]
     plot_hist_edge_color: Union[str, None]
-    plot_xticks_label_rotate: Union[int, float, None]
-    plot_yticks_label_rotate: Union[int, float, None]
 
 
 class VLineStyleAttrs(TypedDict):
@@ -972,8 +960,6 @@ class BoxStyleAttrs(TypedDict):
         plot_box_whisker_linewidth (Union[int, float, None]): The whisker line width.
         plot_box_cap_color (Union[str, None]): The cap line color.
         plot_box_cap_linewidth (Union[int, float, None]): The cap line width.
-        plot_xticks_label_rotate (Union[int, float, None]): The label rotation of the xticks.
-        plot_yticks_label_rotate (Union[int, float, None]): The label rotation of the yticks.
         plot_box_hatch (Union[HATCH_STYLE, str, None]): The hatch pattern of the box.
     """
 
@@ -991,8 +977,6 @@ class BoxStyleAttrs(TypedDict):
     plot_box_whisker_linewidth: Union[int, float, None]
     plot_box_cap_color: Union[str, None]
     plot_box_cap_linewidth: Union[int, float, None]
-    plot_xticks_label_rotate: Union[int, float, None]
-    plot_yticks_label_rotate: Union[int, float, None]
     plot_box_hatch: Union[HATCH_STYLE, str, None]
 
 
@@ -1267,6 +1251,50 @@ class InkStyleAttrs(TypedDict):
     plot_value_etch: Union[Dict[str, List[str]], None]
 
 
+class OverlayStyleAttrs(TypedDict):
+    """The typing for the overlay style: how `Panel` layers the charts it
+    combines on one axes.
+
+    Attributes:
+        overlay_auto_threshold (Union[int, float, None]): The ratio between two
+            charts' value ranges above which `Panel` puts the smaller on a
+            secondary y axis.
+        overlay_bar_alpha (Union[float, None]): The alpha value of overlaid bars.
+        overlay_hist_alpha (Union[float, None]): The alpha value of overlaid
+            histograms.
+        overlay_bar_mode (Union[BAR_MODE, str, None]): How several bar charts
+            share the axes.
+        overlay_default_zorder_bar (Union[int, float, None]): The zorder of
+            overlaid bars.
+        overlay_default_zorder_line (Union[int, float, None]): The zorder of
+            overlaid lines.
+        overlay_default_zorder_scatter (Union[int, float, None]): The zorder of
+            overlaid scatter points.
+        overlay_default_zorder_hist (Union[int, float, None]): The zorder of
+            overlaid histograms.
+        overlay_warn_thin_bars (Union[bool, None]): Warn when grouped bars grow
+            too thin to read.
+        overlay_warn_scale_groups (Union[bool, None]): Warn when the charts'
+            value ranges fall into more scale groups than the two value axes
+            can show.
+        overlay_warn_scale_conflict (Union[bool, None]): Warn when the charts ask
+            for conflicting axis scales.
+
+    """
+
+    overlay_auto_threshold: Union[int, float, None]
+    overlay_bar_alpha: Union[float, None]
+    overlay_hist_alpha: Union[float, None]
+    overlay_bar_mode: Union[BAR_MODE, str, None]
+    overlay_default_zorder_bar: Union[int, float, None]
+    overlay_default_zorder_line: Union[int, float, None]
+    overlay_default_zorder_scatter: Union[int, float, None]
+    overlay_default_zorder_hist: Union[int, float, None]
+    overlay_warn_thin_bars: Union[bool, None]
+    overlay_warn_scale_groups: Union[bool, None]
+    overlay_warn_scale_conflict: Union[bool, None]
+
+
 class StyleAttrs(
     ColorStyleAttrs,
     FontStyleAttrs,
@@ -1309,6 +1337,7 @@ class StyleAttrs(
     ThemeDefaultAttrs,
     SketchStyleAttrs,
     InkStyleAttrs,
+    OverlayStyleAttrs,
 ):
     """The style attributes. Combines all style typings."""
 
@@ -1550,8 +1579,8 @@ class TextSettingAttrs(TypedDict):
 # ================================================
 
 
-class LineDataPointAttrs(TypedDict):
-    """The data point attributes for the line chart.
+class LineRecordAttrs(TypedDict):
+    """One record of the line chart.
 
     Attributes:
         x (Union[int, float]): The x-axis value.
@@ -1566,11 +1595,11 @@ class LineDataPointAttrs(TypedDict):
     yerr: Optional[Union[int, float]]
 
 
-class LineSingleChartAttrs(TypedDict):
+class _LineSingleChartAttrs(TypedDict):
     """The single chart attributes for the line chart.
 
     Attributes:
-        data (List[LineDataPointAttrs]): The list of data points defining the line chart.
+        data (List[LineRecordAttrs]): The list of data points defining the line chart.
         subtitle (Union[str, None]): The subtitle of the line chart. Also used as the label in the legend.
         xlabel (Union[str, None]): The xlabel of the line chart.
         ylabel (Union[str, None]): The ylabel of the line chart.
@@ -1594,7 +1623,7 @@ class LineSingleChartAttrs(TypedDict):
 
     """
 
-    data: List[LineDataPointAttrs]
+    data: List[LineRecordAttrs]
     subtitle: Union[str, None]
     xlabel: Union[str, None]
     ylabel: Union[str, None]
@@ -1625,11 +1654,11 @@ class LineSingleChartAttrs(TypedDict):
 # ================================================
 
 
-class StackedAreaSingleChartAttrs(TypedDict):
+class _StackedAreaSingleChartAttrs(TypedDict):
     """The single chart attributes for the stacked area chart.
 
     Attributes:
-        data (List[LineDataPointAttrs]): The list of data points defining one series; every series shares the same `x` values.
+        data (List[LineRecordAttrs]): The list of data points defining one series; every series shares the same `x` values.
         subtitle (Union[str, None]): The subtitle of the series. Also used as the label in the legend.
         xlabel (Union[str, None]): The xlabel of the chart.
         ylabel (Union[str, None]): The ylabel of the chart.
@@ -1652,7 +1681,7 @@ class StackedAreaSingleChartAttrs(TypedDict):
 
     """
 
-    data: List[LineDataPointAttrs]
+    data: List[LineRecordAttrs]
     subtitle: Union[str, None]
     xlabel: Union[str, None]
     ylabel: Union[str, None]
@@ -1682,11 +1711,11 @@ class StackedAreaSingleChartAttrs(TypedDict):
 # ================================================
 
 
-class BumpSingleChartAttrs(TypedDict):
+class _BumpSingleChartAttrs(TypedDict):
     """The single chart attributes for the bump chart.
 
     Attributes:
-        data (List[LineDataPointAttrs]): The list of data points defining one series; `y` is a value ranked per period, or the rank itself.
+        data (List[LineRecordAttrs]): The list of data points defining one series; `y` is a value ranked per period, or the rank itself.
         subtitle (Union[str, None]): The subtitle of the series. Also used as its end label and legend label.
         xlabel (Union[str, None]): The xlabel of the chart.
         ylabel (Union[str, None]): The ylabel of the chart.
@@ -1706,7 +1735,7 @@ class BumpSingleChartAttrs(TypedDict):
 
     """
 
-    data: List[LineDataPointAttrs]
+    data: List[LineRecordAttrs]
     subtitle: Union[str, None]
     xlabel: Union[str, None]
     ylabel: Union[str, None]
@@ -1733,7 +1762,7 @@ class BumpSingleChartAttrs(TypedDict):
 # ================================================
 
 
-class SankeyLinkAttrs(TypedDict):
+class SankeyLinkRecordAttrs(TypedDict):
     """The link record attributes for the Sankey chart.
 
     Attributes:
@@ -1752,14 +1781,14 @@ class SankeySingleChartAttrs(TypedDict):
     """The single chart attributes for the Sankey chart.
 
     Attributes:
-        links (List[SankeyLinkAttrs]): The flows; a node is the string that names it.
+        links (List[SankeyLinkRecordAttrs]): The flows; a node is the string that names it.
         subtitle (Union[str, None]): The subtitle of the chart.
         style (Union[SankeyStyleAttrs, None]): The style of the chart.
         texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
 
     """
 
-    links: List[SankeyLinkAttrs]
+    links: List[SankeyLinkRecordAttrs]
     subtitle: Union[str, None]
     style: Union[SankeyStyleAttrs, None]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
@@ -1809,7 +1838,7 @@ class TreemapSingleChartAttrs(TypedDict):
 # ================================================
 
 
-class NetworkNodeAttrs(TypedDict):
+class NetworkNodeRecordAttrs(TypedDict):
     """The node record attributes for the network chart.
 
     Attributes:
@@ -1832,7 +1861,7 @@ class NetworkNodeAttrs(TypedDict):
     y: Union[float, None]
 
 
-class NetworkEdgeAttrs(TypedDict):
+class NetworkEdgeRecordAttrs(TypedDict):
     """The edge record attributes for the network chart.
 
     Attributes:
@@ -1851,16 +1880,16 @@ class NetworkSingleChartAttrs(TypedDict):
     """The single chart attributes for the network chart.
 
     Attributes:
-        nodes (Union[List[NetworkNodeAttrs], None]): The nodes; inferred from the edges when omitted.
-        edges (List[NetworkEdgeAttrs]): The edges.
+        nodes (Union[List[NetworkNodeRecordAttrs], None]): The nodes; inferred from the edges when omitted.
+        edges (List[NetworkEdgeRecordAttrs]): The edges.
         subtitle (Union[str, None]): The subtitle of the chart.
         style (Union[NetworkStyleAttrs, None]): The style of the chart.
         texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
 
     """
 
-    nodes: Union[List[NetworkNodeAttrs], None]
-    edges: List[NetworkEdgeAttrs]
+    nodes: Union[List[NetworkNodeRecordAttrs], None]
+    edges: List[NetworkEdgeRecordAttrs]
     subtitle: Union[str, None]
     style: Union[NetworkStyleAttrs, None]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
@@ -1871,8 +1900,8 @@ class NetworkSingleChartAttrs(TypedDict):
 # ================================================
 
 
-class BarDataPointAttrs(TypedDict):
-    """The data point attributes for the bar chart.
+class BarRecordAttrs(TypedDict):
+    """One record of the bar chart.
 
     Attributes:
         label (str): The label.
@@ -1890,11 +1919,11 @@ class BarDataPointAttrs(TypedDict):
     emphasis: Optional[Union[EMPHASIS, str]]
 
 
-class BarSingleChartAttrs(TypedDict):
+class _BarSingleChartAttrs(TypedDict):
     """The single chart attributes for the bar chart.
 
     Attributes:
-        data (List[BarDataPointAttrs]): The list of data points defining the bar chart.
+        data (List[BarRecordAttrs]): The list of data points defining the bar chart.
         subtitle (Union[str, None]): The subtitle of the bar chart. Also used as the label in the legend.
         xlabel (Union[str, None]): The xlabel of the bar chart.
         ylabel (Union[str, None]): The ylabel of the bar chart.
@@ -1918,7 +1947,7 @@ class BarSingleChartAttrs(TypedDict):
 
     """
 
-    data: List[BarDataPointAttrs]
+    data: List[BarRecordAttrs]
     subtitle: Union[str, None]
     xlabel: Union[str, None]
     ylabel: Union[str, None]
@@ -1949,8 +1978,8 @@ class BarSingleChartAttrs(TypedDict):
 # ================================================
 
 
-class HistDataPointAttrs(TypedDict):
-    """The data point attributes for the histogram chart.
+class HistRecordAttrs(TypedDict):
+    """One record of the histogram chart.
 
     Attributes:
         x (Union[int, float]): The x-axis value.
@@ -1961,11 +1990,11 @@ class HistDataPointAttrs(TypedDict):
     x: Union[int, float]
 
 
-class HistogramSingleChartAttrs(TypedDict):
+class _HistogramSingleChartAttrs(TypedDict):
     """The single chart attributes for the histogram chart.
 
     Attributes:
-        data (List[HistDataPointAttrs]): The list of data points defining the histogram chart.
+        data (List[HistRecordAttrs]): The list of data points defining the histogram chart.
         subtitle (Union[str, None]): The subtitle of the histogram chart. Also used as the label in the legend.
         xlabel (Union[str, None]): The xlabel of the histogram chart.
         ylabel (Union[str, None]): The ylabel of the histogram chart.
@@ -1987,7 +2016,7 @@ class HistogramSingleChartAttrs(TypedDict):
 
     """
 
-    data: List[HistDataPointAttrs]
+    data: List[HistRecordAttrs]
     subtitle: Union[str, None]
     xlabel: Union[str, None]
     ylabel: Union[str, None]
@@ -2063,7 +2092,7 @@ class HeatmapDataAttrs(TypedDict):
     emphasis: Union[List[List[Union[EMPHASIS, str, None]]], None]
 
 
-class HeatmapSingleChartAttrs(TypedDict):
+class _HeatmapSingleChartAttrs(TypedDict):
     """The single chart attributes for the heatmap chart.
 
     Attributes:
@@ -2128,7 +2157,7 @@ class CalendarHeatmapDataAttrs(TypedDict):
     value: List[Union[int, float, None]]
 
 
-class CalendarHeatmapSingleChartAttrs(TypedDict):
+class _CalendarHeatmapSingleChartAttrs(TypedDict):
     """The single chart attributes for the calendar heatmap.
 
     Attributes:
@@ -2162,7 +2191,7 @@ class CalendarHeatmapSingleChartAttrs(TypedDict):
 # ================================================
 
 
-class GanttTaskAttrs(TypedDict):
+class GanttTaskRecordAttrs(TypedDict):
     """The task record attributes for the gantt chart.
 
     Attributes:
@@ -2185,11 +2214,11 @@ class GanttTaskAttrs(TypedDict):
     emphasis: Optional[Union[EMPHASIS, str]]
 
 
-class GanttSingleChartAttrs(TypedDict):
+class _GanttSingleChartAttrs(TypedDict):
     """The single chart attributes for the gantt chart.
 
     Attributes:
-        data (List[GanttTaskAttrs]): The task records defining one schedule.
+        data (List[GanttTaskRecordAttrs]): The task records defining one schedule.
         subtitle (Union[str, None]): The subtitle of the schedule.
         style (Union[GanttStyleAttrs, None]): The style of the schedule.
         xtickrotate (Union[int, None]): The xtick rotation value.
@@ -2200,7 +2229,7 @@ class GanttSingleChartAttrs(TypedDict):
 
     """
 
-    data: List[GanttTaskAttrs]
+    data: List[GanttTaskRecordAttrs]
     subtitle: Union[str, None]
     style: Union[GanttStyleAttrs, None]
 
@@ -2234,7 +2263,7 @@ class DumbbellRecordAttrs(TypedDict):
     emphasis: Optional[Union[EMPHASIS, str]]
 
 
-class DumbbellSingleChartAttrs(TypedDict):
+class _DumbbellSingleChartAttrs(TypedDict):
     """The single chart attributes for the dumbbell chart.
 
     Attributes:
@@ -2289,7 +2318,7 @@ class ContourDataAttrs(TypedDict):
     z: List[List[Union[int, float]]]
 
 
-class ContourSingleChartAttrs(TypedDict):
+class _ContourSingleChartAttrs(TypedDict):
     """The single chart attributes for the contour chart.
 
     Attributes:
@@ -2372,7 +2401,7 @@ class HexbinDataAttrs(TypedDict):
     c: Union[List[Union[int, float]], None]
 
 
-class HexbinSingleChartAttrs(TypedDict):
+class _HexbinSingleChartAttrs(TypedDict):
     """The single chart attributes for the hexbin chart.
 
     Attributes:
@@ -2484,8 +2513,8 @@ class BasemapDataAttrs(TypedDict):
 # ================================================
 
 
-class ScatterDataPointAttrs(TypedDict):
-    """The data point attributes for the scatter chart.
+class ScatterRecordAttrs(TypedDict):
+    """One record of the scatter chart.
 
     Attributes:
         x (Union[int, float]): The x-axis value.
@@ -2514,11 +2543,11 @@ class ScatterDataPointAttrs(TypedDict):
     yerr: Optional[Union[float, Tuple[float, float]]]
 
 
-class ScatterSingleChartAttrs(TypedDict):
+class _ScatterSingleChartAttrs(TypedDict):
     """The single chart attributes for the scatter chart.
 
     Attributes:
-        data (List[ScatterDataPointAttrs]): The list of data points defining the scatter chart.
+        data (List[ScatterRecordAttrs]): The list of data points defining the scatter chart.
         subtitle (Union[str, None]): The subtitle of the scatter chart. Also used as the label in the legend.
         xlabel (Union[str, None]): The xlabel of the scatter chart.
         ylabel (Union[str, None]): The ylabel of the scatter chart.
@@ -2546,7 +2575,7 @@ class ScatterSingleChartAttrs(TypedDict):
 
     """
 
-    data: List[ScatterDataPointAttrs]
+    data: List[ScatterRecordAttrs]
     subtitle: Union[str, None]
     xlabel: Union[str, None]
     ylabel: Union[str, None]
@@ -2581,8 +2610,8 @@ class ScatterSingleChartAttrs(TypedDict):
 # ================================================
 
 
-class BoxDataPointAttrs(TypedDict):
-    """The data point attributes for the box plot.
+class BoxRecordAttrs(TypedDict):
+    """One record of the box plot.
 
     Attributes:
         label (str): The category label.
@@ -2594,11 +2623,11 @@ class BoxDataPointAttrs(TypedDict):
     value: Union[int, float]
 
 
-class BoxSingleChartAttrs(TypedDict):
+class _BoxSingleChartAttrs(TypedDict):
     """The single chart attributes for the box plot.
 
     Attributes:
-        data (List[BoxDataPointAttrs]): The list of data points defining the box plot.
+        data (List[BoxRecordAttrs]): The list of data points defining the box plot.
         subtitle (Union[str, None]): The subtitle of the box plot. Also used as the label in the legend.
         xlabel (Union[str, None]): The xlabel of the box plot.
         ylabel (Union[str, None]): The ylabel of the box plot.
@@ -2621,7 +2650,7 @@ class BoxSingleChartAttrs(TypedDict):
 
     """
 
-    data: List[BoxDataPointAttrs]
+    data: List[BoxRecordAttrs]
     subtitle: Union[str, None]
     xlabel: Union[str, None]
     ylabel: Union[str, None]
@@ -2651,8 +2680,8 @@ class BoxSingleChartAttrs(TypedDict):
 # ================================================
 
 
-class SwarmDataPointAttrs(TypedDict):
-    """The data point attributes for the swarm plot.
+class SwarmRecordAttrs(TypedDict):
+    """One record of the swarm plot.
 
     Attributes:
         label (str): The category label.
@@ -2668,11 +2697,11 @@ class SwarmDataPointAttrs(TypedDict):
     emphasis: Optional[Union[EMPHASIS, str]]
 
 
-class SwarmSingleChartAttrs(TypedDict):
+class _SwarmSingleChartAttrs(TypedDict):
     """The single chart attributes for the swarm plot.
 
     Attributes:
-        data (List[SwarmDataPointAttrs]): The list of data points defining the swarm plot.
+        data (List[SwarmRecordAttrs]): The list of data points defining the swarm plot.
         subtitle (Union[str, None]): The subtitle of the swarm plot. Also used as the label in the legend.
         xlabel (Union[str, None]): The xlabel of the swarm plot.
         ylabel (Union[str, None]): The ylabel of the swarm plot.
@@ -2695,7 +2724,7 @@ class SwarmSingleChartAttrs(TypedDict):
 
     """
 
-    data: List[SwarmDataPointAttrs]
+    data: List[SwarmRecordAttrs]
     subtitle: Union[str, None]
     xlabel: Union[str, None]
     ylabel: Union[str, None]
@@ -2724,8 +2753,8 @@ class SwarmSingleChartAttrs(TypedDict):
 # ================================================
 
 
-class ViolinDataPointAttrs(TypedDict):
-    """The data point attributes for the violin plot.
+class ViolinRecordAttrs(TypedDict):
+    """One record of the violin plot.
 
     Attributes:
         label (str): The category label.
@@ -2737,11 +2766,11 @@ class ViolinDataPointAttrs(TypedDict):
     value: Union[int, float]
 
 
-class ViolinSingleChartAttrs(TypedDict):
+class _ViolinSingleChartAttrs(TypedDict):
     """The single chart attributes for the violin plot.
 
     Attributes:
-        data (List[ViolinDataPointAttrs]): The list of data points defining the violin plot.
+        data (List[ViolinRecordAttrs]): The list of data points defining the violin plot.
         subtitle (Union[str, None]): The subtitle of the violin plot. Also used as the label in the legend.
         xlabel (Union[str, None]): The xlabel of the violin plot.
         ylabel (Union[str, None]): The ylabel of the violin plot.
@@ -2764,7 +2793,7 @@ class ViolinSingleChartAttrs(TypedDict):
 
     """
 
-    data: List[ViolinDataPointAttrs]
+    data: List[ViolinRecordAttrs]
     subtitle: Union[str, None]
     xlabel: Union[str, None]
     ylabel: Union[str, None]
@@ -2794,8 +2823,8 @@ class ViolinSingleChartAttrs(TypedDict):
 # ================================================
 
 
-class RidgelineDataPointAttrs(TypedDict):
-    """The data point attributes for the ridgeline plot.
+class RidgelineRecordAttrs(TypedDict):
+    """One record of the ridgeline plot.
 
     Attributes:
         label (str): The category label; one ridge per label.
@@ -2807,11 +2836,11 @@ class RidgelineDataPointAttrs(TypedDict):
     value: Union[int, float]
 
 
-class RidgelineSingleChartAttrs(TypedDict):
+class _RidgelineSingleChartAttrs(TypedDict):
     """The single chart attributes for the ridgeline plot.
 
     Attributes:
-        data (List[RidgelineDataPointAttrs]): The list of data points defining the ridgeline plot.
+        data (List[RidgelineRecordAttrs]): The list of data points defining the ridgeline plot.
         subtitle (Union[str, None]): The subtitle of the ridgeline plot.
         xlabel (Union[str, None]): The xlabel of the ridgeline plot.
         ylabel (Union[str, None]): The ylabel of the ridgeline plot.
@@ -2834,7 +2863,7 @@ class RidgelineSingleChartAttrs(TypedDict):
 
     """
 
-    data: List[RidgelineDataPointAttrs]
+    data: List[RidgelineRecordAttrs]
     subtitle: Union[str, None]
     xlabel: Union[str, None]
     ylabel: Union[str, None]
@@ -2864,8 +2893,8 @@ class RidgelineSingleChartAttrs(TypedDict):
 # ================================================
 
 
-class RaincloudDataPointAttrs(TypedDict):
-    """The data point attributes for the raincloud plot.
+class RaincloudRecordAttrs(TypedDict):
+    """One record of the raincloud plot.
 
     Attributes:
         label (str): The category label.
@@ -2877,11 +2906,11 @@ class RaincloudDataPointAttrs(TypedDict):
     value: Union[int, float]
 
 
-class RaincloudSingleChartAttrs(TypedDict):
+class _RaincloudSingleChartAttrs(TypedDict):
     """The single chart attributes for the raincloud plot.
 
     Attributes:
-        data (List[RaincloudDataPointAttrs]): The list of data points defining the raincloud plot.
+        data (List[RaincloudRecordAttrs]): The list of data points defining the raincloud plot.
         subtitle (Union[str, None]): The subtitle of the raincloud plot.
         xlabel (Union[str, None]): The xlabel of the raincloud plot.
         ylabel (Union[str, None]): The ylabel of the raincloud plot.
@@ -2904,7 +2933,7 @@ class RaincloudSingleChartAttrs(TypedDict):
 
     """
 
-    data: List[RaincloudDataPointAttrs]
+    data: List[RaincloudRecordAttrs]
     subtitle: Union[str, None]
     xlabel: Union[str, None]
     ylabel: Union[str, None]
@@ -2934,8 +2963,8 @@ class RaincloudSingleChartAttrs(TypedDict):
 # ================================================
 
 
-class ParallelCoordsDataPointAttrs(TypedDict):
-    """The data point attributes for the parallel coordinates chart.
+class ParallelCoordsRecordAttrs(TypedDict):
+    """One record of the parallel coordinates chart.
 
     A dictionary where keys are dimension names and values are numeric values.
     Can optionally include a 'hue' key for categorical coloring.
@@ -2948,11 +2977,11 @@ class ParallelCoordsDataPointAttrs(TypedDict):
     hue: Optional[str]
 
 
-class ParallelCoordsSingleChartAttrs(TypedDict):
+class _ParallelCoordsSingleChartAttrs(TypedDict):
     """The single chart attributes for the parallel coordinates chart.
 
     Attributes:
-        data (List[ParallelCoordsDataPointAttrs]): The list of data points.
+        data (List[ParallelCoordsRecordAttrs]): The list of data points.
         subtitle (Union[str, None]): The subtitle of the chart.
         xlabel (Union[str, None]): The xlabel of the chart.
         ylabel (Union[str, None]): The ylabel of the chart.
@@ -2964,7 +2993,7 @@ class ParallelCoordsSingleChartAttrs(TypedDict):
 
     """
 
-    data: List[ParallelCoordsDataPointAttrs]
+    data: List[ParallelCoordsRecordAttrs]
     subtitle: Union[str, None]
     xlabel: Union[str, None]
     ylabel: Union[str, None]
@@ -2980,7 +3009,7 @@ class ParallelCoordsSingleChartAttrs(TypedDict):
 # ================================================
 
 
-class ScatterMatrixDataPointAttrs(TypedDict):
+class ScatterMatrixRecordAttrs(TypedDict):
     """The record attributes for the scatter matrix.
 
     A dictionary where keys are column names: numeric columns become
@@ -3001,8 +3030,8 @@ class ScatterMatrixDataPointAttrs(TypedDict):
 # ================================================
 
 
-class RadialDataPointAttrs(TypedDict):
-    """The data point attributes for the radial chart.
+class RadialRecordAttrs(TypedDict):
+    """One record of the radial chart.
 
     The line, bar, and scatter visuals take `label`/`y` points whose labels
     are placed evenly around the circle; the histogram visual takes numeric
@@ -3025,11 +3054,11 @@ class RadialDataPointAttrs(TypedDict):
     x: Optional[Union[int, float]]
 
 
-class RadialSingleChartAttrs(TypedDict):
+class _RadialSingleChartAttrs(TypedDict):
     """The single chart attributes for the radial chart.
 
     Attributes:
-        data (List[RadialDataPointAttrs]): The list of data points defining the radial chart.
+        data (List[RadialRecordAttrs]): The list of data points defining the radial chart.
         subtitle (Union[str, None]): The subtitle of the radial chart. Also used as the label in the legend.
         style (Union[LineStyleAttrs, BarStyleAttrs, HistStyleAttrs, ScatterStyleAttrs, None]): The style of the radial chart, matching its visual.
         texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
@@ -3042,7 +3071,7 @@ class RadialSingleChartAttrs(TypedDict):
 
     """
 
-    data: List[RadialDataPointAttrs]
+    data: List[RadialRecordAttrs]
     subtitle: Union[str, None]
     style: Union[LineStyleAttrs, BarStyleAttrs, HistStyleAttrs, ScatterStyleAttrs, None]
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
@@ -3061,7 +3090,43 @@ class RadialSingleChartAttrs(TypedDict):
 
 # old name -> new name; removed one release after it ships (ADR 0043)
 # None: no public replacement; the type is kept privately as `_<old name>`
-_DEPRECATED_ALIASES = {}
+_DEPRECATED_ALIASES = {
+    "LineDataPointAttrs": "LineRecordAttrs",
+    "BarDataPointAttrs": "BarRecordAttrs",
+    "HistDataPointAttrs": "HistRecordAttrs",
+    "ScatterDataPointAttrs": "ScatterRecordAttrs",
+    "BoxDataPointAttrs": "BoxRecordAttrs",
+    "SwarmDataPointAttrs": "SwarmRecordAttrs",
+    "ViolinDataPointAttrs": "ViolinRecordAttrs",
+    "RidgelineDataPointAttrs": "RidgelineRecordAttrs",
+    "RaincloudDataPointAttrs": "RaincloudRecordAttrs",
+    "ParallelCoordsDataPointAttrs": "ParallelCoordsRecordAttrs",
+    "ScatterMatrixDataPointAttrs": "ScatterMatrixRecordAttrs",
+    "RadialDataPointAttrs": "RadialRecordAttrs",
+    "SankeyLinkAttrs": "SankeyLinkRecordAttrs",
+    "NetworkNodeAttrs": "NetworkNodeRecordAttrs",
+    "NetworkEdgeAttrs": "NetworkEdgeRecordAttrs",
+    "GanttTaskAttrs": "GanttTaskRecordAttrs",
+    "LineSingleChartAttrs": None,
+    "StackedAreaSingleChartAttrs": None,
+    "BumpSingleChartAttrs": None,
+    "BarSingleChartAttrs": None,
+    "HistogramSingleChartAttrs": None,
+    "HeatmapSingleChartAttrs": None,
+    "CalendarHeatmapSingleChartAttrs": None,
+    "GanttSingleChartAttrs": None,
+    "DumbbellSingleChartAttrs": None,
+    "ContourSingleChartAttrs": None,
+    "HexbinSingleChartAttrs": None,
+    "ScatterSingleChartAttrs": None,
+    "BoxSingleChartAttrs": None,
+    "SwarmSingleChartAttrs": None,
+    "ViolinSingleChartAttrs": None,
+    "RidgelineSingleChartAttrs": None,
+    "RaincloudSingleChartAttrs": None,
+    "ParallelCoordsSingleChartAttrs": None,
+    "RadialSingleChartAttrs": None,
+}
 
 
 def __getattr__(name):

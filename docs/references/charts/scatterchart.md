@@ -14,9 +14,9 @@ One point per observation, placed by two numeric variables. The [Scatter Chart g
 
 ## Data
 
-Each record in `data` is a [`ScatterDataPointAttrs`](#datachart.typings.ScatterDataPointAttrs); the `emphasis`, `x`, `y`, `size`, `hue`, `annotation`, `xerr` and `yerr` parameters rename its keys.
+Each record in `data` is a [`ScatterRecordAttrs`](#datachart.typings.ScatterRecordAttrs); the `emphasis`, `x`, `y`, `size`, `hue`, `annotation`, `xerr` and `yerr` parameters rename its keys.
 
-::: datachart.typings.ScatterDataPointAttrs
+::: datachart.typings.ScatterRecordAttrs
     options:
         heading_level: 3
 

@@ -6,7 +6,7 @@ from ..utils._internal.plot_engine import render
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
-    SwarmDataPointAttrs,
+    SwarmRecordAttrs,
     SwarmStyleAttrs,
     VLineSettingAttrs,
     HLineSettingAttrs,
@@ -34,7 +34,7 @@ from ..constants import (
 
 
 def SwarmPlot(
-    data: Union[List[SwarmDataPointAttrs], List[List[SwarmDataPointAttrs]]],
+    data: Union[List[SwarmRecordAttrs], List[List[SwarmRecordAttrs]]],
     *,
     title: Optional[str] = None,
     xlabel: Optional[str] = None,

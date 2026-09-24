@@ -183,6 +183,38 @@ class TestThemeDefaults(unittest.TestCase):
             )
 
 
+class TestTickLabelRotation(unittest.TestCase):
+    def tearDown(self):
+        config.set_theme(THEME.DEFAULT)
+        plt.close("all")
+
+    def rotations(self, figure):
+        ax = figure.axes[0]
+        return (
+            {label.get_rotation() for label in ax.get_xticklabels()},
+            {label.get_rotation() for label in ax.get_yticklabels()},
+        )
+
+    def test_unset_rotation_leaves_labels_level(self):
+        self.assertEqual(self.rotations(LineChart(data=LINE)), ({0.0}, {0.0}))
+
+    def test_set_rotation_turns_the_labels(self):
+        config.update_config(
+            {"axes_xticks_label_rotate": 45, "axes_yticks_label_rotate": 30}
+        )
+        self.assertEqual(self.rotations(LineChart(data=LINE)), ({45.0}, {30.0}))
+
+    def test_chart_rotation_wins_over_the_theme(self):
+        config.update_config({"axes_xticks_label_rotate": 45})
+        figure = BarChart(data=BAR, xtickrotate=10)
+        self.assertEqual(self.rotations(figure)[0], {10.0})
+
+    def test_old_key_warns_and_applies(self):
+        with self.assertWarns(DeprecationWarning):
+            config.update_config({"plot_xticks_label_rotate": 60})
+        self.assertEqual(self.rotations(BarChart(data=BAR))[0], {60.0})
+
+
 class TestHatchCycle(unittest.TestCase):
     def tearDown(self):
         config.set_theme(THEME.DEFAULT)

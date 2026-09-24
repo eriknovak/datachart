@@ -7,7 +7,7 @@ from ..utils._internal.validate import validate_bandwidth
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
-    RaincloudDataPointAttrs,
+    RaincloudRecordAttrs,
     RaincloudStyleAttrs,
     VLineSettingAttrs,
     HLineSettingAttrs,
@@ -36,7 +36,7 @@ from ..constants import (
 
 
 def RaincloudPlot(
-    data: Union[List[RaincloudDataPointAttrs], List[List[RaincloudDataPointAttrs]]],
+    data: Union[List[RaincloudRecordAttrs], List[List[RaincloudRecordAttrs]]],
     *,
     title: Optional[str] = None,
     xlabel: Optional[str] = None,

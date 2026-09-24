@@ -6,7 +6,7 @@ from ..utils._internal.plot_engine import render
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
-    BarDataPointAttrs,
+    BarRecordAttrs,
     BarStyleAttrs,
     VLineSettingAttrs,
     HLineSettingAttrs,
@@ -35,7 +35,7 @@ from ..constants import (
 
 
 def BarChart(
-    data: Union[List[BarDataPointAttrs], List[List[BarDataPointAttrs]]],
+    data: Union[List[BarRecordAttrs], List[List[BarRecordAttrs]]],
     *,
     title: Optional[str] = None,
     xlabel: Optional[str] = None,

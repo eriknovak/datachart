@@ -14,9 +14,9 @@ One density ridge per group, stacked and partly overlapping. The [Ridgeline Plot
 
 ## Data
 
-Each record in `data` is a [`RidgelineDataPointAttrs`](#datachart.typings.RidgelineDataPointAttrs); the `label` and `value` parameters rename its keys.
+Each record in `data` is a [`RidgelineRecordAttrs`](#datachart.typings.RidgelineRecordAttrs); the `label` and `value` parameters rename its keys.
 
-::: datachart.typings.RidgelineDataPointAttrs
+::: datachart.typings.RidgelineRecordAttrs
     options:
         heading_level: 3
 

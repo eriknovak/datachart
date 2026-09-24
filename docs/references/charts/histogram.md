@@ -14,9 +14,9 @@ The distribution of one numeric variable, binned. The [Histogram guide](../../ho
 
 ## Data
 
-Each record in `data` is a [`HistDataPointAttrs`](#datachart.typings.HistDataPointAttrs); the `x` parameter renames its keys.
+Each record in `data` is a [`HistRecordAttrs`](#datachart.typings.HistRecordAttrs); the `x` parameter renames its keys.
 
-::: datachart.typings.HistDataPointAttrs
+::: datachart.typings.HistRecordAttrs
     options:
         heading_level: 3
 

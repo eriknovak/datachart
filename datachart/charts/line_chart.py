@@ -8,7 +8,7 @@ from ..utils._internal.plot_engine import render
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
-    LineDataPointAttrs,
+    LineRecordAttrs,
     LineStyleAttrs,
     VLineSettingAttrs,
     HLineSettingAttrs,
@@ -34,7 +34,7 @@ from ..constants import (
 
 
 def LineChart(
-    data: Union[List[LineDataPointAttrs], List[List[LineDataPointAttrs]]],
+    data: Union[List[LineRecordAttrs], List[List[LineRecordAttrs]]],
     *,
     title: Optional[str] = None,
     xlabel: Optional[str] = None,

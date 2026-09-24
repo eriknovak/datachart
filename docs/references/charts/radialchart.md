@@ -14,9 +14,9 @@ Series on polar axes, as a radar line, an area, bars, or a histogram. The [Radia
 
 ## Data
 
-Each record in `data` is a [`RadialDataPointAttrs`](#datachart.typings.RadialDataPointAttrs); the `label`, `x`, `y` and `yerr` parameters rename its keys.
+Each record in `data` is a [`RadialRecordAttrs`](#datachart.typings.RadialRecordAttrs); the `label`, `x`, `y` and `yerr` parameters rename its keys.
 
-::: datachart.typings.RadialDataPointAttrs
+::: datachart.typings.RadialRecordAttrs
     options:
         heading_level: 3
 

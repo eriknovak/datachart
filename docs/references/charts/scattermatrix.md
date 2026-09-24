@@ -14,9 +14,9 @@ A scatter chart for every pair of dimensions, distributions on the diagonal. The
 
 ## Data
 
-Each record in `data` is a [`ScatterMatrixDataPointAttrs`](#datachart.typings.ScatterMatrixDataPointAttrs); the `hue` parameter renames its keys.
+Each record in `data` is a [`ScatterMatrixRecordAttrs`](#datachart.typings.ScatterMatrixRecordAttrs); the `hue` parameter renames its keys.
 
-::: datachart.typings.ScatterMatrixDataPointAttrs
+::: datachart.typings.ScatterMatrixRecordAttrs
     options:
         heading_level: 3
 

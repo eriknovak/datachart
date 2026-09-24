@@ -20,7 +20,7 @@ from ..constants import (
     SHOW_GRID,
 )
 
-# renamed style keys, each kept for one release (ADRs 0033, 0071)
+# renamed style keys, each kept for one release (ADRs 0033, 0071, 0072)
 STYLE_ALIASES = {
     "plot_bar_value_fontsize": "plot_value_fontsize",
     "plot_bar_value_color": "plot_value_color",
@@ -28,6 +28,8 @@ STYLE_ALIASES = {
     "plot_calendar_heatmap_week_start": "chart_default_calendar_heatmap_week_start",
     "plot_ridgeline_overlap": "chart_default_ridgeline_overlap",
     "chart_default_node_label_position": "chart_default_network_label_position",
+    "plot_xticks_label_rotate": "axes_xticks_label_rotate",
+    "plot_yticks_label_rotate": "axes_yticks_label_rotate",
 }
 
 
@@ -122,6 +124,8 @@ BASE_THEME: StyleAttrs = {
     "axes_facecolor": None,
     "axes_spines_color": None,
     "axes_ticks_color": None,
+    "axes_xticks_label_rotate": None,
+    "axes_yticks_label_rotate": None,
     # theme-level chart-setting defaults (ADR 0004)
     "chart_default_show_grid": SHOW_GRID.Y,
     "chart_default_show_values": None,
@@ -490,8 +494,6 @@ BASE_THEME: StyleAttrs = {
     "plot_ridgeline_hatch": None,
     "plot_ridgeline_inner_color": None,
     "plot_ridgeline_inner_linewidth": 1.0,
-    "plot_xticks_label_rotate": None,
-    "plot_yticks_label_rotate": None,
     # overlay chart style
     "overlay_auto_threshold": 3.0,
     "overlay_bar_alpha": 0.7,
