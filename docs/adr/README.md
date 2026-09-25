@@ -68,7 +68,8 @@ adds no tag; one that reverses, narrows, widens or replaces a commitment does.
 - [0071](0071-theme-default-naming-and-resolver.md) — A theme default is named for its parameter and read through one resolver
 - [0072](0072-typing-roles-and-theme-conformance.md) — Every public typing carries one of four role suffixes, and the theme keys are the style types
 - [0073](0073-palette-score-gate.md) — A palette is scored by one function, and every predefined theme passes its gate
-- [0074](0074-theme-traits-and-palette-leads.md) — A look owns its furniture, a trait composes, a palette is a lead
+- [0074](0074-theme-traits-and-palette-leads.md) — A look owns its furniture, a trait composes, a palette is a lead (amended by [0075](0075-furniture-defaults-follow-the-guidelines.md))
+- [0075](0075-furniture-defaults-follow-the-guidelines.md) — Furniture defaults follow the guidelines: no legend title, solid grids, and a warning when series outrun the palette
 
 See also 0009, which names the themes for their look, and 0063, which moves the
 theme faces out of the wheel.

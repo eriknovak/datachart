@@ -743,8 +743,18 @@ _Avoid_: font family (the generic one), typeface list, bundled font
 Everything the panel dresses an axes with around the marks: spines, ticks,
 axis and tick fonts, grid, limits, legend, value labels, annotation text,
 heatmap frame and edges, colorbar labels. Its colours contrast with the face
-rather than carry data; marks and their colour cycles are not furniture.
+rather than carry data; marks and their colour cycles are not furniture. It
+stays recessive: the grid is a solid hairline one step off the face and a
+legend carries no title unless the caller names one (ADR 0075).
 _Avoid_: chrome, decorations
+
+**Palette overflow**:
+More series, hue levels or groups than a cycling palette has colours, so the
+colours repeat and two units read as one. The panel warns once per palette
+when it pools its series, naming both counts; a pypalettes name interpolates
+instead of cycling and never overflows, and a one-colour palette is
+monochrome by design (ADR 0075).
+_Avoid_: colour wrap, cycle exhaustion
 
 **Active theme**:
 The name of the theme last applied, held on the configuration as `theme` and

@@ -187,7 +187,7 @@ class LegendStyleAttrs(TypedDict):
         plot_legend_font_size (Union[int, float, str, None]): The font size within the legend.
         plot_legend_title_size (Union[int, float, str, None]): The title size of the legend.
         plot_legend_label_color (Union[str, None]): The label color of the legend.
-        plot_legend_title (Union[str, None]): The legend title; an empty string draws none.
+        plot_legend_title (Union[str, None]): The legend title; `None` or an empty string draws none.
         plot_legend_ncols (Union[int, None]): The number of legend columns.
         plot_legend_edge_color (Union[str, None]): The legend frame color.
             `None` keeps matplotlib's.
