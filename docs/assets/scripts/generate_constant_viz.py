@@ -366,7 +366,7 @@ def arrow_style():
         3.4,
         cols=2,
         footnote="Same annotation under each look; curved looks pick their bow "
-        "side and depth against the data, TOUCHING starts flush at the box border. "
+        "side and depth against the data,\nTOUCHING starts flush at the box border. "
         "Network edges take the headless CURVE and STRAIGHT only.",
     )
 
@@ -599,6 +599,47 @@ def colorbar_location():
     save(fig, "const-colorbar-location.svg")
 
 
+def _greedy_lines(words, fits):
+    """Split `words` into lines, each as long as `fits` allows."""
+    lines, line = [], ""
+    for word in words:
+        trial = f"{line} {word}".strip()
+        if line and not fits(trial):
+            lines.append(line)
+            line = word
+        else:
+            line = trial
+    return lines + [line]
+
+
+def wrap_to_width(fig, text, width, **text_kw):
+    """Wrap `text` into balanced lines no wider than `width` pixels.
+
+    Explicit newlines are kept as forced breaks; each paragraph between them
+    gets the fewest lines that fit, then the narrowest width that keeps that
+    count, so the lines come out even rather than long plus an orphan.
+    """
+    renderer = fig.canvas.get_renderer()
+    probe = fig.text(0, 0, "", **text_kw)
+
+    def measure(line):
+        probe.set_text(line)
+        return probe.get_window_extent(renderer).width
+
+    lines = []
+    for paragraph in text.split("\n"):
+        words = paragraph.split()
+        count = len(_greedy_lines(words, lambda line: measure(line) <= width))
+        low, high = 0.0, width
+        for _ in range(20):
+            mid = (low + high) / 2
+            fitted = _greedy_lines(words, lambda line: measure(line) <= mid)
+            low, high = (mid, high) if len(fitted) > count else (low, mid)
+        lines += _greedy_lines(words, lambda line: measure(line) <= high)
+    probe.remove()
+    return "\n".join(lines)
+
+
 def chart_grid(figs, name, height, cols=None, footnote=None, rasterize=False):
     """Compose chart-front figures with Grid, restyled to the const-* look.
 
@@ -614,16 +655,17 @@ def chart_grid(figs, name, height, cols=None, footnote=None, rasterize=False):
             for artist in ax.collections + ax.patches:
                 artist.set_rasterized(True)
     if footnote:
-        # centered so a note wider than the grid cannot push it off-center,
-        # with a fixed 0.22 in gap whatever the figure height
+        # wrapped to the charts' own extent, so the note never widens the
+        # tight-cropped SVG past them; a fixed 0.22 in gap below the grid
+        note_kw = dict(fontsize=FS_NOTE, color=INK, style="italic")
+        charts = fig.get_tightbbox(fig.canvas.get_renderer())
         fig.text(
-            0.5,
+            (charts.x0 + charts.x1) / 2 / fig.get_figwidth(),
             -0.22 / height,
-            footnote,
+            wrap_to_width(fig, footnote, charts.width * fig.dpi, **note_kw),
             ha="center",
-            fontsize=FS_NOTE,
-            color=INK,
-            style="italic",
+            va="top",
+            **note_kw,
         )
     save(fig, name)
 
@@ -670,8 +712,8 @@ def baseline():
     chart_grid(
         figs,
         "const-baseline.svg",
-        4.0,
-        cols=3,
+        5.4,
+        cols=2,
         footnote="The same three series; the baseline moves where the first one starts.",
     )
 
@@ -1404,14 +1446,14 @@ def _gantt_tasks():
 
 def gantt_value():
     members = [
-        ("NONE", GANTT_VALUE.NONE),
         ("DURATION", GANTT_VALUE.DURATION),
         ("PROGRESS", GANTT_VALUE.PROGRESS),
     ]
     figs = [
         GanttChart(
             data=_gantt_tasks(),
-            show_values=value,
+            show_values=True,
+            value_kind=value,
             show_legend=False,
             title=f"GANTT_VALUE.{label}",
         )
@@ -1421,7 +1463,8 @@ def gantt_value():
         figs,
         "const-gantt-value.svg",
         2.4,
-        footnote="The same five tasks; the label prints past each bar's end.",
+        footnote="The same five tasks with show_values=True; the label prints "
+        "past each bar's end. NONE reads as DEFAULT, which is DURATION.",
     )
 
 
@@ -1518,7 +1561,7 @@ def date_period():
         8.0,
         cols=2,
         footnote="The same five tasks over three weeks (NONE, DAY, WEEK), seven "
-        "months (MONTH, PROJECT_MONTH), and twenty months (QUARTER, YEAR);\nthe "
+        "months (MONTH, PROJECT_MONTH), and twenty months (QUARTER, YEAR); the "
         "first label row names the period, the second its enclosing one.",
     )
 
@@ -1536,20 +1579,26 @@ DUMBBELL_RECORDS = [
 
 def dumbbell_value():
     members = [
-        ("NONE", DUMBBELL_VALUE.NONE),
         ("ENDPOINTS", DUMBBELL_VALUE.ENDPOINTS),
         ("DELTA", DUMBBELL_VALUE.DELTA),
     ]
     figs = [
         DumbbellChart(
             data=DUMBBELL_RECORDS,
-            show_values=value,
+            show_values=True,
+            value_kind=value,
             show_legend=False,
             title=f"DUMBBELL_VALUE.{label}",
         )
         for label, value in members
     ]
-    chart_grid(figs, "const-dumbbell-value.svg", 2.2)
+    chart_grid(
+        figs,
+        "const-dumbbell-value.svg",
+        2.2,
+        footnote="The same four records with show_values=True. "
+        "NONE reads as DEFAULT, which is ENDPOINTS.",
+    )
 
 
 def dumbbell_sort_key():
