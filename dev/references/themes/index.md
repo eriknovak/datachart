@@ -8,20 +8,20 @@ The `themes` module contains the predefined style themes that are used to visual
 
 ## Choosing a Theme
 
-Every theme is a complete [`StyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.StyleAttrs) dictionary, named for its visual trait and listed here by where it works best. Apply one with [`config.set_theme`](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.set_theme) and the member of [`THEME`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME) in the last column; the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md) shows each on six charts, and the [Themes guide](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) shows how to adjust one or build your own. [`derive_theme`](#datachart.themes.derive_theme) rebuilds any theme's palettes from a colormap and keeps its furniture.
+Every theme is a complete [`StyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.StyleAttrs) dictionary, named for its visual trait and listed here by where it works best. Apply one with [`config.set_theme`](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.set_theme) and the member of [`THEME`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME) in the last column; the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md) shows each on six charts, and the [Themes guide](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) shows how to adjust one or build your own. [`derive_theme`](#datachart.themes.derive_theme) rebuilds any theme's palettes from a colormap and keeps its furniture, and [`score_palette`](#datachart.themes.score_palette) reports how a series palette holds up for colour-blind readers; every predefined theme passes its gate.
 
 | Theme                                                    | Look                                                                            | Apply with         |
 | -------------------------------------------------------- | ------------------------------------------------------------------------------- | ------------------ |
 | **Screen and presentations**                             |                                                                                 |                    |
 | [`DEFAULT_THEME`](#datachart.themes.DEFAULT_THEME)       | softened Okabe–Ito palette, colour-blind safe, baseline furniture               | `THEME.DEFAULT`    |
-| [`MATERIAL_THEME`](#datachart.themes.MATERIAL_THEME)     | the Google palette, light grid                                                  | `THEME.MATERIAL`   |
-| [`MINIMAL_THEME`](#datachart.themes.MINIMAL_THEME)       | accent violet, no spines, flat bars                                             | `THEME.MINIMAL`    |
+| [`MATERIAL_THEME`](#datachart.themes.MATERIAL_THEME)     | the Google hues re-stepped for deutan readers, light grid                       | `THEME.MATERIAL`   |
+| [`MINIMAL_THEME`](#datachart.themes.MINIMAL_THEME)       | accent violet and five stepped greys, no spines, flat bars                      | `THEME.MINIMAL`    |
 | [`HARBOR_THEME`](#datachart.themes.HARBOR_THEME)         | navy and amber in lightness steps, colour-blind safe                            | `THEME.HARBOR`     |
 | [`DARK_THEME`](#datachart.themes.DARK_THEME)             | bright marks on a near-black page, light furniture, Viridis value scale         | `THEME.DARK`       |
 | **Print and black-and-white**                            |                                                                                 |                    |
-| [`GREYSCALE_THEME`](#datachart.themes.GREYSCALE_THEME)   | greys only, for print without color                                             | `THEME.GREYSCALE`  |
-| [`INK_THEME`](#datachart.themes.INK_THEME)               | dark-ink accents, print-ready                                                   | `THEME.INK`        |
-| [`HATCH_THEME`](#datachart.themes.HATCH_THEME)           | a hatch cycle, black edges, dotted grid                                         | `THEME.HATCH`      |
+| [`GREYSCALE_THEME`](#datachart.themes.GREYSCALE_THEME)   | five greys with hatch, dash and marker cycles, for print without color          | `THEME.GREYSCALE`  |
+| [`INK_THEME`](#datachart.themes.INK_THEME)               | lightness-stepped blues and greens, navy ink edges, print-ready                 | `THEME.INK`        |
+| [`HATCH_THEME`](#datachart.themes.HATCH_THEME)           | a six-entry hatch cycle, black edges, dotted grid                               | `THEME.HATCH`      |
 | [`MUTED_THEME`](#datachart.themes.MUTED_THEME)           | Tol's muted colours, dash and marker cycles, colour-blind safe                  | `THEME.MUTED`      |
 | [`CONTRAST_THEME`](#datachart.themes.CONTRAST_THEME)     | lightness-stepped colours plus hatches, print-safe                              | `THEME.CONTRAST`   |
 | [`MUTEDHATCH_THEME`](#datachart.themes.MUTEDHATCH_THEME) | Tol's muted colours under hatches, BuPu value scale                             | `THEME.MUTEDHATCH` |
@@ -65,6 +65,48 @@ Examples:
 | ------------ | ------------------ |
 | `StyleAttrs` | The derived theme. |
 
+## Scoring a Palette
+
+### datachart.themes.score_palette
+
+```
+score_palette(
+    colors: str | list[str], face: str | None = None
+) -> PaletteScore
+```
+
+Score a series palette for colour-blind readers.
+
+Every pair of colours is compared, since any two series may sit side by side; each colour is passed through the Machado, Oliveira and Fernandes (2009) simulation of deuteranopia, protanopia and tritanopia at full severity and the distance measured in OKLab (ΔE ×100).
+
+Examples:
+
+```
+>>> from datachart.themes import DEFAULT_THEME, score_palette
+>>> score = score_palette(DEFAULT_THEME["color_general_multiple"])
+>>> score.verdict
+'pass'
+```
+
+| PARAMETER | DESCRIPTION                                                                                      |
+| --------- | ------------------------------------------------------------------------------------------------ |
+| `colors`  | The palette: a list of colours, a COLORS constant, or a pypalettes palette name. **TYPE:** \`str |
+| `face`    | The colour the marks sit on, for the contrast count; None counts nothing. **TYPE:** \`str        |
+
+| RETURNS        | DESCRIPTION |
+| -------------- | ----------- |
+| `PaletteScore` | The score.  |
+
+| RAISES       | DESCRIPTION                                    |
+| ------------ | ---------------------------------------------- |
+| `ValueError` | When the palette holds fewer than two colours. |
+
+### datachart.themes.PaletteScore
+
+How far apart a palette's two closest colours are, per kind of vision.
+
+Every distance is the palette's worst pair in OKLab ΔE ×100, `grey_gap` the smallest lightness step between two colours once printed without colour, `low_contrast` how many colours sit under 3:1 against the face, `worst_kind` whichever of deutan and protan scores lower and `worst_pair` the pair behind it. `verdict` is `"pass"` when deutan and protan reach 8 and normal reaches 15, `"weak"` when deutan and protan stay between 6 and 8 with normal at 15, and `"fail"` otherwise. `colors` is the palette scored; a notebook shows it as a swatch strip over the summary line.
+
 ## Themes
 
 ### datachart.themes.DEFAULT_THEME
@@ -85,11 +127,11 @@ MATERIAL_THEME: StyleAttrs = make_theme(
         "color_general_singular": COLORS.Blues,
         "color_general_multiple": [
             "#1A73E8",
-            "#D93025",
-            "#F9AB00",
-            "#1E8E3E",
-            "#12B5CB",
-            "#9334E6",
+            "#BC261D",
+            "#EFB04E",
+            "#269F47",
+            "#19ACC1",
+            "#7C48B5",
         ],
         "color_parallel_hue_continuous": [
             "#C6DAFC",
@@ -116,7 +158,7 @@ MATERIAL_THEME: StyleAttrs = make_theme(
         "plot_line_width": 2.0,
         "plot_text_box_edgecolor": "#757575",
         "plot_text_arrow_color": "#757575",
-        "plot_dumbbell_start_color": "#F9AB00",
+        "plot_dumbbell_start_color": "#EFB04E",
         "plot_dumbbell_end_color": "#1A73E8",
         "plot_dumbbell_edge_width": 0,
         "plot_heatmap_cmap": COLORS.Blues,
@@ -136,9 +178,11 @@ MINIMAL_THEME: StyleAttrs = make_theme(
         "color_general_singular": COLORS.Purples,
         "color_general_multiple": [
             "#7048E8",
-            "#1F2933",
-            "#8A97A3",
-            "#C5CDD4",
+            "#1B242C",
+            "#A2AEB9",
+            "#414C58",
+            "#D3E0EA",
+            "#6D7983",
         ],
         "color_parallel_hue_continuous": [
             "#DCD3F7",
@@ -164,7 +208,7 @@ MINIMAL_THEME: StyleAttrs = make_theme(
         "plot_line_width": 2.0,
         "plot_scatter_edge_color": "#FFFFFF",
         "plot_swarm_edge_color": "#FFFFFF",
-        "plot_dumbbell_start_color": "#C5CDD4",
+        "plot_dumbbell_start_color": "#A2AEB9",
         "plot_dumbbell_end_color": "#7048E8",
         "plot_dumbbell_connector_color": "#DDE3E8",
         "plot_text_box_edgecolor": "#CFD8DC",
@@ -325,6 +369,9 @@ GREYSCALE_THEME: StyleAttrs = make_theme(
             "#525252",
             "#000000",
         ],
+        "plot_hatch_cycle": ["", "//", "..", "xx", "\\"],
+        "plot_linestyle_cycle": ["-", "--", "-.", ":", "-"],
+        "plot_marker_cycle": ["o", "s", "^", "D", "v"],
         "plot_bar_edge_width": 0.8,
         "plot_bar_edge_color": "#000000",
         "plot_stackedarea_edge_color": "#000000",
@@ -345,8 +392,8 @@ GREYSCALE_THEME: StyleAttrs = make_theme(
         "plot_text_arrow_color": "#5D6D7E",
         "plot_gantt_dependency_color": "#2C3E50",
         "plot_gantt_today_color": "#2C3E50",
-        "plot_dumbbell_start_color": "#ABB2B9",
-        "plot_dumbbell_end_color": "#2C3E50",
+        "plot_dumbbell_start_color": "#9EA9B4",
+        "plot_dumbbell_end_color": "#1A232B",
         "plot_dumbbell_edge_color": "#000000",
         "plot_dumbbell_connector_color": "#85929E",
         "plot_dumbbell_arrow_color": "#5D6D7E",
@@ -363,7 +410,9 @@ GREYSCALE_THEME: StyleAttrs = make_theme(
 )
 ```
 
-The greyscale theme: shades of grey for print or colorblind-safe output.
+The greyscale theme: five slate greys, hatches, dashes and markers, for print.
+
+The greys sit 0.16 apart in lightness, so every pair reads apart on paper and for every colour-blind reader alike; bars carry a hatch cycle, lines a dash cycle and scatter points a marker cycle, so a sixth series still differs.
 
 ### datachart.themes.INK_THEME
 
@@ -406,8 +455,8 @@ INK_THEME: StyleAttrs = make_theme(
         "plot_text_arrow_color": "#000000",
         "plot_gantt_dependency_color": "#0B1F44",
         "plot_gantt_today_color": "#0B1F44",
-        "plot_dumbbell_start_color": "#7FCDBB",
-        "plot_dumbbell_end_color": "#225EA8",
+        "plot_dumbbell_start_color": "#85CFBA",
+        "plot_dumbbell_end_color": "#2165AB",
         "plot_dumbbell_edge_color": "#0B1F44",
         "plot_dumbbell_connector_color": "#7F8C8D",
         "plot_dumbbell_arrow_color": "#34495E",
@@ -441,11 +490,11 @@ HATCH_THEME: StyleAttrs = make_theme(
         "color_general_singular": COLORS.YlOrBr,
         "color_general_multiple": [
             "#B5563A",
-            "#4F6D8F",
-            "#D4A64A",
-            "#4E7A5A",
-            "#A6A6A6",
-            "#7B5EA7",
+            "#5A6F86",
+            "#EBBC63",
+            "#2C4A34",
+            "#9F9A8D",
+            "#966AD5",
         ],
         "color_parallel_hue_continuous": [
             "#F3E0C3",
@@ -459,7 +508,14 @@ HATCH_THEME: StyleAttrs = make_theme(
             "Liberation Sans",
             "DejaVu Sans",
         ],
-        "plot_hatch_cycle": ["", "//", ".."],
+        "plot_hatch_cycle": [
+            "",
+            "//",
+            "..",
+            "xx",
+            "\\",
+            "--",
+        ],
         "plot_grid_color": "#D0D0D0",
         "plot_grid_linestyle": LINE_STYLE.DOTTED,
         "plot_grid_alpha": 0.8,
@@ -479,7 +535,7 @@ HATCH_THEME: StyleAttrs = make_theme(
         "plot_text_arrow_color": "#000000",
         "plot_gantt_dependency_color": "#000000",
         "plot_gantt_today_color": "#000000",
-        "plot_dumbbell_start_color": "#4F6D8F",
+        "plot_dumbbell_start_color": "#5A6F86",
         "plot_dumbbell_end_color": "#B5563A",
         "plot_dumbbell_edge_color": "#000000",
         "plot_dumbbell_connector_color": "#8C8C8C",
@@ -637,10 +693,10 @@ SKETCH_THEME: StyleAttrs = make_theme(
         "color_general_singular": COLORS.YlOrRd,
         "color_general_multiple": [
             "#E4572E",
-            "#2E86AB",
-            "#F5B700",
-            "#7E5AAB",
-            "#76B041",
+            "#3F84A3",
+            "#F4BA2D",
+            "#784AAD",
+            "#90B376",
         ],
         "color_parallel_hue_continuous": [
             "#FDD49E",
@@ -667,7 +723,7 @@ SKETCH_THEME: StyleAttrs = make_theme(
         "plot_bar_edge_width": 1.0,
         "plot_hist_edge_width": 1.0,
         "plot_scatter_edge_color": "#222222",
-        "plot_dumbbell_start_color": "#2E86AB",
+        "plot_dumbbell_start_color": "#3F84A3",
         "plot_dumbbell_end_color": "#E4572E",
         "plot_dumbbell_edge_color": "#222222",
         "plot_dumbbell_connector_color": "#8A8A8A",

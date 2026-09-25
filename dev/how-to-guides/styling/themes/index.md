@@ -103,6 +103,14 @@ NEON_COLORS = ["#00E5FF", "#FF2D95", "#FFB000", "#7DFF5A", "#B26BFF"]
 swatches(NEON_COLORS)
 ```
 
+Score the palette before building on it: [`score_palette`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.score_palette) compares every pair of colours as deutan, protan and tritan readers see them and reports the closest pair with a verdict, the same check `register_theme` and `derive_theme` warn through when a palette fails. Neon colours sit close in lightness, so amber and green come within ΔE 8 for deutan readers and the verdict is `weak`, a palette to pair with a dash or marker cycle; a `fail` would warn when the theme is registered:
+
+```
+from datachart.themes import score_palette
+
+score_palette(NEON_COLORS, face="#0B0F19")
+```
+
 The rest of the dictionary sets the ground, the type, and the furniture. `font_general_family` takes `serif` or `sans-serif` to use the theme's font stacks, or any family matplotlib resolves, here the generic `monospace`; a `None` in a color attribute keeps matplotlib's own color, so every color a dark ground needs is set explicitly:
 
 ```

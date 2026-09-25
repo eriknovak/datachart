@@ -120,7 +120,7 @@ themes; per-chart overrides go in each chart's `style` parameter.
 - [Utils Module](https://eriknovak.github.io/datachart/dev/references/utils/index.md): Panel, Grid, Annotate, and save_figure signatures, with a table of which utility fits which task.
 - [stats](https://eriknovak.github.io/datachart/dev/references/utils/stats/index.md): Statistical function signatures, grouped by center, spread, shape, association, trend line, intervals, binning, smoothing, and density.
 - [config](https://eriknovak.github.io/datachart/dev/references/config/index.md): The Config class and the global config instance, with a table of which method fits which task.
-- [themes](https://eriknovak.github.io/datachart/dev/references/themes/index.md): The predefined theme dictionaries, with a table of each theme's look and its THEME member.
+- [themes](https://eriknovak.github.io/datachart/dev/references/themes/index.md): The predefined theme dictionaries, with a table of each theme's look and its THEME member, derive_theme, and score_palette for checking a palette for colour-blind readers.
 - [constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md): Enums and constants (THEME, FIG_SIZE, ORIENTATION, COLORS, ...).
 - [typings](https://eriknovak.github.io/datachart/dev/references/typings/index.md): The shared TypedDict contracts, per-figure settings, shared style groups, and theme style, with a table pointing to each chart's own typings.
 
