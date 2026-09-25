@@ -23,6 +23,7 @@ from ..constants import (
     EMPHASIS,
     FIG_SIZE,
     AXIS_SCALE,
+    LINE_LABEL_POSITION,
     SHOW_GRID,
     STACKED_AREA_BASELINE,
     VALUE_FORMAT,
@@ -51,6 +52,8 @@ def StackedAreaChart(
     show_legend: Optional[bool] = None,
     legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
+    show_labels: Optional[bool] = None,
+    label_position: Optional[Union[LINE_LABEL_POSITION, str]] = None,
     show_values: Optional[bool] = None,
     value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     value_step: Optional[int] = None,
@@ -190,6 +193,12 @@ def StackedAreaChart(
             [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
         show_grid: Which grid lines to show (e.g., "both", "x", "y");
             `False` draws none.
+        show_labels: Whether to print each series' subtitle beside its band
+            end, at the band's midpoint, in the text color. Labels that would
+            overlap spread apart along the value axis. Defaults to False.
+        label_position: Which band end carries the label, a
+            [`LINE_LABEL_POSITION`][datachart.constants.LINE_LABEL_POSITION]
+            member: `START`, `END` (default), or `BOTH`.
         show_values: Whether to print each value at the midpoint of its band.
         value_format: Format string for the value labels: a
             [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT] constant or any

@@ -230,6 +230,8 @@ class TestRenderSplit(unittest.TestCase):
                 "show_area": True,
                 "scalex": None,
                 "scaley": None,
+                "show_labels": None,
+                "label_position": None,
                 "show_values": None,
                 "show_yerr": None,
                 "value_format": None,

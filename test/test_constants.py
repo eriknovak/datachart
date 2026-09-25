@@ -131,7 +131,11 @@ class TestNoneMeansUnset(unittest.TestCase):
                 self.assertEqual(value, getattr(cls, new))
 
     def test_renamed_classes_warn_and_resolve(self):
-        for old, new in [("SCALE", "AXIS_SCALE"), ("NORMALIZE", "COLOR_NORM")]:
+        for old, new in [
+            ("SCALE", "AXIS_SCALE"),
+            ("NORMALIZE", "COLOR_NORM"),
+            ("BUMP_LABEL_POSITION", "LINE_LABEL_POSITION"),
+        ]:
             with self.subTest(old=old):
                 with self.assertWarns(DeprecationWarning):
                     cls = getattr(constants, old)

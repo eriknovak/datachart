@@ -78,7 +78,8 @@ Classes:
 Classes:
     STACKED_AREA_BASELINE:   `baseline` of `StackedAreaChart`.
     BUMP_RANK:               `rank_by` of `BumpChart`.
-    BUMP_LABEL_POSITION:     `label_position` of `BumpChart`.
+    LINE_LABEL_POSITION:     `label_position` of `LineChart`, `StackedAreaChart`
+                             and `BumpChart`.
     RADIAL_TYPE:             `mark` of `RadialChart`.
     RADIAL_DIRECTION:        `direction` of `RadialChart`.
     CALENDAR_WEEKDAY:        `week_start` of `CalendarHeatmap`; the
@@ -1377,21 +1378,21 @@ class BUMP_RANK(Domain):
     GIVEN = "given"
 
 
-class BUMP_LABEL_POSITION(Domain):
+class LINE_LABEL_POSITION(Domain):
     """The supported end label positions.
 
-    Passed as the `label_position` setting of the bump chart: beside which
-    end of each line its series label prints.
+    Passed as the `label_position` setting of the line, stacked area and bump
+    charts: beside which end of each line its series label prints.
 
-    ![BUMP_LABEL_POSITION at a glance](../assets/imgs/const-label-position.svg){ width="100%" }
+    ![LINE_LABEL_POSITION at a glance](../assets/imgs/const-label-position.svg){ width="100%" }
 
     Examples:
-        >>> from datachart.constants import BUMP_LABEL_POSITION
-        >>> BUMP_LABEL_POSITION.DEFAULT
+        >>> from datachart.constants import LINE_LABEL_POSITION
+        >>> LINE_LABEL_POSITION.DEFAULT
         "end"
 
     Attributes:
-        DEFAULT (str): The default position. Same as `BUMP_LABEL_POSITION.END`.
+        DEFAULT (str): The default position. Same as `LINE_LABEL_POSITION.END`.
         START (str): Beside the first point. Equals to `"start"`.
         END (str): Beside the last point. Equals to `"end"`.
         BOTH (str): Beside the first and the last point. Equals to `"both"`.
@@ -2048,7 +2049,11 @@ class DRAW_POSITION(Domain):
 
 
 # renamed classes, each removed one release after its rename shipped
-_DEPRECATED_ALIASES = {"SCALE": "AXIS_SCALE", "NORMALIZE": "COLOR_NORM"}
+_DEPRECATED_ALIASES = {
+    "SCALE": "AXIS_SCALE",
+    "NORMALIZE": "COLOR_NORM",
+    "BUMP_LABEL_POSITION": "LINE_LABEL_POSITION",
+}
 
 
 def __getattr__(name):

@@ -193,7 +193,7 @@ from ..stats import minimum, maximum, iqr, kde1d
 from ...constants import (
     ARROW_STYLE,
     ASPECT_RATIO,
-    BUMP_LABEL_POSITION,
+    LINE_LABEL_POSITION,
     BUMP_RANK,
     CALENDAR_WEEKDAY,
     COLORBAR_LOCATION,
@@ -295,6 +295,8 @@ POINT_LABEL_SPOTS_VERTICAL = (
 # a raincloud's extremes sit past their points along the value axis, clear of
 # the box whiskers beside the rain (ADR 0033)
 POINT_LABEL_SPOTS_HORIZONTAL = POINT_LABEL_SPOTS[:2]
+# passes of the end-label spread per label; a chain resolves in about one each
+END_LABEL_SPREAD_PASSES = 10
 # the widest correlation readout, for reserving its corner box
 CORRELATION_BOX_TEXT = "r = -0.000"
 # the correlation readout's corner, in axes fractions
@@ -2804,6 +2806,12 @@ def _column_range(chart: dict, attr: str) -> Optional[tuple]:
     return (minimum(values), maximum(values))
 
 
+def _plot_text_font() -> dict:
+    """The plot text style as annotate kwargs, without its alignment."""
+
+    return {k: v for k, v in get_plot_text_style({}).items() if k not in ("ha", "va")}
+
+
 class PointLabelMixin:
     """Marks whose labels the panel places together, once every mark is drawn.
 
@@ -2819,9 +2827,7 @@ class PointLabelMixin:
 
     def _init_point_labels(self) -> None:
         # point labels wear the text font; alignment comes from their spot
-        self.label_font = {
-            k: v for k, v in get_plot_text_style({}).items() if k not in ("ha", "va")
-        }
+        self.label_font = _plot_text_font()
         # drawn points per axes, consumed by the panel's label placement
         self._pending_labels = {}
 
@@ -2859,6 +2865,115 @@ class PointLabelMixin:
         """Display-space boxes of the layer's other marks in `ax` the labels avoid."""
 
         return []
+
+
+class EndLabelMixin:
+    """Series named beside their line ends (ADR 0076).
+
+    A layer prints each end label as it draws; the panel reads them back
+    through `end_labels` once every layer has drawn and spreads the ones
+    that overlap apart along the value axis.
+    """
+
+    def _resolve_end_labels(self, default: bool, pad: float) -> None:
+        """The `show_labels` flag, its position, the label gap and font."""
+
+        show = self.settings.get("show_labels")
+        self.show_labels = default if show is None else bool(show)
+        self.label_position = (
+            self.settings.get("label_position") or LINE_LABEL_POSITION.DEFAULT
+        )
+        self.end_label_pad = pad
+        # end labels wear the text font; the halo keeps them legible over lines
+        self.end_label_font = _plot_text_font()
+        # drawn labels per axes, consumed by the panel's spread
+        self._end_labels = {}
+
+    def _labels_at(self, end: str) -> bool:
+        """Whether an end label prints at the `LINE_LABEL_POSITION.START` or `END`."""
+
+        return bool(self.show_labels and self.subtitle) and self.label_position in (
+            end,
+            LINE_LABEL_POSITION.BOTH,
+        )
+
+    def _draw_end_labels(self, ax, ctx, x, y, radius: float) -> None:
+        """Print the series name beside its first and/or last finite point.
+
+        `x` and `y` are axis numbers along the category and value axes;
+        `radius` is the mark's half size in points, which the gap clears.
+        """
+
+        present = np.flatnonzero(np.isfinite(x) & np.isfinite(y))
+        if not len(present):
+            return
+        ends = []
+        if self._labels_at(LINE_LABEL_POSITION.START):
+            ends.append((present[0], -1))
+        if self._labels_at(LINE_LABEL_POSITION.END):
+            ends.append((present[-1], 1))
+        gap = radius + self.end_label_pad
+        font = dict(self.end_label_font)
+        if ctx.emphasis == EMPHASIS_BACKGROUND:
+            font["color"] = self.muted_color
+        for i, side in ends:
+            xy = (y[i], x[i]) if ctx.transpose else (x[i], y[i])
+            offset = (0, -side * gap) if ctx.transpose else (side * gap, 0)
+            label = ax.annotate(
+                self.subtitle,
+                xy=xy,
+                xytext=offset,
+                textcoords="offset points",
+                ha=("center" if ctx.transpose else "left" if side > 0 else "right"),
+                va=("top" if side > 0 else "bottom") if ctx.transpose else "center",
+                path_effects=self.value_halo,
+                annotation_clip=False,
+                zorder=TEXT_ANNOTATION_ZORDER,
+                **font,
+            )
+            self.register_limit_mark(label, *xy)
+            self._end_labels.setdefault(id(ax), []).append((side, label))
+
+    def end_labels(self, ax) -> list:
+        """The (side, annotation) pairs drawn into `ax`, forgotten once read."""
+
+        return self._end_labels.pop(id(ax), [])
+
+
+def _spread_labels(labels: list, horizontal: bool) -> None:
+    """Nudge overlapping annotations apart along the value axis.
+
+    The value axis is y, or x when `horizontal`. Each label keeps its data
+    anchor and moves only its point offset, which is centred on the anchor
+    along that axis; a pair that overlaps splits the overlap between them,
+    repeated until none is left.
+    """
+
+    axis = 0 if horizontal else 1
+    px_per_pt = labels[0].figure.dpi / 72.0
+    anchors, offsets, sizes = [], [], []
+    for label in labels:
+        anchors.append(label.axes.transData.transform(label.xy)[axis])
+        offsets.append(label.xyann[axis] * px_per_pt)
+        width, height = _text_size(label.get_fontsize(), label.get_text())
+        sizes.append((width if horizontal else height) * px_per_pt)
+    anchors, sizes = np.asarray(anchors), np.asarray(sizes)
+    centers = anchors + np.asarray(offsets)
+    order = np.argsort(centers, kind="stable")
+    for _ in range(END_LABEL_SPREAD_PASSES * len(labels)):
+        moved = False
+        for a, b in zip(order[:-1], order[1:]):
+            overlap = (sizes[a] + sizes[b]) / 2 - (centers[b] - centers[a])
+            if overlap > POINT_LABEL_CLEAR:
+                centers[a] -= overlap / 2
+                centers[b] += overlap / 2
+                moved = True
+        if not moved:
+            break
+    for label, anchor, center in zip(labels, anchors, centers):
+        offset = list(label.xyann)
+        offset[axis] = (center - anchor) / px_per_pt
+        label.xyann = tuple(offset)
 
 
 def _apply_cycle_hatch(style: dict, ctx: DrawContext) -> None:
@@ -2903,7 +3018,7 @@ def _mark_radius(line_style: dict) -> float:
     return (line_style.get("markersize") or plt.rcParams["lines.markersize"]) / 2
 
 
-class LineLayer(PointLabelMixin, AreaFillMixin, Layer):
+class LineLayer(PointLabelMixin, EndLabelMixin, AreaFillMixin, Layer):
     kind = "line"
     label_spots = POINT_LABEL_SPOTS_VERTICAL
 
@@ -2919,6 +3034,7 @@ class LineLayer(PointLabelMixin, AreaFillMixin, Layer):
         self.show_area = self.settings.get("show_area")
         self._resolve_value_labels()
         self._init_point_labels()
+        self._resolve_end_labels(False, POINT_LABEL_PAD)
 
     def y_range(self):
         return _column_range(self.chart, "y")
@@ -2968,6 +3084,16 @@ class LineLayer(PointLabelMixin, AreaFillMixin, Layer):
         (line,) = plot(x, y, **line_style, label=self.label(ctx))
         self._lines.setdefault(id(ax), []).append(line)
         self.register_hover(line, _point_resolver(self.label(ctx), x, y, ctx.transpose))
+
+        if self.show_labels:
+            axis = ax.yaxis if ctx.transpose else ax.xaxis
+            self._draw_end_labels(
+                ax,
+                ctx,
+                np.asarray(axis.convert_units(x), dtype=float),
+                np.asarray(y, dtype=float),
+                _mark_radius(line_style),
+            )
 
         if self.show_values and ctx.emphasis != EMPHASIS_BACKGROUND:
             self._record_points(
@@ -3202,12 +3328,9 @@ class BumpLayer(LineLayer):
         self.show_yerr = False
         self.show_area = False
         self.line_curve = validate_line_curve(self.settings.get("line_curve"))
-        self.show_labels = self.settings.get("show_labels") is not False
-        self.label_position = (
-            self.settings.get("label_position") or BUMP_LABEL_POSITION.DEFAULT
-        )
         self._resolve_value_labels()
         self._init_point_labels()
+        self._resolve_end_labels(True, self.label_padding)
 
     def ranks(self) -> np.ndarray:
         return np.asarray(get_chart_data("y", self.chart), dtype=float)
@@ -3269,52 +3392,10 @@ class BumpLayer(LineLayer):
                 self.value_padding,
             )
 
-        if present.any():
-            color = (
-                self.muted_color
-                if ctx.emphasis == EMPHASIS_BACKGROUND
-                else line.get_color()
-            )
-            self._draw_end_labels(ax, ctx, x, ranks, present, line_style, color)
-
-    def _labels_at(self, end: str) -> bool:
-        """Whether an end label prints at the `BUMP_LABEL_POSITION.START` or `END`."""
-
-        return bool(self.show_labels and self.subtitle) and self.label_position in (
-            end,
-            BUMP_LABEL_POSITION.BOTH,
-        )
-
-    def _draw_end_labels(self, ax, ctx, x, ranks, present, line_style, color):
-        """Print the series name beside its first and/or last present point."""
-
-        indices = np.flatnonzero(present)
-        ends = []
-        if self._labels_at(BUMP_LABEL_POSITION.START):
-            ends.append((indices[0], -1))
-        if self._labels_at(BUMP_LABEL_POSITION.END):
-            ends.append((indices[-1], 1))
-        gap = _mark_radius(line_style) + self.label_padding
-        font = {k: v for k, v in self.label_font.items() if k != "color"}
-        for i, side in ends:
-            xy = (ranks[i], x[i]) if ctx.transpose else (x[i], ranks[i])
-            offset = (0, -side * gap) if ctx.transpose else (side * gap, 0)
-            label = ax.annotate(
-                self.subtitle,
-                xy=xy,
-                xytext=offset,
-                textcoords="offset points",
-                ha=("center" if ctx.transpose else "left" if side > 0 else "right"),
-                va=("top" if side > 0 else "bottom") if ctx.transpose else "center",
-                color=color,
-                annotation_clip=False,
-                zorder=TEXT_ANNOTATION_ZORDER,
-                **font,
-            )
-            self.register_limit_mark(label, *xy)
+        self._draw_end_labels(ax, ctx, x, ranks, _mark_radius(line_style))
 
 
-class StackedAreaLayer(Layer):
+class StackedAreaLayer(EndLabelMixin, Layer):
     """One series of a stack; the panel computes its band (ADR 0025)."""
 
     kind = "stackedarea"
@@ -3328,6 +3409,7 @@ class StackedAreaLayer(Layer):
         self.fill_style = style
         self.line_style = get_line_style(self.style)
         self._resolve_value_labels()
+        self._resolve_end_labels(False, POINT_LABEL_PAD)
 
     def x_values(self):
         return get_chart_data("x", self.chart)
@@ -3380,6 +3462,13 @@ class StackedAreaLayer(Layer):
             line_style["zorder"] = fill_style.get("zorder", 0) + 0.1
             self._apply_emphasis(line_style, ctx.emphasis)
             plot(x, ctx.stack_slot.top, **line_style)
+
+        if self.show_labels:
+            # a band is named at its midpoint, where its value labels sit
+            mids = (ctx.stack_slot.top + ctx.stack_slot.bottom) / 2
+            self._draw_end_labels(
+                ax, ctx, np.asarray(axis.convert_units(x), dtype=float), mids, 0.0
+            )
 
         if self.show_values and ctx.emphasis != EMPHASIS_BACKGROUND:
             self._label_band(ax, ctx, x)
@@ -12227,6 +12316,7 @@ class Panel:
         # point labels are placed once every marker of the panel is drawn and
         # the limits are final, so the estimate sees the real display space
         self._place_point_labels(top_ax, group_axes)
+        self._spread_end_labels(group_axes, horizontal)
 
         # aspect ratio (a polar axes keeps its own; a bare layer fixed its own)
         if s.get("aspect_ratio") and not polar and not bare:
@@ -12404,6 +12494,21 @@ class Panel:
                 obstacles.extend(layer.label_obstacles(owner_ax))
         if entries:
             _draw_point_labels(top_ax, entries, obstacles)
+
+    def _spread_end_labels(self, group_axes, horizontal) -> None:
+        """Spread the visible end labels on each side of an axes apart."""
+
+        sides = {}
+        for group, owner_ax in zip(self.groups, group_axes):
+            for layer in group.layers:
+                if not isinstance(layer, EndLabelMixin):
+                    continue
+                for side, label in layer.end_labels(owner_ax):
+                    if label.get_visible():
+                        sides.setdefault((id(owner_ax), side), []).append(label)
+        for labels in sides.values():
+            if len(labels) > 1:
+                _spread_labels(labels, horizontal)
 
     @staticmethod
     def _correlation_box(ax, layer) -> tuple:
