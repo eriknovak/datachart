@@ -2,10 +2,21 @@
 
 import copy
 import unittest
+import warnings
 
+from datachart import themes
 from datachart.config import config
+from datachart.config.configuration import THEMES
 from datachart.constants import COLORS, THEME
-from datachart.themes import DARK_THEME, MINIMAL_THEME, derive_theme
+from datachart.themes import (
+    DARK_THEME,
+    DEFAULT_THEME,
+    MINIMAL_THEME,
+    PaletteScore,
+    derive_theme,
+    score_palette,
+)
+from datachart.themes.score import palette_colors, theme_palette_score
 from datachart.utils._internal.colors import (
     get_color_scale,
     oklab_lightness as lightness,
@@ -108,6 +119,100 @@ class TestDeriveTheme(unittest.TestCase):
     def test_single_color_lead_raises(self):
         with self.assertRaises(ValueError):
             derive_theme(THEME.DEFAULT, lead="#B5651D")
+
+
+class TestScorePalette(unittest.TestCase):
+    """`score_palette` scores the worst pair of a series palette (ADR 0073)."""
+
+    def test_default_theme_passes(self):
+        score = score_palette(DEFAULT_THEME["color_general_multiple"], face="#FFFFFF")
+        self.assertIsInstance(score, PaletteScore)
+        self.assertEqual(score.verdict, "pass")
+        self.assertGreaterEqual(min(score.deutan, score.protan), 8)
+        self.assertGreaterEqual(score.normal, 15)
+
+    def test_red_green_fails_under_deutan(self):
+        score = score_palette(["#D93025", "#1E8E3E", "#1A73E8"])
+        self.assertEqual(score.verdict, "fail")
+        self.assertLess(score.deutan, 6)
+        self.assertEqual(set(score.worst_pair), {"#D93025", "#1E8E3E"})
+        self.assertIn("#D93025 vs #1E8E3E", str(score))
+
+    def test_greys_score_by_lightness_alone(self):
+        score = score_palette(["#202020", "#606060", "#A0A0A0", "#E0E0E0"])
+        self.assertAlmostEqual(score.deutan, score.normal, places=3)
+        self.assertGreater(score.grey_gap, 15)
+
+    def test_contrast_count_needs_a_face(self):
+        pale = ["#F0F0F0", "#101010"]
+        self.assertEqual(score_palette(pale).low_contrast, 0)
+        self.assertEqual(score_palette(pale, face="#FFFFFF").low_contrast, 1)
+        self.assertEqual(score_palette(pale, face="#000000").low_contrast, 1)
+
+    def test_named_palette_scores_its_colours(self):
+        by_name = score_palette(COLORS.PaperYlGnBu)
+        by_list = score_palette(palette_colors(COLORS.PaperYlGnBu))
+        self.assertEqual(by_name, by_list)
+
+    def test_one_colour_raises(self):
+        with self.assertRaises(ValueError):
+            score_palette(["#000000"])
+
+
+class TestPredefinedThemesPassTheGate(unittest.TestCase):
+    """Every predefined theme's series palette passes, with no allowlist."""
+
+    def test_every_theme_passes(self):
+        predefined = [name for name in themes.__all__ if name.endswith("_THEME")]
+        for name in predefined:
+            score = theme_palette_score(getattr(themes, name))
+            if score is None:
+                continue  # one ink: series differ by pattern, not colour
+            with self.subTest(theme=name):
+                self.assertEqual(score.verdict, "pass", str(score))
+
+
+class TestFailingPaletteWarns(unittest.TestCase):
+    """`register_theme` and `derive_theme` warn once on a failing palette."""
+
+    RED_GREEN = ["#D93025", "#1E8E3E", "#1A73E8"]
+    # amber and green sit at deutan ΔE 7.8: weak, not a fail
+    NEON = ["#00E5FF", "#FF2D95", "#FFB000", "#7DFF5A", "#B26BFF"]
+
+    def tearDown(self):
+        config.set_theme(THEME.DEFAULT)
+        for name in ("redgreen", "fine", "neon"):
+            THEMES.pop(name, None)
+
+    def test_register_theme_warns_once_at_the_caller(self):
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            config.register_theme(
+                "redgreen", {"color_general_multiple": self.RED_GREEN}
+            )
+        self.assertEqual(len(caught), 1)
+        self.assertIs(caught[0].category, UserWarning)
+        self.assertIn("#D93025 vs #1E8E3E", str(caught[0].message))
+        self.assertEqual(caught[0].filename, __file__)
+
+    def test_derive_theme_warns_once_at_the_caller(self):
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            derive_theme(THEME.DEFAULT, lead=self.RED_GREEN)
+        self.assertEqual(len(caught), 1)
+        self.assertEqual(caught[0].filename, __file__)
+
+    def test_weak_passing_and_ramp_palettes_stay_silent(self):
+        self.assertEqual(score_palette(self.NEON, face="#000000").verdict, "weak")
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            config.register_theme("neon", {"color_general_multiple": self.NEON})
+            # a sequential lead's samples are a ramp by design, never gated
+            derive_theme(THEME.DEFAULT, lead=COLORS.Greens)
+            derive_theme(THEME.INK, lead=list(DEFAULT_THEME["color_general_multiple"]))
+            config.register_theme(
+                "fine", {"color_general_multiple": ["#000000", "#FFFFFF"]}
+            )
 
 
 if __name__ == "__main__":

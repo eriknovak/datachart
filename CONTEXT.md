@@ -697,6 +697,17 @@ palette is the lead, the value scale is the base's). A lead is sequential
 when its lightness runs one way; a diverging map is never a lead.
 _Avoid_: primary colour, accent, brand colour
 
+**Palette score**:
+How far apart a series palette's two closest colours are, as a colour-blind
+reader sees them: the worst pair under deuteranopia, protanopia, tritanopia
+and normal vision, the smallest lightness step between two colours (the
+greyscale gap), how many colours sit under 3:1 contrast on the face, and a
+verdict. A palette passes when its worst deutan and protan pair is at least
+ΔE 8 and its worst normal-vision pair at least 15; it is weak between 6 and 8
+and fails below (ADR 0073). Every predefined theme passes; a registered or
+derived theme that fails is drawn, with a warning.
+_Avoid_: CVD score, accessibility score, colour distance (for the result)
+
 **Derived theme**:
 A theme built from a base theme and a lead: the base's furniture, fonts,
 hatches and rendering unchanged, its lead-dependent palettes rebuilt from the

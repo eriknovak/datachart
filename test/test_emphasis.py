@@ -79,8 +79,10 @@ class TestThemeRenames(unittest.TestCase):
             INK_THEME["font_general_sansserif"],
         )
         self.assertIsNone(HATCH_THEME["font_general_serif"])
-        # the hatch identity stays
-        self.assertEqual(HATCH_THEME["plot_hatch_cycle"], ["", "//", ".."])
+        # the hatch identity stays: one hatch per series (ADR 0073)
+        self.assertEqual(
+            HATCH_THEME["plot_hatch_cycle"], ["", "//", "..", "xx", "\\", "--"]
+        )
 
     def test_muted_attrs_in_every_theme(self):
         from datachart.themes import (

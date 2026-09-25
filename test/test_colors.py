@@ -90,7 +90,7 @@ class TestColors(unittest.TestCase):
         """Test that the datachart-registered palettes resolve before pypalettes."""
         self.assertEqual(
             get_color_scale(COLORS.PaperYlGnBu),
-            ["#0C2C84", "#7FCDBB", "#1D91C0", "#C7E9B4", "#225EA8", "#41B6C4"],
+            ["#1E2E85", "#EAF7B1", "#2165AB", "#85CFBA", "#299DC1"],
         )
         self.assertEqual(get_color_scale(COLORS.PaperAccent), ["#5B84C4", "#C85450"])
 
@@ -99,7 +99,7 @@ class TestColors(unittest.TestCase):
         colors = get_discrete_colors(COLORS.PaperAccent, 3)
         self.assertEqual(colors, ["#5B84C4", "#C85450", "#5B84C4"])
         colors = get_discrete_colors(COLORS.PaperYlGnBu, 2)
-        self.assertEqual(colors, ["#0C2C84", "#7FCDBB"])
+        self.assertEqual(colors, ["#1E2E85", "#EAF7B1"])
 
     def test_custom_palettes_colormap(self):
         """Test that custom palettes produce a usable colormap."""

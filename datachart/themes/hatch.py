@@ -4,15 +4,16 @@ from ..constants import LINE_STYLE, COLORS
 
 HATCH_THEME: StyleAttrs = make_theme(
     {
-        # muted print tones under black edges and hatches, rust first
+        # muted print tones under black edges and hatches, rust first, the
+        # green deep enough to stay apart from rust for deutan readers
         "color_general_singular": COLORS.YlOrBr,
         "color_general_multiple": [
             "#B5563A",
-            "#4F6D8F",
-            "#D4A64A",
-            "#4E7A5A",
-            "#A6A6A6",
-            "#7B5EA7",
+            "#5A6F86",
+            "#EBBC63",
+            "#2C4A34",
+            "#9F9A8D",
+            "#966AD5",
         ],
         "color_parallel_hue_continuous": [
             "#F3E0C3",
@@ -26,7 +27,8 @@ HATCH_THEME: StyleAttrs = make_theme(
             "Liberation Sans",
             "DejaVu Sans",
         ],
-        "plot_hatch_cycle": ["", "//", ".."],
+        # one hatch per series, so bar four never repeats bar one's solid
+        "plot_hatch_cycle": ["", "//", "..", "xx", "\\", "--"],
         "plot_grid_color": "#D0D0D0",
         "plot_grid_linestyle": LINE_STYLE.DOTTED,
         "plot_grid_alpha": 0.8,
@@ -46,7 +48,7 @@ HATCH_THEME: StyleAttrs = make_theme(
         "plot_text_arrow_color": "#000000",
         "plot_gantt_dependency_color": "#000000",
         "plot_gantt_today_color": "#000000",
-        "plot_dumbbell_start_color": "#4F6D8F",
+        "plot_dumbbell_start_color": "#5A6F86",
         "plot_dumbbell_end_color": "#B5563A",
         "plot_dumbbell_edge_color": "#000000",
         "plot_dumbbell_connector_color": "#8C8C8C",

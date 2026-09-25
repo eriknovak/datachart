@@ -22,9 +22,12 @@ from .mutedhatch import MUTEDHATCH_THEME
 from .slatehatch import SLATEHATCH_THEME
 from .dark import DARK_THEME
 from .derive import derive_theme
+from .score import PaletteScore, score_palette
 
 __all__ = [
     "derive_theme",
+    "score_palette",
+    "PaletteScore",
     "DEFAULT_THEME",
     "GREYSCALE_THEME",
     "INK_THEME",
