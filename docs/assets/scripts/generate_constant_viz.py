@@ -1446,14 +1446,14 @@ def _gantt_tasks():
 
 def gantt_value():
     members = [
-        ("NONE", GANTT_VALUE.NONE),
         ("DURATION", GANTT_VALUE.DURATION),
         ("PROGRESS", GANTT_VALUE.PROGRESS),
     ]
     figs = [
         GanttChart(
             data=_gantt_tasks(),
-            show_values=value,
+            show_values=True,
+            value_kind=value,
             show_legend=False,
             title=f"GANTT_VALUE.{label}",
         )
@@ -1463,7 +1463,8 @@ def gantt_value():
         figs,
         "const-gantt-value.svg",
         2.4,
-        footnote="The same five tasks; the label prints past each bar's end.",
+        footnote="The same five tasks with show_values=True; the label prints "
+        "past each bar's end. NONE reads as DEFAULT, which is DURATION.",
     )
 
 
@@ -1578,20 +1579,26 @@ DUMBBELL_RECORDS = [
 
 def dumbbell_value():
     members = [
-        ("NONE", DUMBBELL_VALUE.NONE),
         ("ENDPOINTS", DUMBBELL_VALUE.ENDPOINTS),
         ("DELTA", DUMBBELL_VALUE.DELTA),
     ]
     figs = [
         DumbbellChart(
             data=DUMBBELL_RECORDS,
-            show_values=value,
+            show_values=True,
+            value_kind=value,
             show_legend=False,
             title=f"DUMBBELL_VALUE.{label}",
         )
         for label, value in members
     ]
-    chart_grid(figs, "const-dumbbell-value.svg", 2.2)
+    chart_grid(
+        figs,
+        "const-dumbbell-value.svg",
+        2.2,
+        footnote="The same four records with show_values=True. "
+        "NONE reads as DEFAULT, which is ENDPOINTS.",
+    )
 
 
 def dumbbell_sort_key():
