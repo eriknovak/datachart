@@ -55,7 +55,7 @@ from datachart.constants import (
     ASPECT_RATIO,
     BASEMAP_FEATURE,
     BASEMAP_RESOLUTION,
-    BUMP_LABEL_POSITION,
+    LINE_LABEL_POSITION,
     BUMP_RANK,
     CALENDAR_WEEKDAY,
     COLORBAR_LOCATION,
@@ -345,6 +345,9 @@ EXPECTED_CHANGES = {
     "values_swarm_horizontal_strip",
     "values_raincloud",
     "values_theme_minimal_swarm_raincloud",
+    # end labels on the line family (ADR 0076)
+    "line_end_labels",
+    "stackedarea_end_labels",
     # new bump chart cases (ADR 0046)
     "bump_default",
     "bump_given",
@@ -489,6 +492,32 @@ def line_multi():
         show_legend=True,
         show_grid="both",
         title="Lines",
+    )
+
+
+@case
+def line_end_labels():
+    # three series converging on one end, so the labels must spread
+    data = [
+        [{"x": i, "y": 40 + (i - 9) * k} for i in range(10)] for k in (-3.0, 0.0, 3.0)
+    ]
+    return LineChart(
+        data=data,
+        subtitle=["falling", "flat", "rising"],
+        show_labels=True,
+        title="End labels",
+        xlabel="x",
+        ylabel="y",
+    )
+
+
+@case
+def stackedarea_end_labels():
+    return StackedAreaChart(
+        data=stack_series(),
+        subtitle=["a", "b", "c"],
+        show_labels=True,
+        title="Stacked end labels",
     )
 
 
@@ -2351,7 +2380,7 @@ def bump_both_curve():
     return BumpChart(
         data=bump_series(),
         subtitle=BUMP_NAMES,
-        label_position=BUMP_LABEL_POSITION.BOTH,
+        label_position=LINE_LABEL_POSITION.BOTH,
         line_curve=0.8,
         show_values=True,
     )

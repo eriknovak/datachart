@@ -11,15 +11,15 @@ title: Constants Module
 
 ## Constants by Chart
 
-Which constants the parameters of each chart accept, by chart family. A constant used by one chart carries that chart's prefix; one shared across charts carries none. Style attributes take the constants named in their [typings](typings.md).
+Which constants the parameters of each chart accept, by chart family. A constant used by one chart, or by one chart family, carries that chart's prefix; one shared across families carries none. Style attributes take the constants named in their [typings](typings.md).
 
 ### Trends and Comparisons
 
 | Chart | Chart-specific | Shared |
 | :-- | :-- | :-- |
-| [LineChart](charts/linechart.md#datachart.charts.LineChart) | — | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`EMPHASIS`](#datachart.constants.EMPHASIS), [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`VALUE_FORMAT`](#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](#datachart.constants.DATE_FORMAT), [`SHOW_GRID`](#datachart.constants.SHOW_GRID), [`AXIS_SCALE`](#datachart.constants.AXIS_SCALE), [`ASPECT_RATIO`](#datachart.constants.ASPECT_RATIO) |
-| [StackedAreaChart](charts/stackedareachart.md#datachart.charts.StackedAreaChart) | [`STACKED_AREA_BASELINE`](#datachart.constants.STACKED_AREA_BASELINE) | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`EMPHASIS`](#datachart.constants.EMPHASIS), [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`VALUE_FORMAT`](#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](#datachart.constants.DATE_FORMAT), [`SHOW_GRID`](#datachart.constants.SHOW_GRID), [`AXIS_SCALE`](#datachart.constants.AXIS_SCALE), [`ASPECT_RATIO`](#datachart.constants.ASPECT_RATIO) |
-| [BumpChart](charts/bumpchart.md#datachart.charts.BumpChart) | [`BUMP_RANK`](#datachart.constants.BUMP_RANK), [`BUMP_LABEL_POSITION`](#datachart.constants.BUMP_LABEL_POSITION) | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`EMPHASIS`](#datachart.constants.EMPHASIS), [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`VALUE_FORMAT`](#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](#datachart.constants.DATE_FORMAT), [`SHOW_GRID`](#datachart.constants.SHOW_GRID), [`AXIS_SCALE`](#datachart.constants.AXIS_SCALE), [`ASPECT_RATIO`](#datachart.constants.ASPECT_RATIO) |
+| [LineChart](charts/linechart.md#datachart.charts.LineChart) | [`LINE_LABEL_POSITION`](#datachart.constants.LINE_LABEL_POSITION) | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`EMPHASIS`](#datachart.constants.EMPHASIS), [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`VALUE_FORMAT`](#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](#datachart.constants.DATE_FORMAT), [`SHOW_GRID`](#datachart.constants.SHOW_GRID), [`AXIS_SCALE`](#datachart.constants.AXIS_SCALE), [`ASPECT_RATIO`](#datachart.constants.ASPECT_RATIO) |
+| [StackedAreaChart](charts/stackedareachart.md#datachart.charts.StackedAreaChart) | [`STACKED_AREA_BASELINE`](#datachart.constants.STACKED_AREA_BASELINE), [`LINE_LABEL_POSITION`](#datachart.constants.LINE_LABEL_POSITION) | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`EMPHASIS`](#datachart.constants.EMPHASIS), [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`VALUE_FORMAT`](#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](#datachart.constants.DATE_FORMAT), [`SHOW_GRID`](#datachart.constants.SHOW_GRID), [`AXIS_SCALE`](#datachart.constants.AXIS_SCALE), [`ASPECT_RATIO`](#datachart.constants.ASPECT_RATIO) |
+| [BumpChart](charts/bumpchart.md#datachart.charts.BumpChart) | [`BUMP_RANK`](#datachart.constants.BUMP_RANK), [`LINE_LABEL_POSITION`](#datachart.constants.LINE_LABEL_POSITION) | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`EMPHASIS`](#datachart.constants.EMPHASIS), [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`VALUE_FORMAT`](#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](#datachart.constants.DATE_FORMAT), [`SHOW_GRID`](#datachart.constants.SHOW_GRID), [`AXIS_SCALE`](#datachart.constants.AXIS_SCALE), [`ASPECT_RATIO`](#datachart.constants.ASPECT_RATIO) |
 | [BarChart](charts/barchart.md#datachart.charts.BarChart) | — | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`EMPHASIS`](#datachart.constants.EMPHASIS), [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`BAR_MODE`](#datachart.constants.BAR_MODE), [`SORT`](#datachart.constants.SORT), [`ORIENTATION`](#datachart.constants.ORIENTATION), [`VALUE_FORMAT`](#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](#datachart.constants.DATE_FORMAT), [`SHOW_GRID`](#datachart.constants.SHOW_GRID), [`AXIS_SCALE`](#datachart.constants.AXIS_SCALE), [`ASPECT_RATIO`](#datachart.constants.ASPECT_RATIO) |
 | [PyramidChart](charts/pyramidchart.md#datachart.charts.PyramidChart) | — | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`SORT`](#datachart.constants.SORT), [`VALUE_FORMAT`](#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](#datachart.constants.DATE_FORMAT), [`SHOW_GRID`](#datachart.constants.SHOW_GRID) |
 | [RadialChart](charts/radialchart.md#datachart.charts.RadialChart) | [`RADIAL_TYPE`](#datachart.constants.RADIAL_TYPE), [`RADIAL_DIRECTION`](#datachart.constants.RADIAL_DIRECTION) | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`EMPHASIS`](#datachart.constants.EMPHASIS), [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`BAR_MODE`](#datachart.constants.BAR_MODE), [`SORT`](#datachart.constants.SORT), [`VALUE_FORMAT`](#datachart.constants.VALUE_FORMAT), [`SHOW_GRID`](#datachart.constants.SHOW_GRID), [`AXIS_SCALE`](#datachart.constants.AXIS_SCALE) |
@@ -206,17 +206,17 @@ Constants several charts share.
 
 ## Chart-Specific Constants
 
-Constants one chart owns, in the order of the [charts reference](charts/index.md).
+Constants one chart or one chart family owns, in the order of the [charts reference](charts/index.md).
+
+::: datachart.constants.LINE_LABEL_POSITION
+    options:
+        heading_level: 3
 
 ::: datachart.constants.STACKED_AREA_BASELINE
     options:
         heading_level: 3
 
 ::: datachart.constants.BUMP_RANK
-    options:
-        heading_level: 3
-
-::: datachart.constants.BUMP_LABEL_POSITION
     options:
         heading_level: 3
 

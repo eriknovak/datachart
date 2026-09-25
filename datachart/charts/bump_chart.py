@@ -19,7 +19,7 @@ from ..typings import (
 )
 from ..constants import (
     ASPECT_RATIO,
-    BUMP_LABEL_POSITION,
+    LINE_LABEL_POSITION,
     BUMP_RANK,
     DATE_FORMAT,
     EMPHASIS,
@@ -50,7 +50,7 @@ def BumpChart(
     ymin: Optional[Union[int, float]] = None,
     ymax: Optional[Union[int, float]] = None,
     show_labels: Optional[bool] = None,
-    label_position: Optional[Union[BUMP_LABEL_POSITION, str]] = None,
+    label_position: Optional[Union[LINE_LABEL_POSITION, str]] = None,
     show_markers: Optional[bool] = None,
     line_curve: Optional[float] = None,
     show_legend: Optional[bool] = None,
@@ -180,9 +180,9 @@ def BumpChart(
         ymin: The minimum rank shown (the top of the axis).
         ymax: The maximum rank shown (the bottom of the axis).
         show_labels: Whether to print each series' subtitle beside its line
-            end, in the series color. Defaults to True.
+            end, in the text color. Defaults to True.
         label_position: Which line end carries the label, a
-            [`BUMP_LABEL_POSITION`][datachart.constants.BUMP_LABEL_POSITION]
+            [`LINE_LABEL_POSITION`][datachart.constants.LINE_LABEL_POSITION]
             member: `START`, `END` (default), or `BOTH`.
         show_markers: Whether to draw a marker at every period. Defaults to True.
         line_curve: How far each segment eases between two periods, in

@@ -1,5 +1,6 @@
 ---
 status: accepted
+amended-by: [0076]
 ---
 
 # A constant one chart owns carries that chart's prefix

@@ -308,10 +308,14 @@ SHARED_CONSTANTS = set()
 for row in SHARED_PARAMETERS.values():
     constants_in(row.annotation, SHARED_CONSTANTS)
     constants_in(row.per_chart, SHARED_CONSTANTS)
+# a constant one chart family owns carries the family's prefix (ADR 0076)
+FAMILY_OWNED = {"LINE_LABEL_POSITION"}
 SPECIFIC = {
     c
     for c, fronts in uses.items()
-    if len(fronts) == 1 and c in CHART_BLOCKS and c not in SHARED_CONSTANTS
+    if (len(fronts) == 1 or c in FAMILY_OWNED)
+    and c in CHART_BLOCKS
+    and c not in SHARED_CONSTANTS
 }
 
 
@@ -546,7 +550,7 @@ TYPINGS_MD.write_text(
 lines = [
     "## Constants by Chart",
     "",
-    "Which constants the parameters of each chart accept, by chart family. A constant used by one chart carries that chart's prefix; one shared across charts carries none. Style attributes take the constants named in their [typings](typings.md).",
+    "Which constants the parameters of each chart accept, by chart family. A constant used by one chart, or by one chart family, carries that chart's prefix; one shared across families carries none. Style attributes take the constants named in their [typings](typings.md).",
 ]
 for title, fronts in FAMILIES:
     lines += [
@@ -568,7 +572,9 @@ ref_table = "\n".join(lines) + "\n"
 
 s = CONSTANTS_MD.read_text()
 head, _, rest = s.partition("## Figure Constants")
-head = head.split("## Constants by Chart")[0]
+head, _, after_table = head.partition("## Constants by Chart")
+# the sections between the table and the figure constants stay as written
+kept = after_table[after_table.index("\n## ") :] if "\n## " in after_table else "\n"
 chart_sec = rest.split("## Chart Constants", 1)[1]
 blocks = re.findall(
     r"::: datachart\.constants\.(\w+)\n    options:\n        heading_level: 3$",
@@ -586,12 +592,13 @@ assert not missing, missing
 CONSTANTS_MD.write_text(
     head
     + ref_table
-    + "\n## Figure Constants"
+    + kept
+    + "## Figure Constants"
     + rest.split("## Chart Constants", 1)[0]
     + "## Chart Constants\n\nConstants several charts share.\n\n"
     + "\n\n".join(block(f"datachart.constants.{c}") for c in shared)
     + "\n"
-    + "\n## Chart-Specific Constants\n\nConstants one chart owns, in the order of the [charts reference](charts/index.md).\n\n"
+    + "\n## Chart-Specific Constants\n\nConstants one chart or one chart family owns, in the order of the [charts reference](charts/index.md).\n\n"
     + "\n\n".join(block(f"datachart.constants.{c}") for c in by_chart)
     + "\n"
 )

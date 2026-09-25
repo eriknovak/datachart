@@ -423,9 +423,12 @@ value label (`show_values="delta"`) printed at the connector midpoint.
 _Avoid_: change, difference, gap
 
 **End label**:
-A series' label (its `subtitle`) printed beside its first and/or last point in the series
-color (`show_labels`, with `label_position` a `BUMP_LABEL_POSITION` member), so the
-line is named where it ends instead of in a legend.
+A series' label (its `subtitle`) printed beside its first and/or last point in the
+text color with the value-label halo (`show_labels`, with `label_position` a
+`LINE_LABEL_POSITION` member), so the line is named where it ends. Labels that would
+overlap spread apart along the value axis and never leave the end they name. On by
+default on a bump chart, where they replace the legend; off on a line or stacked area
+chart, where they supplement it (ADR 0076).
 _Avoid_: direct label (for this), line label, legend label
 
 **Heatmap**:

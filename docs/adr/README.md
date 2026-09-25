@@ -81,7 +81,7 @@ theme faces out of the wheel.
 - [0034](0034-per-figure-legend-settings.md) — The legend is a per-figure setting, and outside locations expand to two matplotlib arguments
 - [0035](0035-colorbar-setting.md) — The colorbar is a per-figure setting located by edge, and its type takes the setting suffix (amended by [0043](0043-setting-payloads-take-the-setting-suffix.md))
 - [0043](0043-setting-payloads-take-the-setting-suffix.md) — Every setting payload takes the `*SettingAttrs` suffix, old names warn for one release (amended by [0067](0067-shared-parameter-table.md), [0072](0072-typing-roles-and-theme-conformance.md))
-- [0052](0052-chart-prefixed-constants.md) — A constant one chart owns carries that chart's prefix
+- [0052](0052-chart-prefixed-constants.md) — A constant one chart owns carries that chart's prefix (amended by [0076](0076-line-end-labels.md))
 
 ## Axes, scales, and colormaps
 
@@ -115,7 +115,7 @@ theme faces out of the wheel.
 - [0030](0030-network-weighted-and-grouped-layouts.md) — NetworkChart gains the WEIGHTED and GROUPED layouts
 - [0032](0032-treemap-nesting-depth.md) — Treemap nests to four levels through the same group rules
 - [0044](0044-calendar-heatmap.md) — A calendar heatmap draws one panel per year through the heatmap's cell seam (amended by [0052](0052-chart-prefixed-constants.md))
-- [0046](0046-bump-chart.md) — A bump chart ranks per period and draws through the line layer (amended by [0052](0052-chart-prefixed-constants.md))
+- [0046](0046-bump-chart.md) — A bump chart ranks per period and draws through the line layer (amended by [0052](0052-chart-prefixed-constants.md), [0076](0076-line-end-labels.md))
 - [0047](0047-ridgeline-plot.md) — RidgelinePlot stacks per-label density ridges on the category index
 - [0049](0049-gantt-chart.md) — A gantt chart puts time on the value axis and stays a bare figure (amended by [0052](0052-chart-prefixed-constants.md))
 - [0050](0050-dumbbell-chart.md) — A dumbbell chart is a group layer on the category index, not a bar
@@ -123,6 +123,7 @@ theme faces out of the wheel.
 - [0057](0057-scatter-error-bars.md) — Scatter error bars are distances drawn in the point's colour
 - [0060](0060-image-chart.md) — An image is a chart front anchored by an extent, not a setting on other charts (amended by [0062](0062-basemap.md))
 - [0062](0062-basemap.md) — The basemap draws unprojected outlines fetched into a cache (amended by [0063](0063-downloaded-theme-fonts.md))
+- [0076](0076-line-end-labels.md) — End labels are the line family's direct-label mode
 
 ## Distribution and packaging
 

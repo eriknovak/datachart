@@ -26,6 +26,7 @@ from ..constants import (
     AXIS_SCALE,
     VALUE_FORMAT,
     DATE_FORMAT,
+    LINE_LABEL_POSITION,
 )
 
 # ================================================
@@ -52,6 +53,8 @@ def LineChart(
     show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
     show_yerr: Optional[bool] = None,
     show_area: Optional[bool] = None,
+    show_labels: Optional[bool] = None,
+    label_position: Optional[Union[LINE_LABEL_POSITION, str]] = None,
     show_values: Optional[bool] = None,
     value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     value_step: Optional[int] = None,
@@ -186,6 +189,12 @@ def LineChart(
             `False` draws none.
         show_yerr: Whether to show y-axis error bars.
         show_area: Whether to show the area under the line.
+        show_labels: Whether to print each series' subtitle beside its line
+            end, in the text color. Labels that would overlap spread apart
+            along the value axis. Defaults to False.
+        label_position: Which line end carries the label, a
+            [`LINE_LABEL_POSITION`][datachart.constants.LINE_LABEL_POSITION]
+            member: `START`, `END` (default), or `BOTH`.
         show_values: Whether to print each point's value above or below it.
         value_format: Format string for the value labels: a
             [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT] constant or any

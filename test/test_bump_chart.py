@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 
 from datachart.charts import BumpChart
 from datachart.config import config
-from datachart.constants import BUMP_RANK, BUMP_LABEL_POSITION, THEME
+from datachart.constants import BUMP_RANK, LINE_LABEL_POSITION, THEME
 from datachart.utils import Panel, Grid
 from datachart.utils._internal.layers import BumpLayer, MarkClipBox, rank_series
 from datachart.utils._internal.validate import (
@@ -176,7 +176,7 @@ class TestBumpChartDrawing(unittest.TestCase):
         self.assertEqual(line.get_linewidth(), 4)
         self.assertEqual(line.get_marker(), "s")
 
-    def test_end_labels_sit_at_the_last_point_in_series_color(self):
+    def test_end_labels_sit_at_the_last_point_in_text_color(self):
         fig = BumpChart(DATA, subtitle=NAMES)
         ax = fig.axes[0]
         texts = _texts(ax)
@@ -185,10 +185,11 @@ class TestBumpChartDrawing(unittest.TestCase):
             text = texts[name]
             self.assertEqual(text.xy, (line.get_xdata()[-1], line.get_ydata()[-1]))
             self.assertEqual(text.get_ha(), "left")
-            self.assertEqual(text.get_color(), line.get_color())
+            self.assertEqual(text.get_color(), config.get("font_general_color"))
+            self.assertTrue(text.get_path_effects())
 
     def test_label_position_both_labels_each_end(self):
-        fig = BumpChart(DATA, subtitle=NAMES, label_position=BUMP_LABEL_POSITION.BOTH)
+        fig = BumpChart(DATA, subtitle=NAMES, label_position=LINE_LABEL_POSITION.BOTH)
         ax = fig.axes[0]
         self.assertEqual(len(ax.texts), 6)
         starts = [t for t in ax.texts if t.get_ha() == "right"]
