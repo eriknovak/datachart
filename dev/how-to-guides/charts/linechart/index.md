@@ -51,6 +51,7 @@ Every customization is either a keyword argument of `LineChart` or a `plot_line_
 | compare several series in one chart     | `data` as a list of lists, `subtitle`, `show_legend`                  | [Multiple Line Charts](#multiple-line-charts)                                                           |
 | highlight one series, mute the rest     | `emphasis`, `emphasis_rule`                                           | [Emphasis](#emphasis)                                                                                   |
 | title and place the legend              | `legend`                                                              | [Legend](#legend)                                                                                       |
+| name each series at its line end        | `show_labels`, `label_position`                                       | [End labels](#end-labels)                                                                               |
 | draw a confidence band                  | `yerr` in `data`, `show_yerr`                                         | [Confidence interval](#confidence-interval)                                                             |
 | draw each series in its own subplot     | `subplots`, `sharex`, `sharey`, `max_cols`                            | [Subplots](#subplots)                                                                                   |
 | plot against real dates                 | `datetime` objects as `x`, `xticks_format`                            | [Datetime axis](#datetime-axis)                                                                         |
@@ -62,6 +63,7 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 
 | Parameter                                    | Constant                                                                                                                                                                                                                                     |
 | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `label_position`                             | [`LINE_LABEL_POSITION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_LABEL_POSITION)                                                                                                             |
 | `xticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
 | `emphasis`                                   | [`EMPHASIS`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS)                                                                                                                                   |
 | `figsize`                                    | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                                                                                                                                   |
@@ -446,6 +448,26 @@ LineChart(
     show_legend=True,
     # a titled legend in the empty corner
     legend={"title": "Hemisphere", "location": LEGEND_LOCATION.UPPER_LEFT},
+).show()
+```
+
+### End labels
+
+A legend still makes the reader match colors back and forth between the box and the lines. `show_labels` names each series where its line ends, in the text color over a halo, so the eye follows a line to its name; `label_position` picks the end with a [LINE_LABEL_POSITION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_LABEL_POSITION) member: `END` (the default), `START`, or `BOTH`. Labels that would overlap spread apart along the value axis and stay beside their line ends. The legend is unchanged, off unless asked, so the end labels can carry the naming alone.
+
+```
+LineChart(
+    data=warming_by_hemisphere,
+    subtitle=HEMISPHERES,
+    # each hemisphere named where its line ends
+    show_labels=True,
+    title="Temperature anomaly by hemisphere",
+    xlabel="Year",
+    ylabel="Anomaly (°C)",
+    xticks=list(range(1880, 2025, 20)),
+    yticks_format="{x:+.1f}",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_grid=SHOW_GRID.Y,
 ).show()
 ```
 

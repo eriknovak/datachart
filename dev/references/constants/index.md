@@ -74,7 +74,7 @@ Each class and what reads it: a chart parameter, a style attribute, or the confi
 | ------------------------- | ---------------------------------------------------------------------------------------------- |
 | `STACKED_AREA_BASELINE`   | baseline of StackedAreaChart.                                                                  |
 | `BUMP_RANK`               | rank_by of BumpChart.                                                                          |
-| `BUMP_LABEL_POSITION`     | label_position of BumpChart.                                                                   |
+| `LINE_LABEL_POSITION`     | label_position of LineChart, StackedAreaChart and BumpChart.                                   |
 | `RADIAL_TYPE`             | mark of RadialChart.                                                                           |
 | `RADIAL_DIRECTION`        | direction of RadialChart.                                                                      |
 | `CALENDAR_WEEKDAY`        | week_start of CalendarHeatmap; the chart_default_calendar_heatmap_week_start config attribute. |
@@ -97,15 +97,15 @@ Deprecated names, removed in the next release: `SCALE` (now `AXIS_SCALE`), `NORM
 
 ## Constants by Chart
 
-Which constants the parameters of each chart accept, by chart family. A constant used by one chart carries that chart's prefix; one shared across charts carries none. Style attributes take the constants named in their [typings](https://eriknovak.github.io/datachart/dev/references/typings/index.md).
+Which constants the parameters of each chart accept, by chart family. A constant used by one chart, or by one chart family, carries that chart's prefix; one shared across families carries none. Style attributes take the constants named in their [typings](https://eriknovak.github.io/datachart/dev/references/typings/index.md).
 
 ### Trends and Comparisons
 
 | Chart                                                                                                                               | Chart-specific                                                                                                                                                                                                                           | Shared                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | ----------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [LineChart](https://eriknovak.github.io/datachart/dev/references/charts/linechart/#datachart.charts.LineChart)                      | —                                                                                                                                                                                                                                        | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`EMPHASIS`](#datachart.constants.EMPHASIS), [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`VALUE_FORMAT`](#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](#datachart.constants.DATE_FORMAT), [`SHOW_GRID`](#datachart.constants.SHOW_GRID), [`AXIS_SCALE`](#datachart.constants.AXIS_SCALE), [`ASPECT_RATIO`](#datachart.constants.ASPECT_RATIO)                                                                                                                                      |
-| [StackedAreaChart](https://eriknovak.github.io/datachart/dev/references/charts/stackedareachart/#datachart.charts.StackedAreaChart) | [`STACKED_AREA_BASELINE`](#datachart.constants.STACKED_AREA_BASELINE)                                                                                                                                                                    | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`EMPHASIS`](#datachart.constants.EMPHASIS), [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`VALUE_FORMAT`](#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](#datachart.constants.DATE_FORMAT), [`SHOW_GRID`](#datachart.constants.SHOW_GRID), [`AXIS_SCALE`](#datachart.constants.AXIS_SCALE), [`ASPECT_RATIO`](#datachart.constants.ASPECT_RATIO)                                                                                                                                      |
-| [BumpChart](https://eriknovak.github.io/datachart/dev/references/charts/bumpchart/#datachart.charts.BumpChart)                      | [`BUMP_RANK`](#datachart.constants.BUMP_RANK), [`BUMP_LABEL_POSITION`](#datachart.constants.BUMP_LABEL_POSITION)                                                                                                                         | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`EMPHASIS`](#datachart.constants.EMPHASIS), [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`VALUE_FORMAT`](#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](#datachart.constants.DATE_FORMAT), [`SHOW_GRID`](#datachart.constants.SHOW_GRID), [`AXIS_SCALE`](#datachart.constants.AXIS_SCALE), [`ASPECT_RATIO`](#datachart.constants.ASPECT_RATIO)                                                                                                                                      |
+| [LineChart](https://eriknovak.github.io/datachart/dev/references/charts/linechart/#datachart.charts.LineChart)                      | [`LINE_LABEL_POSITION`](#datachart.constants.LINE_LABEL_POSITION)                                                                                                                                                                        | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`EMPHASIS`](#datachart.constants.EMPHASIS), [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`VALUE_FORMAT`](#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](#datachart.constants.DATE_FORMAT), [`SHOW_GRID`](#datachart.constants.SHOW_GRID), [`AXIS_SCALE`](#datachart.constants.AXIS_SCALE), [`ASPECT_RATIO`](#datachart.constants.ASPECT_RATIO)                                                                                                                                      |
+| [StackedAreaChart](https://eriknovak.github.io/datachart/dev/references/charts/stackedareachart/#datachart.charts.StackedAreaChart) | [`STACKED_AREA_BASELINE`](#datachart.constants.STACKED_AREA_BASELINE), [`LINE_LABEL_POSITION`](#datachart.constants.LINE_LABEL_POSITION)                                                                                                 | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`EMPHASIS`](#datachart.constants.EMPHASIS), [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`VALUE_FORMAT`](#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](#datachart.constants.DATE_FORMAT), [`SHOW_GRID`](#datachart.constants.SHOW_GRID), [`AXIS_SCALE`](#datachart.constants.AXIS_SCALE), [`ASPECT_RATIO`](#datachart.constants.ASPECT_RATIO)                                                                                                                                      |
+| [BumpChart](https://eriknovak.github.io/datachart/dev/references/charts/bumpchart/#datachart.charts.BumpChart)                      | [`BUMP_RANK`](#datachart.constants.BUMP_RANK), [`LINE_LABEL_POSITION`](#datachart.constants.LINE_LABEL_POSITION)                                                                                                                         | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`EMPHASIS`](#datachart.constants.EMPHASIS), [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`VALUE_FORMAT`](#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](#datachart.constants.DATE_FORMAT), [`SHOW_GRID`](#datachart.constants.SHOW_GRID), [`AXIS_SCALE`](#datachart.constants.AXIS_SCALE), [`ASPECT_RATIO`](#datachart.constants.ASPECT_RATIO)                                                                                                                                      |
 | [BarChart](https://eriknovak.github.io/datachart/dev/references/charts/barchart/#datachart.charts.BarChart)                         | —                                                                                                                                                                                                                                        | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`EMPHASIS`](#datachart.constants.EMPHASIS), [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`BAR_MODE`](#datachart.constants.BAR_MODE), [`SORT`](#datachart.constants.SORT), [`ORIENTATION`](#datachart.constants.ORIENTATION), [`VALUE_FORMAT`](#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](#datachart.constants.DATE_FORMAT), [`SHOW_GRID`](#datachart.constants.SHOW_GRID), [`AXIS_SCALE`](#datachart.constants.AXIS_SCALE), [`ASPECT_RATIO`](#datachart.constants.ASPECT_RATIO) |
 | [PyramidChart](https://eriknovak.github.io/datachart/dev/references/charts/pyramidchart/#datachart.charts.PyramidChart)             | —                                                                                                                                                                                                                                        | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`SORT`](#datachart.constants.SORT), [`VALUE_FORMAT`](#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](#datachart.constants.DATE_FORMAT), [`SHOW_GRID`](#datachart.constants.SHOW_GRID)                                                                                                                                                                                                                                                    |
 | [RadialChart](https://eriknovak.github.io/datachart/dev/references/charts/radialchart/#datachart.charts.RadialChart)                | [`RADIAL_TYPE`](#datachart.constants.RADIAL_TYPE), [`RADIAL_DIRECTION`](#datachart.constants.RADIAL_DIRECTION)                                                                                                                           | [`FIG_SIZE`](#datachart.constants.FIG_SIZE), [`EMPHASIS`](#datachart.constants.EMPHASIS), [`LEGEND_ALIGN`](#datachart.constants.LEGEND_ALIGN), [`LEGEND_LOCATION`](#datachart.constants.LEGEND_LOCATION), [`BAR_MODE`](#datachart.constants.BAR_MODE), [`SORT`](#datachart.constants.SORT), [`VALUE_FORMAT`](#datachart.constants.VALUE_FORMAT), [`SHOW_GRID`](#datachart.constants.SHOW_GRID), [`AXIS_SCALE`](#datachart.constants.AXIS_SCALE)                                                                                                                                                            |
@@ -1016,7 +1016,30 @@ Examples:
 
 ## Chart-Specific Constants
 
-Constants one chart owns, in the order of the [charts reference](https://eriknovak.github.io/datachart/dev/references/charts/index.md).
+Constants one chart or one chart family owns, in the order of the [charts reference](https://eriknovak.github.io/datachart/dev/references/charts/index.md).
+
+### datachart.constants.LINE_LABEL_POSITION
+
+Bases: `Domain`
+
+The supported end label positions.
+
+Passed as the `label_position` setting of the line, stacked area and bump charts: beside which end of each line its series label prints.
+
+Examples:
+
+```
+>>> from datachart.constants import LINE_LABEL_POSITION
+>>> LINE_LABEL_POSITION.DEFAULT
+"end"
+```
+
+| ATTRIBUTE | DESCRIPTION                                                            |
+| --------- | ---------------------------------------------------------------------- |
+| `DEFAULT` | The default position. Same as LINE_LABEL_POSITION.END. **TYPE:** `str` |
+| `START`   | Beside the first point. Equals to "start". **TYPE:** `str`             |
+| `END`     | Beside the last point. Equals to "end". **TYPE:** `str`                |
+| `BOTH`    | Beside the first and the last point. Equals to "both". **TYPE:** `str` |
 
 ### datachart.constants.STACKED_AREA_BASELINE
 
@@ -1065,29 +1088,6 @@ Examples:
 | `VALUE_DESCENDING` | The highest value ranks first. Equals to "value_descending". **TYPE:** `str` |
 | `VALUE_ASCENDING`  | The lowest value ranks first. Equals to "value_ascending". **TYPE:** `str`   |
 | `GIVEN`            | y is the rank, a positive integer. Equals to "given". **TYPE:** `str`        |
-
-### datachart.constants.BUMP_LABEL_POSITION
-
-Bases: `Domain`
-
-The supported end label positions.
-
-Passed as the `label_position` setting of the bump chart: beside which end of each line its series label prints.
-
-Examples:
-
-```
->>> from datachart.constants import BUMP_LABEL_POSITION
->>> BUMP_LABEL_POSITION.DEFAULT
-"end"
-```
-
-| ATTRIBUTE | DESCRIPTION                                                            |
-| --------- | ---------------------------------------------------------------------- |
-| `DEFAULT` | The default position. Same as BUMP_LABEL_POSITION.END. **TYPE:** `str` |
-| `START`   | Beside the first point. Equals to "start". **TYPE:** `str`             |
-| `END`     | Beside the last point. Equals to "end". **TYPE:** `str`                |
-| `BOTH`    | Beside the first and the last point. Equals to "both". **TYPE:** `str` |
 
 ### datachart.constants.RADIAL_TYPE
 

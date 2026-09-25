@@ -50,7 +50,7 @@ from datachart.constants import (
     ASPECT_RATIO,
     BANDWIDTH,
     BAR_MODE,
-    BUMP_LABEL_POSITION,
+    LINE_LABEL_POSITION,
     BUMP_RANK,
     CALENDAR_WEEKDAY,
     COLORBAR_LOCATION,
@@ -1327,9 +1327,9 @@ def rank():
 
 def label_position():
     members = [
-        ("START", BUMP_LABEL_POSITION.START),
-        ("END", BUMP_LABEL_POSITION.END),
-        ("BOTH", BUMP_LABEL_POSITION.BOTH),
+        ("START", LINE_LABEL_POSITION.START),
+        ("END", LINE_LABEL_POSITION.END),
+        ("BOTH", LINE_LABEL_POSITION.BOTH),
     ]
     figs = [
         BumpChart(
@@ -1337,7 +1337,7 @@ def label_position():
             label_position=value,
             subtitle=["alpha", "beta", "gamma"],
             xticks=[1, 2, 3, 4],
-            title=f"BUMP_LABEL_POSITION.{label}",
+            title=f"LINE_LABEL_POSITION.{label}",
         )
         for label, value in members
     ]

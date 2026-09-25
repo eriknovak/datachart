@@ -41,6 +41,7 @@ Every customization is either a keyword argument of `StackedAreaChart` or a `plo
 | show grid lines                                | `show_grid`                                                         | [Figure size and grid](#figure-size-and-grid)                                                           |
 | fix the aspect ratio of the axes               | `aspect_ratio`                                                      | [Figure size and grid](#figure-size-and-grid)                                                           |
 | name the series, title and place the legend    | `subtitle`, `show_legend`, `legend`                                 | [Legend](#legend)                                                                                       |
+| name each band where it ends                   | `show_labels`, `label_position`                                     | [Legend](#legend)                                                                                       |
 | change the band colors, alpha, hatch, or edges | `style={"plot_area_color": ..., "plot_stackedarea_alpha": ...}`     | [Band style](#band-style)                                                                               |
 | outline the top of every band                  | `style={"plot_stackedarea_outline": True}`                          | [Band style](#band-style)                                                                               |
 | show shares instead of totals                  | `baseline=STACKED_AREA_BASELINE.PERCENT`                            | [Baseline](#baseline)                                                                                   |
@@ -63,6 +64,7 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | Parameter                                    | Constant                                                                                                                                                                                                                                     |
 | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `baseline`                                   | [`STACKED_AREA_BASELINE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.STACKED_AREA_BASELINE)                                                                                                         |
+| `label_position`                             | [`LINE_LABEL_POSITION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_LABEL_POSITION)                                                                                                             |
 | `xticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
 | `emphasis`                                   | [`EMPHASIS`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS)                                                                                                                                   |
 | `figsize`                                    | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                                                                                                                                   |
@@ -138,6 +140,24 @@ StackedAreaChart(
     show_grid=SHOW_GRID.Y,
     # headroom for the legend
     ymax=36000,
+).show()
+```
+
+End labels name each band where it ends instead. `show_labels` prints each series' name at the midpoint of its band at the last `x`, in the text color, and `label_position` picks the end with a [LINE_LABEL_POSITION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_LABEL_POSITION) member: `END` (the default), `START`, or `BOTH`. Seven names at one edge spread apart along the value axis, so a thin band still gets its name beside the stack, and the legend can go.
+
+```
+StackedAreaChart(
+    data=generation,
+    subtitle=SOURCES,
+    # each source named where its band ends
+    show_labels=True,
+    title="World electricity generation",
+    xlabel="Year",
+    ylabel="Generation (TWh)",
+    xticks=[2000, 2005, 2010, 2015, 2020, 2023],
+    yticks_format="{x:,.0f}",
+    figsize=FIG_SIZE.FULL_MEDIUM,
+    show_grid=SHOW_GRID.Y,
 ).show()
 ```
 

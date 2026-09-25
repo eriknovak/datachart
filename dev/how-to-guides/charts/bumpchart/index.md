@@ -62,7 +62,7 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | Parameter                                    | Constant                                                                                                                                                                                                                                     |
 | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `rank_by`                                    | [`BUMP_RANK`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BUMP_RANK)                                                                                                                                 |
-| `label_position`                             | [`BUMP_LABEL_POSITION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BUMP_LABEL_POSITION)                                                                                                             |
+| `label_position`                             | [`LINE_LABEL_POSITION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_LABEL_POSITION)                                                                                                             |
 | `xticks_format`                              | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT), [`DATE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.DATE_FORMAT)         |
 | `emphasis`                                   | [`EMPHASIS`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS)                                                                                                                                   |
 | `figsize`                                    | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                                                                                                                                   |
@@ -161,16 +161,16 @@ BumpChart(
 
 ### End labels
 
-End labels replace the legend and the rank axis: the eye follows a line to its name. `show_labels` turns them on or off (on by default), and `label_position` picks the end that carries the name with a [BUMP_LABEL_POSITION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BUMP_LABEL_POSITION) member: `END` (the default), `START`, or `BOTH`. Labels at both ends show where each country started and where it finished without tracing the line across.
+End labels replace the legend and the rank axis: the eye follows a line to its name. `show_labels` turns them on or off (on by default), and `label_position` picks the end that carries the name with a [LINE_LABEL_POSITION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LINE_LABEL_POSITION) member: `END` (the default), `START`, or `BOTH`. Labels at both ends show where each country started and where it finished without tracing the line across.
 
 ```
-from datachart.constants import BUMP_LABEL_POSITION
+from datachart.constants import LINE_LABEL_POSITION
 
 BumpChart(
     data=population,
     subtitle=COUNTRIES,
     # name every line at both ends
-    label_position=BUMP_LABEL_POSITION.BOTH,
+    label_position=LINE_LABEL_POSITION.BOTH,
     title="The world's most populous countries",
     xlabel="Year",
     ylabel="Rank by population",
@@ -544,7 +544,7 @@ BumpChart(
     # the populations behind the ranks
     show_values=True,
     value_format=VALUE_FORMAT.INTEGER,
-    label_position=BUMP_LABEL_POSITION.BOTH,
+    label_position=LINE_LABEL_POSITION.BOTH,
     texts={
         "text": "India passes China by\nabout 3 million people",
         "x": 0.45,
