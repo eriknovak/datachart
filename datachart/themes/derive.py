@@ -8,7 +8,6 @@ import matplotlib.colors as mcolors
 
 from ._base import TRAITS, canonical_style, warn_aliases
 from .default import DEFAULT_THEME
-from .score import warn_failing_palette
 from ..constants import TRAIT
 from ..typings import StyleAttrs
 from ..utils._internal.colors import get_color_scale, get_colormap, oklab_lightness
@@ -143,7 +142,4 @@ def derive_theme(
     if unknown:
         raise ValueError(f"Unknown theme attributes: {sorted(unknown)}")
     theme.update(copy.deepcopy(overrides))
-    # a ramp's samples never clear the normal-vision floor (ADR 0073)
-    if not sequential:
-        warn_failing_palette(theme)
     return theme

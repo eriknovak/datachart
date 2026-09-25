@@ -756,8 +756,18 @@ More series, hue levels or groups than a cycling palette has colours, so the
 colours repeat and two units read as one. The panel warns once per palette
 when it pools its series, naming both counts; a pypalettes name interpolates
 instead of cycling and never overflows, and a one-colour palette is
-monochrome by design (ADR 0075).
+monochrome by design (ADR 0075). Only series that draw from the palette
+count: a background series and an own-coloured series take no slot.
 _Avoid_: colour wrap, cycle exhaustion
+
+**Own colour**:
+The colour a layer's style sets for its primary mark (`plot_line_color` on a
+line, `plot_area_color` on a stacked band, `plot_bar_color` on a bar). A
+layer with one draws none from the palette: it takes no cycle slot, the
+series after it keep their palette order, and it does not count toward
+palette overflow. Named per layer through `color_style`; layers that colour
+by group or colormap have none (ADR 0077).
+_Avoid_: pinned colour, explicit colour, style colour
 
 **Active theme**:
 The name of the theme last applied, held on the configuration as `theme` and

@@ -7,8 +7,15 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.colors import to_hex
 
-from datachart.charts import LineChart, ScatterChart
+from datachart.charts import (
+    BarChart,
+    Histogram,
+    LineChart,
+    ScatterChart,
+    StackedAreaChart,
+)
 from datachart.config import config
+from datachart.utils import Panel
 from datachart.utils._internal.colors import (
     cycling_colors,
     get_color_scale,
@@ -207,6 +214,59 @@ class TestPaletteOverflow(unittest.TestCase):
         data = [{"x": i, "y": i, "group": f"g{i}"} for i in range(n + 1)]
         (warning,) = self.caught(lambda: ScatterChart(data=data, hue="group"))
         self.assertIn(f"{n + 1} hue levels", str(warning.message))
+
+    def test_own_colored_series_take_no_palette_slot(self):
+        """A series coloured in its style draws nothing from the palette (ADR 0077)."""
+        n = len(config["color_general_multiple"])
+        series = [[{"x": 0, "y": i}, {"x": 1, "y": i + 1}] for i in range(n + 1)]
+        colors = [f"#{20 * i + 30:02x}4040" for i in range(n + 1)]
+        self.assertEqual(
+            self.caught(
+                lambda: LineChart(
+                    data=series, style=[{"plot_line_color": c} for c in colors]
+                )
+            ),
+            [],
+        )
+        self.assertEqual(
+            self.caught(
+                lambda: StackedAreaChart(
+                    data=series, style=[{"plot_area_color": c} for c in colors]
+                )
+            ),
+            [],
+        )
+        figures = [
+            LineChart(data=[s], style={"plot_line_color": c})
+            for s, c in zip(series, colors)
+        ]
+        self.assertEqual(self.caught(lambda: Panel(figures)), [])
+        bars = [[{"label": "a", "y": i}] for i in range(n + 1)]
+        self.assertEqual(
+            self.caught(
+                lambda: BarChart(
+                    data=bars, style=[{"plot_bar_color": c} for c in colors]
+                )
+            ),
+            [],
+        )
+        samples = [[{"x": i}, {"x": i + 1}] for i in range(n + 1)]
+        self.assertEqual(
+            self.caught(
+                lambda: Histogram(
+                    data=samples, style=[{"plot_hist_color": c} for c in colors]
+                )
+            ),
+            [],
+        )
+
+    def test_own_colored_series_do_not_advance_the_cycle(self):
+        palette = config["color_general_multiple"]
+        series = [[{"x": 0, "y": i}, {"x": 1, "y": i + 1}] for i in range(2)]
+        figure = LineChart(data=series, style=[{"plot_line_color": "#123456"}, {}])
+        first, second = figure.axes[0].get_lines()[:2]
+        self.assertEqual(to_hex(first.get_color()), "#123456")
+        self.assertEqual(to_hex(second.get_color()), to_hex(palette[0]))
 
 
 if __name__ == "__main__":

@@ -2224,6 +2224,9 @@ class Layer:
     surface: bool = False
     # a layer that draws no series takes no color-cycle slot
     takes_color: bool = True
+    # the resolved style dict of the layer's primary mark; a color set there
+    # is the layer's own, so it takes no color-cycle slot either (ADR 0077)
+    color_style: Optional[str] = None
     # the edge the layer's drawn colorbar takes; None when it draws none
     colorbar_edge: Optional[str] = None
     # the normalized position a value step must break on; None spaces them evenly
@@ -2615,6 +2618,13 @@ class Layer:
                 style[width_key] = width * MUTED_WIDTH_SCALE
         elif width is not None:
             style[width_key] = width * HIGHLIGHT_WIDTH_SCALE
+
+    def own_color(self) -> Optional[str]:
+        """The color the layer's style sets for its primary mark, if any."""
+
+        if self.color_style is None:
+            return None
+        return getattr(self, self.color_style).get("color")
 
     def draws_all_muted(self, role: Optional[str], panel_role: Optional[str]) -> bool:
         """Whether every mark draws muted, so the layer takes no color or legend."""
@@ -3020,6 +3030,7 @@ def _mark_radius(line_style: dict) -> float:
 
 class LineLayer(PointLabelMixin, EndLabelMixin, AreaFillMixin, Layer):
     kind = "line"
+    color_style = "line_style"
     label_spots = POINT_LABEL_SPOTS_VERTICAL
 
     def __init__(self, chart: dict, settings: dict):
@@ -3399,6 +3410,7 @@ class StackedAreaLayer(EndLabelMixin, Layer):
     """One series of a stack; the panel computes its band (ADR 0025)."""
 
     kind = "stackedarea"
+    color_style = "fill_style"
     surface = True
     # the stack fills its frame: both axes end on the data, not on a tick
     ticks_at_axis_ends = False
@@ -3550,6 +3562,7 @@ def _stack_slots(layers: List[StackedAreaLayer], baseline: str) -> dict:
 
 class BarLayer(Layer):
     kind = "bar"
+    color_style = "bar_style"
     labels_past_mark = True
 
     def _resolve_style(self):
@@ -3773,6 +3786,9 @@ class GanttLayer(BarLayer):
     Draws on the bar layer's geometry: `barh` with each bar's left edge at
     the task start and its width the duration, through the panel's slotting.
     """
+
+    # tasks colour by group from their own cycle, so a bar colour is no series colour
+    color_style = None
 
     kind = "gantt"
 
@@ -4238,6 +4254,7 @@ class GanttLayer(BarLayer):
 
 class HistogramLayer(Layer):
     kind = "histogram"
+    color_style = "hist_style"
     labels_past_mark = True
 
     def _resolve_style(self):
@@ -8180,6 +8197,7 @@ class RadialLayer(Layer):
 
 class RadialLineLayer(AreaFillMixin, RadialLayer):
     kind = "radial-line"
+    color_style = "line_style"
 
     def _resolve_style(self):
         self.line_style = get_line_style(self.style)
@@ -8228,6 +8246,7 @@ class RadialLineLayer(AreaFillMixin, RadialLayer):
 
 class RadialBarLayer(RadialLayer):
     kind = "radial-bar"
+    color_style = "bar_style"
     show_values = False
 
     def _resolve_style(self):
@@ -8346,6 +8365,7 @@ class RadialScatterLayer(RadialLayer):
 
 class RadialHistogramLayer(RadialLayer):
     kind = "radial-histogram"
+    color_style = "hist_style"
     is_categorical = False
 
     def _resolve_style(self):
@@ -11603,15 +11623,16 @@ class Panel:
                 else group.palette
             )
 
-        # background layers do not consume a color-cycle slot
+        # background and own-colored layers do not consume a color-cycle slot
         pooled_colors = defaultdict(int)
         for group in self.groups:
-            n_background = sum(
+            n_slotless = sum(
                 1
                 for l in group.layers
                 if l.draws_all_muted(group.layer_role(l), group.emphasis)
+                or l.own_color() is not None
             )
-            pooled_colors[palette_key(group)] += max(group.max_colors - n_background, 0)
+            pooled_colors[palette_key(group)] += max(group.max_colors - n_slotless, 0)
         cycles = {}
         for group in self.groups:
             key = palette_key(group)
@@ -11661,13 +11682,18 @@ class Panel:
                 role = group.layer_role(layer)
                 muted = layer.draws_all_muted(role, group.emphasis)
 
+                own_color = layer.own_color()
                 ctx = DrawContext(
                     # a colorless lookup would advance the pooled cycle and
                     # shift the colors of later composed figures
                     color=(
                         None
                         if muted or not layer.takes_color
-                        else cycle[layer.chart_hash]["color"]
+                        else (
+                            own_color
+                            if own_color is not None
+                            else cycle[layer.chart_hash]["color"]
+                        )
                     ),
                     z_order=z_order,
                     legend_label=NO_LEGEND if muted else group.legend_label,
