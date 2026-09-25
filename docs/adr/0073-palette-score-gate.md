@@ -1,5 +1,6 @@
 ---
 status: accepted
+amended-by: [0078]
 ---
 
 # A palette is scored by one function, and every predefined theme passes its gate

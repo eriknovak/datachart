@@ -271,7 +271,7 @@ class TestFurnitureDefaults(unittest.TestCase):
 
 
 class TestFailingPaletteWarns(unittest.TestCase):
-    """`register_theme` and `derive_theme` warn once on a failing palette."""
+    """`register_theme` warns once on a failing palette; `derive_theme` never."""
 
     RED_GREEN = ["#D93025", "#1E8E3E", "#1A73E8"]
     # amber and green sit at deutan ΔE 7.8: weak, not a fail
@@ -293,12 +293,12 @@ class TestFailingPaletteWarns(unittest.TestCase):
         self.assertIn("#D93025 vs #1E8E3E", str(caught[0].message))
         self.assertEqual(caught[0].filename, __file__)
 
-    def test_derive_theme_warns_once_at_the_caller(self):
-        with warnings.catch_warnings(record=True) as caught:
-            warnings.simplefilter("always")
+    def test_derive_theme_stays_silent(self):
+        # deriving is experimenting; the gate speaks when a theme is registered
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
             derive_theme(THEME.DEFAULT, lead=self.RED_GREEN)
-        self.assertEqual(len(caught), 1)
-        self.assertEqual(caught[0].filename, __file__)
+            derive_theme(THEME.DEFAULT, lead=COLORS.Dark2)
 
     def test_weak_passing_and_ramp_palettes_stay_silent(self):
         self.assertEqual(score_palette(self.NEON, face="#000000").verdict, "weak")
