@@ -1800,7 +1800,7 @@ class THEME(Domain):
         DEFAULT (str): The default theme. Equals to `"default"`.
         GREYSCALE (str): The greyscale theme. Equals to `"greyscale"`.
         INK (str): The ink theme (dark-ink accents, print-ready). Equals to `"ink"`.
-        HATCH (str): The hatch theme (hatch cycle, value labels, dotted grid). Equals to `"hatch"`.
+        HATCH (str): The hatch theme (hatch cycle, black edges, light grid). Equals to `"hatch"`.
         MINIMAL (str): The minimal theme (accent violet, no spines, flat bars). Equals to `"minimal"`.
         MATERIAL (str): The material theme (Google palette, light grid). Equals to `"material"`.
         SKETCH (str): The sketch theme (hand-drawn, xkcd-style wobble and halo,

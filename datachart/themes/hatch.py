@@ -1,5 +1,5 @@
 from ..typings import StyleAttrs
-from ..constants import COLORS, LINE_STYLE, TRAIT
+from ..constants import COLORS, TRAIT
 from .default import DEFAULT_THEME
 from .derive import derive_theme
 
@@ -7,7 +7,6 @@ from .derive import derive_theme
 HATCH_FURNITURE: StyleAttrs = {
     "font_general_sansserif": ["Helvetica", "Arial", "Liberation Sans", "DejaVu Sans"],
     "plot_grid_color": "#D0D0D0",
-    "plot_grid_linestyle": LINE_STYLE.DOTTED,
     "plot_grid_alpha": 0.8,
 }
 
@@ -23,10 +22,11 @@ HATCH_THEME: StyleAttrs = derive_theme(
     plot_heatmap_cmap_diverging=COLORS.RdBu,
     **HATCH_FURNITURE,
 )
-"""The hatch theme: hatch cycle, black edges, dotted grid.
+"""The hatch theme: hatch cycle, black edges, light grid.
 
 The `Rust` lead, muted print tones with rust first and the green deep enough
 to stay apart from rust for deutan readers; the hatched trait gives every bar
 series its own hatch under black edges, the outlined trait black outlines on
-every other mark, and the grid is dotted. The value scale is YlOrBr.
+every other mark, and the grid is a light solid hairline. The value scale is
+YlOrBr.
 """

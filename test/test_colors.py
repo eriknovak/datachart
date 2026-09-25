@@ -1,15 +1,23 @@
 import unittest
 import warnings
 
+import matplotlib
+
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 from matplotlib.colors import to_hex
 
+from datachart.charts import LineChart, ScatterChart
+from datachart.config import config
 from datachart.utils._internal.colors import (
+    cycling_colors,
     get_color_scale,
     get_discrete_colors,
     get_colormap,
     create_colormap,
+    warn_palette_overflow,
 )
-from datachart.constants import COLORS
+from datachart.constants import COLORS, THEME
 
 # Use a pypalettes palette for testing
 TEST_COLOR_SCALE = COLORS.Blues
@@ -147,6 +155,58 @@ class TestColors(unittest.TestCase):
                 1,
                 f"'{name}' resolved as a plain color instead of a palette.",
             )
+
+
+class TestPaletteOverflow(unittest.TestCase):
+    """More units than a cycling palette has colors warns once (ADR 0075)."""
+
+    def tearDown(self):
+        config.set_theme(THEME.DEFAULT)
+        plt.close("all")
+
+    def caught(self, fn):
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            fn()
+        return [w for w in caught if issubclass(w.category, UserWarning)]
+
+    def test_cycling_palettes_warn_past_their_length(self):
+        for palette in (["#111111", "#222222"], COLORS.PaperAccent):
+            with self.subTest(palette=palette):
+                n = len(cycling_colors(palette))
+                self.assertEqual(
+                    self.caught(lambda: warn_palette_overflow(palette, n)), []
+                )
+                (warning,) = self.caught(lambda: warn_palette_overflow(palette, n + 1))
+                self.assertIn(f"{n + 1} series", str(warning.message))
+                self.assertIn(f"{n} colors", str(warning.message))
+
+    def test_one_color_palette_is_monochrome_by_design(self):
+        for palette in ("#B5651D", ["#B5651D"]):
+            with self.subTest(palette=palette):
+                self.assertEqual(
+                    self.caught(lambda: warn_palette_overflow(palette, 3)), []
+                )
+
+    def test_interpolating_palette_stays_silent(self):
+        self.assertIsNone(cycling_colors(TEST_COLOR_SCALE))
+        self.assertEqual(
+            self.caught(lambda: warn_palette_overflow(TEST_COLOR_SCALE, 40)), []
+        )
+
+    def test_chart_warns_once_when_series_outrun_the_palette(self):
+        n = len(config["color_general_multiple"])
+        series = [[{"x": 0, "y": i}, {"x": 1, "y": i + 1}] for i in range(n + 1)]
+        self.assertEqual(self.caught(lambda: LineChart(data=series[:n])), [])
+        caught = self.caught(lambda: LineChart(data=series))
+        self.assertEqual(len(caught), 1)
+        self.assertIn(f"{n + 1} series", str(caught[0].message))
+
+    def test_scatter_hue_levels_outrun_the_palette(self):
+        n = len(config["color_general_multiple"])
+        data = [{"x": i, "y": i, "group": f"g{i}"} for i in range(n + 1)]
+        (warning,) = self.caught(lambda: ScatterChart(data=data, hue="group"))
+        self.assertIn(f"{n + 1} hue levels", str(warning.message))
 
 
 if __name__ == "__main__":

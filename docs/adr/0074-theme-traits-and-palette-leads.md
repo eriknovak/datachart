@@ -1,5 +1,6 @@
 ---
 status: accepted
+amended-by: [0075]
 ---
 
 # A look owns its furniture, a trait composes, a palette is a lead

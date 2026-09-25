@@ -14,6 +14,10 @@ Methods:
         Get a list of discrete colors.
     create_color_cycle(name, max_colors):
         Create a color cycle.
+    cycling_colors(name):
+        The colors a palette cycles through, or None when it interpolates.
+    warn_palette_overflow(name, count, what):
+        Warn when more units than colors draw from a cycling palette.
     is_plain_color(name):
         Tell a plain color apart from a palette name.
     oklab_lightness(color):
@@ -285,6 +289,51 @@ def get_colormap(
         return create_colormap(get_color_scale(name), name)
 
 
+def cycling_colors(name: Union[str, List[str]]) -> Union[List[str], None]:
+    """The colors a palette cycles through, or None when it interpolates.
+
+    A color list, a custom palette and a plain color repeat their colors past
+    the end; a pypalettes name samples its colormap instead.
+    """
+
+    if isinstance(name, str):
+        if name in CUSTOM_PALETTES:
+            return list(CUSTOM_PALETTES[name])
+        if is_plain_color(name):
+            return [name]
+        return None
+    if not all(isinstance(c, str) for c in name):
+        raise TypeError("All color list items must be strings.")
+    return list(name)
+
+
+def warn_palette_overflow(
+    name: Union[str, List[str]], count: int, what: str = "series"
+) -> None:
+    """Warn when `count` units outrun a cycling palette, so colors repeat.
+
+    A one-color palette is monochrome by design, its patterns carry identity,
+    so it never warns.
+
+    Args:
+        name: The palette the units draw from.
+        count: How many units take a color.
+        what: What the units are, for the message.
+
+    """
+
+    cycling = cycling_colors(name)
+    if cycling is None or len(cycling) < 2 or count <= len(cycling):
+        return
+    palette = f"the `{name}` palette" if isinstance(name, str) else "the palette"
+    warnings.warn(
+        f"{count} {what}, but {palette} has {len(cycling)} colors, so colors "
+        "repeat. Mute the rest with `emphasis`, split them into subplots, or "
+        "set a longer palette.",
+        stacklevel=3,
+    )
+
+
 def get_discrete_colors(
     name: Union[str, List[str]] = DEFAULT_COLOR, max_colors: int = DEFAULT_MAX_COLOR
 ) -> list:
@@ -307,24 +356,11 @@ def get_discrete_colors(
     if max_colors <= 0:
         raise ValueError("The max_colors must be greater than 0.")
 
-    # custom palettes and single colors cycle instead of interpolating
-    if isinstance(name, str):
-        if name in CUSTOM_PALETTES:
-            name = list(CUSTOM_PALETTES[name])
-        elif is_plain_color(name):
-            name = [name]
-
-    # If name is a list of colors, use them directly
-    if isinstance(name, list):
-        if not all(isinstance(c, str) for c in name):
-            raise TypeError("All color list items must be strings.")
-
-        # Cycle through the provided colors if more colors are needed
-        if max_colors <= len(name):
-            return name[:max_colors]
-        else:
-            # Repeat the color list to get enough colors
-            return (name * ((max_colors // len(name)) + 1))[:max_colors]
+    cycling = cycling_colors(name)
+    if cycling is not None:
+        if max_colors <= len(cycling):
+            return cycling[:max_colors]
+        return (cycling * ((max_colors // len(cycling)) + 1))[:max_colors]
 
     # Otherwise use pypalettes
     color_scale = get_color_scale(name)
@@ -337,7 +373,9 @@ def get_discrete_colors(
 
 
 def create_color_cycle(
-    name: Union[str, List[str]] = DEFAULT_COLOR, max_colors: int = DEFAULT_MAX_COLOR
+    name: Union[str, List[str]] = DEFAULT_COLOR,
+    max_colors: int = DEFAULT_MAX_COLOR,
+    what: Union[str, None] = None,
 ) -> Dict[int, Dict[Literal["color"], str]]:
     """Create a color cycle.
 
@@ -345,12 +383,16 @@ def create_color_cycle(
         name: The name of the color scale (any valid pypalettes palette name), a single
             color, or a list of hex color strings.
         max_colors: The maximum number of colors.
+        what: What the colors are for (series, hue levels, groups); when given,
+            more of them than the palette has colors warns.
 
     Returns:
         The color cycle.
 
     """
 
+    if what is not None:
+        warn_palette_overflow(name, max_colors, what)
     color_cycler = cycler(color=get_discrete_colors(name, max_colors))
     color_cycler = color_cycler()
     return defaultdict(lambda: next(color_cycler))

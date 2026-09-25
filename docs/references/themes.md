@@ -25,7 +25,7 @@ Every theme is a complete [`StyleAttrs`](typings.md#datachart.typings.StyleAttrs
 | **Print and black-and-white**                        |                                                                       |            |
 | [`GREYSCALE_THEME`](#datachart.themes.GREYSCALE_THEME) | five greys with hatch, dash and marker cycles, for print without color | `THEME.GREYSCALE` |
 | [`INK_THEME`](#datachart.themes.INK_THEME)             | lightness-stepped blues and greens, navy ink edges, print-ready       | `THEME.INK` |
-| [`HATCH_THEME`](#datachart.themes.HATCH_THEME)         | a six-entry hatch cycle, black edges, dotted grid                     | `THEME.HATCH` |
+| [`HATCH_THEME`](#datachart.themes.HATCH_THEME)         | a six-entry hatch cycle, black edges, light grid                      | `THEME.HATCH` |
 | [`MUTED_THEME`](#datachart.themes.MUTED_THEME)         | Tol's muted colours, dash and marker cycles, colour-blind safe        | `THEME.MUTED` |
 | [`CONTRAST_THEME`](#datachart.themes.CONTRAST_THEME)   | lightness-stepped colours plus hatches, print-safe                    | `THEME.CONTRAST` |
 | [`MUTEDHATCH_THEME`](#datachart.themes.MUTEDHATCH_THEME) | Tol's muted colours under hatches, BuPu value scale | `THEME.MUTEDHATCH` |

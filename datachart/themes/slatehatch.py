@@ -19,6 +19,6 @@ SLATEHATCH_THEME: StyleAttrs = derive_theme(
 """The slate-hatch theme: the hatch theme without rust.
 
 The `Slate` lead, slate blue, sand, wine, green, orchid and sky blue, under
-the hatch theme's hatched and outlined traits and dotted grid; every pair
+the hatch theme's hatched and outlined traits and light grid; every pair
 stays apart for deutan and protan readers. The value scale is PuBu.
 """

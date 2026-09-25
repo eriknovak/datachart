@@ -3740,7 +3740,7 @@ class GanttLayer(BarLayer):
         self.groups = gantt_groups(tasks)
         groups = self.chart.get("group_order") or self.groups
         cycle = (
-            create_color_cycle(config["color_general_multiple"], len(groups))
+            create_color_cycle(config["color_general_multiple"], len(groups), "groups")
             if groups
             else None
         )
@@ -4454,7 +4454,7 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
         if hue_data is not None:
             unique_hues = np.unique(hue_data)
             cycle = create_color_cycle(
-                config["color_general_multiple"], len(unique_hues)
+                config["color_general_multiple"], len(unique_hues), "hue levels"
             )
             self.hue_colors = [cycle[i]["color"] for i in range(len(unique_hues))]
 
@@ -4842,7 +4842,7 @@ class GroupLayer(Layer):
         self.color_by_group = bool(self.settings.get("color_by_group"))
         self.group_colors = (
             create_color_cycle(
-                config["color_general_multiple"], max(len(self.labels()), 1)
+                config["color_general_multiple"], max(len(self.labels()), 1), "groups"
             )
             if self.color_by_group
             else None
@@ -7722,7 +7722,7 @@ class ParallelCoordsLayer(Layer):
         )
 
         if len(unique_hues) > 0:
-            cycle = create_color_cycle(self.hue_palette, len(unique_hues))
+            cycle = create_color_cycle(self.hue_palette, len(unique_hues), "hue levels")
             self.hue_colors = {
                 hue: cycle[i]["color"] for i, hue in enumerate(unique_hues)
             }
@@ -8996,7 +8996,9 @@ class SankeyLayer(Layer):
         # column order never recolors a node; unlinked nodes follow
         names = first_seen_nodes(self.links)
         names += [n for column in self.columns for n in column if n not in names]
-        cycle = create_color_cycle(config["color_general_multiple"], len(names))
+        cycle = create_color_cycle(
+            config["color_general_multiple"], len(names), "nodes"
+        )
         self.node_colors = {name: cycle[i]["color"] for i, name in enumerate(names)}
 
     def _geometry(self) -> tuple:
@@ -9349,7 +9351,9 @@ class TreemapLayer(Layer):
         # top-level records largest first; one palette color each, keyed by
         # label in input order, so a change in size never recolors a group
         self.groups = sorted(self.records, key=treemap_record_total, reverse=True)
-        cycle = create_color_cycle(config["color_general_multiple"], len(self.groups))
+        cycle = create_color_cycle(
+            config["color_general_multiple"], len(self.groups), "groups"
+        )
         self.group_colors = {
             record["label"]: cycle[i]["color"] for i, record in enumerate(self.records)
         }
@@ -10046,7 +10050,7 @@ class NetworkLayer(PointLabelMixin, Layer):
             self.group_colors = {g: base for g in self.group_names}
         elif self.group_names:
             cycle = create_color_cycle(
-                config["color_general_multiple"], len(self.group_names)
+                config["color_general_multiple"], len(self.group_names), "groups"
             )
             self.group_colors = {
                 g: cycle[i]["color"] for i, g in enumerate(self.group_names)
@@ -11524,7 +11528,7 @@ class Panel:
             key = palette_key(group)
             if key not in cycles:
                 cycles[key] = create_color_cycle(
-                    group.palette, max(pooled_colors[key], 1)
+                    group.palette, max(pooled_colors[key], 1), "series"
                 )
 
         # panel-owned parallel normalization (ADR 0009); furniture draws once

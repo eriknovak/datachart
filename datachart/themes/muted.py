@@ -1,12 +1,11 @@
 from ..typings import StyleAttrs
-from ..constants import COLORS, LINE_STYLE, TRAIT
+from ..constants import COLORS, TRAIT
 from .default import DEFAULT_THEME
 from .derive import derive_theme
 
 # the furniture both muted themes keep beside their traits (ADR 0074)
 MUTED_FURNITURE: StyleAttrs = {
     "plot_line_width": 1.2,
-    "plot_grid_linestyle": LINE_STYLE.DOTTED,
     "plot_grid_color": "#C8C8C8",
     "plot_dumbbell_start_color": "#DDCC77",
     "plot_dumbbell_end_color": "#332288",
@@ -27,6 +26,6 @@ MUTED_THEME: StyleAttrs = derive_theme(
 The `TolMuted` lead, indigo, cyan, sand, rose and wine from Paul Tol's muted
 scheme, every pair distinct for deutan, protan and tritan readers. The
 patterned trait gives lines a dash and scatter points a marker, the edged
-trait black bar edges, and the grid is dotted, so a figure survives a
-greyscale print. The value scale is YlOrBr.
+trait black bar edges, so a figure survives a greyscale print; the grid is a
+light solid hairline. The value scale is YlOrBr.
 """

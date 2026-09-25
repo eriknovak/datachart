@@ -33,12 +33,29 @@ class TestLegendStyle(unittest.TestCase):
         config.set_theme(THEME.DEFAULT)
         plt.close("all")
 
-    def test_theme_supplies_title_and_ncols(self):
-        """The theme names the legend title and column count."""
+    def test_theme_supplies_ncols_and_no_title(self):
+        """The theme names the column count; no theme titles the legend."""
         style = get_legend_style()
-        self.assertEqual(style["title"], "Legend")
+        self.assertNotIn("title", style)
         self.assertEqual(style["ncols"], 1)
         self.assertEqual(style["loc"], "best")
+
+    def test_no_predefined_theme_titles_the_legend(self):
+        """A legend carries no title unless the caller names one."""
+        for name in THEME.members():
+            with self.subTest(theme=name):
+                config.set_theme(name)
+                figure = LineChart(data=LINES, subtitle=["a", "b"], show_legend=True)
+                self.assertEqual(legend_of(figure).get_title().get_text(), "")
+                plt.close(figure)
+        config.set_theme(THEME.DEFAULT)
+        figure = LineChart(
+            data=LINES,
+            subtitle=["a", "b"],
+            show_legend=True,
+            legend={"title": "Series"},
+        )
+        self.assertEqual(legend_of(figure).get_title().get_text(), "Series")
 
     def test_setting_overrides_theme_field_by_field(self):
         """A non-None setting field wins; a None field falls back to the theme."""
@@ -71,11 +88,6 @@ class TestLegendSetting(unittest.TestCase):
     def tearDown(self):
         config.set_theme(THEME.DEFAULT)
         plt.close("all")
-
-    def test_default_title_is_legend(self):
-        """With no setting the legend keeps its `Legend` title."""
-        figure = LineChart(LINES, subtitle=["a", "b"], show_legend=True)
-        self.assertEqual(legend_of(figure).get_title().get_text(), "Legend")
 
     def test_setting_overrides_title_columns_and_location(self):
         figure = LineChart(

@@ -7,7 +7,7 @@ import warnings
 from datachart import themes
 from datachart.config import config
 from datachart.config.configuration import THEMES
-from datachart.constants import COLORS, THEME, TRAIT
+from datachart.constants import COLORS, LINE_STYLE, THEME, TRAIT
 from datachart.themes import (
     DARK_THEME,
     DEFAULT_THEME,
@@ -256,6 +256,18 @@ class TestPredefinedThemesPassTheGate(unittest.TestCase):
                 continue  # one ink: series differ by pattern, not colour
             with self.subTest(theme=name):
                 self.assertEqual(score.verdict, "pass", str(score))
+
+
+class TestFurnitureDefaults(unittest.TestCase):
+    """Every predefined theme keeps its furniture recessive (ADR 0075)."""
+
+    def test_solid_grid_and_no_legend_title(self):
+        predefined = [name for name in themes.__all__ if name.endswith("_THEME")]
+        for name in predefined:
+            theme = getattr(themes, name)
+            with self.subTest(theme=name):
+                self.assertEqual(theme["plot_grid_linestyle"], LINE_STYLE.SOLID)
+                self.assertIsNone(theme["plot_legend_title"])
 
 
 class TestFailingPaletteWarns(unittest.TestCase):
