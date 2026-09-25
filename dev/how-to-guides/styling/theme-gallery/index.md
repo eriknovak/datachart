@@ -82,7 +82,7 @@ signature(pair=("#7048E8", "#1B242C")).show()
 
 Navy to sky and amber to sand, stepped in lightness, with taupe and near-black closing the set. Two hue families keep the chart reading as one palette, and every pair of series stays apart for deutan, protan and tritan readers.
 
-Selected with [`THEME.HARBOR`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`HARBOR_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.HARBOR_THEME).
+Built as `derive_theme(THEME.DEFAULT, lead=COLORS.Harbor, traits=[TRAIT.FLAT])` with the Cividis value scale. Selected with [`THEME.HARBOR`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`HARBOR_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.HARBOR_THEME).
 
 ```
 config.set_theme(THEME.HARBOR)
@@ -134,7 +134,7 @@ signature(pair=("#1E2E85", "#299DC1")).show()
 
 Black edges, dotted grid, and a six-entry hatch cycle applied per bar series, so grouped bars stay distinguishable in black-and-white print; the green sits deep so it stays apart from rust for deutan readers.
 
-Selected with [`THEME.HATCH`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`HATCH_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.HATCH_THEME).
+Built as `derive_theme(THEME.DEFAULT, lead=COLORS.Rust, traits=[TRAIT.HATCHED, TRAIT.OUTLINED])` with the YlOrBr value scale, a dotted grid and the ink font stack. Selected with [`THEME.HATCH`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`HATCH_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.HATCH_THEME).
 
 ```
 config.set_theme(THEME.HATCH)
@@ -146,7 +146,7 @@ signature(pair=("#B5563A", "#5A6F86")).show()
 
 Indigo, cyan, sand, rose and wine from Paul Tol's muted scheme, every pair distinct for deutan, protan and tritan readers. Lines also differ by dash and scatter points by marker, bars carry black edges and the grid is dotted, so a figure survives a greyscale print.
 
-Selected with [`THEME.MUTED`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`MUTED_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.MUTED_THEME).
+Built as `derive_theme(THEME.DEFAULT, lead=COLORS.TolMuted, traits=[TRAIT.PATTERNED, TRAIT.EDGED])` with the YlOrBr value scale and a dotted grid. Selected with [`THEME.MUTED`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`MUTED_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.MUTED_THEME).
 
 ```
 config.set_theme(THEME.MUTED)
@@ -158,7 +158,7 @@ signature(pair=("#332288", "#CC6677")).show()
 
 Navy, straw, dusty rose, charcoal and grey, each a clear lightness step from the next, so a photocopy still tells the series apart; bars take a hatch cycle and black edges, lines a dash cycle, scatter points a marker cycle.
 
-Selected with [`THEME.CONTRAST`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`CONTRAST_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.CONTRAST_THEME).
+Built as `derive_theme(THEME.DEFAULT, lead=COLORS.Contrast, traits=[TRAIT.PATTERNED, TRAIT.HATCHED])` with the Cividis value scale. Selected with [`THEME.CONTRAST`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`CONTRAST_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.CONTRAST_THEME).
 
 ```
 config.set_theme(THEME.CONTRAST)
@@ -170,7 +170,7 @@ signature(pair=("#1F4E79", "#B45C6A")).show()
 
 The five muted colours of `MUTED` under the hatch cycle of `CONTRAST`, so bars survive a greyscale print by pattern as well as colour. The value scale is BuPu, the family of indigo and wine, instead of YlOrBr.
 
-Selected with [`THEME.MUTEDHATCH`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`MUTEDHATCH_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.MUTEDHATCH_THEME).
+Built as `derive_theme(THEME.DEFAULT, lead=COLORS.TolMuted, traits=[TRAIT.PATTERNED, TRAIT.HATCHED])` with the BuPu value scale and a dotted grid. Selected with [`THEME.MUTEDHATCH`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`MUTEDHATCH_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.MUTEDHATCH_THEME).
 
 ```
 config.set_theme(THEME.MUTEDHATCH)
@@ -182,7 +182,7 @@ signature(pair=("#332288", "#CC6677")).show()
 
 The `HATCH` theme without rust: slate blue, sand, wine, green, orchid and sky blue under black edges, hatches and a dotted grid, every pair distinct for deutan and protan readers. The value scale is PuBu.
 
-Selected with [`THEME.SLATEHATCH`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`SLATEHATCH_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.SLATEHATCH_THEME).
+Built as `derive_theme(THEME.DEFAULT, lead=COLORS.Slate, traits=[TRAIT.HATCHED, TRAIT.OUTLINED])` with the PuBu value scale and the hatch theme's grid and fonts. Selected with [`THEME.SLATEHATCH`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`SLATEHATCH_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.SLATEHATCH_THEME).
 
 ```
 config.set_theme(THEME.SLATEHATCH)

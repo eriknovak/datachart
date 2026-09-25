@@ -44,7 +44,7 @@ For print and black-and-white reproduction; the greyscale themes pair it with ha
 
 ## Datachart's Own
 
-Two palettes registered by datachart rather than pypalettes, made for the ink theme's publication look. They cycle through their exact colors instead of interpolating, so the series colors are always the ones listed.
+Palettes registered by datachart rather than pypalettes: the two publication palettes of the ink theme, and the tuned categorical leads of the derived themes (harbor, muted, contrast, hatch and slate-hatch), each stepped so every pair of series stays apart for colour-blind readers. They cycle through their exact colors instead of interpolating, so the series colors are always the ones listed.
 
 ## Beyond the Constant
 

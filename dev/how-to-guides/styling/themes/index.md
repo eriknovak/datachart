@@ -209,6 +209,24 @@ with config.override(derive_theme(THEME.DARK, lead=COLORS.Oranges)):
     demo().show()
 ```
 
+Traits are the third ingredient. A [`TRAIT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.TRAIT) is a named set of mark keys and nothing else: `FLAT` (no edges, opaque bars, 2 pt lines), `EDGED` (black bar and histogram edges), `HATCHED` (edged plus one hatch per bar series), `OUTLINED` (black outlines on every other mark) and `PATTERNED` (dash and marker cycles). `derive_theme` applies them in the order given, after the lead and before the keyword overrides, so a later trait wins a shared key. The harbor, muted, contrast, hatch, muted-hatch and slate-hatch themes are built exactly this way from the default theme, a named `COLORS` lead and one or two traits; here is the muted-hatch recipe with its value scale, the grid and line width left to the default theme, and a print variant of the minimal look:
+
+```
+from datachart.constants import TRAIT
+
+mutedhatch = derive_theme(
+    THEME.DEFAULT,
+    lead=COLORS.TolMuted,
+    traits=[TRAIT.PATTERNED, TRAIT.HATCHED],
+    plot_heatmap_cmap=COLORS.BuPu,
+)
+with config.override(mutedhatch):
+    demo().show()
+
+with config.override(derive_theme(THEME.MINIMAL, lead=COLORS.Contrast, traits=[TRAIT.PATTERNED, TRAIT.HATCHED])):
+    demo().show()
+```
+
 ## Sharing a Theme
 
 `save_theme` writes a theme file: a JSON document carrying a name, a format version, and only the attributes that differ from the default theme, so the file stays short and reviewable. A registered theme is saved by name; with no name the live configuration is saved, so a look assembled with `update_config` leaves the process too.

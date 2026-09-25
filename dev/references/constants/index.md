@@ -15,6 +15,7 @@ Each class and what reads it: a chart parameter, a style attribute, or the confi
 | `FIG_SIZE`   | figsize of every chart, Panel, and Grid. |
 | `FIG_FORMAT` | format of save_figure.                   |
 | `THEME`      | config.set_theme.                        |
+| `TRAIT`      | traits of derive_theme.                  |
 
 **Font Constants**
 
@@ -481,52 +482,57 @@ Examples:
 'Blues'
 ```
 
-| ATTRIBUTE        | DESCRIPTION                                                                                       |
-| ---------------- | ------------------------------------------------------------------------------------------------- |
-| `DEFAULT`        | The default theme's singular palette. Same as COLORS.Blues. **TYPE:** `str`                       |
-| `Blues`          | Sequential blue palette. Equals to "Blues". **TYPE:** `str`                                       |
-| `Greens`         | Sequential green palette. Equals to "Greens". **TYPE:** `str`                                     |
-| `Oranges`        | Sequential orange palette. Equals to "Oranges". **TYPE:** `str`                                   |
-| `Purples`        | Sequential purple palette. Equals to "Purples". **TYPE:** `str`                                   |
-| `Reds`           | Sequential red palette. Equals to "Reds". **TYPE:** `str`                                         |
-| `Sunset2`        | Multi-hue sunset palette. Equals to "Sunset2". **TYPE:** `str`                                    |
-| `YlGnBu`         | Multi-hue yellow-green-blue palette. Equals to "YlGnBu". **TYPE:** `str`                          |
-| `YlOrRd`         | Multi-hue yellow-orange-red palette. Equals to "YlOrRd". **TYPE:** `str`                          |
-| `YlOrBr`         | Multi-hue yellow-orange-brown palette. Equals to "YlOrBr". **TYPE:** `str`                        |
-| `PuBuGn`         | Multi-hue purple-blue-green palette. Equals to "PuBuGn". **TYPE:** `str`                          |
-| `GnBu`           | Multi-hue green-blue palette. Equals to "GnBu". **TYPE:** `str`                                   |
-| `BuPu`           | Multi-hue blue-purple palette. Equals to "BuPu". **TYPE:** `str`                                  |
-| `PuBu`           | Multi-hue purple-blue palette. Equals to "PuBu". **TYPE:** `str`                                  |
-| `Egypt`          | Multi-hue Egypt palette. Equals to "Egypt". **TYPE:** `str`                                       |
-| `Hiroshige`      | Multi-hue Hiroshige palette. Equals to "Hiroshige". **TYPE:** `str`                               |
-| `Lake`           | Multi-hue lake palette. Equals to "Lake". **TYPE:** `str`                                         |
-| `Neon`           | Multi-hue neon palette. Equals to "Neon". **TYPE:** `str`                                         |
-| `RdBu`           | Diverging red-blue palette. Equals to "RdBu". **TYPE:** `str`                                     |
-| `BrBG`           | Diverging brown-blue-green palette. Equals to "BrBG". **TYPE:** `str`                             |
-| `PuOr`           | Diverging purple-orange palette. Equals to "PuOr". **TYPE:** `str`                                |
-| `Spectral`       | Diverging spectral palette. Equals to "Spectral". **TYPE:** `str`                                 |
-| `RdYlBu`         | Diverging red-yellow-blue palette. Equals to "RdYlBu". **TYPE:** `str`                            |
-| `RdYlGn`         | Diverging red-yellow-green palette. Equals to "RdYlGn". **TYPE:** `str`                           |
-| `Pastel`         | Soft pastel categorical palette. Equals to "Pastel". **TYPE:** `str`                              |
-| `Set2`           | ColorBrewer Set2 categorical palette. Equals to "Set2". **TYPE:** `str`                           |
-| `Accent`         | ColorBrewer Accent categorical palette. Equals to "Accent". **TYPE:** `str`                       |
-| `Dark2`          | ColorBrewer Dark2 categorical palette. Equals to "Dark2". **TYPE:** `str`                         |
-| `Paired`         | ColorBrewer Paired categorical palette (high contrast). Equals to "Paired". **TYPE:** `str`       |
-| `Set1`           | ColorBrewer Set1 categorical palette (high contrast). Equals to "Set1". **TYPE:** `str`           |
-| `Greys`          | Grayscale palette for monochrome visualizations. Equals to "Greys". **TYPE:** `str`               |
-| `Viridis`        | Perceptually uniform, color-blind friendly. Equals to "Viridis". **TYPE:** `str`                  |
-| `Cividis`        | Color-blind friendly (optimized for CVD). Equals to "Cividis". **TYPE:** `str`                    |
-| `Inferno`        | Perceptually uniform, color-blind friendly. Equals to "Inferno". **TYPE:** `str`                  |
-| `Plasma`         | Perceptually uniform, color-blind friendly. Equals to "Plasma". **TYPE:** `str`                   |
-| `Magma`          | Perceptually uniform, color-blind friendly. Equals to "magma". **TYPE:** `str`                    |
-| `Turbo`          | Rainbow-like but perceptually better. Equals to "turbo". **TYPE:** `str`                          |
-| `OkabeIto`       | Okabe-Ito categorical palette, color-blind safe. Equals to "OkabeIto". **TYPE:** `str`            |
-| `OkabeIto_Black` | Okabe-Ito palette including black. Equals to "OkabeIto_black". **TYPE:** `str`                    |
-| `Coolwarm`       | Diverging cool-warm palette. Equals to "coolwarm". **TYPE:** `str`                                |
-| `Tab10`          | Tableau 10-color categorical palette. Equals to "tab10". **TYPE:** `str`                          |
-| `Tab20`          | Tableau 20-color categorical palette. Equals to "tab20". **TYPE:** `str`                          |
-| `PaperYlGnBu`    | Diversified YlGnBu categorical palette for publications. Equals to "PaperYlGnBu". **TYPE:** `str` |
-| `PaperAccent`    | Two-color blue/red accent pair for publications. Equals to "PaperAccent". **TYPE:** `str`         |
+| ATTRIBUTE        | DESCRIPTION                                                                                                                       |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `DEFAULT`        | The default theme's singular palette. Same as COLORS.Blues. **TYPE:** `str`                                                       |
+| `Blues`          | Sequential blue palette. Equals to "Blues". **TYPE:** `str`                                                                       |
+| `Greens`         | Sequential green palette. Equals to "Greens". **TYPE:** `str`                                                                     |
+| `Oranges`        | Sequential orange palette. Equals to "Oranges". **TYPE:** `str`                                                                   |
+| `Purples`        | Sequential purple palette. Equals to "Purples". **TYPE:** `str`                                                                   |
+| `Reds`           | Sequential red palette. Equals to "Reds". **TYPE:** `str`                                                                         |
+| `Sunset2`        | Multi-hue sunset palette. Equals to "Sunset2". **TYPE:** `str`                                                                    |
+| `YlGnBu`         | Multi-hue yellow-green-blue palette. Equals to "YlGnBu". **TYPE:** `str`                                                          |
+| `YlOrRd`         | Multi-hue yellow-orange-red palette. Equals to "YlOrRd". **TYPE:** `str`                                                          |
+| `YlOrBr`         | Multi-hue yellow-orange-brown palette. Equals to "YlOrBr". **TYPE:** `str`                                                        |
+| `PuBuGn`         | Multi-hue purple-blue-green palette. Equals to "PuBuGn". **TYPE:** `str`                                                          |
+| `GnBu`           | Multi-hue green-blue palette. Equals to "GnBu". **TYPE:** `str`                                                                   |
+| `BuPu`           | Multi-hue blue-purple palette. Equals to "BuPu". **TYPE:** `str`                                                                  |
+| `PuBu`           | Multi-hue purple-blue palette. Equals to "PuBu". **TYPE:** `str`                                                                  |
+| `Egypt`          | Multi-hue Egypt palette. Equals to "Egypt". **TYPE:** `str`                                                                       |
+| `Hiroshige`      | Multi-hue Hiroshige palette. Equals to "Hiroshige". **TYPE:** `str`                                                               |
+| `Lake`           | Multi-hue lake palette. Equals to "Lake". **TYPE:** `str`                                                                         |
+| `Neon`           | Multi-hue neon palette. Equals to "Neon". **TYPE:** `str`                                                                         |
+| `RdBu`           | Diverging red-blue palette. Equals to "RdBu". **TYPE:** `str`                                                                     |
+| `BrBG`           | Diverging brown-blue-green palette. Equals to "BrBG". **TYPE:** `str`                                                             |
+| `PuOr`           | Diverging purple-orange palette. Equals to "PuOr". **TYPE:** `str`                                                                |
+| `Spectral`       | Diverging spectral palette. Equals to "Spectral". **TYPE:** `str`                                                                 |
+| `RdYlBu`         | Diverging red-yellow-blue palette. Equals to "RdYlBu". **TYPE:** `str`                                                            |
+| `RdYlGn`         | Diverging red-yellow-green palette. Equals to "RdYlGn". **TYPE:** `str`                                                           |
+| `Pastel`         | Soft pastel categorical palette. Equals to "Pastel". **TYPE:** `str`                                                              |
+| `Set2`           | ColorBrewer Set2 categorical palette. Equals to "Set2". **TYPE:** `str`                                                           |
+| `Accent`         | ColorBrewer Accent categorical palette. Equals to "Accent". **TYPE:** `str`                                                       |
+| `Dark2`          | ColorBrewer Dark2 categorical palette. Equals to "Dark2". **TYPE:** `str`                                                         |
+| `Paired`         | ColorBrewer Paired categorical palette (high contrast). Equals to "Paired". **TYPE:** `str`                                       |
+| `Set1`           | ColorBrewer Set1 categorical palette (high contrast). Equals to "Set1". **TYPE:** `str`                                           |
+| `Greys`          | Grayscale palette for monochrome visualizations. Equals to "Greys". **TYPE:** `str`                                               |
+| `Viridis`        | Perceptually uniform, color-blind friendly. Equals to "Viridis". **TYPE:** `str`                                                  |
+| `Cividis`        | Color-blind friendly (optimized for CVD). Equals to "Cividis". **TYPE:** `str`                                                    |
+| `Inferno`        | Perceptually uniform, color-blind friendly. Equals to "Inferno". **TYPE:** `str`                                                  |
+| `Plasma`         | Perceptually uniform, color-blind friendly. Equals to "Plasma". **TYPE:** `str`                                                   |
+| `Magma`          | Perceptually uniform, color-blind friendly. Equals to "magma". **TYPE:** `str`                                                    |
+| `Turbo`          | Rainbow-like but perceptually better. Equals to "turbo". **TYPE:** `str`                                                          |
+| `OkabeIto`       | Okabe-Ito categorical palette, color-blind safe. Equals to "OkabeIto". **TYPE:** `str`                                            |
+| `OkabeIto_Black` | Okabe-Ito palette including black. Equals to "OkabeIto_black". **TYPE:** `str`                                                    |
+| `Coolwarm`       | Diverging cool-warm palette. Equals to "coolwarm". **TYPE:** `str`                                                                |
+| `Tab10`          | Tableau 10-color categorical palette. Equals to "tab10". **TYPE:** `str`                                                          |
+| `Tab20`          | Tableau 20-color categorical palette. Equals to "tab20". **TYPE:** `str`                                                          |
+| `PaperYlGnBu`    | Diversified YlGnBu categorical palette for publications. Equals to "PaperYlGnBu". **TYPE:** `str`                                 |
+| `PaperAccent`    | Two-color blue/red accent pair for publications. Equals to "PaperAccent". **TYPE:** `str`                                         |
+| `Harbor`         | Navy to sky and amber to sand in lightness steps, the harbor theme's lead. Equals to "Harbor". **TYPE:** `str`                    |
+| `TolMuted`       | Paul Tol's muted scheme without its greens, the muted theme's lead. Equals to "TolMuted". **TYPE:** `str`                         |
+| `Contrast`       | Navy, straw, dusty rose, charcoal and grey stepped in lightness, the contrast theme's lead. Equals to "Contrast". **TYPE:** `str` |
+| `Rust`           | Muted print tones with rust first, the hatch theme's lead. Equals to "Rust". **TYPE:** `str`                                      |
+| `Slate`          | Slate blue, sand, wine, green, orchid and sky, the slate-hatch theme's lead. Equals to "Slate". **TYPE:** `str`                   |
 
 ### datachart.constants.THEME
 
@@ -560,6 +566,31 @@ Examples:
 | `MUTEDHATCH` | The muted-hatch theme (Tol's muted colours under hatches, BuPu value scale). Equals to "mutedhatch". **TYPE:** `str`                  |
 | `SLATEHATCH` | The slate-hatch theme (the hatch theme without rust, slate blue first, PuBu value scale). Equals to "slatehatch". **TYPE:** `str`     |
 | `DARK`       | The dark theme (bright marks on a near-black page, light furniture, Viridis value scale). Equals to "dark". **TYPE:** `str`           |
+
+### datachart.constants.TRAIT
+
+Bases: `Domain`
+
+The traits a derived theme composes.
+
+A trait changes how marks are drawn and nothing about the furniture; derive_theme applies the traits it is given in order, after the lead and before any overrides. The predefined harbor, muted, contrast, hatch, muted-hatch and slate-hatch themes are built this way; the [Themes guide](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) shows the recipe.
+
+Examples:
+
+```
+>>> from datachart.constants import COLORS, THEME, TRAIT
+>>> from datachart.themes import derive_theme
+>>> theme = derive_theme(THEME.MINIMAL, lead=COLORS.TolMuted, traits=[TRAIT.PATTERNED])
+```
+
+| ATTRIBUTE   | DESCRIPTION                                                                                                                                                    |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DEFAULT`   | No trait; the base's marks as they are. **TYPE:** `None`                                                                                                       |
+| `FLAT`      | No bar, histogram or band edges, opaque bars, 2 pt lines. Equals to "flat". **TYPE:** `str`                                                                    |
+| `EDGED`     | Black edges on bars and histograms, opaque bars. Equals to "edged". **TYPE:** `str`                                                                            |
+| `HATCHED`   | Edged, plus one hatch per bar series and a 0.8 pt bar edge. Equals to "hatched". **TYPE:** `str`                                                               |
+| `OUTLINED`  | Black outlines on every other mark: bands, nodes, tiles, points, bodies, annotation boxes, arrows and the heatmap frame. Equals to "outlined". **TYPE:** `str` |
+| `PATTERNED` | A dash cycle for lines and a marker cycle for points. Equals to "patterned". **TYPE:** `str`                                                                   |
 
 ### datachart.constants.EMPHASIS
 

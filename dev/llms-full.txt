@@ -18407,6 +18407,24 @@ with config.override(derive_theme(THEME.DARK, lead=COLORS.Oranges)):
     demo().show()
 ```
 
+Traits are the third ingredient. A [`TRAIT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.TRAIT) is a named set of mark keys and nothing else: `FLAT` (no edges, opaque bars, 2 pt lines), `EDGED` (black bar and histogram edges), `HATCHED` (edged plus one hatch per bar series), `OUTLINED` (black outlines on every other mark) and `PATTERNED` (dash and marker cycles). `derive_theme` applies them in the order given, after the lead and before the keyword overrides, so a later trait wins a shared key. The harbor, muted, contrast, hatch, muted-hatch and slate-hatch themes are built exactly this way from the default theme, a named `COLORS` lead and one or two traits; here is the muted-hatch recipe with its value scale, the grid and line width left to the default theme, and a print variant of the minimal look:
+
+```
+from datachart.constants import TRAIT
+
+mutedhatch = derive_theme(
+    THEME.DEFAULT,
+    lead=COLORS.TolMuted,
+    traits=[TRAIT.PATTERNED, TRAIT.HATCHED],
+    plot_heatmap_cmap=COLORS.BuPu,
+)
+with config.override(mutedhatch):
+    demo().show()
+
+with config.override(derive_theme(THEME.MINIMAL, lead=COLORS.Contrast, traits=[TRAIT.PATTERNED, TRAIT.HATCHED])):
+    demo().show()
+```
+
 ## Sharing a Theme
 
 `save_theme` writes a theme file: a JSON document carrying a name, a format version, and only the attributes that differ from the default theme, so the file stays short and reviewable. A registered theme is saved by name; with no name the live configuration is saved, so a look assembled with `update_config` leaves the process too.
@@ -18520,7 +18538,7 @@ signature(pair=("#7048E8", "#1B242C")).show()
 
 Navy to sky and amber to sand, stepped in lightness, with taupe and near-black closing the set. Two hue families keep the chart reading as one palette, and every pair of series stays apart for deutan, protan and tritan readers.
 
-Selected with [`THEME.HARBOR`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`HARBOR_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.HARBOR_THEME).
+Built as `derive_theme(THEME.DEFAULT, lead=COLORS.Harbor, traits=[TRAIT.FLAT])` with the Cividis value scale. Selected with [`THEME.HARBOR`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`HARBOR_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.HARBOR_THEME).
 
 ```
 config.set_theme(THEME.HARBOR)
@@ -18572,7 +18590,7 @@ signature(pair=("#1E2E85", "#299DC1")).show()
 
 Black edges, dotted grid, and a six-entry hatch cycle applied per bar series, so grouped bars stay distinguishable in black-and-white print; the green sits deep so it stays apart from rust for deutan readers.
 
-Selected with [`THEME.HATCH`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`HATCH_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.HATCH_THEME).
+Built as `derive_theme(THEME.DEFAULT, lead=COLORS.Rust, traits=[TRAIT.HATCHED, TRAIT.OUTLINED])` with the YlOrBr value scale, a dotted grid and the ink font stack. Selected with [`THEME.HATCH`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`HATCH_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.HATCH_THEME).
 
 ```
 config.set_theme(THEME.HATCH)
@@ -18584,7 +18602,7 @@ signature(pair=("#B5563A", "#5A6F86")).show()
 
 Indigo, cyan, sand, rose and wine from Paul Tol's muted scheme, every pair distinct for deutan, protan and tritan readers. Lines also differ by dash and scatter points by marker, bars carry black edges and the grid is dotted, so a figure survives a greyscale print.
 
-Selected with [`THEME.MUTED`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`MUTED_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.MUTED_THEME).
+Built as `derive_theme(THEME.DEFAULT, lead=COLORS.TolMuted, traits=[TRAIT.PATTERNED, TRAIT.EDGED])` with the YlOrBr value scale and a dotted grid. Selected with [`THEME.MUTED`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`MUTED_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.MUTED_THEME).
 
 ```
 config.set_theme(THEME.MUTED)
@@ -18596,7 +18614,7 @@ signature(pair=("#332288", "#CC6677")).show()
 
 Navy, straw, dusty rose, charcoal and grey, each a clear lightness step from the next, so a photocopy still tells the series apart; bars take a hatch cycle and black edges, lines a dash cycle, scatter points a marker cycle.
 
-Selected with [`THEME.CONTRAST`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`CONTRAST_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.CONTRAST_THEME).
+Built as `derive_theme(THEME.DEFAULT, lead=COLORS.Contrast, traits=[TRAIT.PATTERNED, TRAIT.HATCHED])` with the Cividis value scale. Selected with [`THEME.CONTRAST`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`CONTRAST_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.CONTRAST_THEME).
 
 ```
 config.set_theme(THEME.CONTRAST)
@@ -18608,7 +18626,7 @@ signature(pair=("#1F4E79", "#B45C6A")).show()
 
 The five muted colours of `MUTED` under the hatch cycle of `CONTRAST`, so bars survive a greyscale print by pattern as well as colour. The value scale is BuPu, the family of indigo and wine, instead of YlOrBr.
 
-Selected with [`THEME.MUTEDHATCH`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`MUTEDHATCH_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.MUTEDHATCH_THEME).
+Built as `derive_theme(THEME.DEFAULT, lead=COLORS.TolMuted, traits=[TRAIT.PATTERNED, TRAIT.HATCHED])` with the BuPu value scale and a dotted grid. Selected with [`THEME.MUTEDHATCH`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`MUTEDHATCH_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.MUTEDHATCH_THEME).
 
 ```
 config.set_theme(THEME.MUTEDHATCH)
@@ -18620,7 +18638,7 @@ signature(pair=("#332288", "#CC6677")).show()
 
 The `HATCH` theme without rust: slate blue, sand, wine, green, orchid and sky blue under black edges, hatches and a dotted grid, every pair distinct for deutan and protan readers. The value scale is PuBu.
 
-Selected with [`THEME.SLATEHATCH`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`SLATEHATCH_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.SLATEHATCH_THEME).
+Built as `derive_theme(THEME.DEFAULT, lead=COLORS.Slate, traits=[TRAIT.HATCHED, TRAIT.OUTLINED])` with the PuBu value scale and the hatch theme's grid and fonts. Selected with [`THEME.SLATEHATCH`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`SLATEHATCH_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.SLATEHATCH_THEME).
 
 ```
 config.set_theme(THEME.SLATEHATCH)
@@ -18710,7 +18728,7 @@ For print and black-and-white reproduction; the greyscale themes pair it with ha
 
 ## Datachart's Own
 
-Two palettes registered by datachart rather than pypalettes, made for the ink theme's publication look. They cycle through their exact colors instead of interpolating, so the series colors are always the ones listed.
+Palettes registered by datachart rather than pypalettes: the two publication palettes of the ink theme, and the tuned categorical leads of the derived themes (harbor, muted, contrast, hatch and slate-hatch), each stepped so every pair of series stays apart for colour-blind readers. They cycle through their exact colors instead of interpolating, so the series colors are always the ones listed.
 
 ## Beyond the Constant
 
@@ -29962,11 +29980,11 @@ Examples:
 
 The module containing the `themes`.
 
-The `themes` module contains the predefined style themes that are used to visualize the plots. Themes are named for their visual trait, never for a use case or audience; each is a complete `StyleAttrs` dictionary that `config.set_theme` applies.
+The `themes` module contains the predefined style themes that are used to visualize the plots. Themes are named for their look, never for a use case or audience; each is a complete `StyleAttrs` dictionary that `config.set_theme` applies.
 
 ## Choosing a Theme
 
-Every theme is a complete [`StyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.StyleAttrs) dictionary, named for its visual trait and listed here by where it works best. Apply one with [`config.set_theme`](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.set_theme) and the member of [`THEME`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME) in the last column; the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md) shows each on six charts, and the [Themes guide](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) shows how to adjust one or build your own. [`derive_theme`](#datachart.themes.derive_theme) rebuilds any theme's palettes from a colormap and keeps its furniture, and [`score_palette`](#datachart.themes.score_palette) reports how a series palette holds up for colour-blind readers; every predefined theme passes its gate.
+Every theme is a complete [`StyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.StyleAttrs) dictionary, named for its look and listed here by where it works best. Apply one with [`config.set_theme`](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.set_theme) and the member of [`THEME`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME) in the last column; the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md) shows each on six charts, and the [Themes guide](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) shows how to adjust one or build your own. [`derive_theme`](#datachart.themes.derive_theme) rebuilds any theme's palettes from a lead, keeps its furniture, and composes [`TRAIT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.TRAIT) members on top; the harbor, muted, contrast, hatch, muted-hatch and slate-hatch themes are built that way from the default theme, a named `COLORS` lead and one or two traits. [`score_palette`](#datachart.themes.score_palette) reports how a series palette holds up for colour-blind readers; every predefined theme passes its gate.
 
 | Theme                                                    | Look                                                                            | Apply with         |
 | -------------------------------------------------------- | ------------------------------------------------------------------------------- | ------------------ |
@@ -29994,13 +30012,16 @@ Every theme is a complete [`StyleAttrs`](https://eriknovak.github.io/datachart/d
 
 ```
 derive_theme(
-    base: str | StyleAttrs, lead: Lead, **overrides: Any
+    base: str | StyleAttrs,
+    lead: Lead,
+    traits: Sequence[TRAIT | str] | None = None,
+    **overrides: Any
 ) -> StyleAttrs
 ```
 
 Build a theme variant: the base's furniture with palettes rebuilt from the lead.
 
-A sequential lead becomes the value scale (`color_general_singular`, `plot_heatmap_cmap`); the series palette is six of its colors in lightness steps, interleaved dark and light, the parallel coords ramp four of them from light to dark, and the dumbbell pair its lightest and darkest sample. A categorical lead becomes the series palette, its first color the singular one, and the base keeps its value scale, ramp, and dumbbell pair. Fonts, spines, hatches, and rendering attributes are never touched. The result is a plain theme dictionary: apply it with `register_theme` or `override`.
+A sequential lead becomes the value scale (`color_general_singular`, `plot_heatmap_cmap`); the series palette is six of its colors in lightness steps, interleaved dark and light, the parallel coords ramp four of them from light to dark, and the dumbbell pair its lightest and darkest sample. A categorical lead becomes the series palette, its first color the singular one, and the base keeps its value scale, ramp, and dumbbell pair. Each trait then sets its mark keys, in the order given, so a later trait wins a shared key; fonts, spines and rendering attributes are never touched. The result is a plain theme dictionary: apply it with `register_theme` or `override`; `TRAIT` lists the traits and the predefined themes built this way.
 
 Examples:
 
@@ -30017,6 +30038,7 @@ Examples:
 | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `base`        | A THEME constant, a registered theme name, or a theme dictionary; a partial dictionary is completed from the default theme, as register_theme completes it. **TYPE:** \`str |
 | `lead`        | A COLORS constant, a pypalettes palette name, or a list of colors. A diverging map is not a lead; it is read as categorical. **TYPE:** `Lead`                               |
+| `traits`      | TRAIT members applied in order after the lead; an unknown name raises. **TYPE:** \`Sequence\[TRAIT                                                                          |
 | `**overrides` | Style attributes set on the result; an unknown name raises. **TYPE:** `Any` **DEFAULT:** `{}`                                                                               |
 
 | RETURNS      | DESCRIPTION        |
@@ -30183,39 +30205,27 @@ The minimal theme: accent violet, no spines, flat bars.
 ### datachart.themes.HARBOR_THEME
 
 ```
-HARBOR_THEME: StyleAttrs = make_theme(
-    {
-        "color_general_singular": COLORS.Cividis,
-        "color_general_multiple": [
-            "#1F4E79",
-            "#D08C3A",
-            "#6FA3D3",
-            "#EFC98C",
-            "#8C6D5A",
-            "#1A1A1A",
-        ],
-        "color_parallel_hue_continuous": [
-            "#BCAE6C",
-            "#7D7C78",
-            "#434E6C",
-            "#00224E",
-        ],
-        "plot_line_width": 2.0,
-        "plot_bar_alpha": 1.0,
-        "plot_bar_edge_width": 0,
-        "plot_stackedarea_edge_width": 0,
-        "plot_hist_edge_width": 0,
-        "plot_dumbbell_start_color": "#EFC98C",
-        "plot_dumbbell_end_color": "#1F4E79",
-        "plot_heatmap_cmap": COLORS.Cividis,
-        "plot_heatmap_cmap_diverging": COLORS.RdBu,
-    }
+HARBOR_THEME: StyleAttrs = derive_theme(
+    DEFAULT_THEME,
+    lead=COLORS.Harbor,
+    traits=[TRAIT.FLAT],
+    color_general_singular=COLORS.Cividis,
+    color_parallel_hue_continuous=[
+        "#BCAE6C",
+        "#7D7C78",
+        "#434E6C",
+        "#00224E",
+    ],
+    plot_dumbbell_start_color="#EFC98C",
+    plot_dumbbell_end_color="#1F4E79",
+    plot_heatmap_cmap=COLORS.Cividis,
+    plot_heatmap_cmap_diverging=COLORS.RdBu,
 )
 ```
 
 The harbor theme: navy and amber in lightness steps, colour-blind safe.
 
-Two hue families, navy to sky and amber to sand, with taupe and near-black closing the set; lightness does the separating, so every pair of series stays apart for deutan, protan and tritan readers. Flat bars, 2 pt lines and the Cividis value scale.
+The `Harbor` lead, two hue families, navy to sky and amber to sand, with taupe and near-black closing the set; lightness does the separating, so every pair of series stays apart for deutan, protan and tritan readers. The flat trait gives edgeless opaque bars and 2 pt lines; the value scale is Cividis.
 
 ### datachart.themes.DARK_THEME
 
@@ -30443,205 +30453,129 @@ The ink theme: dark-ink accents, print-ready.
 ### datachart.themes.HATCH_THEME
 
 ```
-HATCH_THEME: StyleAttrs = make_theme(
-    {
-        "color_general_singular": COLORS.YlOrBr,
-        "color_general_multiple": [
-            "#B5563A",
-            "#5A6F86",
-            "#EBBC63",
-            "#2C4A34",
-            "#9F9A8D",
-            "#966AD5",
-        ],
-        "color_parallel_hue_continuous": [
-            "#F3E0C3",
-            "#E0AE6A",
-            "#B5563A",
-            "#6B2E1A",
-        ],
-        "font_general_sansserif": [
-            "Helvetica",
-            "Arial",
-            "Liberation Sans",
-            "DejaVu Sans",
-        ],
-        "plot_hatch_cycle": [
-            "",
-            "//",
-            "..",
-            "xx",
-            "\\",
-            "--",
-        ],
-        "plot_grid_color": "#D0D0D0",
-        "plot_grid_linestyle": LINE_STYLE.DOTTED,
-        "plot_grid_alpha": 0.8,
-        "plot_bar_edge_color": "#000000",
-        "plot_stackedarea_edge_color": "#000000",
-        "plot_sankey_node_edge_color": "#000000",
-        "plot_treemap_edge_color": "#000000",
-        "plot_network_node_edge_color": "#000000",
-        "plot_bar_edge_width": 0.8,
-        "plot_bar_alpha": 1.0,
-        "plot_hist_edge_color": "#000000",
-        "plot_scatter_edge_color": "#000000",
-        "plot_scatter_edge_width": 0.6,
-        "plot_swarm_edge_color": "#000000",
-        "plot_swarm_edge_width": 0.6,
-        "plot_text_box_edgecolor": "#000000",
-        "plot_text_arrow_color": "#000000",
-        "plot_gantt_dependency_color": "#000000",
-        "plot_gantt_today_color": "#000000",
-        "plot_dumbbell_start_color": "#5A6F86",
-        "plot_dumbbell_end_color": "#B5563A",
-        "plot_dumbbell_edge_color": "#000000",
-        "plot_dumbbell_connector_color": "#8C8C8C",
-        "plot_dumbbell_arrow_color": "#000000",
-        "plot_heatmap_cmap": COLORS.YlOrBr,
-        "plot_heatmap_cmap_diverging": COLORS.RdBu,
-        "plot_heatmap_frame_color": "#000000",
-        "plot_violin_edgecolor": "#000000",
-        "plot_ridgeline_edgecolor": "#000000",
-    }
+HATCH_THEME: StyleAttrs = derive_theme(
+    DEFAULT_THEME,
+    lead=COLORS.Rust,
+    traits=[TRAIT.HATCHED, TRAIT.OUTLINED],
+    color_general_singular=COLORS.YlOrBr,
+    color_parallel_hue_continuous=[
+        "#F3E0C3",
+        "#E0AE6A",
+        "#B5563A",
+        "#6B2E1A",
+    ],
+    plot_dumbbell_start_color="#5A6F86",
+    plot_dumbbell_end_color="#B5563A",
+    plot_heatmap_cmap=COLORS.YlOrBr,
+    plot_heatmap_cmap_diverging=COLORS.RdBu,
+    **HATCH_FURNITURE
 )
 ```
 
 The hatch theme: hatch cycle, black edges, dotted grid.
 
+The `Rust` lead, muted print tones with rust first and the green deep enough to stay apart from rust for deutan readers; the hatched trait gives every bar series its own hatch under black edges, the outlined trait black outlines on every other mark, and the grid is dotted. The value scale is YlOrBr.
+
 ### datachart.themes.MUTED_THEME
 
 ```
-MUTED_THEME: StyleAttrs = make_theme(
-    {
-        "color_general_singular": COLORS.YlOrBr,
-        "color_general_multiple": [
-            "#332288",
-            "#88CCEE",
-            "#DDCC77",
-            "#CC6677",
-            "#882255",
-        ],
-        "color_parallel_hue_continuous": [
-            "#FEE391",
-            "#FE9929",
-            "#CC4C02",
-            "#662506",
-        ],
-        "plot_linestyle_cycle": ["-", "--", "-.", ":", "-"],
-        "plot_marker_cycle": ["o", "s", "^", "D", "v"],
-        "plot_line_width": 1.2,
-        "plot_bar_alpha": 1.0,
-        "plot_bar_edge_color": "#000000",
-        "plot_bar_edge_width": 0.6,
-        "plot_hist_edge_color": "#000000",
-        "plot_grid_linestyle": LINE_STYLE.DOTTED,
-        "plot_grid_color": "#C8C8C8",
-        "plot_dumbbell_start_color": "#DDCC77",
-        "plot_dumbbell_end_color": "#332288",
-        "plot_heatmap_cmap": COLORS.YlOrBr,
-        "plot_heatmap_cmap_diverging": COLORS.RdBu,
-    }
+MUTED_THEME: StyleAttrs = derive_theme(
+    DEFAULT_THEME,
+    lead=COLORS.TolMuted,
+    traits=[TRAIT.PATTERNED, TRAIT.EDGED],
+    color_general_singular=COLORS.YlOrBr,
+    color_parallel_hue_continuous=[
+        "#FEE391",
+        "#FE9929",
+        "#CC4C02",
+        "#662506",
+    ],
+    plot_heatmap_cmap=COLORS.YlOrBr,
+    **MUTED_FURNITURE,
+    plot_heatmap_cmap_diverging=COLORS.RdBu
 )
 ```
 
 The muted theme: Tol's muted colours, dashes and markers, colour-blind safe.
 
-Indigo, cyan, sand, rose and wine from Paul Tol's muted scheme, every pair distinct for deutan, protan and tritan readers. Lines also differ by dash and scatter points by marker, bars carry black edges, and the grid is dotted, so a figure survives a greyscale print. The value scale is YlOrBr.
+The `TolMuted` lead, indigo, cyan, sand, rose and wine from Paul Tol's muted scheme, every pair distinct for deutan, protan and tritan readers. The patterned trait gives lines a dash and scatter points a marker, the edged trait black bar edges, and the grid is dotted, so a figure survives a greyscale print. The value scale is YlOrBr.
 
 ### datachart.themes.CONTRAST_THEME
 
 ```
-CONTRAST_THEME: StyleAttrs = make_theme(
-    {
-        "color_general_singular": COLORS.Cividis,
-        "color_general_multiple": [
-            "#1F4E79",
-            "#D4B24C",
-            "#B45C6A",
-            "#2B2B2B",
-            "#9A9A9A",
-        ],
-        "color_parallel_hue_continuous": [
-            "#BCAE6C",
-            "#7D7C78",
-            "#434E6C",
-            "#00224E",
-        ],
-        "plot_linestyle_cycle": ["-", "--", "-.", ":", "-"],
-        "plot_marker_cycle": ["o", "s", "^", "D", "v"],
-        "plot_hatch_cycle": ["", "//", "..", "xx", "\\"],
-        "plot_line_width": 1.4,
-        "plot_bar_alpha": 1.0,
-        "plot_bar_edge_color": "#000000",
-        "plot_bar_edge_width": 0.8,
-        "plot_hist_edge_color": "#000000",
-        "plot_grid_color": "#C8C8C8",
-        "plot_dumbbell_start_color": "#D4B24C",
-        "plot_dumbbell_end_color": "#1F4E79",
-        "plot_heatmap_cmap": COLORS.Cividis,
-        "plot_heatmap_cmap_diverging": COLORS.RdBu,
-    }
+CONTRAST_THEME: StyleAttrs = derive_theme(
+    DEFAULT_THEME,
+    lead=COLORS.Contrast,
+    traits=[TRAIT.PATTERNED, TRAIT.HATCHED],
+    color_general_singular=COLORS.Cividis,
+    color_parallel_hue_continuous=[
+        "#BCAE6C",
+        "#7D7C78",
+        "#434E6C",
+        "#00224E",
+    ],
+    plot_line_width=1.4,
+    plot_grid_color="#C8C8C8",
+    plot_dumbbell_start_color="#D4B24C",
+    plot_dumbbell_end_color="#1F4E79",
+    plot_heatmap_cmap=COLORS.Cividis,
+    plot_heatmap_cmap_diverging=COLORS.RdBu,
 )
 ```
 
 The contrast theme: lightness-stepped colours plus hatches, print-safe.
 
-Navy, straw, dusty rose, charcoal and grey, each a clear lightness step from the next, so a greyscale print or photocopy still tells the series apart, and every pair stays distinct for deutan, protan and tritan readers. Bars take a hatch cycle and black edges, lines a dash cycle, scatter points a marker cycle. The value scale is Cividis.
+The `Contrast` lead, navy, straw, dusty rose, charcoal and grey, each a clear lightness step from the next, so a greyscale print or photocopy still tells the series apart, and every pair stays distinct for deutan, protan and tritan readers. The hatched trait gives bars a hatch cycle and black edges, the patterned trait lines a dash cycle and scatter points a marker cycle. The value scale is Cividis.
 
 ### datachart.themes.MUTEDHATCH_THEME
 
 ```
-MUTEDHATCH_THEME: StyleAttrs = {
-    **MUTED_THEME,
-    "color_general_singular": COLORS.BuPu,
-    "color_parallel_hue_continuous": [
+MUTEDHATCH_THEME: StyleAttrs = derive_theme(
+    DEFAULT_THEME,
+    lead=COLORS.TolMuted,
+    traits=[TRAIT.PATTERNED, TRAIT.HATCHED],
+    color_general_singular=COLORS.BuPu,
+    color_parallel_hue_continuous=[
         "#EDF8FB",
         "#9EBCDA",
         "#8856A7",
         "#4D004B",
     ],
-    "plot_hatch_cycle": CONTRAST_THEME["plot_hatch_cycle"],
-    "plot_bar_edge_width": 0.8,
-    "plot_heatmap_cmap": COLORS.BuPu,
-    "plot_heatmap_cmap_diverging": COLORS.BrBG,
-}
+    plot_heatmap_cmap=COLORS.BuPu,
+    plot_heatmap_cmap_diverging=COLORS.BrBG,
+    **MUTED_FURNITURE
+)
 ```
 
-The muted-hatch theme: Tol's muted colours under Contrast's hatches.
+The muted-hatch theme: Tol's muted colours under hatches.
 
-Indigo, cyan, sand, rose and wine bars take the hatch cycle and black edges; lines keep the muted dashes and markers. The value scale is BuPu.
+The muted theme with the hatched trait in place of the edged one: indigo, cyan, sand, rose and wine bars take the hatch cycle and black edges, lines keep the muted dashes and markers. The value scale is BuPu.
 
 ### datachart.themes.SLATEHATCH_THEME
 
 ```
-SLATEHATCH_THEME: StyleAttrs = {
-    **HATCH_THEME,
-    "color_general_singular": COLORS.PuBu,
-    "color_general_multiple": [
-        "#4F6D8F",
-        "#D4D389",
-        "#743538",
-        "#67A652",
-        "#C06AC9",
-        "#8EB2D2",
-    ],
-    "color_parallel_hue_continuous": [
+SLATEHATCH_THEME: StyleAttrs = derive_theme(
+    DEFAULT_THEME,
+    lead=COLORS.Slate,
+    traits=[TRAIT.HATCHED, TRAIT.OUTLINED],
+    color_general_singular=COLORS.PuBu,
+    color_parallel_hue_continuous=[
         "#F1EEF6",
         "#A6BDDB",
         "#3690C0",
         "#023858",
     ],
-    "plot_dumbbell_start_color": "#4F6D8F",
-    "plot_dumbbell_end_color": "#743538",
-    "plot_heatmap_cmap": COLORS.PuBu,
-    "plot_heatmap_cmap_diverging": COLORS.BrBG,
-}
+    plot_dumbbell_start_color="#4F6D8F",
+    plot_dumbbell_end_color="#743538",
+    plot_heatmap_cmap=COLORS.PuBu,
+    plot_heatmap_cmap_diverging=COLORS.BrBG,
+    **HATCH_FURNITURE
+)
 ```
 
 The slate-hatch theme: the hatch theme without rust.
 
-Slate blue, sand, wine, green, orchid and sky blue under black edges and hatches, with a dotted grid. The value scale is PuBu.
+The `Slate` lead, slate blue, sand, wine, green, orchid and sky blue, under the hatch theme's hatched and outlined traits and dotted grid; every pair stays apart for deutan and protan readers. The value scale is PuBu.
 
 ### datachart.themes.SKETCH_THEME
 
@@ -30934,6 +30868,7 @@ Each class and what reads it: a chart parameter, a style attribute, or the confi
 | `FIG_SIZE`   | figsize of every chart, Panel, and Grid. |
 | `FIG_FORMAT` | format of save_figure.                   |
 | `THEME`      | config.set_theme.                        |
+| `TRAIT`      | traits of derive_theme.                  |
 
 **Font Constants**
 
@@ -31400,52 +31335,57 @@ Examples:
 'Blues'
 ```
 
-| ATTRIBUTE        | DESCRIPTION                                                                                       |
-| ---------------- | ------------------------------------------------------------------------------------------------- |
-| `DEFAULT`        | The default theme's singular palette. Same as COLORS.Blues. **TYPE:** `str`                       |
-| `Blues`          | Sequential blue palette. Equals to "Blues". **TYPE:** `str`                                       |
-| `Greens`         | Sequential green palette. Equals to "Greens". **TYPE:** `str`                                     |
-| `Oranges`        | Sequential orange palette. Equals to "Oranges". **TYPE:** `str`                                   |
-| `Purples`        | Sequential purple palette. Equals to "Purples". **TYPE:** `str`                                   |
-| `Reds`           | Sequential red palette. Equals to "Reds". **TYPE:** `str`                                         |
-| `Sunset2`        | Multi-hue sunset palette. Equals to "Sunset2". **TYPE:** `str`                                    |
-| `YlGnBu`         | Multi-hue yellow-green-blue palette. Equals to "YlGnBu". **TYPE:** `str`                          |
-| `YlOrRd`         | Multi-hue yellow-orange-red palette. Equals to "YlOrRd". **TYPE:** `str`                          |
-| `YlOrBr`         | Multi-hue yellow-orange-brown palette. Equals to "YlOrBr". **TYPE:** `str`                        |
-| `PuBuGn`         | Multi-hue purple-blue-green palette. Equals to "PuBuGn". **TYPE:** `str`                          |
-| `GnBu`           | Multi-hue green-blue palette. Equals to "GnBu". **TYPE:** `str`                                   |
-| `BuPu`           | Multi-hue blue-purple palette. Equals to "BuPu". **TYPE:** `str`                                  |
-| `PuBu`           | Multi-hue purple-blue palette. Equals to "PuBu". **TYPE:** `str`                                  |
-| `Egypt`          | Multi-hue Egypt palette. Equals to "Egypt". **TYPE:** `str`                                       |
-| `Hiroshige`      | Multi-hue Hiroshige palette. Equals to "Hiroshige". **TYPE:** `str`                               |
-| `Lake`           | Multi-hue lake palette. Equals to "Lake". **TYPE:** `str`                                         |
-| `Neon`           | Multi-hue neon palette. Equals to "Neon". **TYPE:** `str`                                         |
-| `RdBu`           | Diverging red-blue palette. Equals to "RdBu". **TYPE:** `str`                                     |
-| `BrBG`           | Diverging brown-blue-green palette. Equals to "BrBG". **TYPE:** `str`                             |
-| `PuOr`           | Diverging purple-orange palette. Equals to "PuOr". **TYPE:** `str`                                |
-| `Spectral`       | Diverging spectral palette. Equals to "Spectral". **TYPE:** `str`                                 |
-| `RdYlBu`         | Diverging red-yellow-blue palette. Equals to "RdYlBu". **TYPE:** `str`                            |
-| `RdYlGn`         | Diverging red-yellow-green palette. Equals to "RdYlGn". **TYPE:** `str`                           |
-| `Pastel`         | Soft pastel categorical palette. Equals to "Pastel". **TYPE:** `str`                              |
-| `Set2`           | ColorBrewer Set2 categorical palette. Equals to "Set2". **TYPE:** `str`                           |
-| `Accent`         | ColorBrewer Accent categorical palette. Equals to "Accent". **TYPE:** `str`                       |
-| `Dark2`          | ColorBrewer Dark2 categorical palette. Equals to "Dark2". **TYPE:** `str`                         |
-| `Paired`         | ColorBrewer Paired categorical palette (high contrast). Equals to "Paired". **TYPE:** `str`       |
-| `Set1`           | ColorBrewer Set1 categorical palette (high contrast). Equals to "Set1". **TYPE:** `str`           |
-| `Greys`          | Grayscale palette for monochrome visualizations. Equals to "Greys". **TYPE:** `str`               |
-| `Viridis`        | Perceptually uniform, color-blind friendly. Equals to "Viridis". **TYPE:** `str`                  |
-| `Cividis`        | Color-blind friendly (optimized for CVD). Equals to "Cividis". **TYPE:** `str`                    |
-| `Inferno`        | Perceptually uniform, color-blind friendly. Equals to "Inferno". **TYPE:** `str`                  |
-| `Plasma`         | Perceptually uniform, color-blind friendly. Equals to "Plasma". **TYPE:** `str`                   |
-| `Magma`          | Perceptually uniform, color-blind friendly. Equals to "magma". **TYPE:** `str`                    |
-| `Turbo`          | Rainbow-like but perceptually better. Equals to "turbo". **TYPE:** `str`                          |
-| `OkabeIto`       | Okabe-Ito categorical palette, color-blind safe. Equals to "OkabeIto". **TYPE:** `str`            |
-| `OkabeIto_Black` | Okabe-Ito palette including black. Equals to "OkabeIto_black". **TYPE:** `str`                    |
-| `Coolwarm`       | Diverging cool-warm palette. Equals to "coolwarm". **TYPE:** `str`                                |
-| `Tab10`          | Tableau 10-color categorical palette. Equals to "tab10". **TYPE:** `str`                          |
-| `Tab20`          | Tableau 20-color categorical palette. Equals to "tab20". **TYPE:** `str`                          |
-| `PaperYlGnBu`    | Diversified YlGnBu categorical palette for publications. Equals to "PaperYlGnBu". **TYPE:** `str` |
-| `PaperAccent`    | Two-color blue/red accent pair for publications. Equals to "PaperAccent". **TYPE:** `str`         |
+| ATTRIBUTE        | DESCRIPTION                                                                                                                       |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `DEFAULT`        | The default theme's singular palette. Same as COLORS.Blues. **TYPE:** `str`                                                       |
+| `Blues`          | Sequential blue palette. Equals to "Blues". **TYPE:** `str`                                                                       |
+| `Greens`         | Sequential green palette. Equals to "Greens". **TYPE:** `str`                                                                     |
+| `Oranges`        | Sequential orange palette. Equals to "Oranges". **TYPE:** `str`                                                                   |
+| `Purples`        | Sequential purple palette. Equals to "Purples". **TYPE:** `str`                                                                   |
+| `Reds`           | Sequential red palette. Equals to "Reds". **TYPE:** `str`                                                                         |
+| `Sunset2`        | Multi-hue sunset palette. Equals to "Sunset2". **TYPE:** `str`                                                                    |
+| `YlGnBu`         | Multi-hue yellow-green-blue palette. Equals to "YlGnBu". **TYPE:** `str`                                                          |
+| `YlOrRd`         | Multi-hue yellow-orange-red palette. Equals to "YlOrRd". **TYPE:** `str`                                                          |
+| `YlOrBr`         | Multi-hue yellow-orange-brown palette. Equals to "YlOrBr". **TYPE:** `str`                                                        |
+| `PuBuGn`         | Multi-hue purple-blue-green palette. Equals to "PuBuGn". **TYPE:** `str`                                                          |
+| `GnBu`           | Multi-hue green-blue palette. Equals to "GnBu". **TYPE:** `str`                                                                   |
+| `BuPu`           | Multi-hue blue-purple palette. Equals to "BuPu". **TYPE:** `str`                                                                  |
+| `PuBu`           | Multi-hue purple-blue palette. Equals to "PuBu". **TYPE:** `str`                                                                  |
+| `Egypt`          | Multi-hue Egypt palette. Equals to "Egypt". **TYPE:** `str`                                                                       |
+| `Hiroshige`      | Multi-hue Hiroshige palette. Equals to "Hiroshige". **TYPE:** `str`                                                               |
+| `Lake`           | Multi-hue lake palette. Equals to "Lake". **TYPE:** `str`                                                                         |
+| `Neon`           | Multi-hue neon palette. Equals to "Neon". **TYPE:** `str`                                                                         |
+| `RdBu`           | Diverging red-blue palette. Equals to "RdBu". **TYPE:** `str`                                                                     |
+| `BrBG`           | Diverging brown-blue-green palette. Equals to "BrBG". **TYPE:** `str`                                                             |
+| `PuOr`           | Diverging purple-orange palette. Equals to "PuOr". **TYPE:** `str`                                                                |
+| `Spectral`       | Diverging spectral palette. Equals to "Spectral". **TYPE:** `str`                                                                 |
+| `RdYlBu`         | Diverging red-yellow-blue palette. Equals to "RdYlBu". **TYPE:** `str`                                                            |
+| `RdYlGn`         | Diverging red-yellow-green palette. Equals to "RdYlGn". **TYPE:** `str`                                                           |
+| `Pastel`         | Soft pastel categorical palette. Equals to "Pastel". **TYPE:** `str`                                                              |
+| `Set2`           | ColorBrewer Set2 categorical palette. Equals to "Set2". **TYPE:** `str`                                                           |
+| `Accent`         | ColorBrewer Accent categorical palette. Equals to "Accent". **TYPE:** `str`                                                       |
+| `Dark2`          | ColorBrewer Dark2 categorical palette. Equals to "Dark2". **TYPE:** `str`                                                         |
+| `Paired`         | ColorBrewer Paired categorical palette (high contrast). Equals to "Paired". **TYPE:** `str`                                       |
+| `Set1`           | ColorBrewer Set1 categorical palette (high contrast). Equals to "Set1". **TYPE:** `str`                                           |
+| `Greys`          | Grayscale palette for monochrome visualizations. Equals to "Greys". **TYPE:** `str`                                               |
+| `Viridis`        | Perceptually uniform, color-blind friendly. Equals to "Viridis". **TYPE:** `str`                                                  |
+| `Cividis`        | Color-blind friendly (optimized for CVD). Equals to "Cividis". **TYPE:** `str`                                                    |
+| `Inferno`        | Perceptually uniform, color-blind friendly. Equals to "Inferno". **TYPE:** `str`                                                  |
+| `Plasma`         | Perceptually uniform, color-blind friendly. Equals to "Plasma". **TYPE:** `str`                                                   |
+| `Magma`          | Perceptually uniform, color-blind friendly. Equals to "magma". **TYPE:** `str`                                                    |
+| `Turbo`          | Rainbow-like but perceptually better. Equals to "turbo". **TYPE:** `str`                                                          |
+| `OkabeIto`       | Okabe-Ito categorical palette, color-blind safe. Equals to "OkabeIto". **TYPE:** `str`                                            |
+| `OkabeIto_Black` | Okabe-Ito palette including black. Equals to "OkabeIto_black". **TYPE:** `str`                                                    |
+| `Coolwarm`       | Diverging cool-warm palette. Equals to "coolwarm". **TYPE:** `str`                                                                |
+| `Tab10`          | Tableau 10-color categorical palette. Equals to "tab10". **TYPE:** `str`                                                          |
+| `Tab20`          | Tableau 20-color categorical palette. Equals to "tab20". **TYPE:** `str`                                                          |
+| `PaperYlGnBu`    | Diversified YlGnBu categorical palette for publications. Equals to "PaperYlGnBu". **TYPE:** `str`                                 |
+| `PaperAccent`    | Two-color blue/red accent pair for publications. Equals to "PaperAccent". **TYPE:** `str`                                         |
+| `Harbor`         | Navy to sky and amber to sand in lightness steps, the harbor theme's lead. Equals to "Harbor". **TYPE:** `str`                    |
+| `TolMuted`       | Paul Tol's muted scheme without its greens, the muted theme's lead. Equals to "TolMuted". **TYPE:** `str`                         |
+| `Contrast`       | Navy, straw, dusty rose, charcoal and grey stepped in lightness, the contrast theme's lead. Equals to "Contrast". **TYPE:** `str` |
+| `Rust`           | Muted print tones with rust first, the hatch theme's lead. Equals to "Rust". **TYPE:** `str`                                      |
+| `Slate`          | Slate blue, sand, wine, green, orchid and sky, the slate-hatch theme's lead. Equals to "Slate". **TYPE:** `str`                   |
 
 ### datachart.constants.THEME
 
@@ -31479,6 +31419,31 @@ Examples:
 | `MUTEDHATCH` | The muted-hatch theme (Tol's muted colours under hatches, BuPu value scale). Equals to "mutedhatch". **TYPE:** `str`                  |
 | `SLATEHATCH` | The slate-hatch theme (the hatch theme without rust, slate blue first, PuBu value scale). Equals to "slatehatch". **TYPE:** `str`     |
 | `DARK`       | The dark theme (bright marks on a near-black page, light furniture, Viridis value scale). Equals to "dark". **TYPE:** `str`           |
+
+### datachart.constants.TRAIT
+
+Bases: `Domain`
+
+The traits a derived theme composes.
+
+A trait changes how marks are drawn and nothing about the furniture; derive_theme applies the traits it is given in order, after the lead and before any overrides. The predefined harbor, muted, contrast, hatch, muted-hatch and slate-hatch themes are built this way; the [Themes guide](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) shows the recipe.
+
+Examples:
+
+```
+>>> from datachart.constants import COLORS, THEME, TRAIT
+>>> from datachart.themes import derive_theme
+>>> theme = derive_theme(THEME.MINIMAL, lead=COLORS.TolMuted, traits=[TRAIT.PATTERNED])
+```
+
+| ATTRIBUTE   | DESCRIPTION                                                                                                                                                    |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DEFAULT`   | No trait; the base's marks as they are. **TYPE:** `None`                                                                                                       |
+| `FLAT`      | No bar, histogram or band edges, opaque bars, 2 pt lines. Equals to "flat". **TYPE:** `str`                                                                    |
+| `EDGED`     | Black edges on bars and histograms, opaque bars. Equals to "edged". **TYPE:** `str`                                                                            |
+| `HATCHED`   | Edged, plus one hatch per bar series and a 0.8 pt bar edge. Equals to "hatched". **TYPE:** `str`                                                               |
+| `OUTLINED`  | Black outlines on every other mark: bands, nodes, tiles, points, bodies, annotation boxes, arrows and the heatmap frame. Equals to "outlined". **TYPE:** `str` |
+| `PATTERNED` | A dash cycle for lines and a marker cycle for points. Equals to "patterned". **TYPE:** `str`                                                                   |
 
 ### datachart.constants.EMPHASIS
 
