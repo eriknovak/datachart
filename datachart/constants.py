@@ -16,6 +16,7 @@ Classes:
     FIG_SIZE:   `figsize` of every chart, `Panel`, and `Grid`.
     FIG_FORMAT: `format` of `save_figure`.
     THEME:      `config.set_theme`.
+    TRAIT:      `traits` of `derive_theme`.
 
 **Font Constants**
 
@@ -819,6 +820,11 @@ class COLORS(Domain):
         Tab20 (str): Tableau 20-color categorical palette. Equals to `"tab20"`.
         PaperYlGnBu (str): Diversified YlGnBu categorical palette for publications. Equals to `"PaperYlGnBu"`.
         PaperAccent (str): Two-color blue/red accent pair for publications. Equals to `"PaperAccent"`.
+        Harbor (str): Navy to sky and amber to sand in lightness steps, the harbor theme's lead. Equals to `"Harbor"`.
+        TolMuted (str): Paul Tol's muted scheme without its greens, the muted theme's lead. Equals to `"TolMuted"`.
+        Contrast (str): Navy, straw, dusty rose, charcoal and grey stepped in lightness, the contrast theme's lead. Equals to `"Contrast"`.
+        Rust (str): Muted print tones with rust first, the hatch theme's lead. Equals to `"Rust"`.
+        Slate (str): Slate blue, sand, wine, green, orchid and sky, the slate-hatch theme's lead. Equals to `"Slate"`.
 
     """
 
@@ -883,6 +889,11 @@ class COLORS(Domain):
     # Custom datachart palettes (registered locally, not in pypalettes)
     PaperYlGnBu = "PaperYlGnBu"
     PaperAccent = "PaperAccent"
+    Harbor = "Harbor"
+    TolMuted = "TolMuted"
+    Contrast = "Contrast"
+    Rust = "Rust"
+    Slate = "Slate"
 
     _OTHER = "a pypalettes palette name or a matplotlib color"
 
@@ -1824,6 +1835,39 @@ class THEME(Domain):
     MUTEDHATCH = "mutedhatch"
     SLATEHATCH = "slatehatch"
     DARK = "dark"
+
+
+class TRAIT(Domain):
+    """The traits a derived theme composes.
+
+    A trait changes how marks are drawn and nothing about the furniture;
+    [`derive_theme`][datachart.themes.derive_theme] applies the traits it is
+    given in order, after the lead and before any overrides. The predefined
+    harbor, muted, contrast, hatch, muted-hatch and slate-hatch themes are
+    built this way; the [Themes guide](../../how-to-guides/styling/themes/)
+    shows the recipe.
+
+    Examples:
+        >>> from datachart.constants import COLORS, THEME, TRAIT
+        >>> from datachart.themes import derive_theme
+        >>> theme = derive_theme(THEME.MINIMAL, lead=COLORS.TolMuted, traits=[TRAIT.PATTERNED])
+
+    Attributes:
+        DEFAULT (None): No trait; the base's marks as they are.
+        FLAT (str): No bar, histogram or band edges, opaque bars, 2 pt lines. Equals to `"flat"`.
+        EDGED (str): Black edges on bars and histograms, opaque bars. Equals to `"edged"`.
+        HATCHED (str): Edged, plus one hatch per bar series and a 0.8 pt bar edge. Equals to `"hatched"`.
+        OUTLINED (str): Black outlines on every other mark: bands, nodes, tiles, points,
+            bodies, annotation boxes, arrows and the heatmap frame. Equals to `"outlined"`.
+        PATTERNED (str): A dash cycle for lines and a marker cycle for points. Equals to `"patterned"`.
+    """
+
+    DEFAULT = None
+    FLAT = "flat"
+    EDGED = "edged"
+    HATCHED = "hatched"
+    OUTLINED = "outlined"
+    PATTERNED = "patterned"
 
 
 class EMPHASIS(Domain):

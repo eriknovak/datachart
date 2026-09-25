@@ -93,6 +93,18 @@ class TestColors(unittest.TestCase):
             ["#1E2E85", "#EAF7B1", "#2165AB", "#85CFBA", "#299DC1"],
         )
         self.assertEqual(get_color_scale(COLORS.PaperAccent), ["#5B84C4", "#C85450"])
+        # the derived themes' leads cycle exactly and pass the palette gate
+        for name, first in (
+            (COLORS.Harbor, "#1F4E79"),
+            (COLORS.TolMuted, "#332288"),
+            (COLORS.Contrast, "#1F4E79"),
+            (COLORS.Rust, "#B5563A"),
+            (COLORS.Slate, "#4F6D8F"),
+        ):
+            with self.subTest(palette=name):
+                scale = get_color_scale(name)
+                self.assertEqual(scale[0], first)
+                self.assertEqual(get_discrete_colors(name, len(scale) + 1)[-1], first)
 
     def test_custom_palettes_cycle_not_interpolate(self):
         """Test that custom palettes cycle like explicit color lists."""

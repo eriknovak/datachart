@@ -1,13 +1,15 @@
 """Derive a theme variant from a base theme and a lead colormap."""
 
 import copy
-from typing import Any, List, Union
+from typing import Any, List, Optional, Sequence, Union
 
 import numpy as np
 import matplotlib.colors as mcolors
 
-from ._base import canonical_style, warn_aliases
+from ._base import TRAITS, canonical_style, warn_aliases
+from .default import DEFAULT_THEME
 from .score import warn_failing_palette
+from ..constants import TRAIT
 from ..typings import StyleAttrs
 from ..utils._internal.colors import get_color_scale, get_colormap, oklab_lightness
 
@@ -44,19 +46,21 @@ def _is_dark_page(theme: StyleAttrs) -> bool:
 
 
 def _resolve_base(base: Union[str, StyleAttrs]) -> StyleAttrs:
-    # imported here: the configuration module imports the themes package
-    from ..config.configuration import THEMES
-    from .default import DEFAULT_THEME
-
     if isinstance(base, dict):
         return {**copy.deepcopy(DEFAULT_THEME), **copy.deepcopy(base)}
+    # for a name only: the config module imports this package while loading
+    from ..config.configuration import THEMES
+
     if base not in THEMES:
         raise ValueError(f"Unknown theme: {base!r}. Must be one of {list(THEMES)}")
     return copy.deepcopy(THEMES[base])
 
 
 def derive_theme(
-    base: Union[str, StyleAttrs], lead: Lead, **overrides: Any
+    base: Union[str, StyleAttrs],
+    lead: Lead,
+    traits: Optional[Sequence[Union[TRAIT, str]]] = None,
+    **overrides: Any,
 ) -> StyleAttrs:
     """Build a theme variant: the base's furniture with palettes rebuilt from the lead.
 
@@ -65,9 +69,12 @@ def derive_theme(
     steps, interleaved dark and light, the parallel coords ramp four of them
     from light to dark, and the dumbbell pair its lightest and darkest sample.
     A categorical lead becomes the series palette, its first color the singular
-    one, and the base keeps its value scale, ramp, and dumbbell pair. Fonts,
-    spines, hatches, and rendering attributes are never touched. The result is
-    a plain theme dictionary: apply it with `register_theme` or `override`.
+    one, and the base keeps its value scale, ramp, and dumbbell pair. Each
+    trait then sets its mark keys, in the order given, so a later trait wins a
+    shared key; fonts, spines and rendering attributes are never touched. The
+    result is a plain theme dictionary: apply it with `register_theme` or
+    `override`; `TRAIT` lists the traits and the predefined themes built
+    this way.
 
     Examples:
         >>> from datachart.config import config
@@ -83,6 +90,8 @@ def derive_theme(
             `register_theme` completes it.
         lead: A `COLORS` constant, a pypalettes palette name, or a list of colors.
             A diverging map is not a lead; it is read as categorical.
+        traits: `TRAIT` members applied in order after the lead; an unknown
+            name raises.
         **overrides: Style attributes set on the result; an unknown name raises.
 
     Returns:
@@ -123,6 +132,10 @@ def derive_theme(
                 "color_general_multiple": swatches,
             }
         )
+
+    for trait in traits or ():
+        if TRAIT.check(trait, "traits") is not None:
+            theme.update(copy.deepcopy(TRAITS[trait]))
 
     warn_aliases(overrides)
     overrides = canonical_style(overrides)

@@ -95,7 +95,7 @@ The package is organized into six main modules:
 - **charts**: Chart creation functions (BarChart, LineChart, ScatterChart, Heatmap, Histogram, BoxPlot, ViolinPlot, SwarmPlot, PyramidChart, RadialChart, ParallelCoords)
 - **utils**: Utilities including the Panel/Grid composition fronts (ADR 0002), save_figure, and stats functions
 - **config**: Global configuration system with the singleton `config` instance
-- **themes**: Predefined style themes (DEFAULT_THEME, GREYSCALE_THEME, INK_THEME, HATCH_THEME, MINIMAL_THEME, MATERIAL_THEME, SKETCH_THEME), named for their visual trait
+- **themes**: Predefined style themes (DEFAULT_THEME, GREYSCALE_THEME, INK_THEME, HATCH_THEME, MINIMAL_THEME, MATERIAL_THEME, SKETCH_THEME, …), named for their look; six of them are derivations of the default theme, a named `COLORS` lead and `TRAIT` members through `derive_theme` (ADR 0074)
 - **constants**: Enums and constants (THEME, FIG_SIZE, ORIENTATION, COLORS, etc.)
 - **typings**: TypedDict definitions for all chart attributes and style configurations
 

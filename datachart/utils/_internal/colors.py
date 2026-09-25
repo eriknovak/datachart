@@ -51,6 +51,12 @@ CUSTOM_PALETTES: Dict[str, List[str]] = {
         "#299DC1",
     ],
     COLORS.PaperAccent: ["#5B84C4", "#C85450"],
+    # the tuned categorical leads of the derived themes (ADR 0074)
+    COLORS.Harbor: ["#1F4E79", "#D08C3A", "#6FA3D3", "#EFC98C", "#8C6D5A", "#1A1A1A"],
+    COLORS.TolMuted: ["#332288", "#88CCEE", "#DDCC77", "#CC6677", "#882255"],
+    COLORS.Contrast: ["#1F4E79", "#D4B24C", "#B45C6A", "#2B2B2B", "#9A9A9A"],
+    COLORS.Rust: ["#B5563A", "#5A6F86", "#EBBC63", "#2C4A34", "#9F9A8D", "#966AD5"],
+    COLORS.Slate: ["#4F6D8F", "#D4D389", "#743538", "#67A652", "#C06AC9", "#8EB2D2"],
 }
 
 # ===============================================
