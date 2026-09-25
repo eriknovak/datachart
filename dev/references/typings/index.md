@@ -479,7 +479,7 @@ The typing for the legend style.
 | `plot_legend_font_size`   | The font size within the legend. **TYPE:** \`int                      |
 | `plot_legend_title_size`  | The title size of the legend. **TYPE:** \`int                         |
 | `plot_legend_label_color` | The label color of the legend. **TYPE:** \`str                        |
-| `plot_legend_title`       | The legend title; an empty string draws none. **TYPE:** \`str         |
+| `plot_legend_title`       | The legend title; None or an empty string draws none. **TYPE:** \`str |
 | `plot_legend_ncols`       | The number of legend columns. **TYPE:** \`int                         |
 | `plot_legend_edge_color`  | The legend frame color. None keeps matplotlib's. **TYPE:** \`str      |
 | `plot_legend_face_color`  | The legend background color. None keeps matplotlib's. **TYPE:** \`str |

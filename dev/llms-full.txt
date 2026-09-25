@@ -18469,7 +18469,7 @@ Each predefined theme has a card here: a strip of its color swatches with hex co
 | [Print and black-and-white](#print-and-black-and-white) |                                                                            |
 | [`THEME.GREYSCALE`](#greyscale)                         | Five greys with hatch, dash and marker cycles, print-friendly.             |
 | [`THEME.INK`](#ink)                                     | Lightness-stepped YlGnBu palette with navy ink accents.                    |
-| [`THEME.HATCH`](#hatch)                                 | Six-entry hatch cycle, black edges, dotted grid.                           |
+| [`THEME.HATCH`](#hatch)                                 | Six-entry hatch cycle, black edges, light grid.                            |
 | [`THEME.MUTED`](#muted)                                 | Tol's muted colours, dash and marker cycles, colour-blind safe.            |
 | [`THEME.CONTRAST`](#contrast)                           | Lightness-stepped colours plus hatches, print-safe.                        |
 | [`THEME.MUTEDHATCH`](#muted-hatch)                      | Tol's muted colours under hatches, BuPu value scale.                       |
@@ -18588,9 +18588,9 @@ signature(pair=("#1E2E85", "#299DC1")).show()
 
 ### Hatch
 
-Black edges, dotted grid, and a six-entry hatch cycle applied per bar series, so grouped bars stay distinguishable in black-and-white print; the green sits deep so it stays apart from rust for deutan readers.
+Black edges, light grid, and a six-entry hatch cycle applied per bar series, so grouped bars stay distinguishable in black-and-white print; the green sits deep so it stays apart from rust for deutan readers.
 
-Built as `derive_theme(THEME.DEFAULT, lead=COLORS.Rust, traits=[TRAIT.HATCHED, TRAIT.OUTLINED])` with the YlOrBr value scale, a dotted grid and the ink font stack. Selected with [`THEME.HATCH`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`HATCH_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.HATCH_THEME).
+Built as `derive_theme(THEME.DEFAULT, lead=COLORS.Rust, traits=[TRAIT.HATCHED, TRAIT.OUTLINED])` with the YlOrBr value scale, a light grid and the ink font stack. Selected with [`THEME.HATCH`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`HATCH_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.HATCH_THEME).
 
 ```
 config.set_theme(THEME.HATCH)
@@ -18602,7 +18602,7 @@ signature(pair=("#B5563A", "#5A6F86")).show()
 
 Indigo, cyan, sand, rose and wine from Paul Tol's muted scheme, every pair distinct for deutan, protan and tritan readers. Lines also differ by dash and scatter points by marker, bars carry black edges and the grid is dotted, so a figure survives a greyscale print.
 
-Built as `derive_theme(THEME.DEFAULT, lead=COLORS.TolMuted, traits=[TRAIT.PATTERNED, TRAIT.EDGED])` with the YlOrBr value scale and a dotted grid. Selected with [`THEME.MUTED`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`MUTED_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.MUTED_THEME).
+Built as `derive_theme(THEME.DEFAULT, lead=COLORS.TolMuted, traits=[TRAIT.PATTERNED, TRAIT.EDGED])` with the YlOrBr value scale and a light grid. Selected with [`THEME.MUTED`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`MUTED_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.MUTED_THEME).
 
 ```
 config.set_theme(THEME.MUTED)
@@ -18626,7 +18626,7 @@ signature(pair=("#1F4E79", "#B45C6A")).show()
 
 The five muted colours of `MUTED` under the hatch cycle of `CONTRAST`, so bars survive a greyscale print by pattern as well as colour. The value scale is BuPu, the family of indigo and wine, instead of YlOrBr.
 
-Built as `derive_theme(THEME.DEFAULT, lead=COLORS.TolMuted, traits=[TRAIT.PATTERNED, TRAIT.HATCHED])` with the BuPu value scale and a dotted grid. Selected with [`THEME.MUTEDHATCH`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`MUTEDHATCH_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.MUTEDHATCH_THEME).
+Built as `derive_theme(THEME.DEFAULT, lead=COLORS.TolMuted, traits=[TRAIT.PATTERNED, TRAIT.HATCHED])` with the BuPu value scale and a light grid. Selected with [`THEME.MUTEDHATCH`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`MUTEDHATCH_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.MUTEDHATCH_THEME).
 
 ```
 config.set_theme(THEME.MUTEDHATCH)
@@ -18636,7 +18636,7 @@ signature(pair=("#332288", "#CC6677")).show()
 
 ### Slate hatch
 
-The `HATCH` theme without rust: slate blue, sand, wine, green, orchid and sky blue under black edges, hatches and a dotted grid, every pair distinct for deutan and protan readers. The value scale is PuBu.
+The `HATCH` theme without rust: slate blue, sand, wine, green, orchid and sky blue under black edges, hatches and a light grid, every pair distinct for deutan and protan readers. The value scale is PuBu.
 
 Built as `derive_theme(THEME.DEFAULT, lead=COLORS.Slate, traits=[TRAIT.HATCHED, TRAIT.OUTLINED])` with the PuBu value scale and the hatch theme's grid and fonts. Selected with [`THEME.SLATEHATCH`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME); the full attribute set is [`SLATEHATCH_THEME`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.SLATEHATCH_THEME).
 
@@ -29997,7 +29997,7 @@ Every theme is a complete [`StyleAttrs`](https://eriknovak.github.io/datachart/d
 | **Print and black-and-white**                            |                                                                                 |                    |
 | [`GREYSCALE_THEME`](#datachart.themes.GREYSCALE_THEME)   | five greys with hatch, dash and marker cycles, for print without color          | `THEME.GREYSCALE`  |
 | [`INK_THEME`](#datachart.themes.INK_THEME)               | lightness-stepped blues and greens, navy ink edges, print-ready                 | `THEME.INK`        |
-| [`HATCH_THEME`](#datachart.themes.HATCH_THEME)           | a six-entry hatch cycle, black edges, dotted grid                               | `THEME.HATCH`      |
+| [`HATCH_THEME`](#datachart.themes.HATCH_THEME)           | a six-entry hatch cycle, black edges, light grid                                | `THEME.HATCH`      |
 | [`MUTED_THEME`](#datachart.themes.MUTED_THEME)           | Tol's muted colours, dash and marker cycles, colour-blind safe                  | `THEME.MUTED`      |
 | [`CONTRAST_THEME`](#datachart.themes.CONTRAST_THEME)     | lightness-stepped colours plus hatches, print-safe                              | `THEME.CONTRAST`   |
 | [`MUTEDHATCH_THEME`](#datachart.themes.MUTEDHATCH_THEME) | Tol's muted colours under hatches, BuPu value scale                             | `THEME.MUTEDHATCH` |
@@ -30472,9 +30472,9 @@ HATCH_THEME: StyleAttrs = derive_theme(
 )
 ```
 
-The hatch theme: hatch cycle, black edges, dotted grid.
+The hatch theme: hatch cycle, black edges, light grid.
 
-The `Rust` lead, muted print tones with rust first and the green deep enough to stay apart from rust for deutan readers; the hatched trait gives every bar series its own hatch under black edges, the outlined trait black outlines on every other mark, and the grid is dotted. The value scale is YlOrBr.
+The `Rust` lead, muted print tones with rust first and the green deep enough to stay apart from rust for deutan readers; the hatched trait gives every bar series its own hatch under black edges, the outlined trait black outlines on every other mark, and the grid is a light solid hairline. The value scale is YlOrBr.
 
 ### datachart.themes.MUTED_THEME
 
@@ -30498,7 +30498,7 @@ MUTED_THEME: StyleAttrs = derive_theme(
 
 The muted theme: Tol's muted colours, dashes and markers, colour-blind safe.
 
-The `TolMuted` lead, indigo, cyan, sand, rose and wine from Paul Tol's muted scheme, every pair distinct for deutan, protan and tritan readers. The patterned trait gives lines a dash and scatter points a marker, the edged trait black bar edges, and the grid is dotted, so a figure survives a greyscale print. The value scale is YlOrBr.
+The `TolMuted` lead, indigo, cyan, sand, rose and wine from Paul Tol's muted scheme, every pair distinct for deutan, protan and tritan readers. The patterned trait gives lines a dash and scatter points a marker, the edged trait black bar edges, so a figure survives a greyscale print; the grid is a light solid hairline. The value scale is YlOrBr.
 
 ### datachart.themes.CONTRAST_THEME
 
@@ -30575,7 +30575,7 @@ SLATEHATCH_THEME: StyleAttrs = derive_theme(
 
 The slate-hatch theme: the hatch theme without rust.
 
-The `Slate` lead, slate blue, sand, wine, green, orchid and sky blue, under the hatch theme's hatched and outlined traits and dotted grid; every pair stays apart for deutan and protan readers. The value scale is PuBu.
+The `Slate` lead, slate blue, sand, wine, green, orchid and sky blue, under the hatch theme's hatched and outlined traits and light grid; every pair stays apart for deutan and protan readers. The value scale is PuBu.
 
 ### datachart.themes.SKETCH_THEME
 
@@ -31408,7 +31408,7 @@ Examples:
 | `DEFAULT`    | The default theme. Equals to "default". **TYPE:** `str`                                                                               |
 | `GREYSCALE`  | The greyscale theme. Equals to "greyscale". **TYPE:** `str`                                                                           |
 | `INK`        | The ink theme (dark-ink accents, print-ready). Equals to "ink". **TYPE:** `str`                                                       |
-| `HATCH`      | The hatch theme (hatch cycle, value labels, dotted grid). Equals to "hatch". **TYPE:** `str`                                          |
+| `HATCH`      | The hatch theme (hatch cycle, black edges, light grid). Equals to "hatch". **TYPE:** `str`                                            |
 | `MINIMAL`    | The minimal theme (accent violet, no spines, flat bars). Equals to "minimal". **TYPE:** `str`                                         |
 | `MATERIAL`   | The material theme (Google palette, light grid). Equals to "material". **TYPE:** `str`                                                |
 | `SKETCH`     | The sketch theme (hand-drawn, xkcd-style wobble and halo, Comic Neue font). Equals to "sketch". **TYPE:** `str`                       |
@@ -32851,7 +32851,7 @@ The typing for the legend style.
 | `plot_legend_font_size`   | The font size within the legend. **TYPE:** \`int                      |
 | `plot_legend_title_size`  | The title size of the legend. **TYPE:** \`int                         |
 | `plot_legend_label_color` | The label color of the legend. **TYPE:** \`str                        |
-| `plot_legend_title`       | The legend title; an empty string draws none. **TYPE:** \`str         |
+| `plot_legend_title`       | The legend title; None or an empty string draws none. **TYPE:** \`str |
 | `plot_legend_ncols`       | The number of legend columns. **TYPE:** \`int                         |
 | `plot_legend_edge_color`  | The legend frame color. None keeps matplotlib's. **TYPE:** \`str      |
 | `plot_legend_face_color`  | The legend background color. None keeps matplotlib's. **TYPE:** \`str |

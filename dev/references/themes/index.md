@@ -21,7 +21,7 @@ Every theme is a complete [`StyleAttrs`](https://eriknovak.github.io/datachart/d
 | **Print and black-and-white**                            |                                                                                 |                    |
 | [`GREYSCALE_THEME`](#datachart.themes.GREYSCALE_THEME)   | five greys with hatch, dash and marker cycles, for print without color          | `THEME.GREYSCALE`  |
 | [`INK_THEME`](#datachart.themes.INK_THEME)               | lightness-stepped blues and greens, navy ink edges, print-ready                 | `THEME.INK`        |
-| [`HATCH_THEME`](#datachart.themes.HATCH_THEME)           | a six-entry hatch cycle, black edges, dotted grid                               | `THEME.HATCH`      |
+| [`HATCH_THEME`](#datachart.themes.HATCH_THEME)           | a six-entry hatch cycle, black edges, light grid                                | `THEME.HATCH`      |
 | [`MUTED_THEME`](#datachart.themes.MUTED_THEME)           | Tol's muted colours, dash and marker cycles, colour-blind safe                  | `THEME.MUTED`      |
 | [`CONTRAST_THEME`](#datachart.themes.CONTRAST_THEME)     | lightness-stepped colours plus hatches, print-safe                              | `THEME.CONTRAST`   |
 | [`MUTEDHATCH_THEME`](#datachart.themes.MUTEDHATCH_THEME) | Tol's muted colours under hatches, BuPu value scale                             | `THEME.MUTEDHATCH` |
@@ -496,9 +496,9 @@ HATCH_THEME: StyleAttrs = derive_theme(
 )
 ```
 
-The hatch theme: hatch cycle, black edges, dotted grid.
+The hatch theme: hatch cycle, black edges, light grid.
 
-The `Rust` lead, muted print tones with rust first and the green deep enough to stay apart from rust for deutan readers; the hatched trait gives every bar series its own hatch under black edges, the outlined trait black outlines on every other mark, and the grid is dotted. The value scale is YlOrBr.
+The `Rust` lead, muted print tones with rust first and the green deep enough to stay apart from rust for deutan readers; the hatched trait gives every bar series its own hatch under black edges, the outlined trait black outlines on every other mark, and the grid is a light solid hairline. The value scale is YlOrBr.
 
 ### datachart.themes.MUTED_THEME
 
@@ -522,7 +522,7 @@ MUTED_THEME: StyleAttrs = derive_theme(
 
 The muted theme: Tol's muted colours, dashes and markers, colour-blind safe.
 
-The `TolMuted` lead, indigo, cyan, sand, rose and wine from Paul Tol's muted scheme, every pair distinct for deutan, protan and tritan readers. The patterned trait gives lines a dash and scatter points a marker, the edged trait black bar edges, and the grid is dotted, so a figure survives a greyscale print. The value scale is YlOrBr.
+The `TolMuted` lead, indigo, cyan, sand, rose and wine from Paul Tol's muted scheme, every pair distinct for deutan, protan and tritan readers. The patterned trait gives lines a dash and scatter points a marker, the edged trait black bar edges, so a figure survives a greyscale print; the grid is a light solid hairline. The value scale is YlOrBr.
 
 ### datachart.themes.CONTRAST_THEME
 
@@ -599,7 +599,7 @@ SLATEHATCH_THEME: StyleAttrs = derive_theme(
 
 The slate-hatch theme: the hatch theme without rust.
 
-The `Slate` lead, slate blue, sand, wine, green, orchid and sky blue, under the hatch theme's hatched and outlined traits and dotted grid; every pair stays apart for deutan and protan readers. The value scale is PuBu.
+The `Slate` lead, slate blue, sand, wine, green, orchid and sky blue, under the hatch theme's hatched and outlined traits and light grid; every pair stays apart for deutan and protan readers. The value scale is PuBu.
 
 ### datachart.themes.SKETCH_THEME
 
