@@ -7,15 +7,20 @@ import warnings
 from datachart import themes
 from datachart.config import config
 from datachart.config.configuration import THEMES
-from datachart.constants import COLORS, THEME
+from datachart.constants import COLORS, THEME, TRAIT
 from datachart.themes import (
     DARK_THEME,
     DEFAULT_THEME,
+    HATCH_THEME,
     MINIMAL_THEME,
+    MUTED_THEME,
+    MUTEDHATCH_THEME,
+    SLATEHATCH_THEME,
     PaletteScore,
     derive_theme,
     score_palette,
 )
+from datachart.themes._base import TRAITS
 from datachart.themes.score import palette_colors, theme_palette_score
 from datachart.utils._internal.colors import (
     get_color_scale,
@@ -119,6 +124,87 @@ class TestDeriveTheme(unittest.TestCase):
     def test_single_color_lead_raises(self):
         with self.assertRaises(ValueError):
             derive_theme(THEME.DEFAULT, lead="#B5651D")
+
+
+class TestTraits(unittest.TestCase):
+    """Traits compose in order on top of the lead (ADR 0074)."""
+
+    def test_trait_sets_its_mark_keys_only(self):
+        plain = derive_theme(THEME.DEFAULT, lead=COLORS.TolMuted)
+        flat = derive_theme(THEME.DEFAULT, lead=COLORS.TolMuted, traits=[TRAIT.FLAT])
+        changed = {k for k in flat if flat[k] != plain[k]}
+        self.assertEqual(changed, set(TRAITS[TRAIT.FLAT]))
+        self.assertEqual(flat["plot_bar_edge_width"], 0)
+        self.assertEqual(flat["font_general_family"], plain["font_general_family"])
+
+    def test_later_trait_wins_a_shared_key(self):
+        flat_then_hatched = derive_theme(
+            THEME.DEFAULT, lead=COLORS.TolMuted, traits=[TRAIT.FLAT, TRAIT.HATCHED]
+        )
+        hatched_then_flat = derive_theme(
+            THEME.DEFAULT, lead=COLORS.TolMuted, traits=[TRAIT.HATCHED, TRAIT.FLAT]
+        )
+        self.assertEqual(flat_then_hatched["plot_bar_edge_width"], 0.8)
+        self.assertEqual(hatched_then_flat["plot_bar_edge_width"], 0)
+        # an override still wins everything
+        theme = derive_theme(
+            THEME.DEFAULT,
+            lead=COLORS.TolMuted,
+            traits=[TRAIT.HATCHED],
+            plot_bar_edge_width=2,
+        )
+        self.assertEqual(theme["plot_bar_edge_width"], 2)
+
+    def test_plain_strings_and_unknown_names(self):
+        by_string = derive_theme(THEME.DEFAULT, lead=COLORS.TolMuted, traits=["flat"])
+        by_member = derive_theme(
+            THEME.DEFAULT, lead=COLORS.TolMuted, traits=[TRAIT.FLAT]
+        )
+        self.assertEqual(by_string, by_member)
+        with self.assertRaises(ValueError):
+            derive_theme(THEME.DEFAULT, lead=COLORS.TolMuted, traits=["glossy"])
+        # the domain's DEFAULT is no trait at all
+        plain = derive_theme(THEME.DEFAULT, lead=COLORS.TolMuted)
+        self.assertEqual(
+            derive_theme(THEME.DEFAULT, lead=COLORS.TolMuted, traits=[TRAIT.DEFAULT]),
+            plain,
+        )
+
+    def test_bundle_themes_are_derivations(self):
+        """The hatched sibling of a theme is that theme plus the trait and its scale."""
+        mutedhatch = derive_theme(
+            MUTED_THEME,
+            lead=COLORS.TolMuted,
+            traits=[TRAIT.HATCHED],
+            color_general_singular=COLORS.BuPu,
+            color_parallel_hue_continuous=MUTEDHATCH_THEME[
+                "color_parallel_hue_continuous"
+            ],
+            plot_heatmap_cmap=COLORS.BuPu,
+            plot_heatmap_cmap_diverging=COLORS.BrBG,
+        )
+        self.assertEqual(mutedhatch, MUTEDHATCH_THEME)
+        slatehatch = derive_theme(
+            HATCH_THEME,
+            lead=COLORS.Slate,
+            color_general_singular=COLORS.PuBu,
+            color_parallel_hue_continuous=SLATEHATCH_THEME[
+                "color_parallel_hue_continuous"
+            ],
+            plot_dumbbell_start_color="#4F6D8F",
+            plot_dumbbell_end_color="#743538",
+            plot_heatmap_cmap=COLORS.PuBu,
+            plot_heatmap_cmap_diverging=COLORS.BrBG,
+        )
+        self.assertEqual(slatehatch, SLATEHATCH_THEME)
+
+    def test_trait_keys_are_marks_never_furniture(self):
+        for name, trait in TRAITS.items():
+            with self.subTest(trait=name):
+                self.assertTrue(all(k.startswith("plot_") for k in trait))
+                self.assertFalse(
+                    any("color_general" in k or "cmap" in k for k in trait)
+                )
 
 
 class TestScorePalette(unittest.TestCase):

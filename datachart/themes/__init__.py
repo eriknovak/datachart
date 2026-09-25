@@ -1,7 +1,7 @@
 """The module containing the `themes`.
 
 The `themes` module contains the predefined style themes that are used to visualize
-the plots. Themes are named for their visual trait, never for a use case or
+the plots. Themes are named for their look, never for a use case or
 audience; each is a complete `StyleAttrs` dictionary that `config.set_theme`
 applies.
 

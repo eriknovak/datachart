@@ -708,10 +708,27 @@ and fails below (ADR 0073). Every predefined theme passes; a registered or
 derived theme that fails is drawn, with a warning.
 _Avoid_: CVD score, accessibility score, colour distance (for the result)
 
+**Trait**:
+A named partial style that changes how marks are drawn and nothing about the
+furniture: `FLAT` (no edges, opaque bars), `EDGED` (black edges on bars and
+histograms), `HATCHED` (edged plus the hatch cycle), `OUTLINED` (black
+outlines on every other mark) and `PATTERNED` (dash and marker cycles). A
+derivation applies traits in the order given, after the lead and before the
+overrides; a trait never sets a palette, a colormap or a font (ADR 0074).
+_Avoid_: modifier, preset (for a trait), style mixin
+
+**Look**:
+A predefined theme that owns its furniture and serves as the base of a
+derivation: default, minimal, material, dark, ink, greyscale, sketch, quill.
+The other six predefined themes are derivations of a look, a lead and traits,
+kept under their own names (ADR 0074).
+_Avoid_: base theme (for the concept), root theme
+
 **Derived theme**:
-A theme built from a base theme and a lead: the base's furniture, fonts,
-hatches and rendering unchanged, its lead-dependent palettes rebuilt from the
-new lead. It is a plain theme dictionary, applied like any hand-written one.
+A theme built from a base theme, a lead and any traits: the base's furniture,
+fonts and rendering unchanged, its lead-dependent palettes rebuilt from the
+new lead, the traits' mark keys applied. It is a plain theme dictionary,
+applied like any hand-written one.
 _Avoid_: theme variant, recoloured theme, sub-theme
 
 **Font stack**:

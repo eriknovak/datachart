@@ -6,6 +6,7 @@ overriding just the attributes that define its identity via `make_theme`.
 
 import copy
 import warnings
+from typing import Dict
 
 from ..typings import StyleAttrs
 from ..constants import (
@@ -18,6 +19,7 @@ from ..constants import (
     LINE_DRAW_STYLE,
     LINE_STYLE,
     SHOW_GRID,
+    TRAIT,
 )
 
 # renamed style keys, each kept for one release (ADRs 0033, 0071, 0072)
@@ -506,6 +508,55 @@ BASE_THEME: StyleAttrs = {
     "overlay_warn_thin_bars": True,
     "overlay_warn_scale_groups": True,
     "overlay_warn_scale_conflict": True,
+}
+
+
+# black edges on bars and histograms, opaque bars
+_EDGED: StyleAttrs = {
+    "plot_bar_alpha": 1.0,
+    "plot_bar_edge_color": "#000000",
+    "plot_hist_edge_color": "#000000",
+}
+
+# the traits a derivation composes: mark keys only, never furniture (ADR 0074)
+TRAITS: Dict[str, StyleAttrs] = {
+    TRAIT.FLAT: {
+        "plot_bar_alpha": 1.0,
+        "plot_bar_edge_width": 0,
+        "plot_hist_edge_width": 0,
+        "plot_stackedarea_edge_width": 0,
+        "plot_line_width": 2.0,
+    },
+    TRAIT.EDGED: _EDGED,
+    TRAIT.HATCHED: {
+        **_EDGED,
+        "plot_bar_edge_width": 0.8,
+        "plot_hatch_cycle": ["", "//", "..", "xx", "\\", "--"],
+    },
+    TRAIT.OUTLINED: {
+        "plot_stackedarea_edge_color": "#000000",
+        "plot_sankey_node_edge_color": "#000000",
+        "plot_treemap_edge_color": "#000000",
+        "plot_network_node_edge_color": "#000000",
+        "plot_gantt_dependency_color": "#000000",
+        "plot_gantt_today_color": "#000000",
+        "plot_dumbbell_edge_color": "#000000",
+        "plot_dumbbell_connector_color": "#8C8C8C",
+        "plot_dumbbell_arrow_color": "#000000",
+        "plot_text_box_edgecolor": "#000000",
+        "plot_text_arrow_color": "#000000",
+        "plot_heatmap_frame_color": "#000000",
+        "plot_scatter_edge_width": 0.6,
+        "plot_scatter_edge_color": "#000000",
+        "plot_swarm_edge_width": 0.6,
+        "plot_swarm_edge_color": "#000000",
+        "plot_violin_edgecolor": "#000000",
+        "plot_ridgeline_edgecolor": "#000000",
+    },
+    TRAIT.PATTERNED: {
+        "plot_linestyle_cycle": ["-", "--", "-.", ":", "-"],
+        "plot_marker_cycle": ["o", "s", "^", "D", "v"],
+    },
 }
 
 

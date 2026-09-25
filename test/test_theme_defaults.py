@@ -368,7 +368,8 @@ class TestColourSafeThemes(unittest.TestCase):
                 self.assertEqual(len(config["plot_linestyle_cycle"]), n)
                 self.assertEqual(len(config["plot_marker_cycle"]), n)
         config.set_theme(THEME.CONTRAST)
-        self.assertEqual(len(config["plot_hatch_cycle"]), 5)
+        # the hatched trait's cycle covers every series and one more
+        self.assertGreaterEqual(len(config["plot_hatch_cycle"]), n)
 
     def test_mutedhatch_pairs_muted_colours_with_contrast_hatches(self):
         config.set_theme(THEME.MUTED)

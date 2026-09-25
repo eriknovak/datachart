@@ -126,6 +126,10 @@ Which constants the parameters of each chart accept, by chart family. A constant
     options:
         heading_level: 3
 
+::: datachart.constants.TRAIT
+    options:
+        heading_level: 3
+
 ::: datachart.constants.EMPHASIS
     options:
         heading_level: 3
