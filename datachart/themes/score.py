@@ -40,9 +40,11 @@ class PaletteScore:
     `worst_kind` whichever of deutan and protan scores lower and `worst_pair`
     the pair behind it. `verdict` is `"pass"` when deutan and protan reach 8
     and normal reaches 15, `"weak"` when deutan and protan stay between 6
-    and 8 with normal at 15, and `"fail"` otherwise.
+    and 8 with normal at 15, and `"fail"` otherwise. `colors` is the palette
+    scored; a notebook shows it as a swatch strip over the summary line.
     """
 
+    colors: Tuple[str, ...]
     deutan: float
     protan: float
     tritan: float
@@ -60,6 +62,27 @@ class PaletteScore:
             f"greyscale gap {self.grey_gap:.0f} · {self.verdict} "
             f"({self.worst_pair[0]} vs {self.worst_pair[1]}, {self.worst_kind} "
             f"ΔE {getattr(self, self.worst_kind):.1f})"
+        )
+
+    def _repr_html_(self) -> str:
+        badge = {
+            "pass": "color:#117733;background:#E3F0E6",
+            "weak": "color:#8A6A10;background:#F6EBCB",
+            "fail": "color:#BB5566;background:#F5E1E4",
+        }[self.verdict]
+        swatches = "".join(
+            f'<span title="{c}" style="display:inline-block;width:1.6em;height:1.6em;'
+            f"margin-right:.25em;border-radius:.25em;background:{c};"
+            f'box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)"></span>'
+            for c in self.colors
+        )
+        summary = str(self).rsplit(" · ", 1)[0]
+        return (
+            f'<div style="font-size:.85em;line-height:2">{swatches}<br>{summary} '
+            f'<span style="{badge};font-weight:600;padding:0 .4em;border-radius:3px;'
+            f'text-transform:uppercase">{self.verdict}</span> '
+            f"<code>{self.worst_pair[0]}</code> vs <code>{self.worst_pair[1]}</code>, "
+            f"{self.worst_kind} ΔE {getattr(self, self.worst_kind):.1f}</div>"
         )
 
 
@@ -132,11 +155,12 @@ def score_palette(
     else:
         verdict = "fail"
     return PaletteScore(
-        deutan=worst["deutan"][0],
-        protan=worst["protan"][0],
-        tritan=worst["tritan"][0],
-        normal=worst["normal"][0],
-        grey_gap=grey_gap,
+        colors=tuple(swatches),
+        deutan=round(worst["deutan"][0], 1),
+        protan=round(worst["protan"][0], 1),
+        tritan=round(worst["tritan"][0], 1),
+        normal=round(worst["normal"][0], 1),
+        grey_gap=round(grey_gap, 1),
         low_contrast=low_contrast,
         worst_kind=worst_kind,
         worst_pair=worst[worst_kind][1],
