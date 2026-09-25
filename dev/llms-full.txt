@@ -18532,7 +18532,7 @@ config.reset_config()
 
 # Theme Gallery
 
-Each predefined theme has a card here: a strip of its color swatches with hex codes, the sequential and diverging colormaps, and the font it sets in, its colour-blindness scores, and the same six signature charts rendered under that theme — grouped bars, lines, a fitted scatter, a box plot, a heatmap, and a twin-axis [`Panel`](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md). The six charts cover every trait a theme can differ in: palette, edges and fills, line strokes and markers, bodies, value scales, and the furniture around them (spines, grid, ticks, legend). The themes are grouped by where they work best:
+Each predefined theme has a card here: a ledger of its series colors with hex codes, its singular, heatmap and diverging colormaps, the font it sets in and its colour-blindness scores, and the same six signature charts rendered under that theme — grouped bars, lines, a fitted scatter, a box plot, a heatmap, and a twin-axis [`Panel`](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md). The six charts cover every trait a theme can differ in: palette, edges and fills, line strokes and markers, bodies, value scales, and the furniture around them (spines, grid, ticks, legend). The themes are grouped by where they work best:
 
 | Theme                                                   | Character                                                                  |
 | ------------------------------------------------------- | -------------------------------------------------------------------------- |
@@ -18558,7 +18558,7 @@ Themes also carry *defaults for chart settings*: every theme but `SKETCH` and `Q
 
 A theme with a different hue is not a new card: `derive_theme` in the [Themes guide](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/#deriving-a-theme-from-a-colormap) rebuilds any theme's palettes from a colormap in [COLORS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORS) and keeps its furniture.
 
-The sample data and the two helpers behind every card are defined in a hidden cell. `show_swatches()` reads the palette, the colormaps and the font straight from the active [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md), so the strip always matches the theme as shipped. It closes with the theme's colour-blindness scores from [`score_palette`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.score_palette), as explained in the next section; `cvd_table()` lists them for every theme. `signature(pair)` builds the six charts with the very same code for every theme; `pair` supplies the two colors the twin-axis panel styles explicitly (one per axis), picked from the theme's own swatches. Each card opens with the one call that selects the theme.
+The sample data and the two helpers behind every card are defined in a hidden cell. `show_swatches()` reads the palette, the colormaps and the font straight from the active [`config`](https://eriknovak.github.io/datachart/dev/references/config/index.md), so the ledger always matches the theme as shipped. Its last row is the theme's colour-blindness scores from [`score_palette`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.score_palette), as explained in the next section; `cvd_table()` lists them for every theme. `signature(pair)` builds the six charts with the very same code for every theme; `pair` supplies the two colors the twin-axis panel styles explicitly (one per axis), picked from the theme's own swatches. Each card opens with the one call that selects the theme.
 
 ## Colour-blindness suitability
 
@@ -18772,7 +18772,7 @@ A palette is named wherever a theme asks for colors: the two general palettes, t
 
 A palette asked for one color gives its last one, so a sequential palette yields one strong color and a graded set when several are asked for. The calendar heatmap, hexbin, and contour colormaps follow the heatmap's unless set. A heatmap drawn with `norm="centered"` or `norm="twoslope"` takes `plot_heatmap_cmap_diverging` in place of `plot_heatmap_cmap`, so a signed matrix reads its sign as a hue; see the [Heatmap guide](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/heatmap/#normalization). See the [Themes](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) guide for setting these attributes and building a theme around them.
 
-Each palette below is shown as a continuous strip and as the six colors a chart with six series receives; hover a swatch for its hex code. A palette is passed as its `COLORS` value, or as the plain name string. A chip names a predefined theme that uses the palette and the role it plays there, and links to the theme's card in the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md).
+Each palette below is shown as a continuous strip and as the six colors a chart with six series receives; hover a swatch for its hex code. A palette is passed as its `COLORS` value, or as the plain name string.
 
 ```
 from datachart.constants import COLORS
