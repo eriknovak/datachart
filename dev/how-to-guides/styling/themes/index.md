@@ -103,7 +103,7 @@ NEON_COLORS = ["#00E5FF", "#FF2D95", "#FFB000", "#7DFF5A", "#B26BFF"]
 swatches(NEON_COLORS)
 ```
 
-Score the palette before building on it: [`score_palette`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.score_palette) compares every pair of colours as deutan, protan and tritan readers see them and reports the closest pair with a verdict, the same check `register_theme` and `derive_theme` warn through when a palette fails. Neon colours sit close in lightness, so amber and green come within ΔE 8 for deutan readers and the verdict is `weak`, a palette to pair with a dash or marker cycle; a `fail` would warn when the theme is registered:
+Score the palette before building on it: [`score_palette`](https://eriknovak.github.io/datachart/dev/references/themes/#datachart.themes.score_palette) compares every pair of colours as deutan, protan and tritan readers see them and reports the closest pair with a verdict, the same check `register_theme` warns through when a palette fails. Neon colours sit close in lightness, so amber and green come within ΔE 8 for deutan readers and the verdict is `weak`, a palette to pair with a dash or marker cycle; a `fail` would warn when the theme is registered:
 
 ```
 from datachart.themes import score_palette
@@ -200,7 +200,7 @@ with config.override(derive_theme(THEME.MINIMAL, lead=COLORS.Dark2)):
 Keyword arguments set any other attribute on the result, an unknown name raises, and `register_theme` makes the variant switchable by name like any theme; a dark base keeps the samples off its page:
 
 ```
-ember = derive_theme(THEME.INK, lead=COLORS.Reds, font_general_family="serif")
+ember = derive_theme(THEME.INK, lead=COLORS.Rust, font_general_family="serif")
 config.register_theme("ember", ember)
 with config.using_theme("ember"):
     demo().show()

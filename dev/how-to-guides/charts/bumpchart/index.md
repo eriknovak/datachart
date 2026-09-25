@@ -18,6 +18,27 @@ Each series is a list of `{x, y}` points, with the year as `x` and the populatio
 population[0][:2]
 ```
 
+Ten series outrun the palette. A theme's palette has six colors, and a seventh line would repeat the first, which the chart warns about. Where every line matters, as in the feature examples below, set a palette with one color per series on the configuration with [config.update_config](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.update_config), once, and every chart draws from it. Ten colors cannot all stay apart for color-blind readers, so the end labels carry the names; where the story is about a few lines, the [Emphasis](#emphasis) section mutes the rest instead.
+
+```
+from datachart.config import config
+
+# one color per country: Paul Tol's muted qualitative scheme
+COUNTRY_COLORS = [
+    "#332288",
+    "#88CCEE",
+    "#44AA99",
+    "#117733",
+    "#999933",
+    "#DDCC77",
+    "#CC6677",
+    "#882255",
+    "#AA4499",
+    "#DDDDDD",
+]
+config.update_config({"color_general_multiple": COUNTRY_COLORS})
+```
+
 **Basic example.** Only the `data` argument is required, and `subtitle` names the lines: each name prints beside the line's last point, in the line's color, so the chart needs no legend and no rank axis. At every year the most populous country takes rank 1 at the top:
 
 ```
@@ -506,10 +527,9 @@ BumpChart(
 
 ### Themes
 
-A theme sets the palette, the line width and the furniture of every chart at once; the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md) shows each one. Apply one with [config.set_theme](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.set_theme) and a [THEME](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME) member, and reset the configuration afterwards so the following charts draw in the default again.
+A theme sets the palette, the line width and the furniture of every chart at once; the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md) shows each one. Apply one with [config.set_theme](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.set_theme) and a [THEME](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME) member, and reset the configuration afterwards so the following charts draw in the default again. A theme brings its own palette, six colors for `MATERIAL`, fewer than the ten countries; the example keeps the three top-ranked countries in the theme's colors and mutes the rest with `emphasis_rule`, as the [Emphasis](#emphasis) section showed.
 
 ```
-from datachart.config import config
 from datachart.constants import THEME
 
 config.set_theme(THEME.MATERIAL)
@@ -517,6 +537,8 @@ figure = BumpChart(
     data=population,
     subtitle=COUNTRIES,
     line_curve=0.8,
+    # the theme's palette has six colors: keep the top three
+    emphasis_rule={"top": 3},
     title="The world's most populous countries",
     xlabel="Year",
     ylabel="Rank by population",

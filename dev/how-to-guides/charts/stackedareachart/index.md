@@ -18,7 +18,25 @@ The data is a list of series, one per source, the first at the bottom of the sta
 {source: points[:3] for source, points in zip(SOURCES, generation)}
 ```
 
-**Basic example.** Only the `data` argument is required. Each source fills the band between the sources below it and its own value, so the top edge of the stack is the world's total generation, and the axes start where the stack does. A single list of points draws one band on its own. The default palette has six colors, so the seventh band repeats the first; the [Band style](#band-style) section gives every source a color of its own.
+Seven sources outrun the palette: a theme's palette has six colors, and the seventh band would repeat the first, which the chart warns about. Colors carry meaning in a stack, so the guide sets its own palette on the configuration with [config.update_config](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.update_config), once, one color per source in stack order: the fossil sources warm, the low-carbon ones cool, the rest grey. Every chart below draws from it unless it sets its own colors; the [Band style](#band-style) section pins the colors per source, so a chart of a few sources keeps them, and where a few sources are the story, the [Emphasis](#emphasis) section mutes the rest.
+
+```
+from datachart.config import config
+
+# fossil sources warm, low-carbon sources cool, the rest grey
+SOURCE_COLORS = {
+    "Coal": "#5b4636",
+    "Gas": "#e07b39",
+    "Nuclear": "#7b5ea7",
+    "Hydro": "#2e86ab",
+    "Wind": "#7fc8e8",
+    "Solar": "#f4c542",
+    "Other": "#b8b8b8",
+}
+config.update_config({"color_general_multiple": list(SOURCE_COLORS.values())})
+```
+
+**Basic example.** Only the `data` argument is required. Each source fills the band between the sources below it and its own value, so the top edge of the stack is the world's total generation, and the axes start where the stack does. A single list of points draws one band on its own. The bands take the palette set above, one color per source in stack order.
 
 ```
 StackedAreaChart(
@@ -163,21 +181,11 @@ StackedAreaChart(
 
 ### Band style
 
-Colors carry meaning in a stack: sources that belong together should look alike, and a reader should not have to consult the legend for every band. The `style` dictionary sets the look of the bands: the fill color and hatch come from the `plot_area_*` attributes ([AreaStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.AreaStyleAttrs)), and `plot_stackedarea_alpha`, the stroke between the bands (`plot_stackedarea_edge_color`, `plot_stackedarea_edge_width`) and `plot_stackedarea_outline`, which draws the top edge of every band as a line in the `plot_line_*` style, are the stack's own ([StackedAreaStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/stackedareachart/#datachart.typings.StackedAreaStyleAttrs)). A single dictionary applies to every series; a list aligned with `data` styles each on its own, and any attribute left out keeps the value of the active theme. `SOURCE_STYLE` colors the fossil sources in warm tones, the low-carbon ones in cool tones and the rest in grey, with a hatch from [HATCH_STYLE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.HATCH_STYLE) marking the miscellaneous band. It also sets `plot_area_zorder`, the drawing order of the bands: by default the bands are drawn over reference lines and over lines composed with them, and a lower value sends them underneath (the [Reference lines](#reference-lines) section shows why that matters). The rest of the guide reuses `SOURCE_STYLE`.
+Colors carry meaning in a stack: sources that belong together should look alike, and a reader should not have to consult the legend for every band. The `style` dictionary sets the look of the bands: the fill color and hatch come from the `plot_area_*` attributes ([AreaStyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.AreaStyleAttrs)), and `plot_stackedarea_alpha`, the stroke between the bands (`plot_stackedarea_edge_color`, `plot_stackedarea_edge_width`) and `plot_stackedarea_outline`, which draws the top edge of every band as a line in the `plot_line_*` style, are the stack's own ([StackedAreaStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/stackedareachart/#datachart.typings.StackedAreaStyleAttrs)). A single dictionary applies to every series; a list aligned with `data` styles each on its own, and any attribute left out keeps the value of the active theme. `SOURCE_STYLE` pins each source's color from `SOURCE_COLORS`, so a chart of a few sources keeps them (the [examples](#real-world-examples) at the end draw three), and adds a hatch from [HATCH_STYLE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.HATCH_STYLE) marking the miscellaneous band. It also sets `plot_area_zorder`, the drawing order of the bands: by default the bands are drawn over reference lines and over lines composed with them, and a lower value sends them underneath (the [Reference lines](#reference-lines) section shows why that matters). The rest of the guide reuses `SOURCE_STYLE`.
 
 ```
 from datachart.constants import HATCH_STYLE
 
-# fossil sources warm, low-carbon sources cool, the rest grey
-SOURCE_COLORS = {
-    "Coal": "#5b4636",
-    "Gas": "#e07b39",
-    "Nuclear": "#7b5ea7",
-    "Hydro": "#2e86ab",
-    "Wind": "#7fc8e8",
-    "Solar": "#f4c542",
-    "Other": "#b8b8b8",
-}
 SOURCE_STYLE = [
     {
         "plot_area_color": SOURCE_COLORS[source],
@@ -622,16 +630,20 @@ StackedAreaChart(
 
 ### Themes
 
-A theme sets the palette, the band alpha, the stroke between the bands and the furniture of every chart at once, so a report keeps one look without restyling each figure; the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md) shows the whole suite under each. Apply one with [config.set_theme](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.set_theme) from the [THEME](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME) constants, and reset the configuration afterwards so the following charts draw in the default again. The style is resolved when the chart is created, so the figure keeps the theme when it is shown after the reset.
+A theme sets the palette, the band alpha, the stroke between the bands and the furniture of every chart at once, so a report keeps one look without restyling each figure; the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md) shows the whole suite under each. Apply one with [config.set_theme](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.set_theme) from the [THEME](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME) constants, and reset the configuration afterwards so the following charts draw in the default again. The style is resolved when the chart is created, so the figure keeps the theme when it is shown after the reset. A theme brings its own palette, five colors for `INK`, fewer than the seven sources; the example keeps wind and solar in the theme's colors and mutes the rest with `emphasis`, as the [Emphasis](#emphasis) section showed.
 
 ```
-from datachart.config import config
 from datachart.constants import THEME
 
 config.set_theme(THEME.INK)
 figure = StackedAreaChart(
     data=generation,
     subtitle=SOURCES,
+    # the theme's palette has five colors: keep wind and solar
+    emphasis=[
+        EMPHASIS.HIGHLIGHT if source in ("Wind", "Solar") else EMPHASIS.BACKGROUND
+        for source in SOURCES
+    ],
     show_legend=True,
     legend={"title": "Source", "location": LEGEND_LOCATION.UPPER_LEFT, "ncols": 2},
     title="World electricity generation",
