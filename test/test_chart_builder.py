@@ -163,5 +163,70 @@ class TestFrontsThroughTheBuilder(unittest.TestCase):
         )
 
 
+MARK_PARAMETERS = ("vlines", "hlines", "dlines", "brackets", "vspans", "hspans", "texts")
+LINE = [{"x": 0, "y": 1}, {"x": 1, "y": 3}]
+
+
+class TestMarkLists(unittest.TestCase):
+    """A flat mark list is every chart's; a list holding lists is per chart."""
+
+    def tearDown(self):
+        plt.close("all")
+
+    def marks(self, name, value):
+        charts = build_charts_structure("linechart", [LINE, LINE], **{name: value})
+        return [chart.get(name) for chart in charts]
+
+    def test_flat_list_goes_to_every_chart(self):
+        for name in MARK_PARAMETERS:
+            with self.subTest(parameter=name):
+                flat = [{"n": 0}, {"n": 1}, {"n": 2}]
+                self.assertEqual(self.marks(name, flat), [flat, flat])
+
+    def test_one_dict_goes_to_every_chart(self):
+        for name in MARK_PARAMETERS:
+            with self.subTest(parameter=name):
+                self.assertEqual(self.marks(name, {"n": 0}), [{"n": 0}, {"n": 0}])
+
+    def test_list_of_lists_is_per_chart(self):
+        for name in MARK_PARAMETERS:
+            with self.subTest(parameter=name):
+                nested = [[{"n": 0}], [{"n": 1}, {"n": 2}]]
+                self.assertEqual(self.marks(name, nested), nested)
+
+    def test_mixed_list_is_per_chart(self):
+        for name in MARK_PARAMETERS:
+            with self.subTest(parameter=name):
+                mixed = [{"n": 0}, None]
+                self.assertEqual(self.marks(name, mixed), [{"n": 0}, None])
+
+    def vline_positions(self, ax):
+        return sorted(
+            float(segment[0][0])
+            for collection in ax.collections
+            for segment in collection.get_segments()
+        )
+
+    def test_flat_vlines_draw_in_full_on_one_axes(self):
+        vlines = [{"x": 1}, {"x": 2}, {"x": 3}]
+        figure = LineChart([LINE, LINE], vlines=vlines)
+        self.assertEqual(self.vline_positions(figure.axes[0]), [1, 2, 3])
+
+    def test_flat_vlines_draw_in_full_on_every_subplot(self):
+        vlines = [{"x": 1}, {"x": 2}, {"x": 3}]
+        figure = LineChart([LINE, LINE], vlines=vlines, subplots=True)
+        axes = [ax for ax in figure.axes if ax.axison]
+        self.assertEqual(len(axes), 2)
+        for ax in axes:
+            self.assertEqual(self.vline_positions(ax), [1, 2, 3])
+
+    def test_nested_vlines_draw_per_subplot(self):
+        vlines = [[{"x": 1}], [{"x": 2}, {"x": 3}]]
+        figure = LineChart([LINE, LINE], vlines=vlines, subplots=True)
+        axes = [ax for ax in figure.axes if ax.axison]
+        self.assertEqual(self.vline_positions(axes[0]), [1])
+        self.assertEqual(self.vline_positions(axes[1]), [2, 3])
+
+
 if __name__ == "__main__":
     unittest.main()
