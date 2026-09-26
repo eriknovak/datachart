@@ -422,7 +422,9 @@ def canonical_records(kind: ChartKind, chart: dict, where: str) -> Any:
     that chart without the key. The caller's records are never
     mutated; keys the row does not declare, like `emphasis`, carry over.
     Records carrying a key the row has `renamed`, and not its new name,
-    are read under the old name with a warning.
+    are read under the old name with a warning, unless another record key
+    already reads the old one; the chart's `renamed` maps each such new
+    name to the old one it read.
 
     Args:
         kind: The front's row, declaring the record keys.
@@ -441,6 +443,7 @@ def canonical_records(kind: ChartKind, chart: dict, where: str) -> Any:
         if (
             new in kind.record_keys
             and sources[new] == new
+            and old not in sources.values()
             and _carries(data, old)
             and not _carries(data, new)
         ):
@@ -451,6 +454,8 @@ def canonical_records(kind: ChartKind, chart: dict, where: str) -> Any:
                 stacklevel=5,
             )
             sources[new] = old
+            # the row's `check_records` validates it like the parameter
+            chart.setdefault("renamed", {})[new] = old
     if isinstance(data, dict):
         return _canonical(data, sources)
     if not isinstance(data, list):

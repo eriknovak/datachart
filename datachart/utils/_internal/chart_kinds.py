@@ -77,6 +77,7 @@ from .layers import (
     value_label_font,
 )
 from .validate import (
+    validate_annotation,
     validate_calendar_dates,
     validate_calendar_year,
     validate_dumbbell_records,
@@ -388,6 +389,13 @@ def _ridgeline_layers(charts: List[dict], settings: dict) -> List[Layer]:
 def _check_dumbbells(charts: List[dict], settings: dict) -> None:
     for chart in charts:
         validate_dumbbell_records(chart["data"])
+
+
+def _check_annotations(charts: List[dict], settings: dict) -> None:
+    # a `label` key read as the annotation meets the `annotation` check
+    for chart in charts:
+        old = chart.pop("renamed", {}).get("annotation")
+        validate_annotation(old, settings.get("show_values"))
 
 
 def _check_tasks(charts: List[dict], settings: dict) -> None:
@@ -758,6 +766,7 @@ _KINDS = (
         required_keys=("x", "y"),
         # `label` is the category key on every other front (ADR 0069)
         renamed={"label": "annotation"},
+        check_records=_check_annotations,
         emphasis_units=series_units("y"),
         emphasis_by="mean",
     ),
