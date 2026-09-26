@@ -50,6 +50,7 @@ adds no tag; one that reverses, narrows, widens or replaces a commitment does.
 - [0007](0007-nested-grid-alignment.md) — Nested grids render in the parent gridspec, with a reserved heading row
 - [0012](0012-orientation-aware-panel.md) — A Panel has an orientation, inferred from its layers, and its value axis follows it (amended by [0017](0017-pyramid-chart.md))
 - [0041](0041-panel-axis-scales.md) — Panel takes axis scales, and a layer group carries its source figure's scale
+- [0080](0080-per-axis-stacking.md) — Each value axis of a Panel stacks only its own layers
 - [0070](0070-composition-furniture-vocabulary.md) — Panel and Grid take the chart fronts' furniture vocabulary; one grid layout path
 
 ## Emphasis and category order
@@ -102,7 +103,7 @@ theme faces out of the wheel.
 
 ## Chart fronts
 
-- [0014](0014-histogram-stacking-and-step-defaults.md) — Histogram stacking moves to bar_mode; step edges follow the series
+- [0014](0014-histogram-stacking-and-step-defaults.md) — Histogram stacking moves to bar_mode; step edges follow the series (amended by [0080](0080-per-axis-stacking.md))
 - [0015](0015-radial-chart.md) — RadialChart is one front with a visual switch, on a projection-aware Panel (amended by [0052](0052-chart-prefixed-constants.md))
 - [0017](0017-pyramid-chart.md) — PyramidChart is a mirrored two-series bar front speaking spatial axes
 - [0019](0019-violin-plot.md) — ViolinPlot mirrors BoxPlot and draws its inner marks itself
@@ -111,7 +112,7 @@ theme faces out of the wheel.
 - [0022](0022-contour-chart.md) — ContourChart draws a gridded surface as lines or fills through one layer
 - [0023](0023-heatmap-chart-dicts.md) — Heatmap takes `{x, y, z}` chart dicts; `x` and `y` are labels, not coordinates
 - [0024](0024-hexbin-chart.md) — HexbinChart bins dense scatter data into colormapped hexagons (amended by [0035](0035-colorbar-setting.md))
-- [0025](0025-stacked-area-chart.md) — StackedAreaChart stacks series over an ordered axis with a panel-computed baseline (amended by [0052](0052-chart-prefixed-constants.md))
+- [0025](0025-stacked-area-chart.md) — StackedAreaChart stacks series over an ordered axis with a panel-computed baseline (amended by [0052](0052-chart-prefixed-constants.md), [0080](0080-per-axis-stacking.md))
 - [0026](0026-sankey-chart.md) — SankeyChart draws weighted flows between column-ordered nodes through one layer
 - [0028](0028-treemap-chart.md) — Treemap tiles one level of nested part-of-whole data through one layer (amended by [0032](0032-treemap-nesting-depth.md))
 - [0029](0029-network-chart.md) — NetworkChart draws node-link diagrams from a nodes/edges dict through one layer (amended by [0030](0030-network-weighted-and-grouped-layouts.md))
