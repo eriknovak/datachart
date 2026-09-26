@@ -78,11 +78,13 @@ category position — so numeric-x layers and ticks line up with group centers.
 _Avoid_: bar offset (for the concept), dodge
 
 **Category index**:
-A panel's shared map from group label to position on the category axis, built
-as the first-seen union of labels across its group-oriented layers (box,
-swarm, violin) and handed to each through the `DrawContext`. Positions are
-0-based, the first group at 0 like the first bar. The panel sets the category
-ticks from it once; layers never place their own groups.
+A panel's shared map from category label to position on the category axis,
+built as the first-seen union of labels across every category layer — bars,
+radial layers, and the group-oriented layers (box, swarm, violin) — and handed
+to each through the `DrawContext`. Positions are 0-based. Each layer places a
+value at its label's position; a series missing a label leaves that slot
+empty. The panel sets the category ticks (or radial spokes) from it once;
+layers never place their own categories.
 _Avoid_: box positions, group order (for the map)
 
 **Swarm**:
