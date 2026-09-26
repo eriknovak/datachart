@@ -11670,6 +11670,19 @@ class Panel:
                 for group in self.groups
             ]
 
+        # each value axis stacks only its own layers (ADR 0080)
+        layer_axes = {
+            id(layer): side
+            for group, side in zip(self.groups, assignments)
+            for layer in group.layers
+        }
+
+        def by_axis(layers):
+            pools = defaultdict(list)
+            for layer in layers:
+                pools[layer_axes[id(layer)]].append(layer)
+            return pools.values()
+
         # bar slotting across every layer in the panel; radial bars share the
         # machinery — their slots are sector fractions, scaled at draw time
         bar_layers = [
@@ -11704,19 +11717,20 @@ class Panel:
                     )
             elif bar_mode == "stack":
                 # bottoms accumulate per category slot, whatever the record order
-                bottoms = np.zeros(len(category_index or ()))
-                for idx, layer in enumerate(bar_layers):
-                    labels, y = _layer_category_labels(layer), layer.y_values()
-                    stacks = category_index is not None and labels is not None
-                    positions = _category_positions(labels or (), category_index)
-                    bar_slots[id(layer)] = BarSlot(
-                        offset=0.0,
-                        width=layer.bar_width,
-                        bottom=bottoms[positions] if stacks else None,
-                        show_yerr=idx == len(bar_layers) - 1,
-                    )
-                    if stacks and y is not None:
-                        np.add.at(bottoms, positions, np.asarray(y, dtype=float))
+                for stack in by_axis(bar_layers):
+                    bottoms = np.zeros(len(category_index or ()))
+                    for idx, layer in enumerate(stack):
+                        labels, y = _layer_category_labels(layer), layer.y_values()
+                        stacks = category_index is not None and labels is not None
+                        positions = _category_positions(labels or (), category_index)
+                        bar_slots[id(layer)] = BarSlot(
+                            offset=0.0,
+                            width=layer.bar_width,
+                            bottom=bottoms[positions] if stacks else None,
+                            show_yerr=idx == len(stack) - 1,
+                        )
+                        if stacks and y is not None:
+                            np.add.at(bottoms, positions, np.asarray(y, dtype=float))
             else:  # overlay
                 for layer in bar_layers:
                     bar_slots[id(layer)] = BarSlot(offset=0.0, width=layer.bar_width)
@@ -11752,14 +11766,15 @@ class Panel:
                     np.hstack(tuple(l.x_values() for _, l in hist_pairs)),
                     bins=hist_pairs[0][0].num_bins,
                 )[1]
-            hist_slots = _hist_stack_slots([l for _, l in hist_pairs], stack_bins)
+            for stack in by_axis(l for _, l in hist_pairs):
+                hist_slots.update(_hist_stack_slots(stack, stack_bins))
 
         # stacked areas always stack; the baseline is a panel setting (ADR 0025)
         stack_layers = [l for l in self.layers if isinstance(l, StackedAreaLayer)]
         stack_slots = {}
-        if stack_layers:
-            stack_slots = _stack_slots(
-                stack_layers, s.get("baseline") or STACKED_AREA_BASELINE.DEFAULT
+        for stack in by_axis(stack_layers):
+            stack_slots.update(
+                _stack_slots(stack, s.get("baseline") or STACKED_AREA_BASELINE.DEFAULT)
             )
 
         zorder_defaults = s.get("zorder_defaults", {})
