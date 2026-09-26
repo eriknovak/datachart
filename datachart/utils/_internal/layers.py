@@ -81,6 +81,7 @@ from .validate import (
     infer_network_nodes,
     first_seen_nodes,
     infer_sankey_columns,
+    is_missing,
     is_number,
     treemap_record_total,
     validate_contour_levels,
@@ -534,22 +535,34 @@ def get_chart_data(attr: str, chart: dict) -> Optional[np.ndarray]:
     return np.array(values)
 
 
-def get_chart_observations(attr: str, chart: dict) -> Optional[np.ndarray]:
-    """A data column as one flat pool of observations.
+def get_chart_observations(attr: str, chart: dict, name: str) -> Optional[np.ndarray]:
+    """A data column as one flat pool of observations, NaN dropped.
 
     A point carries a single observation or a list of them, and the charts
     that bin or estimate over a sample read the lot as one series. Records
     are concatenated, so lists of unequal length never have to square into
-    a grid (issue #233).
+    a grid (issue #233). A column of NaN alone raises, naming the chart
+    `name` and its subtitle.
     """
 
     values = _chart_column(attr, chart)
     if values is None:
         return None
     if isinstance(chart["data"], dict):
-        return np.ravel(values)
-    flat = [np.ravel(value) for value in values]
-    return np.concatenate(flat) if flat else None
+        observations = np.ravel(values)
+    else:
+        flat = [np.ravel(value) for value in values]
+        if not flat:
+            return None
+        observations = np.concatenate(flat)
+    if observations.dtype.kind != "f":
+        return observations
+    finite = observations[~np.isnan(observations)]
+    if len(observations) and not len(finite):
+        subtitle = chart.get("subtitle")
+        named = f"{name} `{subtitle}`" if subtitle else name
+        raise ValueError(f"The {named} has no finite `{attr}` values.")
+    return finite
 
 
 def get_chart_grid(chart: dict, kind: str, dtype=float) -> tuple:
@@ -588,6 +601,9 @@ class NumpyEncoder(json.JSONEncoder):
             return obj.item()
         if is_temporal(obj):
             return obj.isoformat() if isinstance(obj, date) else str(obj)
+        # a formatter keys by identity: the same function hashes alike
+        if callable(obj):
+            return repr(obj)
         return super().default(obj)
 
 
@@ -4323,7 +4339,7 @@ class HistogramLayer(Layer):
         self._resolve_value_labels()
 
     def x_values(self) -> Optional[np.ndarray]:
-        return get_chart_observations("x", self.chart)
+        return get_chart_observations("x", self.chart, "histogram")
 
     def y_range(self):
         x = self.x_values()
@@ -4479,7 +4495,7 @@ class KdeLayer(Layer):
         self.xlim = self.settings.get("kde_xlim")
 
     def x_values(self) -> Optional[np.ndarray]:
-        return get_chart_observations("x", self.chart)
+        return get_chart_observations("x", self.chart, "density")
 
     def curve(self) -> Optional[tuple]:
         """The (x, density) samples; None when the values have no spread."""
@@ -4873,20 +4889,31 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
                 errors=_masked_errors(errors, mask),
             )
 
+        if not (self.show_regression or self.show_correlation):
+            return
         x_fit = _axis_numbers(ax, ctx.transpose, x_data)
+        y_fit = np.asarray(y_data, dtype=float)
+        # a point missing a coordinate stays out of the fit and the correlation
+        present = np.isfinite(x_fit) & np.isfinite(y_fit)
+        if not present.any():
+            raise ValueError(
+                f"The scatter chart `{self.label(ctx)}` has no point with finite "
+                "`x` and `y` values to fit."
+            )
+        x_fit, y_fit = x_fit[present], y_fit[present]
         if hue_data is not None:
             if self.show_correlation:
-                self._draw_correlation(ax, x_fit, y_data, color=None)
+                self._draw_correlation(ax, x_fit, y_fit, color=None)
             if self.show_regression:
-                self._draw_regression(ax, ctx, x_fit, y_data, color=None)
+                self._draw_regression(ax, ctx, x_fit, y_fit, color=None)
             return
         color = (
             self.muted_color if ctx.emphasis == EMPHASIS_BACKGROUND else series_color
         )
         if self.show_regression:
-            self._draw_regression(ax, ctx, x_fit, y_data, color=color)
+            self._draw_regression(ax, ctx, x_fit, y_fit, color=color)
         if self.show_correlation:
-            self._draw_correlation(ax, x_data, y_data, color=color)
+            self._draw_correlation(ax, x_data[present], y_fit, color=color)
 
     def _draw_unit(
         self,
@@ -4959,13 +4986,16 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
 
 
 def grouped_records(chart: dict) -> dict:
-    """A group chart's drawn records keyed by label, in first-seen label order."""
+    """A group chart's drawn records keyed by label, in first-seen label order.
+
+    Records without a value are left out, NaN like None.
+    """
 
     grouped = {}
     data = chart.get("data", [])
     if isinstance(data, list):
         for d in data:
-            if d.get("label") is not None and d.get("value") is not None:
+            if d.get("label") is not None and not is_missing(d.get("value")):
                 grouped.setdefault(d["label"], []).append(d)
     return grouped
 
@@ -6076,7 +6106,7 @@ class ViolinLayer(GroupLayer):
         if isinstance(data, list):
             for d in data:
                 lbl, val = d.get("label"), d.get("value")
-                if lbl is None or val is None:
+                if lbl is None or is_missing(val):
                     continue
                 side = d.get(self.split) if self.split else None
                 if self.split and side not in split_values:
@@ -6153,11 +6183,14 @@ class ViolinLayer(GroupLayer):
             showmedians=False,
             showmeans=False,
         )
-        if scale == AXIS_SCALE.LOG:
-            parts = ax.violin([self._log_stats(values)], **options)
+        if np.ptp(values) == 0:
+            body = self._flat_body(ax, values[0], position, width)
         else:
-            parts = ax.violinplot([values], bw_method=self.bandwidth, **options)
-        body = parts["bodies"][0]
+            if scale == AXIS_SCALE.LOG:
+                parts = ax.violin([self._log_stats(values)], **options)
+            else:
+                parts = ax.violinplot([values], bw_method=self.bandwidth, **options)
+            body = parts["bodies"][0]
         # above the axis gridlines (zorder 1.5), like a box patch
         body.set_zorder(2)
         facecolor = style.get("facecolor")
@@ -6177,6 +6210,16 @@ class ViolinLayer(GroupLayer):
             clip = np.minimum if side < 0 else np.maximum
             for path in body.get_paths():
                 path.vertices[:, axis] = clip(path.vertices[:, axis], position)
+        return body
+
+    def _flat_body(self, ax, value, position, width) -> PolyCollection:
+        """Values without spread have no density: a line across the body width."""
+
+        ends = [(position - width / 2, value), (position + width / 2, value)]
+        if self.is_horizontal:
+            ends = [(v, c) for c, v in ends]
+        body = PolyCollection([ends], closed=False)
+        ax.add_collection(body)
         return body
 
     def _log_stats(self, values) -> dict:
@@ -6226,13 +6269,17 @@ class ViolinLayer(GroupLayer):
             )[0]
             return [whisker, bar, dot]
 
-        # the line marks span the body width at their value
-        kde = GaussianKDE(values, self.bandwidth)
-        grid = np.linspace(values.min(), values.max(), 100)
-        peak = float(kde.evaluate(grid).max()) or 1.0
+        # marks span the body width at their value; flat, the full width
+        flat = np.ptp(values) == 0
+        if not flat:
+            kde = GaussianKDE(values, self.bandwidth)
+            grid = np.linspace(values.min(), values.max(), 100)
+            peak = float(kde.evaluate(grid).max()) or 1.0
 
         def span(value, linestyle):
-            h = float(kde.evaluate([value])[0]) / peak * width / 2
+            h = width / 2
+            if not flat:
+                h *= float(kde.evaluate([value])[0]) / peak
             lo_c = position if side > 0 else position - h
             hi_c = position if side < 0 else position + h
             return line(
@@ -6300,21 +6347,22 @@ class RidgelineLayer(GroupLayer):
 
         if log is None:
             log = self.settings.get("scaley") == AXIS_SCALE.LOG
-        ends = [
-            (curve[0]["x"], curve[-1]["x"])
-            for curve in (
-                kde1d(
-                    np.log10(values) if log else values,
-                    bandwidth=self.bandwidth,
-                    gridsize=2,
-                )
-                for values in self.grouped_values().values()
-                if len(values) > 1
-            )
-        ]
+        ends = []
+        for values in self.grouped_values().values():
+            if len(values) < 2:
+                continue
+            fit = np.log10(values) if log else np.asarray(values, dtype=float)
+            if np.ptp(fit) == 0:
+                ends.append((fit[0], fit[0]))
+                continue
+            curve = kde1d(fit, bandwidth=self.bandwidth, gridsize=2)
+            ends.append((curve[0]["x"], curve[-1]["x"]))
         if not ends:
             return None
         lo, hi = min(e[0] for e in ends), max(e[1] for e in ends)
+        if lo == hi:
+            # rows without spread alone: a unit of room around their value
+            lo, hi = lo - 0.5, hi + 0.5
         return (10.0**lo, 10.0**hi) if log else (lo, hi)
 
     def _grid_bounds(self, log: bool) -> tuple:
@@ -6354,16 +6402,10 @@ class RidgelineLayer(GroupLayer):
             lo, hi = np.log10(lo), np.log10(hi)
         else:
             grouped_fit = grouped
-        curves = [
-            kde1d(
-                values, bandwidth=self.bandwidth, gridsize=RIDGE_GRIDSIZE, xlim=(lo, hi)
-            )
-            for values in grouped_fit.values()
-        ]
-        grid = np.array([point["x"] for point in curves[0]])
+        grid = np.linspace(lo, hi, RIDGE_GRIDSIZE)
+        densities = [self._density(values, lo, hi) for values in grouped_fit.values()]
         if log:
             grid = np.power(10.0, grid)
-        densities = [np.array([point["y"] for point in curve]) for curve in curves]
         peak = 1 + self.overlap
         common_max = max(float(d.max()) for d in densities)
         step = RIDGE_ZORDER_SPAN / len(grouped)
@@ -6390,6 +6432,9 @@ class RidgelineLayer(GroupLayer):
             position = ctx.category_index[label]
             baseline = position
             tops = baseline + rise * heights
+            flat = np.ptp(values) == 0
+            # a flat row's marks rise to the line standing in for its ridge
+            inner_tops = np.full_like(grid, baseline + rise * peak) if flat else tops
             # a ridge draws over the row it rises into, so overlap reads as depth
             depth = i if self.is_horizontal else len(grouped) - 1 - i
             zorder = RIDGE_ZORDER + depth * step
@@ -6416,10 +6461,26 @@ class RidgelineLayer(GroupLayer):
                     :
                 ] = [grid[0], grid[-1]]
                 artists.append(("fill", body))
+            if flat:
+                # a line at the value, the height of a full ridge, stands in
+                value = values[0]
+                xs, ys = [value, value], [baseline, inner_tops[0]]
+                spike = ax.plot(
+                    *((xs, ys) if self.is_horizontal else (ys, xs)),
+                    color=edgecolor,
+                    linewidth=style.get("linewidth"),
+                    zorder=zorder + 2 * step / 3,
+                )[0]
+                artists.insert(0, ("outline", spike))
             artists += [
                 ("mark", mark)
                 for mark in self._draw_inner(
-                    ax, values, grid, baseline, tops, zorder + step / 3
+                    ax,
+                    values,
+                    grid,
+                    baseline,
+                    inner_tops,
+                    zorder + step / 3,
                 )
             ]
             if self.show_outline:
@@ -6439,6 +6500,16 @@ class RidgelineLayer(GroupLayer):
             self._apply_ridge_emphasis(artists, roles[label])
             datum = self.summary_datum(self.label(ctx), position, values)
             self.register_hover(artists[0][1], lambda _, datum=datum: datum)
+
+    def _density(self, values, lo: float, hi: float) -> np.ndarray:
+        """The row's density on the shared grid; a row without spread has none."""
+
+        if np.ptp(values) == 0:
+            return np.zeros(RIDGE_GRIDSIZE)
+        curve = kde1d(
+            values, bandwidth=self.bandwidth, gridsize=RIDGE_GRIDSIZE, xlim=(lo, hi)
+        )
+        return np.array([point["y"] for point in curve])
 
     def _draw_inner(self, ax, values, grid, baseline, tops, zorder) -> list:
         """The median or quartile marks, from the baseline up to the ridge."""
@@ -6598,11 +6669,19 @@ class _LockedBarLocator:
 
 
 def _value_formatter(valfmt):
-    """A `{x}`-style format string as a matplotlib formatter; others pass."""
+    """A value format as a matplotlib formatter; None keeps the default.
 
-    if isinstance(valfmt, str) and "{x" in valfmt:
-        return mticker.StrMethodFormatter(valfmt)
-    return valfmt
+    Takes all `_format_value` takes, so ticks print as value labels do,
+    with the typographic minus of matplotlib's own formatters.
+    """
+
+    if valfmt is None or isinstance(valfmt, mticker.Formatter):
+        return valfmt
+    return mticker.FuncFormatter(
+        lambda value, _pos=None: mticker.Formatter.fix_minus(
+            _format_value(valfmt, value)
+        )
+    )
 
 
 def heatmap_cell_roles(chart: dict, z: list) -> list:
@@ -6810,7 +6889,8 @@ class HeatmapLayer(Layer):
         alpha = self._cell_style().get("alpha")
         alphas = np.broadcast_to(1.0 if alpha is None else alpha, values.shape)
         self._draw_value_steps(ax, steps, cells, im.get_zorder(), alphas)
-        im.set_alpha(0)
+        # an array: the image may already hold the per-cell fade array
+        im.set_alpha(np.zeros(values.shape))
 
     def _cell_datum(self, label, row, col) -> dict:
         """The hover datum of a cell: the indices the tick labels name."""
@@ -7222,6 +7302,8 @@ class ContourLayer(Layer):
         """The validated (x, y, z) arrays; x and y default to the indices."""
 
         x, y, z = get_chart_grid(self.chart, "contour")
+        if not np.isfinite(z).any():
+            raise ValueError("The contour chart `z` grid has no finite values.")
         n_rows, n_cols = z.shape
         self._x_kind = axis_kind(x)
         if x is None:
@@ -8461,7 +8543,7 @@ class RadialHistogramLayer(RadialLayer):
         self.num_bins = self.settings.get("num_bins") or DEFAULT_NUM_BINS
 
     def x_values(self) -> Optional[np.ndarray]:
-        return get_chart_observations("x", self.chart)
+        return get_chart_observations("x", self.chart, "radial histogram")
 
     def value_data(self):
         return None

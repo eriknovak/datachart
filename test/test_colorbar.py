@@ -14,9 +14,10 @@ from matplotlib.transforms import Bbox
 
 from datachart.charts import CalendarHeatmap, ContourChart, Heatmap, HexbinChart
 from datachart.config import config
-from datachart.constants import COLORBAR_LOCATION, ORIENTATION, THEME
+from datachart.constants import COLORBAR_LOCATION, ORIENTATION, THEME, VALUE_FORMAT
 from datachart.typings import ColorbarSettingAttrs
 from datachart.utils import Grid
+from datachart.utils._internal.layers import get_chart_hash
 from datachart.utils._internal.config_helpers import (
     get_colorbar_setting,
     get_text_style,
@@ -216,8 +217,7 @@ class TestColorbarRendering(unittest.TestCase):
     def test_hexbin_value_format_is_the_format_fallback(self):
         figure = HexbinChart(data=points(), gridsize=8, value_format="{x:.2f}")
         colorbar = colorbar_of(figure)
-        self.assertIsInstance(colorbar.formatter, mticker.StrMethodFormatter)
-        self.assertEqual(colorbar.formatter.fmt, "{x:.2f}")
+        self.assertEqual(colorbar.formatter(1.5), "1.50")
 
         figure = HexbinChart(
             data=points(),
@@ -225,7 +225,7 @@ class TestColorbarRendering(unittest.TestCase):
             value_format="{x:.2f}",
             colorbar={"format": "{x:.1f}"},
         )
-        self.assertEqual(colorbar_of(figure).formatter.fmt, "{x:.1f}")
+        self.assertEqual(colorbar_of(figure).formatter(1.5), "1.5")
 
     def test_heatmap_value_format_still_formats_cells(self):
         figure = Heatmap(
@@ -395,7 +395,58 @@ class TestColorbarRendering(unittest.TestCase):
         self.assertEqual(len(bars), 1)
         self.assertEqual(bars[0].orientation, "horizontal")
         self.assertEqual(bars[0].ax.xaxis.label.get_text(), "Count")
-        self.assertEqual(bars[0].formatter.fmt, "{x:.2f}")
+        self.assertEqual(bars[0].formatter(1.5), "1.50")
+
+
+Z_SMALL = {"z": [[1, 2], [3, 4]]}
+
+
+def one_decimal(value):
+    return f"{value:.1f}"
+
+
+def cell_texts(figure):
+    return [t.get_text() for ax in figure.axes for t in ax.texts]
+
+
+class TestColorbarFormats(unittest.TestCase):
+    def tearDown(self):
+        plt.close("all")
+
+    def test_callables_hash(self):
+        chart = {
+            "data": Z_SMALL,
+            "value_format": one_decimal,
+            "colorbar": {"format": one_decimal},
+        }
+        self.assertEqual(get_chart_hash(chart), get_chart_hash(dict(chart)))
+
+    def test_callable_value_format_and_colorbar_format(self):
+        figure = Heatmap(Z_SMALL, show_values=True, value_format=one_decimal)
+        self.assertIn("1.0", cell_texts(figure))
+        Heatmap(Z_SMALL, show_colorbars=True, colorbar={"format": one_decimal})
+
+    def test_colorbar_formats_label_a_tick_at_one_and_a_half(self):
+        formats = (
+            "%.1f",
+            "{:.1f}",
+            "{x:.1f}",
+            VALUE_FORMAT.DECIMAL,
+            one_decimal,
+        )
+        for fmt in formats:
+            with self.subTest(fmt=fmt):
+                figure = Heatmap(
+                    Z_SMALL,
+                    show_colorbars=True,
+                    colorbar={"format": fmt, "ticks": [1.5]},
+                    vmin=1,
+                    vmax=4,
+                )
+                figure.canvas.draw()
+                bar = figure.axes[-1]
+                labels = [t.get_text() for t in bar.get_yticklabels()]
+                self.assertEqual(labels, ["1.5"])
 
 
 if __name__ == "__main__":

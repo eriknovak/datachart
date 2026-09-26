@@ -12,6 +12,8 @@ from .chart_kinds import ChartKind, chart_kind
 
 # extra attrs whose single value is itself a list, like the tick positions
 LIST_TYPE_EXTRA_ATTRS = {"dimensions"}
+# kept as lists: a group chart's `emphasis` holds one role per group
+UNWRAP_EXEMPT_ATTRS = LIST_TYPE_EXTRA_ATTRS | {"emphasis"}
 
 
 def _get_indexed_value(value: Any, index: int, is_list_type: bool = False) -> Any:
@@ -278,8 +280,14 @@ def build_chart_dict_single(
     if texts is not None:
         chart_dict["texts"] = _get_chart_marks(texts, 0)
 
-    # Add extra chart-specific attributes (preserve as-is, don't transform)
+    # a one-element list is the one chart's value, like `subtitle` above
     for attr_name, attr_value in extra_attrs.items():
+        if (
+            attr_name not in UNWRAP_EXEMPT_ATTRS
+            and isinstance(attr_value, list)
+            and len(attr_value) == 1
+        ):
+            attr_value = attr_value[0]
         if attr_value is not None:
             chart_dict[attr_name] = attr_value
 
@@ -309,6 +317,15 @@ def dict_datasets(chart_type: str, data: Any) -> List[dict]:
             f"{' with ' + shape if shape else ''}, or a list of such dicts."
         )
     return datasets
+
+
+def _is_record_rows(kind: ChartKind, data: Any) -> bool:
+    # one record per row: each data key holds one value, not a column
+    return isinstance(data, list) and all(
+        isinstance(record, dict)
+        and all(k in record and not isinstance(record[k], list) for k in kind.data_keys)
+        for record in data
+    )
 
 
 def build_charts_structure(
@@ -366,6 +383,11 @@ def build_charts_structure(
             dict shape, or a record misses a required key.
     """
     kind = chart_kind(chart_type)
+    if kind.data_keys is not None and isinstance(data, list) and not data:
+        # no datasets draw one empty panel, like a bar chart without records
+        return []
+    if kind.record_rows and _is_record_rows(kind, data):
+        data = {key: [record.get(key) for record in data] for key in kind.data_keys}
     if kind.data_keys is not None:
         dict_datasets(chart_type, data)
 
