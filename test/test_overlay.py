@@ -803,15 +803,8 @@ class TestTwinAxisStacking:
     def test_value_label_headroom_on_the_right_axis(self):
         alone = BarChart([{"label": "x", "y": 2000}], show_values=True)
         single_hi = alone.axes[0].get_ylim()[1]
-        fig = Panel(
-            [
-                {
-                    "figure": BarChart([{"label": "x", "y": 2000}]),
-                    "y_axis": "right",
-                    "show_values": True,
-                }
-            ]
-        )
+        labelled = BarChart([{"label": "x", "y": 2000}], show_values=True)
+        fig = Panel([{"figure": labelled, "y_axis": "right"}])
         host, right = _twin(fig)
         assert right.get_ylim()[1] == pytest.approx(single_hi)
 
