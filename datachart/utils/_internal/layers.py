@@ -1653,7 +1653,7 @@ def _draw_ref_lines(
         ax.set_ylim(*ylim)
 
 
-def _category_labels(layer: "Layer") -> Optional[list]:
+def _layer_category_labels(layer: "Layer") -> Optional[list]:
     """The labels a layer places on the panel's category axis (ADR 0079).
 
     None for a layer off that axis; Gantt rows place themselves by task.
@@ -1669,19 +1669,32 @@ def _category_labels(layer: "Layer") -> Optional[list]:
     return None
 
 
-def _check_unique_labels(layer: "Layer", labels: list) -> None:
+def _check_unique_labels(layer: "Layer", labels: list, number: int) -> None:
     """Raise when one series names a category twice: its slot is ambiguous."""
 
     seen = set()
     for label in labels:
         if label in seen:
-            series = layer.chart.get("subtitle")
-            named = f" in series {series!r}" if series else ""
+            series = layer.chart.get("subtitle") or f"#{number}"
             raise ValueError(
-                f"Category label {label!r} repeats{named}; each label may "
-                "appear once per series."
+                f"Category label '{label}' repeats in series {series}; each "
+                "label may appear once per series."
             )
         seen.add(label)
+
+
+def _sorted_category_order(layer: "Layer", labels: list) -> list:
+    """The sort's category order (ADR 0042), else the layer's own labels.
+
+    The order holds raw record labels; this chart's own read as `labels()`
+    does, so a label array's type coercion cannot miss the index.
+    """
+
+    order = layer.chart.get("category_order")
+    if not order:
+        return labels
+    own = dict(zip(_chart_column("label", layer.chart) or (), labels))
+    return [own.get(label, label) for label in order]
 
 
 def _category_positions(labels, index: Optional[dict]) -> np.ndarray:
@@ -8189,10 +8202,10 @@ def _radial_theta(n: int) -> np.ndarray:
     return np.linspace(0, 2 * np.pi, n, endpoint=False)
 
 
-def _on_spokes(values, positions, n: int, fill=np.nan) -> np.ndarray:
+def _on_spokes(values, positions, n: int, fill=np.nan, dtype=float) -> np.ndarray:
     """`values` spread over `n` spokes at `positions`; `fill` on the rest."""
 
-    spread = np.full(n, fill, dtype=float if fill is np.nan else object)
+    spread = np.full(n, fill, dtype=dtype)
     spread[positions] = values
     return spread
 
@@ -8272,11 +8285,10 @@ class RadialLineLayer(AreaFillMixin, RadialLayer):
             (float(t), float(v), float(v), int(i))
             for i, t, v in zip(positions, angles, y)
         ]
-        # every spoke carries a point; a label the series lacks is a gap, so
-        # the line breaks there rather than invent a value
+        # a label the series lacks is a gap: the line breaks, inventing nothing
         theta = _radial_theta(n)
         y = _on_spokes(y, positions, n)
-        spoke_labels = _on_spokes(labels, positions, n, fill=None)
+        spoke_labels = _on_spokes(labels, positions, n, fill=None, dtype=object)
         # close the polygon: the first point repeats one full turn later, so
         # the closing segment sweeps the short arc forward
         theta = np.append(theta, theta[0] + 2 * np.pi)
@@ -10679,8 +10691,7 @@ def sort_bar_charts(charts: List[dict], settings: dict) -> List[dict]:
                 r.get("label") if isinstance(r, dict) else None, len(rank)
             ),
         )
-        # the panel's category index follows the sort, even past the
-        # categories this chart lacks (ADR 0079)
+        # the category index follows the sort past this chart's gaps (ADR 0079)
         sorted_charts.append({**chart, "data": data, "category_order": ordered})
     return sorted_charts
 
@@ -11607,11 +11618,10 @@ class Panel:
                         width=layer.bar_width / len(bar_layers),
                     )
             elif bar_mode == "stack":
-                # bottoms accumulate per category slot, so a series stacks
-                # onto the same label, whatever its record order
+                # bottoms accumulate per category slot, whatever the record order
                 bottoms = np.zeros(len(category_index or ()))
                 for idx, layer in enumerate(bar_layers):
-                    labels, y = _category_labels(layer), layer.y_values()
+                    labels, y = _layer_category_labels(layer), layer.y_values()
                     stacks = category_index is not None and labels is not None
                     positions = _category_positions(labels or (), category_index)
                     bar_slots[id(layer)] = BarSlot(
@@ -11832,14 +11842,15 @@ class Panel:
         """
 
         index = {}
-        for layer in layers:
-            labels = _category_labels(layer)
-            if labels is None:
-                continue
-            _check_unique_labels(layer, labels)
-            # a sorted chart names every category in sort order, so a series
-            # missing the first one still leaves it first (ADR 0042)
-            for label in layer.chart.get("category_order") or labels:
+        category_layers = [
+            (layer, labels)
+            for layer in layers
+            if (labels := _layer_category_labels(layer)) is not None
+        ]
+        for number, (layer, labels) in enumerate(category_layers, 1):
+            _check_unique_labels(layer, labels, number)
+            # a sorted series lacking the top category still leaves it first
+            for label in [*_sorted_category_order(layer, labels), *labels]:
                 index.setdefault(label, len(index))
         return index or None
 

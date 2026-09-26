@@ -148,10 +148,14 @@ class TestSort:
         assert (ticks["A"], 0, 9) in _bar_extents(ax)
         assert (ticks["B"], 2, 4) in _bar_extents(ax)
 
+    def test_sort_keeps_mixed_type_labels(self):
+        ax = BarChart(data=_bars([(1, 1), ("a", 3)]), sort="ascending").axes[0]
+        assert list(_ticks(ax)) == ["1", "a"]
+
 
 class TestRepeatedLabel:
     def test_repeated_label_in_one_series_raises(self):
-        with pytest.raises(ValueError, match="'A'"):
+        with pytest.raises(ValueError, match="'A' repeats in series #1"):
             BarChart(data=_bars([("A", 1), ("B", 2), ("A", 3)]))
 
     def test_repeated_radial_label_raises(self):

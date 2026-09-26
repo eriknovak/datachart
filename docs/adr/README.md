@@ -55,7 +55,7 @@ adds no tag; one that reverses, narrows, widens or replaces a commitment does.
 ## Emphasis and category order
 
 - [0009](0009-emphasis-over-background-theme.md) — Emphasis replaces the background theme; themes are named for their look (amended by [0042](0042-category-sort-and-emphasis-rules.md))
-- [0042](0042-category-sort-and-emphasis-rules.md) — Bar-type fronts sort their categories, and a rule fills in per-record emphasis (amended by [0045](0045-emphasis-rules-on-every-front.md))
+- [0042](0042-category-sort-and-emphasis-rules.md) — Bar-type fronts sort their categories, and a rule fills in per-record emphasis (amended by [0045](0045-emphasis-rules-on-every-front.md), [0079](0079-one-category-index-per-panel.md))
 - [0045](0045-emphasis-rules-on-every-front.md) — Emphasis rules reach every front, each selecting its own unit
 - [0079](0079-one-category-index-per-panel.md) — One category index per panel places bars, stacks, radial and group layers by label
 

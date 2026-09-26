@@ -24,7 +24,7 @@ axis and one map from label to position.
   would be ambiguous.
 - **A radial line breaks at a missing label** rather than joining its
   neighbours, so no value is invented.
-- **Category sort (ADR 0042) is unchanged** — it reorders the records, and
+- **Category sort (ADR 0042) keeps its record order** — it reorders the records, and
   each sorted chart also carries the full sorted category order, which the
   index reads in place of its labels. A series missing the first category
   would otherwise push that category behind its own.
