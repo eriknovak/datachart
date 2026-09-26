@@ -11274,7 +11274,8 @@ def determine_axis_assignment(
     prefs = [g.y_axis for g in groups]
     all_auto = all(p == "auto" for p in prefs)
 
-    if all_auto and warn_scale_groups:
+    # the flag silences the warning only; placement never depends on it
+    if all_auto:
         clusters = _cluster_by_scale_compatibility(ranges, threshold)
         sorted_clusters = sorted(clusters, key=len, reverse=True)
 
@@ -11283,7 +11284,7 @@ def determine_axis_assignment(
             for idx in sorted_clusters[1]:
                 assignments[idx] = "right"
 
-        if len(sorted_clusters) > 2:
+        if warn_scale_groups and len(sorted_clusters) > 2:
             warnings.warn(
                 f"Found {len(sorted_clusters)} scale-incompatible groups but only 2 axes available. "
                 f"Groups: {[len(g) for g in sorted_clusters]}. "
