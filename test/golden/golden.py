@@ -408,6 +408,8 @@ EXPECTED_CHANGES = {
     "calendar_centered",
     # new scatter error bar case (ADR 0057)
     "scatter_error_bars",
+    # an emphasis rule on a quill heatmap keeps its per-cell fade (#305)
+    "theme_quill_heatmap_rule_above",
 }
 
 
@@ -1226,6 +1228,12 @@ def theme_quill_heatmap_steps():
         show_colorbars=True,
         colorbar={"label": "value"},
     )
+
+
+@case
+def theme_quill_heatmap_rule_above():
+    config.set_theme(THEME.QUILL)
+    return heatmap_rule_above()
 
 
 @case

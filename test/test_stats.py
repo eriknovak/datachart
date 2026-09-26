@@ -566,5 +566,13 @@ class TestStatsTemporalX(unittest.TestCase):
         self.assertIsInstance(kde2d(x, self.y, gridsize=5)["x"][0], datetime)
 
 
+class TestKdeWithoutSpread(unittest.TestCase):
+    def test_equal_values_raise(self):
+        with self.assertRaisesRegex(ValueError, "no spread"):
+            kde1d([2, 2, 2, 2])
+        with self.assertRaisesRegex(ValueError, "no spread"):
+            kde2d([2, 2, 2], [1, 1, 1])
+
+
 if __name__ == "__main__":
     unittest.main()

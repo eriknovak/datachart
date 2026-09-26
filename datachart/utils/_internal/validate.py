@@ -868,6 +868,41 @@ def validate_dumbbell_sort_by(sort, sort_by) -> str:
     return _validate_sort_key(sort, sort_by, DUMBBELL_SORT_KEY.DEFAULT)
 
 
+def is_missing(value) -> bool:
+    """Whether a value is absent: None or NaN."""
+
+    return value is None or (
+        isinstance(value, (float, np.floating)) and math.isnan(value)
+    )
+
+
+def validate_finite_groups(chart: dict, name: str) -> None:
+    """Raise when a group of a group chart holds NaN values and nothing else.
+
+    Args:
+        chart: One chart, its `data` a list of `{label, value}` records.
+        name: The front's name in the message, e.g. `"box plot"`.
+    """
+
+    data = chart.get("data")
+    if not isinstance(data, list):
+        return
+    nan_labels, finite_labels = [], set()
+    for record in data:
+        label, value = record.get("label"), record.get("value")
+        if label is None or value is None:
+            continue
+        if is_missing(value):
+            nan_labels.append(label)
+        else:
+            finite_labels.add(label)
+    for label in nan_labels:
+        if label not in finite_labels:
+            subtitle = chart.get("subtitle")
+            named = f"{name} `{subtitle}`" if subtitle else name
+            raise ValueError(f"The {named} group `{label}` has no finite values.")
+
+
 def validate_dumbbell_records(records) -> None:
     """Raise unless `records` is a non-empty list of `{label, start, end}` records.
 

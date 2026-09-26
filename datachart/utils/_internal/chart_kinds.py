@@ -82,6 +82,7 @@ from .validate import (
     validate_calendar_year,
     validate_dumbbell_records,
     validate_emphasis_rule,
+    validate_finite_groups,
     validate_gantt_groups,
     validate_gantt_sort_by,
     validate_gantt_tasks,
@@ -250,6 +251,8 @@ class ChartKind:
             several charts come as a list of dicts rather than of lists.
         data_keys: The keys one chart's `data` dict must carry; None skips
             the shape check.
+        record_rows: One chart's `data` may also come as a flat list of
+            records, each holding one value per data key, read as columns.
         datasets: What several datasets draw as when `subplots` is unset.
         subplots: The charts may split into one subplot each.
         rejects: Parameters the front takes only as None, with the reason
@@ -299,6 +302,7 @@ class ChartKind:
     expand: Optional[Expand] = None
     dict_data: bool = False
     data_keys: Optional[Tuple[str, ...]] = None
+    record_rows: bool = False
     datasets: DatasetPolicy = DatasetPolicy.OVERLAY
     subplots: bool = True
     rejects: Mapping[str, str] = field(default_factory=dict)
@@ -398,6 +402,15 @@ def _check_annotations(charts: List[dict], settings: dict) -> None:
         validate_annotation(label_key, settings.get("show_values"))
 
 
+def _finite_groups(name: str) -> Callable[[List[dict], dict], None]:
+    # NaN values are dropped as None is; a group of them alone has no values
+    def check(charts: List[dict], settings: dict) -> None:
+        for chart in charts:
+            validate_finite_groups(chart, name)
+
+    return check
+
+
 def _check_tasks(charts: List[dict], settings: dict) -> None:
     sort = settings.get("sort")
     sort_key = validate_gantt_sort_by(sort, settings.get("sort_by"))
@@ -416,7 +429,7 @@ def _year_panels(charts: List[dict], settings: dict) -> Tuple[List[dict], dict]:
     year = settings.get("year")
     charts = [panel for chart in charts for panel in _year_charts(chart, year)]
     if settings.get("figsize") is None:
-        rows = math.ceil(len(charts) / settings["max_cols"])
+        rows = max(math.ceil(len(charts) / settings["max_cols"]), 1)
         figsize = (FIG_SIZE.DEFAULT[0], CALENDAR_ROW_HEIGHT * rows)
         settings = {**settings, "figsize": figsize}
     return charts, settings
@@ -623,6 +636,7 @@ _KINDS = (
         defaults={"aspect_ratio": ASPECT_RATIO.EQUAL, "max_cols": 1},
         dict_data=True,
         data_keys=("date", "value"),
+        record_rows=True,
         # one calendar per year of each dataset
         expand=_year_panels,
         datasets=DatasetPolicy.SUBPLOT,
@@ -693,6 +707,7 @@ _KINDS = (
         "boxplot",
         "box plot",
         BoxLayer,
+        check_records=_finite_groups("box plot"),
         record_keys=("label", "value"),
         required_keys=("label", "value"),
         defaults={"orientation": ORIENTATION.VERTICAL},
@@ -706,6 +721,7 @@ _KINDS = (
         "violin plot",
         ViolinLayer,
         domains={"inner": VIOLIN_INNER},
+        check_records=_finite_groups("violin plot"),
         record_keys=("label", "value"),
         required_keys=("label", "value"),
         defaults={"orientation": ORIENTATION.VERTICAL},
@@ -718,6 +734,7 @@ _KINDS = (
         "swarmplot",
         "swarm plot",
         SwarmLayer,
+        check_records=_finite_groups("swarm plot"),
         record_keys=("label", "value"),
         required_keys=("label", "value"),
         defaults={"orientation": ORIENTATION.VERTICAL, "mode": SWARM_MODE.SWARM},
@@ -729,6 +746,7 @@ _KINDS = (
         "raincloudplot",
         "raincloud plot",
         ViolinLayer,
+        check_records=_finite_groups("raincloud plot"),
         record_keys=("label", "value"),
         required_keys=("label", "value"),
         defaults={
@@ -748,6 +766,7 @@ _KINDS = (
         RidgelineLayer,
         domains={"inner": VIOLIN_INNER, "ridge_scale": RIDGELINE_SCALE},
         theme_defaults={"overlap": "chart_default_ridgeline_overlap"},
+        check_records=_finite_groups("ridgeline plot"),
         record_keys=("label", "value"),
         required_keys=("label", "value"),
         defaults={"orientation": ORIENTATION.HORIZONTAL},

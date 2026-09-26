@@ -777,6 +777,9 @@ def _kde(points: np.ndarray, bandwidth, cut: float) -> Tuple[GaussianKDE, np.nda
         raise ValueError("The values must be finite numbers.")
     if cut < 0:
         raise ValueError("The `cut` must be a non-negative number.")
+    # a singular covariance: equal values, or 2-D points on one line
+    if np.linalg.matrix_rank(np.atleast_2d(np.cov(points))) < len(points):
+        raise ValueError("The values have no spread, so they have no density.")
     kde = GaussianKDE(points, bandwidth)
     # pad each axis by `cut` kernel widths (about `factor * std`)
     padding = cut * kde.covariance_factor() * points.std(axis=1, ddof=1)
@@ -821,7 +824,7 @@ def kde1d(
 
     Raises:
         ValueError: If the bandwidth is invalid, there are fewer than two
-            values, or a value is not finite.
+            values, a value is not finite, or the values are all equal.
     """
     points = np.asarray(values, dtype=float).reshape(1, -1)
     kde, (padding,) = _kde(points, bandwidth, cut)
@@ -878,7 +881,8 @@ def kde2d(
         TypeError: If x or xlim mixes temporal and numeric values, or xlim
             is temporal while x is not, or the other way around.
         ValueError: If the bandwidth is invalid, x and y differ in length,
-            there are fewer than two points, or a value is not finite.
+            there are fewer than two points, a value is not finite, or the
+            points have no spread (all equal, or on one straight line).
     """
     if len(x) != len(y):
         raise ValueError("x and y must have the same length.")

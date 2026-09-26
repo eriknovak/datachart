@@ -76,7 +76,7 @@ def composition_panel(
 
     if layers is None:
         layers = build_layers(chart_type, charts, settings)
-    first_style = charts[0].get("style", {}) or {}
+    first_style = (charts[0].get("style") if charts else None) or {}
     composition_settings = build_chart_panel_settings(
         chart_type, settings, "composition", first_style
     )
@@ -189,7 +189,7 @@ def render_chart(
     max_cols = settings.get("max_cols")
     subplot_config = get_subplot_config(
         split,
-        n_charts=len(charts),
+        n_charts=max(len(charts), 1),
         max_cols=4 if max_cols is None else max_cols,
     )
     figsize = settings.get("figsize")
@@ -226,7 +226,7 @@ def render_chart(
             )
             ax.set_anchor(vert + horiz or "C")
 
-    first_style = charts[0].get("style", {}) or {}
+    first_style = (charts[0].get("style") if charts else None) or {}
 
     if is_single_plot:
         panel_settings = build_chart_panel_settings(
