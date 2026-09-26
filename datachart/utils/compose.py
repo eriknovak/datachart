@@ -145,6 +145,18 @@ def _source_scales(source: _PanelSeam, group: LayerGroup) -> Dict[str, Any]:
     }
 
 
+def _role_format(source: _PanelSeam, role: str) -> Any:
+    """A source figure's tick format for the `"value"` or `"category"` axis.
+
+    A source panel's tick-format keys are literal, so its own orientation
+    maps them back to roles, like `_source_scales`.
+    """
+
+    value_axis, category_axis = ("x", "y") if source.horizontal else ("y", "x")
+    axis = value_axis if role == "value" else category_axis
+    return source.settings.get(f"{axis}ticks_format")
+
+
 def _apply_emphasis_rule(groups: List[LayerGroup], rule) -> List[LayerGroup]:
     """The groups with the rule's role on each layer that carries none.
 
@@ -473,10 +485,14 @@ def Panel(
 
     # the x-axis hugs the data only when every source figure hugs it too
     panel_settings["tighten_xlim"] = all(s.get("tighten_xlim") for s in source_settings)
-    # the first source figure that formats an axis' ticks formats the panel's
-    for key in ("xticks_format", "yticks_format"):
-        panel_settings[key] = next(
-            (s.get(key) for s in source_settings if s.get(key) is not None), None
+    # the first source figure that formats a role's ticks formats the panel's
+    # axis carrying that role, like the scales
+    sources = [item["figure"]._chart_metadata["panel"] for item in items]
+    value_axis, category_axis = ("x", "y") if probe.horizontal else ("y", "x")
+    for axis, role in ((value_axis, "value"), (category_axis, "category")):
+        panel_settings[f"{axis}ticks_format"] = next(
+            (f for f in (_role_format(src, role) for src in sources) if f is not None),
+            None,
         )
     # the first stacked source figure's baseline wins, like bar_mode (ADR 0025)
     panel_settings["baseline"] = next(
