@@ -33,7 +33,7 @@ from typing import List, Union, Dict, Literal
 import numpy as np
 import matplotlib.colors as colors
 
-from pypalettes import load_palette, load_cmap
+from pypalettes import load_palette
 
 from ...constants import COLORS
 
@@ -217,7 +217,6 @@ def get_color_scale(name: str = DEFAULT_COLOR) -> List[str]:
 
     try:
         palette = load_palette(name)
-        return list(palette)
     except Exception:
         warnings.warn(
             f"Warning: '{name}' is not a valid pypalettes palette. "
@@ -230,6 +229,8 @@ def get_color_scale(name: str = DEFAULT_COLOR) -> List[str]:
         except Exception:
             # Ultimate fallback to a simple color list
             return ["#d7191c", "#fdae61", "#ffffbf", "#abdda4", "#2b83ba"]
+    # pypalettes pads a short palette by repeating colors (Set1 to ten)
+    return list(dict.fromkeys(palette))
 
 
 def create_colormap(
@@ -282,11 +283,11 @@ def get_colormap(
     if isinstance(name, str) and is_plain_color(name):
         return create_colormap([name], name)
 
-    try:
-        return load_cmap(name, cmap_type=cmap_type)
-    except Exception:
-        # Fallback to creating colormap from color scale
-        return create_colormap(get_color_scale(name), name)
+    # built from the distinct colors, so a padded palette repeats no stop
+    scale = get_color_scale(name)
+    if cmap_type == "discrete":
+        return colors.ListedColormap(scale, name)
+    return create_colormap(scale, name)
 
 
 def cycling_colors(name: Union[str, List[str]]) -> Union[List[str], None]:
