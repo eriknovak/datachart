@@ -1653,13 +1653,52 @@ def _draw_ref_lines(
         ax.set_ylim(*ylim)
 
 
+def _category_labels(layer: "Layer") -> Optional[list]:
+    """The labels a layer places on the panel's category axis (ADR 0079).
+
+    None for a layer off that axis; Gantt rows place themselves by task.
+    """
+
+    if isinstance(layer, GanttLayer):
+        return None
+    if isinstance(layer, (GroupLayer, BarLayer)) or (
+        isinstance(layer, RadialLayer) and layer.is_categorical
+    ):
+        labels = layer.labels()
+        return None if labels is None else list(labels)
+    return None
+
+
+def _check_unique_labels(layer: "Layer", labels: list) -> None:
+    """Raise when one series names a category twice: its slot is ambiguous."""
+
+    seen = set()
+    for label in labels:
+        if label in seen:
+            series = layer.chart.get("subtitle")
+            named = f" in series {series!r}" if series else ""
+            raise ValueError(
+                f"Category label {label!r} repeats{named}; each label may "
+                "appear once per series."
+            )
+        seen.add(label)
+
+
+def _category_positions(labels, index: Optional[dict]) -> np.ndarray:
+    """Each label's position on the panel's category axis, else its own index."""
+
+    if not index:
+        return np.arange(len(labels))
+    return np.array([index[label] for label in labels], dtype=int)
+
+
 def _bracket_categories(layers: List["Layer"], category_index: dict) -> tuple:
     """A panel's categories for bracket placement, as (positions, tops).
 
-    `positions` maps a label to its place on the category axis: group layers
-    share the panel's category index, a bar family layer places its labels in
-    its own order, as it draws them. `tops` maps a position to the top of the
-    data drawn there.
+    `positions` maps a label to its place on the category axis: group and bar
+    layers share the panel's category index (ADR 0079), and a layer off it
+    places its labels in its own order. `tops` maps a position to the top of
+    the data drawn there.
     """
 
     positions = dict(category_index)
@@ -3603,7 +3642,8 @@ class BarLayer(Layer):
             return
 
         yerr = get_chart_data("yerr", self.chart) if self.show_yerr else None
-        x = np.arange(len(labels))
+        # each bar sits at its label's place on the panel's category axis
+        x = _category_positions(labels, ctx.category_index)
 
         bar_style = self._merge_color("color", ctx.color, self.bar_style)
         if ctx.z_order is not None:
@@ -8149,6 +8189,22 @@ def _radial_theta(n: int) -> np.ndarray:
     return np.linspace(0, 2 * np.pi, n, endpoint=False)
 
 
+def _on_spokes(values, positions, n: int, fill=np.nan) -> np.ndarray:
+    """`values` spread over `n` spokes at `positions`; `fill` on the rest."""
+
+    spread = np.full(n, fill, dtype=float if fill is np.nan else object)
+    spread[positions] = values
+    return spread
+
+
+def _radial_spokes(labels, index: Optional[dict]) -> tuple:
+    """Each label's spoke position and angle, and the spoke count (ADR 0079)."""
+
+    positions = _category_positions(labels, index)
+    n = len(index) if index else len(labels)
+    return positions, _radial_theta(n)[positions], n
+
+
 def _radial_resolver(label, angles, radii) -> Callable[[int], dict]:
     """The hover resolver of radial marks: `angle` and `radius` under their own keys.
 
@@ -8211,10 +8267,16 @@ class RadialLineLayer(AreaFillMixin, RadialLayer):
         if y is None or labels is None:
             return
 
-        theta = _radial_theta(len(y))
+        positions, angles, n = _radial_spokes(labels, ctx.category_index)
         self._tips = [
-            (float(t), float(v), float(v), i) for i, (t, v) in enumerate(zip(theta, y))
+            (float(t), float(v), float(v), int(i))
+            for i, t, v in zip(positions, angles, y)
         ]
+        # every spoke carries a point; a label the series lacks is a gap, so
+        # the line breaks there rather than invent a value
+        theta = _radial_theta(n)
+        y = _on_spokes(y, positions, n)
+        spoke_labels = _on_spokes(labels, positions, n, fill=None)
         # close the polygon: the first point repeats one full turn later, so
         # the closing segment sweeps the short arc forward
         theta = np.append(theta, theta[0] + 2 * np.pi)
@@ -8228,7 +8290,12 @@ class RadialLineLayer(AreaFillMixin, RadialLayer):
         self._stroke_halo(line_style)
 
         yerr = get_chart_data("yerr", self.chart)
-        if self.show_yerr and isinstance(yerr, np.ndarray) and len(yerr) == len(y) - 1:
+        if (
+            self.show_yerr
+            and isinstance(yerr, np.ndarray)
+            and len(yerr) == len(positions)
+        ):
+            yerr = _on_spokes(yerr, positions, n)
             yerr = np.append(yerr, yerr[0])
             band = ax.fill_between(
                 theta, y - yerr, y + yerr, **self._resolved_area_style(ctx)
@@ -8236,7 +8303,9 @@ class RadialLineLayer(AreaFillMixin, RadialLayer):
             self._etch([band], wash=False)
 
         (line,) = ax.plot(theta, y, **line_style, label=self.label(ctx))
-        self.register_hover(line, _radial_resolver(self.label(ctx), labels, y[:-1]))
+        self.register_hover(
+            line, _radial_resolver(self.label(ctx), spoke_labels, y[:-1])
+        )
 
         if self.show_area:
             # the fill reaches the center (or the innerradius hole clips it)
@@ -8271,8 +8340,8 @@ class RadialBarLayer(RadialLayer):
         if y is None or labels is None:
             return
 
-        sector = 2 * np.pi / len(labels)
-        theta = _radial_theta(len(labels))
+        positions, theta, n = _radial_spokes(labels, ctx.category_index)
+        sector = 2 * np.pi / n
 
         bar_style = self._merge_color("color", ctx.color, self.bar_style)
         if ctx.z_order is not None:
@@ -8307,9 +8376,9 @@ class RadialBarLayer(RadialLayer):
                 float(t + theta_offset),
                 float(r),
                 None if role == EMPHASIS_BACKGROUND else float(v),
-                i,
+                int(i),
             )
-            for i, (t, r, v, role) in enumerate(zip(theta, tops, y, roles))
+            for i, t, r, v, role in zip(positions, theta, tops, y, roles)
         ]
 
         bars = ax.bar(
@@ -8353,9 +8422,10 @@ class RadialScatterLayer(RadialLayer):
         if ctx.emphasis == EMPHASIS_BACKGROUND:
             scatter_style["c"] = self.muted_color
 
-        theta = _radial_theta(len(y))
+        positions, theta, _ = _radial_spokes(labels, ctx.category_index)
         self._tips = [
-            (float(t), float(v), float(v), i) for i, (t, v) in enumerate(zip(theta, y))
+            (float(t), float(v), float(v), int(i))
+            for i, t, v in zip(positions, theta, y)
         ]
         points = ax.scatter(
             theta, y, label=self.label(ctx), **_hollow_marker(scatter_style)
@@ -10609,7 +10679,9 @@ def sort_bar_charts(charts: List[dict], settings: dict) -> List[dict]:
                 r.get("label") if isinstance(r, dict) else None, len(rank)
             ),
         )
-        sorted_charts.append({**chart, "data": data})
+        # the panel's category index follows the sort, even past the
+        # categories this chart lacks (ADR 0079)
+        sorted_charts.append({**chart, "data": data, "category_order": ordered})
     return sorted_charts
 
 
@@ -11508,6 +11580,8 @@ class Panel:
             l for l in self.layers if isinstance(l, (BarLayer, RadialBarLayer))
         ]
         bar_mode = s.get("bar_mode") or BAR_MODE.DEFAULT
+        # every category layer shares one category axis (ADR 0020, ADR 0079)
+        category_index = self.category_index(self.layers)
 
         bar_slots = {}
         # the group spans the widest layer; each layer keeps its own
@@ -11533,20 +11607,21 @@ class Panel:
                         width=layer.bar_width / len(bar_layers),
                     )
             elif bar_mode == "stack":
-                bottoms = None
-                first_labels = bar_layers[0].labels()
-                if first_labels is not None:
-                    bottoms = np.zeros(len(first_labels))
+                # bottoms accumulate per category slot, so a series stacks
+                # onto the same label, whatever its record order
+                bottoms = np.zeros(len(category_index or ()))
                 for idx, layer in enumerate(bar_layers):
+                    labels, y = _category_labels(layer), layer.y_values()
+                    stacks = category_index is not None and labels is not None
+                    positions = _category_positions(labels or (), category_index)
                     bar_slots[id(layer)] = BarSlot(
                         offset=0.0,
                         width=layer.bar_width,
-                        bottom=None if bottoms is None else bottoms.copy(),
+                        bottom=bottoms[positions] if stacks else None,
                         show_yerr=idx == len(bar_layers) - 1,
                     )
-                    y = layer.y_values()
-                    if bottoms is not None and y is not None:
-                        bottoms = bottoms + np.array(y)
+                    if stacks and y is not None:
+                        np.add.at(bottoms, positions, np.asarray(y, dtype=float))
             else:  # overlay
                 for layer in bar_layers:
                     bar_slots[id(layer)] = BarSlot(offset=0.0, width=layer.bar_width)
@@ -11594,9 +11669,7 @@ class Panel:
 
         zorder_defaults = s.get("zorder_defaults", {})
 
-        # group layers share one category axis (ADR 0020)
         group_layers = [l for l in self.layers if isinstance(l, GroupLayer)]
-        category_index = self.category_index(group_layers)
         dumbbell_count = sum(isinstance(l, DumbbellLayer) for l in group_layers)
 
         # hatch, line-style and marker cycles: per series, parallel to the
@@ -11745,7 +11818,7 @@ class Panel:
                 if target_ax is ax:
                     limit_marks.extend(marks)
 
-        if category_index:
+        if category_index and group_layers:
             self._apply_category_ticks(ax, category_index, group_layers, horizontal)
 
         self._finalize(
@@ -11754,13 +11827,20 @@ class Panel:
 
     @staticmethod
     def category_index(layers: List[Layer]) -> Optional[dict]:
-        """Label -> position (0..n-1), the first-seen union across group layers."""
+        """Label -> position (0..n-1), the first-seen union of every category
+        layer's labels (ADR 0079). A label repeated within one series raises.
+        """
 
         index = {}
         for layer in layers:
-            if isinstance(layer, GroupLayer):
-                for label in layer.labels():
-                    index.setdefault(label, len(index))
+            labels = _category_labels(layer)
+            if labels is None:
+                continue
+            _check_unique_labels(layer, labels)
+            # a sorted chart names every category in sort order, so a series
+            # missing the first one still leaves it first (ADR 0042)
+            for label in layer.chart.get("category_order") or labels:
+                index.setdefault(label, len(index))
         return index or None
 
     def _category_labels(self, labels, axis: str) -> list:
@@ -11937,19 +12017,14 @@ class Panel:
                             axis.parameter, axis.role, axis.scale, values, hint
                         )
 
-    def _radial_category_labels(self) -> Optional[np.ndarray]:
-        """The widest categorical layer's labels; the spokes follow them.
+    def _radial_category_labels(self) -> Optional[list]:
+        """The panel's category labels, in index order; the spokes follow them.
 
         `None` when no layer is categorical, as on a radial histogram.
         """
 
-        label_sets = [
-            l.labels()
-            for l in self.layers
-            if isinstance(l, RadialLayer) and l.is_categorical
-        ]
-        label_sets = [lbl for lbl in label_sets if lbl is not None and len(lbl)]
-        return max(label_sets, key=len) if label_sets else None
+        index = self.category_index(self.layers)
+        return list(index) if index else None
 
     def _apply_polar_grid_selection(self, ax, show_grid) -> None:
         """Draw only the polar grid set the user named (ADR 0015).
@@ -12813,12 +12888,16 @@ class Panel:
                 ax, self._tick_rotation("y", gantt.chart.get("ytickrotate"))
             )
             return
-        # the widest layer supplies the labels when category counts differ
-        layer = max(bar_layers, key=lambda l: len(l.labels()))
-        labels = layer.labels()
+        # the panel's category index supplies the labels (ADR 0079)
+        index = self.category_index(self.layers)
+        if not index:
+            return
+        layer = bar_layers[0]
         # ticks sit on the category positions; slotted groups center on them
-        ticks_loc = np.arange(labels.shape[0])
-        labels = self._category_labels(labels, "y" if layer.is_horizontal else "x")
+        ticks_loc = np.array(list(index.values()))
+        labels = self._category_labels(
+            index.keys(), "y" if layer.is_horizontal else "x"
+        )
 
         if bar_ticks == "group":
             rotation_default = 0
