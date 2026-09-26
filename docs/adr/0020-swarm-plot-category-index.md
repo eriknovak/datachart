@@ -1,5 +1,6 @@
 ---
 status: accepted
+amended-by: [0079]
 ---
 
 # SwarmPlot aligns with boxes through a panel category index, not bar slots
