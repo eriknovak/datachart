@@ -163,7 +163,15 @@ class TestFrontsThroughTheBuilder(unittest.TestCase):
         )
 
 
-MARK_PARAMETERS = ("vlines", "hlines", "dlines", "brackets", "vspans", "hspans", "texts")
+MARK_PARAMETERS = (
+    "vlines",
+    "hlines",
+    "dlines",
+    "brackets",
+    "vspans",
+    "hspans",
+    "texts",
+)
 LINE = [{"x": 0, "y": 1}, {"x": 1, "y": 3}]
 
 
@@ -199,6 +207,12 @@ class TestMarkLists(unittest.TestCase):
             with self.subTest(parameter=name):
                 mixed = [{"n": 0}, None]
                 self.assertEqual(self.marks(name, mixed), [{"n": 0}, None])
+
+    def test_one_chart_takes_the_first_of_each_charts_marks(self):
+        charts = build_charts_structure(
+            "linechart", LINE, vlines=[[{"n": 0}, {"n": 1}]]
+        )
+        self.assertEqual(charts[0]["vlines"], [{"n": 0}, {"n": 1}])
 
     def vline_positions(self, ax):
         return sorted(

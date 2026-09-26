@@ -261,7 +261,7 @@ def create_colormap(
 
 def get_colormap(
     name: str = DEFAULT_COLOR, cmap_type: str = "continuous"
-) -> colors.LinearSegmentedColormap:
+) -> colors.Colormap:
     """Get a color map by name using pypalettes.
 
     Args:

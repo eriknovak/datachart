@@ -40,7 +40,7 @@ def _get_indexed_value(value: Any, index: int, is_list_type: bool = False) -> An
         return value
 
 
-def _get_nested_value(value: Any, index: int) -> Any:
+def _get_chart_marks(value: Any, index: int) -> Any:
     """Get the chart's marks from one or several marks, or those of each chart.
 
     A flat list of mark dicts belongs to every chart; a list holding a list
@@ -159,24 +159,24 @@ def build_chart_dict_multi(
         chart_dict["ytickrotate"] = _get_indexed_value(ytickrotate, index)
 
     if vlines is not None:
-        chart_dict["vlines"] = _get_nested_value(vlines, index)
+        chart_dict["vlines"] = _get_chart_marks(vlines, index)
 
     if hlines is not None:
-        chart_dict["hlines"] = _get_nested_value(hlines, index)
+        chart_dict["hlines"] = _get_chart_marks(hlines, index)
 
     if dlines is not None:
-        chart_dict["dlines"] = _get_nested_value(dlines, index)
+        chart_dict["dlines"] = _get_chart_marks(dlines, index)
     if brackets is not None:
-        chart_dict["brackets"] = _get_nested_value(brackets, index)
+        chart_dict["brackets"] = _get_chart_marks(brackets, index)
 
     if vspans is not None:
-        chart_dict["vspans"] = _get_nested_value(vspans, index)
+        chart_dict["vspans"] = _get_chart_marks(vspans, index)
 
     if hspans is not None:
-        chart_dict["hspans"] = _get_nested_value(hspans, index)
+        chart_dict["hspans"] = _get_chart_marks(hspans, index)
 
     if texts is not None:
-        chart_dict["texts"] = _get_nested_value(texts, index)
+        chart_dict["texts"] = _get_chart_marks(texts, index)
 
     # Add extra chart-specific attributes
     for attr_name, attr_value in extra_attrs.items():
@@ -259,24 +259,24 @@ def build_chart_dict_single(
         chart_dict["ytickrotate"] = _get_single_value(ytickrotate, int)
 
     if vlines is not None:
-        chart_dict["vlines"] = vlines
+        chart_dict["vlines"] = _get_chart_marks(vlines, 0)
 
     if hlines is not None:
-        chart_dict["hlines"] = hlines
+        chart_dict["hlines"] = _get_chart_marks(hlines, 0)
 
     if dlines is not None:
-        chart_dict["dlines"] = dlines
+        chart_dict["dlines"] = _get_chart_marks(dlines, 0)
     if brackets is not None:
-        chart_dict["brackets"] = brackets
+        chart_dict["brackets"] = _get_chart_marks(brackets, 0)
 
     if vspans is not None:
-        chart_dict["vspans"] = vspans
+        chart_dict["vspans"] = _get_chart_marks(vspans, 0)
 
     if hspans is not None:
-        chart_dict["hspans"] = hspans
+        chart_dict["hspans"] = _get_chart_marks(hspans, 0)
 
     if texts is not None:
-        chart_dict["texts"] = texts
+        chart_dict["texts"] = _get_chart_marks(texts, 0)
 
     # Add extra chart-specific attributes (preserve as-is, don't transform)
     for attr_name, attr_value in extra_attrs.items():

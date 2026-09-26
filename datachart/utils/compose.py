@@ -406,9 +406,8 @@ def Panel(
 
     groups = _apply_emphasis_rule(groups, emphasis_rule)
 
-    source_settings = [
-        item["figure"]._chart_metadata["panel"].settings for item in items
-    ]
+    sources = [item["figure"]._chart_metadata["panel"] for item in items]
+    source_settings = [source.settings for source in sources]
     # the first source figure that set a bar mode of its own lends it to this
     # panel, which lends it on in turn; the caller's own `bar_mode` wins
     source_bar_mode = next(
@@ -485,9 +484,7 @@ def Panel(
 
     # the x-axis hugs the data only when every source figure hugs it too
     panel_settings["tighten_xlim"] = all(s.get("tighten_xlim") for s in source_settings)
-    # the first source figure that formats a role's ticks formats the panel's
-    # axis carrying that role, like the scales
-    sources = [item["figure"]._chart_metadata["panel"] for item in items]
+    # a role's first source tick format lands on the axis carrying that role
     value_axis, category_axis = ("x", "y") if probe.horizontal else ("y", "x")
     for axis, role in ((value_axis, "value"), (category_axis, "category")):
         panel_settings[f"{axis}ticks_format"] = next(

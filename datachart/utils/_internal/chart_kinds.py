@@ -394,8 +394,8 @@ def _check_dumbbells(charts: List[dict], settings: dict) -> None:
 def _check_annotations(charts: List[dict], settings: dict) -> None:
     # a `label` key read as the annotation meets the `annotation` check
     for chart in charts:
-        old = chart.pop("renamed", {}).get("annotation")
-        validate_annotation(old, settings.get("show_values"))
+        label_key = chart.pop("renamed", {}).get("annotation")
+        validate_annotation(label_key, settings.get("show_values"))
 
 
 def _check_tasks(charts: List[dict], settings: dict) -> None:
