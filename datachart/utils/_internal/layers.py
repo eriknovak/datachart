@@ -3625,7 +3625,6 @@ class BarLayer(Layer):
         self.show_yerr = self.settings.get("show_yerr")
         self.record_roles = _record_emphasis(self.chart)
         self._resolve_value_labels()
-        self.log_offset = 1 if self.settings.get("scaley") == "log" else 0
 
     def labels(self) -> Optional[np.ndarray]:
         return get_chart_data("label", self.chart)
@@ -3681,7 +3680,7 @@ class BarLayer(Layer):
         draw_func = ax.barh if self.is_horizontal else ax.bar
         bars = draw_func(
             x + x_offset,
-            y + self.log_offset,
+            y,
             label=self.label(ctx),
             **error_range,
             **bar_style,
@@ -3716,7 +3715,7 @@ class BarLayer(Layer):
                         if role == EMPHASIS_BACKGROUND
                         else _format_value(self.value_format, magnitude(v))
                     )
-                    for v, role in zip(y + self.log_offset, roles)
+                    for v, role in zip(y, roles)
                 ],
                 stacked=slot is not None and slot.bottom is not None,
             )
@@ -3849,7 +3848,6 @@ class GanttLayer(BarLayer):
         self.is_horizontal = True
         self.is_pyramid = False
         self.show_yerr = False
-        self.log_offset = 0
         self.gantt_style = get_gantt_style(self.style)
         bar_keys = ("color", "alpha", "hatch", "linewidth", "edgecolor", "zorder")
         self.bar_style = {k: v for k, v in self.gantt_style.items() if k in bar_keys}
