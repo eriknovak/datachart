@@ -7912,11 +7912,12 @@ class ParallelCoordsLayer(Layer):
             if value is None:
                 return np.nan
             return stats["category_map"][dim].get(value, np.nan)
-        range_val = stats["dim_max"][dim] - stats["dim_min"][dim]
-        if range_val == 0:
-            return 0.0
         if not is_number(value):
             return np.nan
+        range_val = stats["dim_max"][dim] - stats["dim_min"][dim]
+        if range_val == 0:
+            # one value sits mid-axis, on its single tick
+            return 0.5
         return (value - stats["dim_min"][dim]) / range_val
 
     def draw(self, ax, ctx):
@@ -8103,11 +8104,14 @@ def compute_parallel_stats(layers: List["ParallelCoordsLayer"]) -> Optional[dict
         return None
 
     def detected_dimensions(layer):
+        # every key some record gives a value, in first-seen order
         hue_attr = layer.charts[0].get("hue", "hue")
+        found = {}
         for chart in layer.charts:
             for d in chart.get("data", []) or []:
-                return [k for k, v in d.items() if k != hue_attr and v is not None]
-        return []
+                found.update((k, None) for k, v in d.items() if v is not None)
+        found.pop(hue_attr, None)
+        return list(found)
 
     # every data set on one axes shares one dimension order
     all_dimensions = [

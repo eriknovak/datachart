@@ -174,5 +174,40 @@ class TestHueScale(unittest.TestCase):
         self.assertEqual(parallel_layer(figure).unique_hues, ["b"])
 
 
+def record_lines(figure, n):
+    """The normalized y values of the first `n` drawn lines, one per record."""
+    return [list(line.get_ydata()) for line in figure.axes[0].lines[:n]]
+
+
+class TestDegenerateValues(unittest.TestCase):
+    def tearDown(self):
+        plt.close("all")
+
+    def test_one_value_dimension_draws_at_its_tick(self):
+        figure = ParallelCoords([{"a": 1, "b": 5}, {"a": 2, "b": 5}])
+        self.assertEqual(axis_ticks(figure, 1), [(0.5, "5.00")])
+        for values in record_lines(figure, 2):
+            self.assertEqual(values[1], 0.5)
+
+    def test_none_leaves_a_gap_in_the_line(self):
+        figure = ParallelCoords([{"a": 1, "b": None}, {"a": 2, "b": 3}])
+        self.assertEqual(dimension_labels(figure), ["a", "b"])
+        first, second = record_lines(figure, 2)
+        self.assertTrue(np.isnan(first[1]))
+        self.assertFalse(np.isnan(second[1]))
+
+    def test_none_in_a_one_value_dimension_leaves_a_gap(self):
+        figure = ParallelCoords(
+            [{"a": 1, "b": None}, {"a": 2, "b": 3}, {"a": 3, "b": 3}]
+        )
+        first, second, _ = record_lines(figure, 3)
+        self.assertTrue(np.isnan(first[1]))
+        self.assertEqual(second[1], 0.5)
+
+    def test_later_record_keys_become_dimensions(self):
+        figure = ParallelCoords([{"a": 1, "b": 2}, {"a": 2, "b": 3, "c": 4}])
+        self.assertEqual(dimension_labels(figure), ["a", "b", "c"])
+
+
 if __name__ == "__main__":
     unittest.main()
