@@ -722,9 +722,9 @@ Examples:
 | ------------------------ | --------------------------------------- |
 | `list[dict[str, float]]` | The {x, y} points of the density curve. |
 
-| RAISES       | DESCRIPTION                                                                             |
-| ------------ | --------------------------------------------------------------------------------------- |
-| `ValueError` | If the bandwidth is invalid, there are fewer than two values, or a value is not finite. |
+| RAISES       | DESCRIPTION                                                                                                       |
+| ------------ | ----------------------------------------------------------------------------------------------------------------- |
+| `ValueError` | If the bandwidth is invalid, there are fewer than two values, a value is not finite, or the values are all equal. |
 
 ### datachart.utils.stats.kde2d
 
@@ -770,7 +770,7 @@ Examples:
 | ----------------- | ------------------------------------------------ |
 | `dict[str, list]` | The {x, y, z} chart dict of the density surface. |
 
-| RAISES       | DESCRIPTION                                                                                                       |
-| ------------ | ----------------------------------------------------------------------------------------------------------------- |
-| `TypeError`  | If x or xlim mixes temporal and numeric values, or xlim is temporal while x is not, or the other way around.      |
-| `ValueError` | If the bandwidth is invalid, x and y differ in length, there are fewer than two points, or a value is not finite. |
+| RAISES       | DESCRIPTION                                                                                                                                                                       |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `TypeError`  | If x or xlim mixes temporal and numeric values, or xlim is temporal while x is not, or the other way around.                                                                      |
+| `ValueError` | If the bandwidth is invalid, x and y differ in length, there are fewer than two points, a value is not finite, or the points have no spread (all equal, or on one straight line). |

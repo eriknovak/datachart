@@ -7769,7 +7769,7 @@ integrates to 1, so it overlays a density <code>Histogram</code> of the same val
             <td class="doc-raises-details">
               <div class="doc-md-description">
                 <p>If the bandwidth is invalid, there are fewer than two
-values, or a value is not finite.</p>
+values, a value is not finite, or the values are all equal.</p>
               </div>
             </td>
           </tr>
@@ -8024,7 +8024,8 @@ is temporal while x is not, or the other way around.</p>
             <td class="doc-raises-details">
               <div class="doc-md-description">
                 <p>If the bandwidth is invalid, x and y differ in length,
-there are fewer than two points, or a value is not finite.</p>
+there are fewer than two points, a value is not finite, or the
+points have no spread (all equal, or on one straight line).</p>
               </div>
             </td>
           </tr>
