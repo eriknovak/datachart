@@ -96,13 +96,25 @@ class TestTextsParameter(unittest.TestCase):
         )
         self.assertEqual(len(charts[0]["texts"]), 2)
 
-    def test_texts_index_per_subplot_chart(self):
+    def test_flat_texts_draw_on_every_subplot(self):
         figure = LineChart(
             [LINE1, LINE2],
             subplots=True,
             texts=[
                 {"text": "first", "x": 1, "y": 1},
                 {"text": "second", "x": 1, "y": 1},
+            ],
+        )
+        self.assertEqual(len(annotation_texts(figure, "first")), 2)
+        self.assertEqual(len(annotation_texts(figure, "second")), 2)
+
+    def test_texts_index_per_subplot_chart(self):
+        figure = LineChart(
+            [LINE1, LINE2],
+            subplots=True,
+            texts=[
+                [{"text": "first", "x": 1, "y": 1}],
+                [{"text": "second", "x": 1, "y": 1}],
             ],
         )
         self.assertEqual(len(annotation_texts(figure, "first")), 1)

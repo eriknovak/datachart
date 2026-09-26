@@ -2,10 +2,11 @@ import unittest
 import warnings
 
 import matplotlib
+import numpy as np
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from matplotlib.colors import to_hex
+from matplotlib.colors import to_hex, to_rgb
 
 from datachart.charts import (
     BarChart,
@@ -25,6 +26,13 @@ from datachart.utils._internal.colors import (
     warn_palette_overflow,
 )
 from datachart.constants import COLORS, THEME
+from datachart.themes import derive_theme
+from pypalettes import load_cmap
+
+
+def to_rgb_array(colors):
+    return np.array([to_rgb(c) for c in colors])
+
 
 # Use a pypalettes palette for testing
 TEST_COLOR_SCALE = COLORS.Blues
@@ -267,6 +275,56 @@ class TestPaletteOverflow(unittest.TestCase):
         first, second = figure.axes[0].get_lines()[:2]
         self.assertEqual(to_hex(first.get_color()), "#123456")
         self.assertEqual(to_hex(second.get_color()), to_hex(palette[0]))
+
+
+class TestPaddedPalettes(unittest.TestCase):
+    """A palette pypalettes pads with repeats samples only its real colors."""
+
+    PADDED = (COLORS.Set1, COLORS.Set2, COLORS.Dark2, COLORS.Accent)
+
+    def tearDown(self):
+        config.set_theme(THEME.DEFAULT)
+        plt.close("all")
+
+    def test_color_scale_has_no_repeats(self):
+        for name in self.PADDED:
+            with self.subTest(palette=name):
+                scale = get_color_scale(name)
+                self.assertEqual(len(scale), len(set(scale)))
+
+    def test_two_series_get_two_colors(self):
+        for name in self.PADDED:
+            with self.subTest(palette=name):
+                config.update_config({"color_general_multiple": name})
+                lines = [[{"x": 0, "y": i}, {"x": 1, "y": i}] for i in range(2)]
+                figure = LineChart(lines)
+                colors = [to_hex(l.get_color()) for l in figure.axes[0].lines]
+                self.assertEqual(len(set(colors)), 2)
+
+    def test_colormap_has_no_repeated_stop(self):
+        cmap = get_colormap(COLORS.Set1)
+        scale = get_color_scale(COLORS.Set1)
+        samples = cmap(np.linspace(0, 1, len(scale)))
+        # the 256-entry lookup table lands near, not on, each stop
+        np.testing.assert_allclose(samples[:, :3], to_rgb_array(scale), atol=0.02)
+
+    def test_unpadded_palette_samples_as_before(self):
+        for name in (COLORS.Spectral, COLORS.Viridis, COLORS.Tab10):
+            with self.subTest(palette=name):
+                expected = load_cmap(name, cmap_type="continuous")(np.linspace(0, 1, 7))
+                actual = get_colormap(name)(np.linspace(0, 1, 7))
+                np.testing.assert_allclose(actual, expected, atol=1e-9)
+
+    def test_derived_theme_has_no_repeats_and_warns_past_them(self):
+        theme = derive_theme(THEME.DEFAULT, COLORS.Set2)
+        palette = theme["color_general_multiple"]
+        self.assertEqual(len(palette), len(set(palette)))
+        config.update_config({"color_general_multiple": palette})
+        lines = [[{"x": 0, "y": i}, {"x": 1, "y": i}] for i in range(10)]
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            LineChart(lines)
+        self.assertTrue(any("colors repeat" in str(w.message) for w in caught))
 
 
 if __name__ == "__main__":

@@ -338,3 +338,22 @@ class TestAssignmentWarnings:
         )
         with pytest.warns(UserWarning, match="Grid"):
             assert determine_axis_assignment(groups, 3.0) == ["left", "right", "right"]
+
+
+class TestTickFormatsFollowTheCarriedAxis:
+    def texts(self, labels):
+        return [t.get_text() for t in labels if t.get_text()]
+
+    def test_line_value_format_lands_on_the_horizontal_value_axis(self):
+        line = LineChart(data=LINE_LARGE, yticks_format="{x:.0f}%")
+        (ax,) = render(Panel([hbar(), line]))
+        assert all(t.endswith("%") for t in self.texts(ax.get_xticklabels()))
+
+    def test_horizontal_bar_value_format_stays_on_its_value_axis(self):
+        (ax,) = render(Panel([hbar(xticks_format="{x:.0f}u")]))
+        assert all(t.endswith("u") for t in self.texts(ax.get_xticklabels()))
+
+    def test_vertical_panel_keeps_literal_formats(self):
+        line = LineChart(data=LINE_LARGE, yticks_format="{x:.0f}%")
+        (ax,) = render(Panel([vbar(), line]))
+        assert all(t.endswith("%") for t in self.texts(ax.get_yticklabels()))

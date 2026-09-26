@@ -40,6 +40,24 @@ def _get_indexed_value(value: Any, index: int, is_list_type: bool = False) -> An
         return value
 
 
+def _get_chart_marks(value: Any, index: int) -> Any:
+    """Get the chart's marks from one or several marks, or those of each chart.
+
+    A flat list of mark dicts belongs to every chart; a list holding a list
+    or `None` gives its item at `index` to that chart.
+
+    Args:
+        value: One mark, a flat list of marks, or a list of each chart's marks.
+        index: The chart's index.
+
+    Returns:
+        The chart's mark or marks.
+    """
+    if isinstance(value, list) and any(v is None or isinstance(v, list) for v in value):
+        return value[index] if index < len(value) else None
+    return value
+
+
 def _get_single_value(value: Any, expected_type: type) -> Any:
     """Get a single value, unwrapping from a list if needed.
 
@@ -141,24 +159,24 @@ def build_chart_dict_multi(
         chart_dict["ytickrotate"] = _get_indexed_value(ytickrotate, index)
 
     if vlines is not None:
-        chart_dict["vlines"] = _get_indexed_value(vlines, index)
+        chart_dict["vlines"] = _get_chart_marks(vlines, index)
 
     if hlines is not None:
-        chart_dict["hlines"] = _get_indexed_value(hlines, index)
+        chart_dict["hlines"] = _get_chart_marks(hlines, index)
 
     if dlines is not None:
-        chart_dict["dlines"] = _get_indexed_value(dlines, index)
+        chart_dict["dlines"] = _get_chart_marks(dlines, index)
     if brackets is not None:
-        chart_dict["brackets"] = _get_indexed_value(brackets, index)
+        chart_dict["brackets"] = _get_chart_marks(brackets, index)
 
     if vspans is not None:
-        chart_dict["vspans"] = _get_indexed_value(vspans, index)
+        chart_dict["vspans"] = _get_chart_marks(vspans, index)
 
     if hspans is not None:
-        chart_dict["hspans"] = _get_indexed_value(hspans, index)
+        chart_dict["hspans"] = _get_chart_marks(hspans, index)
 
     if texts is not None:
-        chart_dict["texts"] = _get_indexed_value(texts, index)
+        chart_dict["texts"] = _get_chart_marks(texts, index)
 
     # Add extra chart-specific attributes
     for attr_name, attr_value in extra_attrs.items():
@@ -241,24 +259,24 @@ def build_chart_dict_single(
         chart_dict["ytickrotate"] = _get_single_value(ytickrotate, int)
 
     if vlines is not None:
-        chart_dict["vlines"] = vlines
+        chart_dict["vlines"] = _get_chart_marks(vlines, 0)
 
     if hlines is not None:
-        chart_dict["hlines"] = hlines
+        chart_dict["hlines"] = _get_chart_marks(hlines, 0)
 
     if dlines is not None:
-        chart_dict["dlines"] = dlines
+        chart_dict["dlines"] = _get_chart_marks(dlines, 0)
     if brackets is not None:
-        chart_dict["brackets"] = brackets
+        chart_dict["brackets"] = _get_chart_marks(brackets, 0)
 
     if vspans is not None:
-        chart_dict["vspans"] = vspans
+        chart_dict["vspans"] = _get_chart_marks(vspans, 0)
 
     if hspans is not None:
-        chart_dict["hspans"] = hspans
+        chart_dict["hspans"] = _get_chart_marks(hspans, 0)
 
     if texts is not None:
-        chart_dict["texts"] = texts
+        chart_dict["texts"] = _get_chart_marks(texts, 0)
 
     # Add extra chart-specific attributes (preserve as-is, don't transform)
     for attr_name, attr_value in extra_attrs.items():
@@ -404,7 +422,9 @@ def canonical_records(kind: ChartKind, chart: dict, where: str) -> Any:
     that chart without the key. The caller's records are never
     mutated; keys the row does not declare, like `emphasis`, carry over.
     Records carrying a key the row has `renamed`, and not its new name,
-    are read under the old name with a warning.
+    are read under the old name with a warning, unless another record key
+    already reads the old one; the chart's `renamed` maps each such new
+    name to the old one it read.
 
     Args:
         kind: The front's row, declaring the record keys.
@@ -423,6 +443,7 @@ def canonical_records(kind: ChartKind, chart: dict, where: str) -> Any:
         if (
             new in kind.record_keys
             and sources[new] == new
+            and old not in sources.values()
             and _carries(data, old)
             and not _carries(data, new)
         ):
@@ -433,6 +454,8 @@ def canonical_records(kind: ChartKind, chart: dict, where: str) -> Any:
                 stacklevel=5,
             )
             sources[new] = old
+            # the row's `check_records` validates it like the parameter
+            chart.setdefault("renamed", {})[new] = old
     if isinstance(data, dict):
         return _canonical(data, sources)
     if not isinstance(data, list):
