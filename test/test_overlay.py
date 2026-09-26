@@ -800,6 +800,13 @@ class TestTwinAxisStacking:
         assert lo == 0
         assert 2 <= hi < 3
 
+    def test_stacked_areas_share_x_across_both_axes(self):
+        # the axes share one category axis, so the x values must still match
+        left = StackedAreaChart([{"x": i, "y": 1000} for i in range(3)])
+        small = StackedAreaChart([{"x": i, "y": 2} for i in range(5)])
+        with pytest.raises(ValueError, match="share the same `x`"):
+            Panel([left, {"figure": small, "y_axis": "right"}])
+
     def test_value_label_headroom_on_the_right_axis(self):
         alone = BarChart([{"label": "x", "y": 2000}], show_values=True)
         single_hi = alone.axes[0].get_ylim()[1]

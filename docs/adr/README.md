@@ -50,8 +50,8 @@ adds no tag; one that reverses, narrows, widens or replaces a commitment does.
 - [0007](0007-nested-grid-alignment.md) — Nested grids render in the parent gridspec, with a reserved heading row
 - [0012](0012-orientation-aware-panel.md) — A Panel has an orientation, inferred from its layers, and its value axis follows it (amended by [0017](0017-pyramid-chart.md))
 - [0041](0041-panel-axis-scales.md) — Panel takes axis scales, and a layer group carries its source figure's scale
-- [0080](0080-per-axis-stacking.md) — Each value axis of a Panel stacks only its own layers
 - [0070](0070-composition-furniture-vocabulary.md) — Panel and Grid take the chart fronts' furniture vocabulary; one grid layout path
+- [0080](0080-per-axis-stacking.md) — Each value axis of a Panel stacks only its own layers
 
 ## Emphasis and category order
 

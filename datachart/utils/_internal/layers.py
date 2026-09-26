@@ -3613,7 +3613,6 @@ def stack_first_line(y: np.ndarray, baseline: str) -> np.ndarray:
 def _stack_slots(layers: List[StackedAreaLayer], baseline: str) -> dict:
     """Per-layer (bottom, top) bands of the stack; series order is stack order."""
 
-    validate_shared_x([l.x_values() for l in layers])
     y = np.vstack([l.y_values() for l in layers])
     if baseline == STACKED_AREA_BASELINE.PERCENT:
         total = y.sum(0)
@@ -11671,9 +11670,10 @@ class Panel:
             ]
 
         # each value axis stacks only its own layers (ADR 0080)
+        group_axes = [ax_right if a == "right" else ax for a in assignments]
         layer_axes = {
-            id(layer): side
-            for group, side in zip(self.groups, assignments)
+            id(layer): target_ax
+            for group, target_ax in zip(self.groups, group_axes)
             for layer in group.layers
         }
 
@@ -11772,6 +11772,9 @@ class Panel:
         # stacked areas always stack; the baseline is a panel setting (ADR 0025)
         stack_layers = [l for l in self.layers if isinstance(l, StackedAreaLayer)]
         stack_slots = {}
+        # both value axes share the one category axis, so every stack shares x
+        if stack_layers:
+            validate_shared_x([l.x_values() for l in stack_layers])
         for stack in by_axis(stack_layers):
             stack_slots.update(
                 _stack_slots(stack, s.get("baseline") or STACKED_AREA_BASELINE.DEFAULT)
@@ -11836,7 +11839,6 @@ class Panel:
             figure._hover_targets = []
             figure._hover_style = self.snapshot_hover_style()
         hover_targets = figure._hover_targets
-        group_axes = [ax_right if a == "right" else ax for a in assignments]
         size_extents = _size_extents(
             (layer, target_ax)
             for group, target_ax in zip(self.groups, group_axes)
@@ -12201,7 +12203,7 @@ class Panel:
 
         # scales, per axis: an explicit setting beats the groups' stamps
         scalex, scaley, scale_right = scales
-        # each value axes and the layers drawn on it; the host always counts
+        # each value axis and the layers drawn on it; the host always counts
         value_axes = {ax: []}
         for group, owner_ax in zip(self.groups, group_axes):
             value_axes.setdefault(owner_ax, []).extend(group.layers)
