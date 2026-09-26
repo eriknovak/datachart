@@ -1,7 +1,8 @@
 """Generates docs/assets/imgs/gallery-*.png — one figure per chart type for
 the gallery cards of the charts index, one per composition utility for the
 cards of the utilities index, and one per styling guide for the cards of the
-styling index.
+styling index — and docs/assets/imgs/home-*.png, the same figures for the
+homepage marquees, each in a different predefined theme.
 
 Each figure is a small but realistic chart, with several series, a legend
 where the chart has one, and the axes labelled, so a reader can tell from the
@@ -22,7 +23,8 @@ import numpy as np
 from PIL import Image
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3]))
-from datachart.constants import BASEMAP_FEATURE, COLORS
+from datachart.config import config
+from datachart.constants import BASEMAP_FEATURE, COLORS, THEME
 from datachart.utils import Annotate, Grid, Panel
 from datachart.utils._internal.colors import get_colormap
 from generate_example_themes import THEMES, tile
@@ -696,16 +698,62 @@ CHARTS = (
 )
 
 
+# the homepage marquees in template order, so neighbouring tiles differ in theme
+HOME = (
+    line,
+    bar,
+    scatter,
+    sankey,
+    heatmap,
+    bump,
+    violin,
+    treemap,
+    gantt,
+    contour,
+    pyramid,
+    ridgeline,
+    network,
+    stackedarea,
+    histogram,
+    dumbbell,
+    hexbin,
+    radial,
+    raincloud,
+    parallelcoords,
+    box,
+    swarm,
+    scattermatrix,
+    image,
+    basemap,
+    calendarheatmap,
+    panel,
+    grid,
+    highlighting,
+    annotate,
+)
+# the hand-drawn themes read poorly at marquee size
+HOME_THEMES = [name for name in THEMES if name not in ("SKETCH", "QUILL")]
+
+
+def _save(figure, path):
+    if isinstance(figure, Image.Image):
+        figure.save(path)
+    else:
+        figure.savefig(
+            path, dpi=DPI, bbox_inches="tight", facecolor=figure.get_facecolor()
+        )
+    plt.close("all")
+    print(path.name)
+
+
 def main():
     for chart in CHARTS + UTILITIES + STYLING:
-        figure = chart()
-        path = OUT / f"gallery-{chart.__name__}.png"
-        if isinstance(figure, Image.Image):
-            figure.save(path)
-        else:
-            figure.savefig(path, dpi=DPI, bbox_inches="tight", facecolor="white")
-        plt.close("all")
-        print(path.name)
+        config.set_theme(THEME.DEFAULT)
+        _save(chart(), OUT / f"gallery-{chart.__name__}.png")
+    for i, chart in enumerate(HOME):
+        config.set_theme(getattr(THEME, HOME_THEMES[i % len(HOME_THEMES)]))
+        _save(chart(), OUT / f"home-{chart.__name__}.png")
+    config.set_theme(THEME.DEFAULT)
 
 
 if __name__ == "__main__":

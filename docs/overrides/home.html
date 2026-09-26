@@ -44,7 +44,7 @@
       {%- for copy in range(2) %}
         {%- for slug, name, href in tiles %}
           <a class="dc-tile" href="{{ href | url }}" title="{{ name }}"{% if copy %} aria-hidden="true" tabindex="-1"{% endif %}>
-            <img src="{{ ('assets/imgs/gallery-' ~ slug ~ '.png') | url }}" alt="{{ name }}">
+            <img src="{{ ('assets/imgs/home-' ~ slug ~ '.png') | url }}" alt="{{ name }}">
             <span class="dc-tile__caption">{{ name }}</span>
           </a>
         {%- endfor %}
