@@ -731,8 +731,26 @@ HOME = (
     highlighting,
     annotate,
 )
-# the hand-drawn themes read poorly at marquee size
-HOME_THEMES = [name for name in THEMES if name not in ("SKETCH", "QUILL")]
+# split by the lead colour, which fills the single-series charts; the
+# hand-drawn SKETCH and QUILL read poorly at marquee size
+HOME_LIGHT = ("DEFAULT", "MATERIAL", "HATCH", "MINIMAL")
+HOME_DARK = (
+    "INK",
+    "HARBOR",
+    "MUTED",
+    "CONTRAST",
+    "DARK",
+    "GREYSCALE",
+    "MUTEDHATCH",
+    "SLATEHATCH",
+)
+
+
+def _home_theme(i):
+    """Every third marquee tile takes a dark theme, the others a light one."""
+    if i % 3 == 2:
+        return HOME_DARK[(i // 3) % len(HOME_DARK)]
+    return HOME_LIGHT[(i - i // 3) % len(HOME_LIGHT)]
 
 
 def _save(figure, path):
@@ -751,7 +769,7 @@ def main():
         config.set_theme(THEME.DEFAULT)
         _save(chart(), OUT / f"gallery-{chart.__name__}.png")
     for i, chart in enumerate(HOME):
-        config.set_theme(getattr(THEME, HOME_THEMES[i % len(HOME_THEMES)]))
+        config.set_theme(getattr(THEME, _home_theme(i)))
         _save(chart(), OUT / f"home-{chart.__name__}.png")
     config.set_theme(THEME.DEFAULT)
 
