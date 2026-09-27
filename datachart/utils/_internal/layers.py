@@ -360,7 +360,6 @@ NO_LEGEND = "_nolegend_"
 # radial furniture defaults: compass and calendar conventions (ADR 0015)
 DEFAULT_STARTANGLE = "N"
 DEFAULT_DIRECTION = RADIAL_DIRECTION.CLOCKWISE
-COMPASS_LOCATIONS = ("N", "NE", "E", "SE", "S", "SW", "W", "NW")
 # the polar border circle crosses the plot area, so the r-value labels and
 # the legend stack above the spine zorder, not just above the marks
 RADIAL_LABEL_Z_OVER_SPINE = 1
@@ -5560,15 +5559,6 @@ class SwarmLayer(UnclippedMarksMixin, PointLabelMixin, GroupLayer):
             marks.insert(0, (int(np.argmin(np.abs(values - median))), median))
         for index, value in marks:
             labelled[index] = _format_value(self.value_format, value)
-        return labelled
-        order = np.argsort(values, kind="stable")
-        along = 0 if self.is_horizontal else 1
-        ends = np.zeros((2, 2))
-        ends[:, along] = values[order[[0, -1]]]
-        span_px = np.ptp(ax.transData.transform(ends)[:, along])
-        labelled[order] = self._value_texts(
-            ax, values[order], not self.is_horizontal, span_px * 72.0 / ax.figure.dpi
-        )
         return labelled
 
 
