@@ -18,7 +18,7 @@ The data is a list of series, one per source, the first at the bottom of the sta
 {source: points[:3] for source, points in zip(SOURCES, generation)}
 ```
 
-Seven sources outrun the palette: a theme's palette has six colors, and the seventh band would repeat the first, which the chart warns about. Colors carry meaning in a stack, so the guide sets its own palette on the configuration with [config.update_config](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.update_config), once, one color per source in stack order: the fossil sources warm, the low-carbon ones cool, the rest grey. Every chart below draws from it unless it sets its own colors; the [Band style](#band-style) section pins the colors per source, so a chart of a few sources keeps them, and where a few sources are the story, the [Emphasis](#emphasis) section mutes the rest.
+Seven sources outrun the palette: a theme's palette has six colors, and the seventh band would repeat the first, which the chart warns about. Colors carry meaning in a stack, so the guide sets its own palette on the configuration with [config.update](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.update), once, one color per source in stack order: the fossil sources warm, the low-carbon ones cool, the rest grey. Every chart below draws from it unless it sets its own colors; the [Band style](#band-style) section pins the colors per source, so a chart of a few sources keeps them, and where a few sources are the story, the [Emphasis](#emphasis) section mutes the rest.
 
 ```
 from datachart.config import config
@@ -33,7 +33,7 @@ SOURCE_COLORS = {
     "Solar": "#f4c542",
     "Other": "#b8b8b8",
 }
-config.update_config({"color_general_multiple": list(SOURCE_COLORS.values())})
+config.update({"color_general_multiple": list(SOURCE_COLORS.values())})
 ```
 
 **Basic example.** Only the `data` argument is required. Each source fills the band between the sources below it and its own value, so the top edge of the stack is the world's total generation, and the axes start where the stack does. A single list of points draws one band on its own. The bands take the palette set above, one color per source in stack order.
@@ -654,7 +654,7 @@ figure = StackedAreaChart(
     figsize=FIG_SIZE.FULL_MEDIUM,
     ymax=36000,
 )
-config.reset_config()
+config.reset()
 figure.show()
 ```
 

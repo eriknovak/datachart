@@ -5023,7 +5023,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </tr>
 <tr>
 <td style="text-align:left">Read and change single attributes</td>
-<td style="text-align:left"><code>config[...]</code>, <code>update_config</code>, <code>override</code></td>
+<td style="text-align:left"><code>config[...]</code>, <code>update</code>, <code>override</code></td>
 <td style="text-align:left"><a href="#what-a-theme-controls">What a Theme Controls</a></td>
 </tr>
 <tr>
@@ -5043,7 +5043,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </tr>
 <tr>
 <td style="text-align:left">Return to the default theme</td>
-<td style="text-align:left"><code>reset_config</code></td>
+<td style="text-align:left"><code>reset</code></td>
 <td style="text-align:left"><a href="#applying-a-theme">Applying a Theme</a></td>
 </tr>
 </tbody>
@@ -5282,7 +5282,7 @@ config.theme
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><code>reset_config</code> returns to the default theme, discarding every change made since:</p>
+<p><code>reset</code> returns to the default theme, discarding every change made since:</p>
 </div>
 </div>
 </div>
@@ -5305,10 +5305,10 @@ config.theme
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">config</span><span class="o">.</span><span class="n">reset_config</span><span class="p">()</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">config</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
 <span class="n">config</span><span class="o">.</span><span class="n">theme</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5">config.reset_config()
+<div class="clipboard-copy-txt" id="cell-5">config.reset()
 config.theme
 </div>
 </div>
@@ -5498,7 +5498,7 @@ config.theme
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><code>update_config</code> changes attributes on top of the active theme; the change persists until the next <code>set_theme</code> or <code>reset_config</code>, and unknown attribute names are skipped with a warning. <code>override</code> does the same for one <code>with</code> block, taking a dictionary or keyword arguments. Palette attributes also accept a single color, used for every series that asks for one.</p>
+<p><code>update</code> changes attributes on top of the active theme; the change persists until the next <code>set_theme</code> or <code>reset</code>, and unknown attribute names are skipped with a warning. <code>override</code> does the same for one <code>with</code> block, taking a dictionary or keyword arguments. Palette attributes also accept a single color, used for every series that asks for one.</p>
 </div>
 </div>
 </div>
@@ -5521,10 +5521,10 @@ config.theme
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">config</span><span class="o">.</span><span class="n">update_config</span><span class="p">({</span><span class="s2">"font_general_family"</span><span class="p">:</span> <span class="s2">"serif"</span><span class="p">,</span> <span class="s2">"plot_line_width"</span><span class="p">:</span> <span class="mi">3</span><span class="p">})</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">"font_general_family"</span><span class="p">:</span> <span class="s2">"serif"</span><span class="p">,</span> <span class="s2">"plot_line_width"</span><span class="p">:</span> <span class="mi">3</span><span class="p">})</span>
 <span class="n">demo</span><span class="p">()</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-8">config.update_config({"font_general_family": "serif", "plot_line_width": 3})
+<div class="clipboard-copy-txt" id="cell-8">config.update({"font_general_family": "serif", "plot_line_width": 3})
 demo().show()
 </div>
 </div>
@@ -5566,12 +5566,12 @@ demo().show()
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">with</span> <span class="n">config</span><span class="o">.</span><span class="n">override</span><span class="p">(</span><span class="n">color_general_multiple</span><span class="o">=</span><span class="p">[</span><span class="s2">"#0B3954"</span><span class="p">,</span> <span class="s2">"#FF6663"</span><span class="p">,</span> <span class="s2">"#E0FF4F"</span><span class="p">]):</span>
     <span class="n">demo</span><span class="p">()</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
-<span class="n">config</span><span class="o">.</span><span class="n">reset_config</span><span class="p">()</span>
+<span class="n">config</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-9">with config.override(color_general_multiple=["#0B3954", "#FF6663", "#E0FF4F"]):
     demo().show()
 
-config.reset_config()
+config.reset()
 </div>
 </div>
 </div>
@@ -5651,7 +5651,7 @@ swatches(NEON_COLORS)
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=db1e24c9">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=61a9f765">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -5662,7 +5662,7 @@ swatches(NEON_COLORS)
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=fda57e49">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=89053fd8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -5875,7 +5875,7 @@ config.theme
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Register the dictionary under a name and it behaves like a predefined theme: it appears in <code>list_themes</code>, <code>set_theme</code> and <code>using_theme</code> apply it, and <code>update_config</code> tweaks on top of it, here lifting the axes off the ground with a lighter face:</p>
+<p>Register the dictionary under a name and it behaves like a predefined theme: it appears in <code>list_themes</code>, <code>set_theme</code> and <code>using_theme</code> apply it, and <code>update</code> tweaks on top of it, here lifting the axes off the ground with a lighter face:</p>
 </div>
 </div>
 </div>
@@ -5956,10 +5956,10 @@ config.list_themes()
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">config</span><span class="o">.</span><span class="n">update_config</span><span class="p">({</span><span class="s2">"axes_facecolor"</span><span class="p">:</span> <span class="s2">"#131A2A"</span><span class="p">})</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">"axes_facecolor"</span><span class="p">:</span> <span class="s2">"#131A2A"</span><span class="p">})</span>
 <span class="n">demo</span><span class="p">()</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-15">config.update_config({"axes_facecolor": "#131A2A"})
+<div class="clipboard-copy-txt" id="cell-15">config.update({"axes_facecolor": "#131A2A"})
 demo().show()
 </div>
 </div>
@@ -6191,7 +6191,7 @@ with config.override(derive_theme(THEME.DARK, lead=COLORS.Oranges)):
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=044180d9">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=576c1c20">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -6202,7 +6202,7 @@ with config.override(derive_theme(THEME.DARK, lead=COLORS.Oranges)):
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=82b0b913">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=9a51bb60">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -6277,7 +6277,7 @@ with config.override(derive_theme(THEME.MINIMAL, lead=COLORS.Contrast, traits=[T
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="sharing-a-theme">Sharing a Theme<a class="anchor-link" href="#sharing-a-theme">¶</a></h2><p><code>save_theme</code> writes a theme file: a JSON document carrying a name, a format version, and only the attributes that differ from the default theme, so the file stays short and reviewable. A registered theme is saved by name; with no name the live configuration is saved, so a look assembled with <code>update_config</code> leaves the process too.</p>
+<h2 id="sharing-a-theme">Sharing a Theme<a class="anchor-link" href="#sharing-a-theme">¶</a></h2><p><code>save_theme</code> writes a theme file: a JSON document carrying a name, a format version, and only the attributes that differ from the default theme, so the file stays short and reviewable. A registered theme is saved by name; with no name the live configuration is saved, so a look assembled with <code>update</code> leaves the process too.</p>
 </div>
 </div>
 </div>
@@ -6456,9 +6456,9 @@ config.theme
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">config</span><span class="o">.</span><span class="n">reset_config</span><span class="p">()</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">config</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-22">config.reset_config()
+<div class="clipboard-copy-txt" id="cell-22">config.reset()
 </div>
 </div>
 </div>

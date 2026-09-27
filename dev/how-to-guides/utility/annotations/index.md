@@ -66,7 +66,7 @@ Every customization is either a key of the annotation dictionary, a `plot_text_*
 | annotate a panel                                 | `Annotate` on the `Panel` figure                                          | [Annotating a panel](#annotating-a-panel)                                                               |
 | annotate one subplot of a finished figure        | `Annotate` with the `subplot` index                                       | [Annotating finished subplots](#annotating-finished-subplots)                                           |
 | annotate a figure that goes into a grid          | `Annotate` before `Grid`                                                  | [Annotations in a grid](#annotations-in-a-grid)                                                         |
-| change the defaults of every annotation          | `config.update_config` with the `plot_text_*` keys                        | [Text Configuration](#text-configuration)                                                               |
+| change the defaults of every annotation          | `config.update` with the `plot_text_*` keys                               | [Text Configuration](#text-configuration)                                                               |
 | save the chart to a file                         | `save_figure`                                                             | [Saving Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md) guide |
 
 The parameter that accepts a constant, with the class in [datachart.constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md) that lists its values:
@@ -381,7 +381,7 @@ except ValueError as error:
 
 ## Text Configuration
 
-The defaults every annotation falls back on (the font, the box face and edge, the connector look and color) are part of the global configuration, under the keys that start with `plot_text_`. Every predefined theme sets them to match its own look, and they are changed like any other setting, through [datachart.config.config.update_config](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.update_config); see the [Themes](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) guide for the configuration system as a whole. The current keys and their values in the active theme are:
+The defaults every annotation falls back on (the font, the box face and edge, the connector look and color) are part of the global configuration, under the keys that start with `plot_text_`. Every predefined theme sets them to match its own look, and they are changed like any other setting, through [datachart.config.config.update](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.update); see the [Themes](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) guide for the configuration system as a whole. The current keys and their values in the active theme are:
 
 ```
 from datachart.config import config
@@ -392,7 +392,7 @@ from datachart.config import config
 A `plot_text_*` key in an annotation's `style` always wins over the configuration. The configuration is the place for a default that should hold for every annotation of a document, such as arrowheads on every connector and notes without a box:
 
 ```
-config.update_config(
+config.update(
     {
         # arrowheads and boxless notes for every annotation
         "plot_text_arrow_style": ARROW_STYLE.ARROW,
@@ -412,7 +412,7 @@ LineChart(
 ).show()
 
 # restore the defaults for the rest of the guide
-config.reset_config()
+config.reset()
 ```
 
 ## Real-World Examples

@@ -49,7 +49,7 @@ Every customization is either a keyword argument of `Panel` or a per-figure opti
 | overlay several bar charts           | `bar_mode`                                                         | [Bar mode](#bar-mode)                                                                                   |
 | add a figure to an existing panel    | nest `Panel` figures                                               | [Nesting panels](#nesting-panels)                                                                       |
 | overlay horizontal bars              | `orientation` on the bar charts, the same `Panel` parameters       | [Horizontal panels](#horizontal-panels)                                                                 |
-| change the defaults of every panel   | `config.update_config` with the `overlay_*` settings               | [Panel configuration](#panel-configuration)                                                             |
+| change the defaults of every panel   | `config.update` with the `overlay_*` settings                      | [Panel configuration](#panel-configuration)                                                             |
 | save the panel to a file             | `save_figure`                                                      | [Saving Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md) guide |
 
 The full list of parameters and per-figure options is in the [datachart.utils.Panel](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) reference. The look of each figure (colors, line widths, markers) is set on the chart itself through its `style` attribute; see the guide of each chart in the [Charts](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/index.md) section.
@@ -371,7 +371,7 @@ Panel(
 
 ## Panel Configuration
 
-The defaults the panel falls back on (the automatic axis threshold, the transparency of overlaid bars and histograms, the default drawing order of each chart type, the bar mode) are part of the global configuration, under the keys that start with `overlay_`. They are changed like any other setting, through [datachart.config.config.update_config](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.update_config); see the [Themes](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) guide for the configuration system as a whole. The current keys and their values in the active theme are:
+The defaults the panel falls back on (the automatic axis threshold, the transparency of overlaid bars and histograms, the default drawing order of each chart type, the bar mode) are part of the global configuration, under the keys that start with `overlay_`. They are changed like any other setting, through [datachart.config.config.update](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.update); see the [Themes](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) guide for the configuration system as a whole. The current keys and their values in the active theme are:
 
 ```
 from datachart.config import config
@@ -382,7 +382,7 @@ from datachart.config import config
 A setting given to `Panel` directly, such as `auto_secondary_axis` or `bar_mode`, always wins over the configuration. The configuration is the place for a default that should hold for every panel of a document:
 
 ```
-config.update_config(
+config.update(
     {
         # split the value axes sooner
         "overlay_auto_threshold": 2.0,
@@ -403,7 +403,7 @@ Panel(
 ).show()
 
 # restore the defaults for the rest of the guide
-config.reset_config()
+config.reset()
 ```
 
 ## Real-World Examples

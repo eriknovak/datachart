@@ -273,7 +273,7 @@ figure = SankeyChart(
     title="Where a country's energy goes",
     figsize=FIG_SIZE.FULL_MEDIUM,
 )
-config.reset_config()
+config.reset()
 figure.show()
 ```
 

@@ -4133,10 +4133,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#datachart.utils.stats.correlation" class="md-nav__link">
+  <a href="#datachart.utils.stats.pearson" class="md-nav__link">
     <span class="md-ellipsis">
       
-        <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;correlation
+        <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;pearson
       
     </span>
   </a>
@@ -4804,10 +4804,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#datachart.utils.stats.correlation" class="md-nav__link">
+  <a href="#datachart.utils.stats.pearson" class="md-nav__link">
     <span class="md-ellipsis">
       
-        <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;correlation
+        <code class="doc-symbol doc-symbol-toc doc-symbol-function"></code>&nbsp;pearson
       
     </span>
   </a>
@@ -5092,7 +5092,7 @@ over the finite values, and a pair with a missing half is left out.</p>
 </tr>
 <tr>
 <td style="text-align: left;">how two variables move together</td>
-<td style="text-align: left;"><a href="#datachart.utils.stats.correlation"><code>correlation</code></a>, <a href="#datachart.utils.stats.spearman"><code>spearman</code></a></td>
+<td style="text-align: left;"><a href="#datachart.utils.stats.pearson"><code>pearson</code></a>, <a href="#datachart.utils.stats.spearman"><code>spearman</code></a></td>
 </tr>
 <tr>
 <td style="text-align: left;">a trend line</td>
@@ -6297,12 +6297,12 @@ are ignored.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="datachart.utils.stats.correlation" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">datachart.utils.stats.correlation</span>
+<h3 id="datachart.utils.stats.pearson" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">datachart.utils.stats.pearson</span>
 
 
 </h3>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">correlation</span><span class="p">(</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">pearson</span><span class="p">(</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">x</span><span class="p">:</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span> <span class="o">|</span> <span class="n"><span title="float">float</span></span><span class="p">],</span> <span class="n">y</span><span class="p">:</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="int">int</span></span> <span class="o">|</span> <span class="n"><span title="float">float</span></span><span class="p">]</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="float">float</span></span>
 </code></pre></div>
@@ -6318,10 +6318,10 @@ correlated as matplotlib date numbers.</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.utils.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">correlation</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">correlation</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]),</span> <span class="mi">6</span><span class="p">)</span>
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.utils.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">pearson</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">pearson</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]),</span> <span class="mi">6</span><span class="p">)</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="go">1.0</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">correlation</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span> <span class="mi">6</span><span class="p">)</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">pearson</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span> <span class="mi">6</span><span class="p">)</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="go">-1.0</span>
 </code></pre></div>
 
@@ -6454,7 +6454,7 @@ temporal and numeric values.</p>
         <p>Calculates the Spearman rank correlation between two lists.</p>
 <p>The Spearman coefficient is the Pearson correlation of the ranks, so it
 measures any monotone relationship, not only a linear one, and is robust
-to outliers. It ranges from -1 to 1 like <code>correlation</code>, and likewise
+to outliers. It ranges from -1 to 1 like <code>pearson</code>, and likewise
 accepts a temporal <code>x</code>.</p>
 
 
@@ -7446,10 +7446,10 @@ harder. A missing value outputs <code>nan</code> and leaves the average unchange
 <p>At each <code>x</code> a straight line is fitted to the nearest <code>frac</code> share of the
 points, weighted by a tricube kernel so closer points count more, and the
 smoothed <code>y</code> is that line's value there (LOESS/LOWESS). The result is a
-list of <code>{x, y}</code> points sorted by <code>x</code>, ready for <code>LineChart</code>, as <code>kde1d</code>
-returns. A smaller <code>frac</code> follows the data more closely. A temporal <code>x</code>
-(dates, datetimes, or <code>datetime64</code>) is smoothed as date numbers and the
-curve's <code>x</code> values come back as datetimes, in the input's zone.</p>
+list of <code>{x, y}</code> points sorted by <code>x</code>, ready for <code>LineChart</code>. A smaller <code>frac</code> follows the
+data more closely. A temporal <code>x</code> (dates, datetimes, or <code>datetime64</code>) is
+smoothed as date numbers and the curve's <code>x</code> values come back as
+datetimes, in the input's zone.</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -7632,7 +7632,7 @@ temporal and numeric values.</p>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">cut</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">xlim</span><span class="p">:</span> <span class="n"><span title="tuple">tuple</span></span><span class="p">[</span><span class="n"><span title="float">float</span></span><span class="p">,</span> <span class="n"><span title="float">float</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">gridsize</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="float">float</span></span><span class="p">]]</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="float">float</span></span><span class="p">]]</span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -7642,16 +7642,17 @@ temporal and numeric values.</p>
 points over the range of the values, extended by <code>cut</code> bandwidths on each
 side so the curve tails off instead of being clipped at the extremes, or
 over an explicit <code>xlim</code> so several curves share one grid. The
-result is a list of <code>{x, y}</code> points ready for <code>LineChart</code>; the curve
-integrates to 1, so it overlays a density <code>Histogram</code> of the same values.</p>
+result is an <code>{x, y}</code> dict of columns ready for <code>LineChart</code>, the shape
+<code>kde2d</code> returns; the curve integrates to 1, so it overlays a density
+<code>Histogram</code> of the same values.</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.utils.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">kde1d</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">curve</span> <span class="o">=</span> <span class="n">kde1d</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="n">grid_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">cut</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="nb">round</span><span class="p">(</span><span class="n">point</span><span class="p">[</span><span class="s2">"x"</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">curve</span><span class="p">]</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="nb">round</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">curve</span><span class="p">[</span><span class="s2">"x"</span><span class="p">]]</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="go">[1.0, 2.0, 3.0, 4.0, 5.0]</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">point</span><span class="p">[</span><span class="s2">"y"</span><span class="p">]</span> <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">curve</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">curve</span><span class="p">[</span><span class="s2">"y"</span><span class="p">]),</span> <span class="mi">2</span><span class="p">)</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="go">0.94</span>
 </code></pre></div>
 
@@ -7798,12 +7799,12 @@ default.</p>
           <tr class="doc-section-item">
             <td>
                 <span class="doc-returns-annotation">
-                    <code><span title="list">list</span>[<span title="dict">dict</span>[<span title="str">str</span>, <span title="float">float</span>]]</code>
+                    <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="list">list</span>[<span title="float">float</span>]]</code>
                 </span>
             </td>
             <td class="doc-returns-details">
               <div class="doc-md-description">
-                <p>The <code>{x, y}</code> points of the density curve.</p>
+                <p>The density curve as <code>{"x": [...], "y": [...]}</code>, one <code>y</code> per <code>x</code>.</p>
               </div>
             </td>
           </tr>

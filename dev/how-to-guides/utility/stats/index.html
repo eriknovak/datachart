@@ -5436,7 +5436,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </tr>
 <tr>
 <td style="text-align:left">say how much two variables move together</td>
-<td style="text-align:left"><code>correlation</code>, <code>spearman</code></td>
+<td style="text-align:left"><code>pearson</code>, <code>spearman</code></td>
 <td style="text-align:left"><a href="#association">Association</a></td>
 </tr>
 <tr>
@@ -5911,7 +5911,7 @@ DumbbellChart(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="association">Association<a class="anchor-link" href="#association">¶</a></h3><p><em>When one variable goes up, does the other?</em> <code>correlation</code> is Pearson's coefficient: the strength of a <em>straight-line</em> relationship, from -1 through 0 (none) to 1. <code>spearman</code> is the same coefficient computed on the ranks, so it measures any relationship that only goes one way (monotone), whether or not it is a straight line, and one outlier cannot move it much. When the two agree, the relationship is linear; when Spearman is clearly larger, the relationship bends or an outlier is dragging Pearson down. Flipper length and body mass:</p>
+<h3 id="association">Association<a class="anchor-link" href="#association">¶</a></h3><p><em>When one variable goes up, does the other?</em> <code>pearson</code> is Pearson's coefficient: the strength of a <em>straight-line</em> relationship, from -1 through 0 (none) to 1. <code>spearman</code> is the same coefficient computed on the ranks, so it measures any relationship that only goes one way (monotone), whether or not it is a straight line, and one outlier cannot move it much. When the two agree, the relationship is linear; when Spearman is clearly larger, the relationship bends or an outlier is dragging Pearson down. Flipper length and body mass:</p>
 </div>
 </div>
 </div>
@@ -5934,9 +5934,9 @@ DumbbellChart(
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">stats</span><span class="o">.</span><span class="n">correlation</span><span class="p">(</span><span class="n">flipper</span><span class="p">,</span> <span class="n">mass</span><span class="p">),</span> <span class="n">stats</span><span class="o">.</span><span class="n">spearman</span><span class="p">(</span><span class="n">flipper</span><span class="p">,</span> <span class="n">mass</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">stats</span><span class="o">.</span><span class="n">pearson</span><span class="p">(</span><span class="n">flipper</span><span class="p">,</span> <span class="n">mass</span><span class="p">),</span> <span class="n">stats</span><span class="o">.</span><span class="n">spearman</span><span class="p">(</span><span class="n">flipper</span><span class="p">,</span> <span class="n">mass</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-10">stats.correlation(flipper, mass), stats.spearman(flipper, mass)</div>
+<div class="clipboard-copy-txt" id="cell-10">stats.pearson(flipper, mass), stats.spearman(flipper, mass)</div>
 </div>
 </div>
 </div>
@@ -5948,7 +5948,7 @@ DumbbellChart(
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
 <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[11]:</div>
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>(0.8712017673060117, 0.8399741230312999)</pre>
+<pre>(0.8712017673060111, 0.8399741230312999)</pre>
 </div>
 </div>
 </div>
@@ -5992,11 +5992,11 @@ DumbbellChart(
         <span class="k">for</span> <span class="n">species</span> <span class="ow">in</span> <span class="n">SPECIES</span>
     <span class="p">],</span>
     <span class="n">subtitle</span><span class="o">=</span><span class="p">[</span>
-        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">species</span><span class="si">}</span><span class="s2"> (r = </span><span class="si">{</span><span class="n">stats</span><span class="o">.</span><span class="n">correlation</span><span class="p">(</span><span class="n">flipper_by_species</span><span class="p">[</span><span class="n">species</span><span class="p">],</span><span class="w"> </span><span class="n">mass_by_species</span><span class="p">[</span><span class="n">species</span><span class="p">])</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">)"</span>
+        <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">species</span><span class="si">}</span><span class="s2"> (r = </span><span class="si">{</span><span class="n">stats</span><span class="o">.</span><span class="n">pearson</span><span class="p">(</span><span class="n">flipper_by_species</span><span class="p">[</span><span class="n">species</span><span class="p">],</span><span class="w"> </span><span class="n">mass_by_species</span><span class="p">[</span><span class="n">species</span><span class="p">])</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">)"</span>
         <span class="k">for</span> <span class="n">species</span> <span class="ow">in</span> <span class="n">SPECIES</span>
     <span class="p">],</span>
     <span class="n">title</span><span class="o">=</span><span class="p">(</span>
-        <span class="sa">f</span><span class="s2">"Flipper length against body mass: Pearson </span><span class="si">{</span><span class="n">stats</span><span class="o">.</span><span class="n">correlation</span><span class="p">(</span><span class="n">flipper</span><span class="p">,</span><span class="w"> </span><span class="n">mass</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">, "</span>
+        <span class="sa">f</span><span class="s2">"Flipper length against body mass: Pearson </span><span class="si">{</span><span class="n">stats</span><span class="o">.</span><span class="n">pearson</span><span class="p">(</span><span class="n">flipper</span><span class="p">,</span><span class="w"> </span><span class="n">mass</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">, "</span>
         <span class="sa">f</span><span class="s2">"Spearman </span><span class="si">{</span><span class="n">stats</span><span class="o">.</span><span class="n">spearman</span><span class="p">(</span><span class="n">flipper</span><span class="p">,</span><span class="w"> </span><span class="n">mass</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">"</span>
     <span class="p">),</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Flipper length (mm)"</span><span class="p">,</span>
@@ -6014,11 +6014,11 @@ ScatterChart(
         for species in SPECIES
     ],
     subtitle=[
-        f"{species} (r = {stats.correlation(flipper_by_species[species], mass_by_species[species]):.2f})"
+        f"{species} (r = {stats.pearson(flipper_by_species[species], mass_by_species[species]):.2f})"
         for species in SPECIES
     ],
     title=(
-        f"Flipper length against body mass: Pearson {stats.correlation(flipper, mass):.2f}, "
+        f"Flipper length against body mass: Pearson {stats.pearson(flipper, mass):.2f}, "
         f"Spearman {stats.spearman(flipper, mass):.2f}"
     ),
     xlabel="Flipper length (mm)",
@@ -6661,7 +6661,7 @@ LineChart(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="density-estimates">Density estimates<a class="anchor-link" href="#density-estimates">¶</a></h3><p><em>What does the distribution look like, without the bins?</em> A histogram's shape changes with its bin edges; a kernel density estimate smooths the same values into a curve that does not. <code>kde1d(values)</code> returns the curve as <code>{x, y}</code> points ready for a <a href="../../charts/linechart/">Line Chart</a>; it integrates to 1, so it overlays a density <a href="../../charts/histogram/">Histogram</a> of the same values on the same axis. Its <code>bandwidth</code> sets how smooth the curve is: a rule of <a href="../../../references/constants/#datachart.constants.BANDWIDTH">BANDWIDTH</a> (Scott's by default) or a number, where smaller values follow the data more closely. <code>grid_size</code> is the number of points, and <code>cut</code> how many bandwidths the curve extends past the extremes (or <code>xlim</code> fixes the range, so several curves share one grid). One curve per species, with <code>show_area</code>, is the cleanest picture of the three flipper distributions:</p>
+<h3 id="density-estimates">Density estimates<a class="anchor-link" href="#density-estimates">¶</a></h3><p><em>What does the distribution look like, without the bins?</em> A histogram's shape changes with its bin edges; a kernel density estimate smooths the same values into a curve that does not. <code>kde1d(values)</code> returns the curve as <code>{x, y}</code> columns ready for a <a href="../../charts/linechart/">Line Chart</a>; it integrates to 1, so it overlays a density <a href="../../charts/histogram/">Histogram</a> of the same values on the same axis. Its <code>bandwidth</code> sets how smooth the curve is: a rule of <a href="../../../references/constants/#datachart.constants.BANDWIDTH">BANDWIDTH</a> (Scott's by default) or a number, where smaller values follow the data more closely. <code>grid_size</code> is the number of points, and <code>cut</code> how many bandwidths the curve extends past the extremes (or <code>xlim</code> fixes the range, so several curves share one grid). One curve per species, with <code>show_area</code>, is the cleanest picture of the three flipper distributions:</p>
 </div>
 </div>
 </div>

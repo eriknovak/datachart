@@ -220,8 +220,8 @@ signature(pair=("#1A120A", "#1A120A")).show()
 
 ______________________________________________________________________
 
-Applying a theme replaces the whole global configuration, so remember to call `config.set_theme(...)` (or `config.reset_config()`) before building the charts it should style. See the [themes how-to](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) for customizing themes attribute by attribute.
+Applying a theme replaces the whole global configuration, so remember to call `config.set_theme(...)` (or `config.reset()`) before building the charts it should style. See the [themes how-to](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) for customizing themes attribute by attribute.
 
 ```
-config.reset_config()
+config.reset()
 ```

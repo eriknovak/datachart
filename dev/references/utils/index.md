@@ -167,7 +167,9 @@ Grid(
     xmax: float | None = None,
     ymin: int | float | None = None,
     ymax: int | float | None = None,
-    aspect_ratio: ASPECT_RATIO | str | None = None
+    aspect_ratio: ASPECT_RATIO | str | None = None,
+    scalex: AXIS_SCALE | str | None = None,
+    scaley: AXIS_SCALE | str | None = None
 ) -> plt.Figure
 ```
 
@@ -177,7 +179,7 @@ Each figure's chart is redrawn into its grid cell. Nested rows define the layout
 
 Grids nest: a Grid figure placed in a cell occupies exactly that cell and rebuilds its internal layout inside it, to any depth. The nested grid keeps its own title (a heading spanning its subgrid) and its own sharex/sharey among its own cells; the outer grid's sharex/sharey applies only to its top-level cells. Panel figures also nest in a cell; the reverse — a Grid figure inside a Panel — stays an error.
 
-The grid's title, axis labels and legend are drawn once for the whole figure. Its limits, `show_grid` and `aspect_ratio` apply to every cell, nested grids included; one left unset keeps what each cell's chart was built with.
+The grid's title, axis labels and legend are drawn once for the whole figure. Its limits, scales, `show_grid` and `aspect_ratio` apply to every cell, nested grids included; one left unset keeps what each cell's chart was built with.
 
 Examples:
 
@@ -233,14 +235,16 @@ Examples:
 | `ymin`         | Minimum value for the y-axis limits of every cell. **TYPE:** \`int                                                                                                                                                                                                                                                                                            |
 | `ymax`         | Maximum value for the y-axis limits of every cell. **TYPE:** \`int                                                                                                                                                                                                                                                                                            |
 | `aspect_ratio` | The aspect ratio of every cell's axes box; "geographic" keeps a map of longitude against latitude at true proportions. Default: each cell's own. See ASPECT_RATIO. **TYPE:** \`ASPECT_RATIO                                                                                                                                                                   |
+| `scalex`       | The x-axis scale of every cell ("linear", "log", "symlog", "asinh"). Default: each cell's own. **TYPE:** \`AXIS_SCALE                                                                                                                                                                                                                                         |
+| `scaley`       | The y-axis scale of every cell. Default: each cell's own. **TYPE:** \`AXIS_SCALE                                                                                                                                                                                                                                                                              |
 
 | RETURNS      | DESCRIPTION                                                     |
 | ------------ | --------------------------------------------------------------- |
 | `plt.Figure` | A new matplotlib Figure containing all charts in a grid layout. |
 
-| RAISES       | DESCRIPTION                                                                                                                                                                                                                  |
-| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ValueError` | If charts is empty, rows are mixed with flat items, a cell is invalid, two layout_spec cells overlap, max_cols is not a positive integer, the legend location is unknown, or a figure cannot be composed (missing metadata). |
+| RAISES       | DESCRIPTION                                                                                                                                                                                                                                                          |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ValueError` | If charts is empty, rows are mixed with flat items, a cell is invalid, two layout_spec cells overlap, max_cols is not a positive integer, the legend location is unknown, a figure cannot be composed (missing metadata), or a log scale meets a non-positive value. |
 
 ### datachart.utils.Annotate
 
@@ -302,16 +306,17 @@ Examples:
 ```
 save_figure(
     figure: plt.Figure,
-    path: str,
+    path: str | os.PathLike,
     dpi: int = 300,
-    format: FIG_FORMAT | list[FIG_FORMAT] | None = None,
+    fmt: FIG_FORMAT | list[FIG_FORMAT] | None = None,
     transparent: bool = False,
+    format: FIG_FORMAT | list[FIG_FORMAT] | None = None,
 ) -> list[str]
 ```
 
 Save the figure to one or more files.
 
-Writes the rendered figure to disk in the format given by `format` or, when omitted, by the file extension. Use a vector format (PDF, SVG) for print and papers, PNG with `dpi` >= 300 for raster deliverables, and `transparent=True` to drop the figure background for slides and web pages. The theme is already baked into the figure, so saving never consults the global config.
+Writes the rendered figure to disk in the format given by `fmt` or, when omitted, by the file extension. Use a vector format (PDF, SVG) for print and papers, PNG with `dpi` >= 300 for raster deliverables, and `transparent=True` to drop the figure background for slides and web pages. The theme is already baked into the figure, so saving never consults the global config.
 
 Pass a list of formats to write the same figure several times in one call. `path` is then a stem: its extension is dropped when it names a supported format, and one file per format is written next to it. `dpi` and `transparent` apply to every file.
 
@@ -328,27 +333,28 @@ Examples:
 >>> from datachart.utils.figure import save_figure
 >>> from datachart.constants import FIG_FORMAT
 >>> path = "/path/to/save/chart.png"
->>> save_figure(figure, path, dpi=300, format=FIG_FORMAT.PNG, transparent=True)
+>>> save_figure(figure, path, dpi=300, fmt=FIG_FORMAT.PNG, transparent=True)
 ```
 
 ```
 >>> # 3. save the same figure as a PDF and a PNG
->>> save_figure(figure, "/path/to/save/chart", format=[FIG_FORMAT.PDF, FIG_FORMAT.PNG])
+>>> save_figure(figure, "/path/to/save/chart", fmt=[FIG_FORMAT.PDF, FIG_FORMAT.PNG])
 ['/path/to/save/chart.pdf', '/path/to/save/chart.png']
 ```
 
 | PARAMETER     | DESCRIPTION                                                                                                                                     |
 | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | `figure`      | The figure to save. **TYPE:** `plt.Figure`                                                                                                      |
-| `path`        | The path where the figure is saved. A stem when format is a list. **TYPE:** `str`                                                               |
+| `path`        | The path where the figure is saved. A stem when fmt is a list. **TYPE:** \`str                                                                  |
 | `dpi`         | The DPI of the figure. **TYPE:** `int` **DEFAULT:** `300`                                                                                       |
-| `format`      | The format of the figure, or a list of formats to write. If None, the format will be determined from the file extension. **TYPE:** \`FIG_FORMAT |
+| `fmt`         | The format of the figure, or a list of formats to write. If None, the format will be determined from the file extension. **TYPE:** \`FIG_FORMAT |
 | `transparent` | Whether to make the background transparent. **TYPE:** `bool` **DEFAULT:** `False`                                                               |
+| `format`      | Deprecated; use fmt. **TYPE:** \`FIG_FORMAT                                                                                                     |
 
 | RETURNS     | DESCRIPTION                                             |
 | ----------- | ------------------------------------------------------- |
 | `list[str]` | The paths written, in the order the formats were given. |
 
-| RAISES       | DESCRIPTION                 |
-| ------------ | --------------------------- |
-| `ValueError` | If format is an empty list. |
+| RAISES       | DESCRIPTION                                                 |
+| ------------ | ----------------------------------------------------------- |
+| `ValueError` | If fmt is an empty list, or both fmt and format are passed. |

@@ -21,9 +21,9 @@ One `config` instance holds the style every chart is drawn with. Its methods cha
 | I want to…                                  | Call                                                         | See                                                                                                  |
 | ------------------------------------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
 | switch the look of every chart              | `config.set_theme(THEME.INK)`                                | [set_theme](#datachart.config.Config.set_theme)                                                      |
-| change a few attributes on top of the theme | `config.update_config({"font_general_size": 12})`            | [update_config](#datachart.config.Config.update_config)                                              |
+| change a few attributes on top of the theme | `config.update({"font_general_size": 12})`                   | [update](#datachart.config.Config.update)                                                            |
 | change the look for one block of code       | `with config.override(...)`, `with config.using_theme(...)`  | [override](#datachart.config.Config.override), [using_theme](#datachart.config.Config.using_theme)   |
-| go back to the default theme                | `config.reset_config()`                                      | [reset_config](#datachart.config.Config.reset_config)                                                |
+| go back to the default theme                | `config.reset()`                                             | [reset](#datachart.config.Config.reset)                                                              |
 | add a theme of my own                       | `config.register_theme(name, theme)`, then `set_theme(name)` | [register_theme](#datachart.config.Config.register_theme)                                            |
 | see which names `set_theme` accepts         | `config.list_themes()`                                       | [list_themes](#datachart.config.Config.list_themes)                                                  |
 | share a theme as a file                     | `config.save_theme(path)`, `config.load_theme(path)`         | [save_theme](#datachart.config.Config.save_theme), [load_theme](#datachart.config.Config.load_theme) |
@@ -55,8 +55,8 @@ The class representing the configuration options.
 | METHOD           | DESCRIPTION                                                   |
 | ---------------- | ------------------------------------------------------------- |
 | `set_theme`      | Set the global configuration to match the theme.              |
-| `reset_config`   | Resets the global configuration.                              |
-| `update_config`  | Updates the global configuration.                             |
+| `reset`          | Resets the global configuration.                              |
+| `update`         | Updates the global configuration.                             |
 | `override`       | Applies attribute overrides for the duration of a with block. |
 | `using_theme`    | Applies a theme for the duration of a with block.             |
 | `register_theme` | Registers a custom theme for use with set_theme.              |
@@ -68,12 +68,12 @@ The class representing the configuration options.
 #### set_theme
 
 ```
-set_theme(theme: THEME) -> None
+set_theme(theme: THEME | str) -> None
 ```
 
 Sets the global configuration to match the theme.
 
-Replaces the whole style configuration with a deep copy of the theme: one of the THEME constants or a name registered with `register_theme`. Use it to switch the look of every chart rendered afterwards; call `update_config` on top for per-attribute tweaks.
+Replaces the whole style configuration with a deep copy of the theme: one of the THEME constants or a name registered with `register_theme`. Use it to switch the look of every chart rendered afterwards; call `update` on top for per-attribute tweaks.
 
 Examples:
 
@@ -87,7 +87,7 @@ Examples:
 
 | PARAMETER | DESCRIPTION                            |
 | --------- | -------------------------------------- |
-| `theme`   | The theme to be set. **TYPE:** `THEME` |
+| `theme`   | The theme to be set. **TYPE:** \`THEME |
 
 #### register_theme
 
@@ -119,24 +119,55 @@ Examples:
 | ------------ | ------------------------------------------------------------------ |
 | `ValueError` | If name is a predefined theme or theme holds an unknown attribute. |
 
+#### reset
+
+```
+reset() -> None
+```
+
+Resets the global configuration.
+
+Restores the default theme, discarding the current theme and every `update` override, and resets the active theme name to match. Use it to return to a known state, for example at the start of a notebook section or between tests.
+
+Examples:
+
+```
+>>> from datachart.config import config
+>>> config.reset()
+>>> config.theme
+'default'
+```
+
 #### reset_config
 
 ```
 reset_config() -> None
 ```
 
-Resets the global configuration.
+Deprecated: use `reset`, which it forwards to.
 
-Restores the default theme, discarding the current theme and every `update_config` override, and resets the active theme name to match. Use it to return to a known state, for example at the start of a notebook section or between tests.
+#### update
+
+```
+update(config: StyleAttrs) -> None
+```
+
+Updates the global configuration.
+
+Overrides individual style attributes on top of the current theme; the change persists until the next `set_theme` or `reset`. Use it for global tweaks such as font family or default colors; the values are copied, and unknown attribute names are skipped with a warning.
 
 Examples:
 
 ```
 >>> from datachart.config import config
->>> config.reset_config()
->>> config.theme
-'default'
+>>> config.update({"font_general_color": "#FFFFFF"})
+>>> config.get("font_general_color")
+'#FFFFFF'
 ```
+
+| PARAMETER | DESCRIPTION                                                        |
+| --------- | ------------------------------------------------------------------ |
+| `config`  | The configuration attributes to be updated. **TYPE:** `StyleAttrs` |
 
 #### update_config
 
@@ -144,18 +175,7 @@ Examples:
 update_config(config: StyleAttrs) -> None
 ```
 
-Updates the global configuration.
-
-Overrides individual style attributes on top of the current theme; the change persists until the next `set_theme` or `reset_config`. Use it for global tweaks such as font family or default colors; the values are copied, and unknown attribute names are skipped with a warning.
-
-Examples:
-
-```
->>> from datachart.config import config
->>> config.update_config({"font_general_color": "#FFFFFF"})
->>> config.get("font_general_color")
-'#FFFFFF'
-```
+Deprecated: use `update`; it applies the attributes the same way.
 
 | PARAMETER | DESCRIPTION                                                        |
 | --------- | ------------------------------------------------------------------ |
@@ -167,7 +187,7 @@ Examples:
 _update(config: StyleAttrs, stacklevel: int) -> None
 ```
 
-`update_config`, warning at `stacklevel` counted from the caller.
+`update`, warning at `stacklevel` counted from the caller.
 
 #### \_scope
 
@@ -187,7 +207,7 @@ override(
 
 Applies style overrides for the duration of a `with` block.
 
-On entry the attributes are applied the way `update_config` applies them; on exit the configuration that entered the block is restored, also when the block raises. Any `set_theme` or `update_config` performed inside the block is discarded at exit. Use it for a one-off figure that needs a different font or palette without touching the global state. The scope is plain save-and-restore on the global configuration: it is neither thread-safe nor async-safe.
+On entry the attributes are applied the way `update` applies them; on exit the configuration that entered the block is restored, also when the block raises. Any `set_theme` or `update` performed inside the block is discarded at exit. Use it for a one-off figure that needs a different font or palette without touching the global state. The scope is plain save-and-restore on the global configuration: it is neither thread-safe nor async-safe.
 
 Examples:
 
@@ -208,12 +228,12 @@ Examples:
 #### using_theme
 
 ```
-using_theme(theme: THEME) -> Iterator[None]
+using_theme(theme: THEME | str) -> Iterator[None]
 ```
 
 Applies a theme for the duration of a `with` block.
 
-On entry the theme is applied the way `set_theme` applies it; on exit both the configuration and the active theme name that entered the block are restored, also when the block raises. Any `set_theme` or `update_config` performed inside the block is discarded at exit. The scope is plain save-and-restore on the global configuration: it is neither thread-safe nor async-safe.
+On entry the theme is applied the way `set_theme` applies it; on exit both the configuration and the active theme name that entered the block are restored, also when the block raises. Any `set_theme` or `update` performed inside the block is discarded at exit. The scope is plain save-and-restore on the global configuration: it is neither thread-safe nor async-safe.
 
 Examples:
 
@@ -229,7 +249,7 @@ Examples:
 
 | PARAMETER | DESCRIPTION                                                                            |
 | --------- | -------------------------------------------------------------------------------------- |
-| `theme`   | The theme to apply: one of the THEME constants or a registered name. **TYPE:** `THEME` |
+| `theme`   | The theme to apply: one of the THEME constants or a registered name. **TYPE:** \`THEME |
 
 #### list_themes
 
@@ -263,13 +283,13 @@ save_theme(
 
 Writes a theme file.
 
-With no name the live configuration is saved, so a look assembled with `update_config` can be shared or committed directly; the file is named after its stem. With a name that registered theme is saved instead. The file is JSON and carries only the attributes that differ from the default theme, so it stays short and reviewable; load it back with `load_theme`. The parent directory must exist.
+With no name the live configuration is saved, so a look assembled with `update` can be shared or committed directly; the file is named after its stem. With a name that registered theme is saved instead. The file is JSON and carries only the attributes that differ from the default theme, so it stays short and reviewable; load it back with `load_theme`. The parent directory must exist.
 
 Examples:
 
 ```
 >>> from datachart.config import config
->>> config.update_config({"font_general_size": 14})
+>>> config.update({"font_general_size": 14})
 >>> config.save_theme("house.json")
 >>> config.save_theme("ink.json", name="ink")
 ```

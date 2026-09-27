@@ -560,7 +560,7 @@ figure = HexbinChart(
     figsize=FIG_SIZE.FULL_SHORT,
 )
 
-config.reset_config()
+config.reset()
 figure.show()
 ```
 

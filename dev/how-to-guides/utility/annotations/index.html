@@ -5570,7 +5570,7 @@ LineChart(
 </tr>
 <tr>
 <td style="text-align:left">change the defaults of every annotation</td>
-<td style="text-align:left"><code>config.update_config</code> with the <code>plot_text_*</code> keys</td>
+<td style="text-align:left"><code>config.update</code> with the <code>plot_text_*</code> keys</td>
 <td style="text-align:left"><a href="#text-configuration">Text Configuration</a></td>
 </tr>
 <tr>
@@ -6552,7 +6552,7 @@ except ValueError as error:
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="text-configuration">Text Configuration<a class="anchor-link" href="#text-configuration">¶</a></h2><p>The defaults every annotation falls back on (the font, the box face and edge, the connector look and color) are part of the global configuration, under the keys that start with <code>plot_text_</code>. Every predefined theme sets them to match its own look, and they are changed like any other setting, through <a href="../../../references/config/#datachart.config.Config.update_config">datachart.config.config.update_config</a>; see the <a href="../../styling/themes/">Themes</a> guide for the configuration system as a whole. The current keys and their values in the active theme are:</p>
+<h2 id="text-configuration">Text Configuration<a class="anchor-link" href="#text-configuration">¶</a></h2><p>The defaults every annotation falls back on (the font, the box face and edge, the connector look and color) are part of the global configuration, under the keys that start with <code>plot_text_</code>. Every predefined theme sets them to match its own look, and they are changed like any other setting, through <a href="../../../references/config/#datachart.config.Config.update">datachart.config.config.update</a>; see the <a href="../../styling/themes/">Themes</a> guide for the configuration system as a whole. The current keys and their values in the active theme are:</p>
 </div>
 </div>
 </div>
@@ -6644,7 +6644,7 @@ except ValueError as error:
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">config</span><span class="o">.</span><span class="n">update_config</span><span class="p">(</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
     <span class="p">{</span>
         <span class="c1"># arrowheads and boxless notes for every annotation</span>
         <span class="s2">"plot_text_arrow_style"</span><span class="p">:</span> <span class="n">ARROW_STYLE</span><span class="o">.</span><span class="n">ARROW</span><span class="p">,</span>
@@ -6664,9 +6664,9 @@ except ValueError as error:
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
 <span class="c1"># restore the defaults for the rest of the guide</span>
-<span class="n">config</span><span class="o">.</span><span class="n">reset_config</span><span class="p">()</span>
+<span class="n">config</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-15">config.update_config(
+<div class="clipboard-copy-txt" id="cell-15">config.update(
     {
         # arrowheads and boxless notes for every annotation
         "plot_text_arrow_style": ARROW_STYLE.ARROW,
@@ -6686,7 +6686,7 @@ LineChart(
 ).show()
 
 # restore the defaults for the rest of the guide
-config.reset_config()</div>
+config.reset()</div>
 </div>
 </div>
 </div>

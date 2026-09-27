@@ -351,7 +351,7 @@ figure = Treemap(
     title="World population by continent and country, 2024 (millions)",
     figsize=FIG_SIZE.FULL_MEDIUM,
 )
-config.reset_config()
+config.reset()
 figure.show()
 ```
 

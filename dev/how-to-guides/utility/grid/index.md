@@ -63,6 +63,7 @@ Every customization is either a keyword argument of `Grid` or the shape of the l
 | set the rows myself                   | nested rows                        | [Nested rows](#nested-rows)                                                                             |
 | leave a cell blank                    | `None` in a row                    | [Blank cells](#blank-cells)                                                                             |
 | compare the cells on one scale        | `sharex`, `sharey`                 | [Sharing axes](#sharing-axes)                                                                           |
+| put every cell on a log axis          | `scalex`, `scaley`                 | [Sharing axes](#sharing-axes)                                                                           |
 | span a figure across rows or columns  | per-figure `"layout_spec"`         | [Irregular layouts](#irregular-layouts)                                                                 |
 | use a grid or a panel as one cell     | nest `Grid` and `Panel` figures    | [Nesting grids and panels](#nesting-grids-and-panels)                                                   |
 | put a chart with subplots in one cell | a chart drawn with `subplots=True` | [Subplot figures](#subplot-figures)                                                                     |
@@ -159,7 +160,7 @@ Grid(
 ).show()
 ```
 
-`sharex` and `sharey` put every cell on one x or y scale. Sharing is honest when the cells hold the same quantity in the same units, as here; sharing a scale between a temperature and a precipitation would squeeze one of them flat and invite a comparison that means nothing. In an automatic (flat-list) grid, shared axes are also labeled only once per row or column, which declutters the cells. With a shared y-axis the three climates separate at a glance:
+`sharex` and `sharey` put every cell on one x or y scale. Sharing is honest when the cells hold the same quantity in the same units, as here; sharing a scale between a temperature and a precipitation would squeeze one of them flat and invite a comparison that means nothing. In an automatic (flat-list) grid, shared axes are also labeled only once per row or column, which declutters the cells. `scalex` and `scaley` set one axis scale for every cell the same way, `scaley="log"` for values that span orders of magnitude; a log axis raises on a cell holding zero or a negative value. With a shared y-axis the three climates separate at a glance:
 
 ```
 Grid(

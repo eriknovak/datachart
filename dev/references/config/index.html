@@ -4035,10 +4035,32 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#datachart.config.Config.reset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;reset
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#datachart.config.Config.reset_config" class="md-nav__link">
     <span class="md-ellipsis">
       
         <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;reset_config
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#datachart.config.Config.update" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;update
       
     </span>
   </a>
@@ -4469,10 +4491,32 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#datachart.config.Config.reset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;reset
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#datachart.config.Config.reset_config" class="md-nav__link">
     <span class="md-ellipsis">
       
         <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;reset_config
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#datachart.config.Config.update" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;update
       
     </span>
   </a>
@@ -4725,8 +4769,8 @@ to globally customize the chart and plot styles.</p>
 </tr>
 <tr>
 <td style="text-align: left;">change a few attributes on top of the theme</td>
-<td style="text-align: left;"><code>config.update_config({"font_general_size": 12})</code></td>
-<td style="text-align: left;"><a href="#datachart.config.Config.update_config">update_config</a></td>
+<td style="text-align: left;"><code>config.update({"font_general_size": 12})</code></td>
+<td style="text-align: left;"><a href="#datachart.config.Config.update">update</a></td>
 </tr>
 <tr>
 <td style="text-align: left;">change the look for one block of code</td>
@@ -4735,8 +4779,8 @@ to globally customize the chart and plot styles.</p>
 </tr>
 <tr>
 <td style="text-align: left;">go back to the default theme</td>
-<td style="text-align: left;"><code>config.reset_config()</code></td>
-<td style="text-align: left;"><a href="#datachart.config.Config.reset_config">reset_config</a></td>
+<td style="text-align: left;"><code>config.reset()</code></td>
+<td style="text-align: left;"><a href="#datachart.config.Config.reset">reset</a></td>
 </tr>
 <tr>
 <td style="text-align: left;">add a theme of my own</td>
@@ -4860,7 +4904,7 @@ to globally customize the chart and plot styles.</p>
               </td>
             </tr>
             <tr class="doc-section-item">
-              <td><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-method&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-function-name&quot;&gt;reset_config&lt;/span&gt; (&lt;code&gt;datachart.config.Config.reset_config&lt;/code&gt;)" href="#datachart.config.Config.reset_config">reset_config</a></code></td>
+              <td><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-method&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-function-name&quot;&gt;reset&lt;/span&gt; (&lt;code&gt;datachart.config.Config.reset&lt;/code&gt;)" href="#datachart.config.Config.reset">reset</a></code></td>
               <td class="doc-function-details">
                 <div class="doc-md-description">
                   <p>Resets the global configuration.</p>
@@ -4868,7 +4912,7 @@ to globally customize the chart and plot styles.</p>
               </td>
             </tr>
             <tr class="doc-section-item">
-              <td><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-method&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-function-name&quot;&gt;update_config&lt;/span&gt; (&lt;code&gt;datachart.config.Config.update_config&lt;/code&gt;)" href="#datachart.config.Config.update_config">update_config</a></code></td>
+              <td><code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-method&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-function-name&quot;&gt;update&lt;/span&gt; (&lt;code&gt;datachart.config.Config.update&lt;/code&gt;)" href="#datachart.config.Config.update">update</a></code></td>
               <td class="doc-function-details">
                 <div class="doc-md-description">
                   <p>Updates the global configuration.</p>
@@ -4963,7 +5007,7 @@ to globally customize the chart and plot styles.</p>
 
 
 </h4>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">set_theme</span><span class="p">(</span><span class="n">theme</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.THEME&lt;/span&gt;" href="../constants/#datachart.constants.THEME">THEME</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">set_theme</span><span class="p">(</span><span class="n">theme</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.THEME&lt;/span&gt;" href="../constants/#datachart.constants.THEME">THEME</a></span> <span class="o">|</span> <span class="n"><span title="str">str</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -4972,7 +5016,7 @@ to globally customize the chart and plot styles.</p>
 <p>Replaces the whole style configuration with a deep copy of the theme: one of the
 <a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.THEME&lt;/span&gt;" href="../constants/#datachart.constants.THEME"><code>THEME</code></a> constants or a name registered with
 <code>register_theme</code>. Use it to switch the look of every chart rendered afterwards;
-call <code>update_config</code> on top for per-attribute tweaks.</p>
+call <code>update</code> on top for per-attribute tweaks.</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -5003,7 +5047,7 @@ call <code>update_config</code> on top for per-attribute tweaks.</p>
               <p>
                   <span class="doc-param-annotation">
                     <b>TYPE:</b>
-                      <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.THEME&lt;/span&gt;" href="../constants/#datachart.constants.THEME">THEME</a></code>
+                      <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.THEME&lt;/span&gt;" href="../constants/#datachart.constants.THEME">THEME</a> | <span title="str">str</span></code>
                   </span>
               </p>
             </td>
@@ -5122,6 +5166,38 @@ unknown attribute.</p>
 <div class="doc doc-object doc-function">
 
 
+<h4 id="datachart.config.Config.reset" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">reset</span>
+
+
+</h4>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">reset</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Resets the global configuration.</p>
+<p>Restores the default theme, discarding the current theme and every
+<code>update</code> override, and resets the active theme name to match.
+Use it to return to a known state, for example at the start of a
+notebook section or between tests.</p>
+
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">config</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">config</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">config</span><span class="o">.</span><span class="n">theme</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="go">'default'</span>
+</code></pre></div>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
 <h4 id="datachart.config.Config.reset_config" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">reset_config</span>
 
@@ -5132,19 +5208,67 @@ unknown attribute.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Resets the global configuration.</p>
-<p>Restores the default theme, discarding the current theme and every
-<code>update_config</code> override, and resets the active theme name to match.
-Use it to return to a known state, for example at the start of a
-notebook section or between tests.</p>
+        <p>Deprecated: use <code>reset</code>, which it forwards to.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="datachart.config.Config.update" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">update</span>
+
+
+</h4>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">update</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.StyleAttrs&lt;/span&gt;" href="../typings/#datachart.typings.StyleAttrs">StyleAttrs</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Updates the global configuration.</p>
+<p>Overrides individual style attributes on top of the current theme; the
+change persists until the next <code>set_theme</code> or <code>reset</code>. Use it for
+global tweaks such as font family or default colors; the values are
+copied, and unknown attribute names are skipped with a warning.</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">config</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">config</span><span class="o">.</span><span class="n">reset_config</span><span class="p">()</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">config</span><span class="o">.</span><span class="n">theme</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="go">'default'</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">"font_general_color"</span><span class="p">:</span> <span class="s2">"#FFFFFF"</span><span class="p">})</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"font_general_color"</span><span class="p">)</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="go">'#FFFFFF'</span>
 </code></pre></div>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>config</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>The configuration attributes to be updated.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.StyleAttrs&lt;/span&gt;" href="../typings/#datachart.typings.StyleAttrs">StyleAttrs</a></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
     </div>
@@ -5164,19 +5288,7 @@ notebook section or between tests.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Updates the global configuration.</p>
-<p>Overrides individual style attributes on top of the current theme; the
-change persists until the next <code>set_theme</code> or <code>reset_config</code>. Use it for
-global tweaks such as font family or default colors; the values are
-copied, and unknown attribute names are skipped with a warning.</p>
-
-
-<p><span class="doc-section-title">Examples:</span></p>
-    <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">config</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">config</span><span class="o">.</span><span class="n">update_config</span><span class="p">({</span><span class="s2">"font_general_color"</span><span class="p">:</span> <span class="s2">"#FFFFFF"</span><span class="p">})</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"font_general_color"</span><span class="p">)</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="go">'#FFFFFF'</span>
-</code></pre></div>
+        <p>Deprecated: use <code>update</code>; it applies the attributes the same way.</p>
 
 
 <table>
@@ -5224,7 +5336,7 @@ copied, and unknown attribute names are skipped with a warning.</p>
 
     <div class="doc doc-contents ">
 
-        <p><code>update_config</code>, warning at <code>stacklevel</code> counted from the caller.</p>
+        <p><code>update</code>, warning at <code>stacklevel</code> counted from the caller.</p>
 
 
     </div>
@@ -5267,9 +5379,9 @@ copied, and unknown attribute names are skipped with a warning.</p>
     <div class="doc doc-contents ">
 
         <p>Applies style overrides for the duration of a <code>with</code> block.</p>
-<p>On entry the attributes are applied the way <code>update_config</code> applies
+<p>On entry the attributes are applied the way <code>update</code> applies
 them; on exit the configuration that entered the block is restored,
-also when the block raises. Any <code>set_theme</code> or <code>update_config</code> performed
+also when the block raises. Any <code>set_theme</code> or <code>update</code> performed
 inside the block is discarded at exit. Use it for a one-off figure that
 needs a different font or palette without touching the global state.
 The scope is plain save-and-restore on the global configuration: it is
@@ -5350,7 +5462,7 @@ neither thread-safe nor async-safe.</p>
 
 
 </h4>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">using_theme</span><span class="p">(</span><span class="n">theme</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.THEME&lt;/span&gt;" href="../constants/#datachart.constants.THEME">THEME</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="typing.Iterator">Iterator</span></span><span class="p">[</span><span class="kc">None</span><span class="p">]</span>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">using_theme</span><span class="p">(</span><span class="n">theme</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.THEME&lt;/span&gt;" href="../constants/#datachart.constants.THEME">THEME</a></span> <span class="o">|</span> <span class="n"><span title="str">str</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="typing.Iterator">Iterator</span></span><span class="p">[</span><span class="kc">None</span><span class="p">]</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -5359,7 +5471,7 @@ neither thread-safe nor async-safe.</p>
 <p>On entry the theme is applied the way <code>set_theme</code> applies it; on exit
 both the configuration and the active theme name that entered the
 block are restored, also when the block raises. Any <code>set_theme</code> or
-<code>update_config</code> performed inside the block is discarded at exit. The
+<code>update</code> performed inside the block is discarded at exit. The
 scope is plain save-and-restore on the global configuration: it is
 neither thread-safe nor async-safe.</p>
 
@@ -5395,7 +5507,7 @@ constants or a registered name.</p>
               <p>
                   <span class="doc-param-annotation">
                     <b>TYPE:</b>
-                      <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.THEME&lt;/span&gt;" href="../constants/#datachart.constants.THEME">THEME</a></code>
+                      <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.THEME&lt;/span&gt;" href="../constants/#datachart.constants.THEME">THEME</a> | <span title="str">str</span></code>
                   </span>
               </p>
             </td>
@@ -5478,7 +5590,7 @@ name added with <code>register_theme</code> or <code>load_theme</code> in regist
 
         <p>Writes a theme file.</p>
 <p>With no name the live configuration is saved, so a look assembled
-with <code>update_config</code> can be shared or committed directly; the file is
+with <code>update</code> can be shared or committed directly; the file is
 named after its stem. With a name that registered theme is saved
 instead. The file is JSON and carries only the attributes that differ
 from the default theme, so it stays short and reviewable; load it back
@@ -5487,7 +5599,7 @@ with <code>load_theme</code>. The parent directory must exist.</p>
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">config</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">config</span><span class="o">.</span><span class="n">update_config</span><span class="p">({</span><span class="s2">"font_general_size"</span><span class="p">:</span> <span class="mi">14</span><span class="p">})</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">"font_general_size"</span><span class="p">:</span> <span class="mi">14</span><span class="p">})</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">config</span><span class="o">.</span><span class="n">save_theme</span><span class="p">(</span><span class="s2">"house.json"</span><span class="p">)</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">config</span><span class="o">.</span><span class="n">save_theme</span><span class="p">(</span><span class="s2">"ink.json"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"ink"</span><span class="p">)</span>
 </code></pre></div>

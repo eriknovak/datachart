@@ -6531,9 +6531,9 @@ Treemap(
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>/home/runner/work/datachart/datachart/datachart/utils/_internal/layers.py:9677: UserWarning: 9 groups, but the palette has 6 colors, so colors repeat. Mute the rest with `emphasis`, split them into subplots, or set a longer palette.
+<pre>/home/runner/work/datachart/datachart/datachart/utils/_internal/layers.py:9674: UserWarning: 9 groups, but the palette has 6 colors, so colors repeat. Mute the rest with `emphasis`, split them into subplots, or set a longer palette.
   cycle = create_color_cycle(
-/home/runner/work/datachart/datachart/datachart/utils/_internal/layers.py:9677: UserWarning: 8 groups, but the palette has 6 colors, so colors repeat. Mute the rest with `emphasis`, split them into subplots, or set a longer palette.
+/home/runner/work/datachart/datachart/datachart/utils/_internal/layers.py:9674: UserWarning: 8 groups, but the palette has 6 colors, so colors repeat. Mute the rest with `emphasis`, split them into subplots, or set a longer palette.
   cycle = create_color_cycle(
 </pre>
 </div>
@@ -6676,7 +6676,7 @@ Grid([[tiles, totals]], title="World population by continent, 2024", figsize=FIG
     <span class="n">title</span><span class="o">=</span><span class="s2">"World population by continent and country, 2024 (millions)"</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_MEDIUM</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">config</span><span class="o">.</span><span class="n">reset_config</span><span class="p">()</span>
+<span class="n">config</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
 <span class="n">figure</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-16">from datachart.config import config
@@ -6689,7 +6689,7 @@ figure = Treemap(
     title="World population by continent and country, 2024 (millions)",
     figsize=FIG_SIZE.FULL_MEDIUM,
 )
-config.reset_config()
+config.reset()
 figure.show()</div>
 </div>
 </div>

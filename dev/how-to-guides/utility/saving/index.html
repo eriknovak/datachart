@@ -4438,12 +4438,12 @@
 <tbody>
 <tr>
 <td style="text-align: left;">put the figure in a paper or a printed report</td>
-<td style="text-align: left;"><code>format=FIG_FORMAT.PDF</code> or <code>.svg</code></td>
+<td style="text-align: left;"><code>fmt=FIG_FORMAT.PDF</code> or <code>.svg</code></td>
 <td style="text-align: left;"><a href="#vector-or-raster">Vector or raster</a></td>
 </tr>
 <tr>
 <td style="text-align: left;">upload it where only images are accepted</td>
-<td style="text-align: left;"><code>format=FIG_FORMAT.PNG</code>, <code>dpi=300</code> or higher</td>
+<td style="text-align: left;"><code>fmt=FIG_FORMAT.PNG</code>, <code>dpi=300</code> or higher</td>
 <td style="text-align: left;"><a href="#vector-or-raster">Vector or raster</a></td>
 </tr>
 <tr>
@@ -4453,7 +4453,7 @@
 </tr>
 <tr>
 <td style="text-align: left;">write a PDF and a PNG of the same figure</td>
-<td style="text-align: left;"><code>format=[FIG_FORMAT.PDF, FIG_FORMAT.PNG]</code></td>
+<td style="text-align: left;"><code>fmt=[FIG_FORMAT.PDF, FIG_FORMAT.PNG]</code></td>
 <td style="text-align: left;"><a href="#several-formats-at-once">Several formats at once</a></td>
 </tr>
 <tr>
@@ -4473,7 +4473,7 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">FIG_FORMAT</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">save_figure</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="s2">"chart.pdf"</span><span class="p">)</span>                       <span class="c1"># vector, from the extension</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">save_figure</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="s2">"chart"</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">FIG_FORMAT</span><span class="o">.</span><span class="n">PNG</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>  <span class="c1"># raster, at 600 dots per inch</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">save_figure</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="s2">"chart"</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="n">FIG_FORMAT</span><span class="o">.</span><span class="n">PNG</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>  <span class="c1"># raster, at 600 dots per inch</span>
 </code></pre></div>
 <h3 id="transparent-background">Transparent background</h3>
 <p><em>What is behind the figure?</em> By default the figure has the theme's background color, which is right on a white page and wrong on a colored slide, a dark web page, or a poster: the chart arrives in a white rectangle. <code>transparent=True</code> drops the figure background, so the chart sits on whatever is behind it.</p>
@@ -4482,7 +4482,7 @@
 <p>Text and marks keep their own colors, so a transparent figure meant for a dark background needs a theme with light text; the <a href="../../styling/themes/">Themes</a> guide shows how to set one before the chart is drawn.</p>
 <h3 id="several-formats-at-once">Several formats at once</h3>
 <p><em>Who else needs this figure?</em> A figure is often needed more than once: a PDF for the manuscript, a PNG for the preview, an SVG for the slides. Pass a list of formats and the same figure is written once per format.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">save_figure</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="s2">"figures/growth"</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="p">[</span><span class="n">FIG_FORMAT</span><span class="o">.</span><span class="n">PDF</span><span class="p">,</span> <span class="n">FIG_FORMAT</span><span class="o">.</span><span class="n">PNG</span><span class="p">])</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">paths</span> <span class="o">=</span> <span class="n">save_figure</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="s2">"figures/growth"</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="p">[</span><span class="n">FIG_FORMAT</span><span class="o">.</span><span class="n">PDF</span><span class="p">,</span> <span class="n">FIG_FORMAT</span><span class="o">.</span><span class="n">PNG</span><span class="p">])</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="c1"># ["figures/growth.pdf", "figures/growth.png"]</span>
 </code></pre></div>
 <p>With a list, the path is a stem rather than a file name, and each format is appended to it. An extension on the stem is dropped when it names a supported format, so <code>figures/growth.png</code> and <code>figures/growth</code> behave the same; a dotted name such as <code>figures/growth.v2</code> keeps every part of itself and yields <code>figures/growth.v2.pdf</code>.</p>
@@ -4532,7 +4532,7 @@
 <a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a>
 <a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a><span class="n">written</span> <span class="o">=</span> <span class="p">[]</span>
 <a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a><span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">figure</span> <span class="ow">in</span> <span class="n">figures</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a>    <span class="n">written</span> <span class="o">+=</span> <span class="n">save_figure</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">out</span> <span class="o">/</span> <span class="n">name</span><span class="p">),</span> <span class="nb">format</span><span class="o">=</span><span class="p">[</span><span class="n">FIG_FORMAT</span><span class="o">.</span><span class="n">PDF</span><span class="p">,</span> <span class="n">FIG_FORMAT</span><span class="o">.</span><span class="n">PNG</span><span class="p">],</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
+<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a>    <span class="n">written</span> <span class="o">+=</span> <span class="n">save_figure</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="n">out</span> <span class="o">/</span> <span class="n">name</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="p">[</span><span class="n">FIG_FORMAT</span><span class="o">.</span><span class="n">PDF</span><span class="p">,</span> <span class="n">FIG_FORMAT</span><span class="o">.</span><span class="n">PNG</span><span class="p">],</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
 <a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a>
 <a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a><span class="n">written</span>
 <a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a><span class="c1"># ["manuscript/figures/fig1_growth.pdf", "manuscript/figures/fig1_growth.png", ...]</span>
@@ -4553,7 +4553,7 @@
 <a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="p">)</span>
 <a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="n">save_figure</span><span class="p">(</span><span class="n">figure</span><span class="p">,</span> <span class="s2">"deck/revenue.png"</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div>
-<p>Insert the PNG at full slide width and it lands pixel for pixel, with no resizing and no white frame. For a deck that will also be printed as a handout, add <code>FIG_FORMAT.PDF</code> to a <code>format</code> list in the same call.</p>
+<p>Insert the PNG at full slide width and it lands pixel for pixel, with no resizing and no white frame. For a deck that will also be printed as a handout, add <code>FIG_FORMAT.PDF</code> to an <code>fmt</code> list in the same call.</p>
 <h3 id="example-3-a-chart-on-a-documentation-page-svg-transparent-in-an-image-tag">Example 3: A Chart on a Documentation Page (SVG, Transparent, in an Image Tag)</h3>
 <p>A documentation site is read on phones and high-density laptop screens, in light and dark mode. The one export that serves all of them is a transparent SVG: it stays sharp at any density, scales with the page layout, and shows the page's own background in either color scheme. Draw the figure at the page's content width, save it next to the page, and reference it from an image tag with an <code>alt</code> text that says what the chart shows, so the page reads without it too.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.charts</span><span class="w"> </span><span class="kn">import</span> <span class="n">LineChart</span>

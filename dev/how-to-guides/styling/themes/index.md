@@ -2,15 +2,15 @@
 
 A theme is the complete set of style attributes the charts read when they are built: the palettes, the fonts, the axes furniture, and the per-chart defaults, one value per key of [StyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.StyleAttrs). The package ships fourteen predefined themes, each named for its visual trait; the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md) shows their color swatches and signature charts, grouped by use. Themes are applied and built through the global [config](https://eriknovak.github.io/datachart/dev/references/config/index.md) instance:
 
-| Task                                     | Method                                     | Section                                                               |
-| ---------------------------------------- | ------------------------------------------ | --------------------------------------------------------------------- |
-| Switch the look of every chart           | `set_theme`, `list_themes`                 | [Applying a Theme](#applying-a-theme)                                 |
-| Switch it for one block only             | `using_theme`                              | [Applying a Theme](#applying-a-theme)                                 |
-| Read and change single attributes        | `config[...]`, `update_config`, `override` | [What a Theme Controls](#what-a-theme-controls)                       |
-| Make your own theme switchable by name   | `register_theme`                           | [Building Your Own Theme](#building-your-own-theme)                   |
-| Recolour a theme from a colormap         | `derive_theme`                             | [Deriving a Theme from a Colormap](#deriving-a-theme-from-a-colormap) |
-| Share a theme as a file and load it back | `save_theme`, `load_theme`                 | [Sharing a Theme](#sharing-a-theme)                                   |
-| Return to the default theme              | `reset_config`                             | [Applying a Theme](#applying-a-theme)                                 |
+| Task                                     | Method                              | Section                                                               |
+| ---------------------------------------- | ----------------------------------- | --------------------------------------------------------------------- |
+| Switch the look of every chart           | `set_theme`, `list_themes`          | [Applying a Theme](#applying-a-theme)                                 |
+| Switch it for one block only             | `using_theme`                       | [Applying a Theme](#applying-a-theme)                                 |
+| Read and change single attributes        | `config[...]`, `update`, `override` | [What a Theme Controls](#what-a-theme-controls)                       |
+| Make your own theme switchable by name   | `register_theme`                    | [Building Your Own Theme](#building-your-own-theme)                   |
+| Recolour a theme from a colormap         | `derive_theme`                      | [Deriving a Theme from a Colormap](#deriving-a-theme-from-a-colormap) |
+| Share a theme as a file and load it back | `save_theme`, `load_theme`          | [Sharing a Theme](#sharing-a-theme)                                   |
+| Return to the default theme              | `reset`                             | [Applying a Theme](#applying-a-theme)                                 |
 
 ```
 from datachart.config import config
@@ -43,10 +43,10 @@ with config.using_theme(THEME.INK):
 config.theme
 ```
 
-`reset_config` returns to the default theme, discarding every change made since:
+`reset` returns to the default theme, discarding every change made since:
 
 ```
-config.reset_config()
+config.reset()
 config.theme
 ```
 
@@ -78,10 +78,10 @@ config["color_general_multiple"], config.get("font_general_family")
 {key: value for key, value in config.config.items() if key.startswith("axes_")}
 ```
 
-`update_config` changes attributes on top of the active theme; the change persists until the next `set_theme` or `reset_config`, and unknown attribute names are skipped with a warning. `override` does the same for one `with` block, taking a dictionary or keyword arguments. Palette attributes also accept a single color, used for every series that asks for one.
+`update` changes attributes on top of the active theme; the change persists until the next `set_theme` or `reset`, and unknown attribute names are skipped with a warning. `override` does the same for one `with` block, taking a dictionary or keyword arguments. Palette attributes also accept a single color, used for every series that asks for one.
 
 ```
-config.update_config({"font_general_family": "serif", "plot_line_width": 3})
+config.update({"font_general_family": "serif", "plot_line_width": 3})
 demo().show()
 ```
 
@@ -89,7 +89,7 @@ demo().show()
 with config.override(color_general_multiple=["#0B3954", "#FF6663", "#E0FF4F"]):
     demo().show()
 
-config.reset_config()
+config.reset()
 ```
 
 ## Building Your Own Theme
@@ -157,7 +157,7 @@ with config.override(NEON):
 config.theme
 ```
 
-Register the dictionary under a name and it behaves like a predefined theme: it appears in `list_themes`, `set_theme` and `using_theme` apply it, and `update_config` tweaks on top of it, here lifting the axes off the ground with a lighter face:
+Register the dictionary under a name and it behaves like a predefined theme: it appears in `list_themes`, `set_theme` and `using_theme` apply it, and `update` tweaks on top of it, here lifting the axes off the ground with a lighter face:
 
 ```
 config.register_theme("neon", NEON)
@@ -166,7 +166,7 @@ config.list_themes()
 ```
 
 ```
-config.update_config({"axes_facecolor": "#131A2A"})
+config.update({"axes_facecolor": "#131A2A"})
 demo().show()
 ```
 
@@ -229,7 +229,7 @@ with config.override(derive_theme(THEME.MINIMAL, lead=COLORS.Contrast, traits=[T
 
 ## Sharing a Theme
 
-`save_theme` writes a theme file: a JSON document carrying a name, a format version, and only the attributes that differ from the default theme, so the file stays short and reviewable. A registered theme is saved by name; with no name the live configuration is saved, so a look assembled with `update_config` leaves the process too.
+`save_theme` writes a theme file: a JSON document carrying a name, a format version, and only the attributes that differ from the default theme, so the file stays short and reviewable. A registered theme is saved by name; with no name the live configuration is saved, so a look assembled with `update` leaves the process too.
 
 ```
 import tempfile
@@ -253,5 +253,5 @@ A companion package ships its themes the same way: it registers or loads them on
 Finally, reset the configuration back to the default theme:
 
 ```
-config.reset_config()
+config.reset()
 ```

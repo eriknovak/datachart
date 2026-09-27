@@ -33,7 +33,7 @@ The module is organised around the questions its functions answer. The table map
 | know where the values sit                              | `mean`, `median`, `mode`                                     | [Center](#center)                             |
 | know how far they spread                               | `stdev`, `variance`, `quantile`, `iqr`, `minimum`, `maximum` | [Spread](#spread)                             |
 | tell a skewed or heavy-tailed sample from a normal one | `skewness`, `kurtosis`                                       | [Shape](#shape)                               |
-| say how much two variables move together               | `correlation`, `spearman`                                    | [Association](#association)                   |
+| say how much two variables move together               | `pearson`, `spearman`                                        | [Association](#association)                   |
 | draw a trend line                                      | `linear_fit`                                                 | [Trend line](#trend-line)                     |
 | put an error bar on a mean                             | `bootstrap_ci`                                               | [Confidence intervals](#confidence-intervals) |
 | pick the bins of a histogram from the data             | `histogram`                                                  | [Binning](#binning)                           |
@@ -149,10 +149,10 @@ Histogram(
 
 ### Association
 
-*When one variable goes up, does the other?* `correlation` is Pearson's coefficient: the strength of a *straight-line* relationship, from -1 through 0 (none) to 1. `spearman` is the same coefficient computed on the ranks, so it measures any relationship that only goes one way (monotone), whether or not it is a straight line, and one outlier cannot move it much. When the two agree, the relationship is linear; when Spearman is clearly larger, the relationship bends or an outlier is dragging Pearson down. Flipper length and body mass:
+*When one variable goes up, does the other?* `pearson` is Pearson's coefficient: the strength of a *straight-line* relationship, from -1 through 0 (none) to 1. `spearman` is the same coefficient computed on the ranks, so it measures any relationship that only goes one way (monotone), whether or not it is a straight line, and one outlier cannot move it much. When the two agree, the relationship is linear; when Spearman is clearly larger, the relationship bends or an outlier is dragging Pearson down. Flipper length and body mass:
 
 ```
-stats.correlation(flipper, mass), stats.spearman(flipper, mass)
+stats.pearson(flipper, mass), stats.spearman(flipper, mass)
 ```
 
 A correlation belongs next to the scatter it summarises. The [Scatter Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/scatterchart/index.md) can print it by itself with `show_correlation`; computing it here instead lets the title carry both coefficients, and the per-species correlations show that the relationship holds *within* each species too, not only because the species differ in size:
@@ -166,11 +166,11 @@ ScatterChart(
         for species in SPECIES
     ],
     subtitle=[
-        f"{species} (r = {stats.correlation(flipper_by_species[species], mass_by_species[species]):.2f})"
+        f"{species} (r = {stats.pearson(flipper_by_species[species], mass_by_species[species]):.2f})"
         for species in SPECIES
     ],
     title=(
-        f"Flipper length against body mass: Pearson {stats.correlation(flipper, mass):.2f}, "
+        f"Flipper length against body mass: Pearson {stats.pearson(flipper, mass):.2f}, "
         f"Spearman {stats.spearman(flipper, mass):.2f}"
     ),
     xlabel="Flipper length (mm)",
@@ -322,7 +322,7 @@ LineChart(
 
 ### Density estimates
 
-*What does the distribution look like, without the bins?* A histogram's shape changes with its bin edges; a kernel density estimate smooths the same values into a curve that does not. `kde1d(values)` returns the curve as `{x, y}` points ready for a [Line Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/index.md); it integrates to 1, so it overlays a density [Histogram](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/histogram/index.md) of the same values on the same axis. Its `bandwidth` sets how smooth the curve is: a rule of [BANDWIDTH](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH) (Scott's by default) or a number, where smaller values follow the data more closely. `grid_size` is the number of points, and `cut` how many bandwidths the curve extends past the extremes (or `xlim` fixes the range, so several curves share one grid). One curve per species, with `show_area`, is the cleanest picture of the three flipper distributions:
+*What does the distribution look like, without the bins?* A histogram's shape changes with its bin edges; a kernel density estimate smooths the same values into a curve that does not. `kde1d(values)` returns the curve as `{x, y}` columns ready for a [Line Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/index.md); it integrates to 1, so it overlays a density [Histogram](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/histogram/index.md) of the same values on the same axis. Its `bandwidth` sets how smooth the curve is: a rule of [BANDWIDTH](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH) (Scott's by default) or a number, where smaller values follow the data more closely. `grid_size` is the number of points, and `cut` how many bandwidths the curve extends past the extremes (or `xlim` fixes the range, so several curves share one grid). One curve per species, with `show_area`, is the cleanest picture of the three flipper distributions:
 
 ```
 LineChart(

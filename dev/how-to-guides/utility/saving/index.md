@@ -27,14 +27,14 @@ The function returns the list of paths it wrote, here `["chart.png"]`. The paren
 
 The format, resolution and background are the three choices, and the destination decides each of them. The table maps the common destinations to the arguments that fit; the [FIG_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_FORMAT) constant lists every supported format.
 
-| I want to…                                    | Use                                          | See                                                                                                      |
-| --------------------------------------------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| put the figure in a paper or a printed report | `format=FIG_FORMAT.PDF` or `.svg`            | [Vector or raster](#vector-or-raster)                                                                    |
-| upload it where only images are accepted      | `format=FIG_FORMAT.PNG`, `dpi=300` or higher | [Vector or raster](#vector-or-raster)                                                                    |
-| lay it on a colored slide or page             | `transparent=True`                           | [Transparent background](#transparent-background)                                                        |
-| write a PDF and a PNG of the same figure      | `format=[FIG_FORMAT.PDF, FIG_FORMAT.PNG]`    | [Several formats at once](#several-formats-at-once)                                                      |
-| show it on a web page                         | SVG in an `<img>` tag, or inline             | [Embedding in web pages](#embedding-in-web-pages)                                                        |
-| size it for the destination before saving     | `figsize` on the chart function              | [FIG_SIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE) |
+| I want to…                                    | Use                                       | See                                                                                                      |
+| --------------------------------------------- | ----------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| put the figure in a paper or a printed report | `fmt=FIG_FORMAT.PDF` or `.svg`            | [Vector or raster](#vector-or-raster)                                                                    |
+| upload it where only images are accepted      | `fmt=FIG_FORMAT.PNG`, `dpi=300` or higher | [Vector or raster](#vector-or-raster)                                                                    |
+| lay it on a colored slide or page             | `transparent=True`                        | [Transparent background](#transparent-background)                                                        |
+| write a PDF and a PNG of the same figure      | `fmt=[FIG_FORMAT.PDF, FIG_FORMAT.PNG]`    | [Several formats at once](#several-formats-at-once)                                                      |
+| show it on a web page                         | SVG in an `<img>` tag, or inline          | [Embedding in web pages](#embedding-in-web-pages)                                                        |
+| size it for the destination before saving     | `figsize` on the chart function           | [FIG_SIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE) |
 
 ### Vector or raster
 
@@ -44,7 +44,7 @@ The format, resolution and background are the three choices, and the destination
 from datachart.constants import FIG_FORMAT
 
 save_figure(figure, "chart.pdf")                       # vector, from the extension
-save_figure(figure, "chart", format=FIG_FORMAT.PNG, dpi=600)  # raster, at 600 dots per inch
+save_figure(figure, "chart", fmt=FIG_FORMAT.PNG, dpi=600)  # raster, at 600 dots per inch
 ```
 
 ### Transparent background
@@ -62,7 +62,7 @@ Text and marks keep their own colors, so a transparent figure meant for a dark b
 *Who else needs this figure?* A figure is often needed more than once: a PDF for the manuscript, a PNG for the preview, an SVG for the slides. Pass a list of formats and the same figure is written once per format.
 
 ```
-paths = save_figure(figure, "figures/growth", format=[FIG_FORMAT.PDF, FIG_FORMAT.PNG])
+paths = save_figure(figure, "figures/growth", fmt=[FIG_FORMAT.PDF, FIG_FORMAT.PNG])
 # ["figures/growth.pdf", "figures/growth.png"]
 ```
 
@@ -128,7 +128,7 @@ out.mkdir(parents=True, exist_ok=True)
 
 written = []
 for name, figure in figures.items():
-    written += save_figure(figure, str(out / name), format=[FIG_FORMAT.PDF, FIG_FORMAT.PNG], dpi=600)
+    written += save_figure(figure, out / name, fmt=[FIG_FORMAT.PDF, FIG_FORMAT.PNG], dpi=600)
 
 written
 # ["manuscript/figures/fig1_growth.pdf", "manuscript/figures/fig1_growth.png", ...]
@@ -155,7 +155,7 @@ figure = BarChart(
 save_figure(figure, "deck/revenue.png", dpi=200, transparent=True)
 ```
 
-Insert the PNG at full slide width and it lands pixel for pixel, with no resizing and no white frame. For a deck that will also be printed as a handout, add `FIG_FORMAT.PDF` to a `format` list in the same call.
+Insert the PNG at full slide width and it lands pixel for pixel, with no resizing and no white frame. For a deck that will also be printed as a handout, add `FIG_FORMAT.PDF` to an `fmt` list in the same call.
 
 ### Example 3: A Chart on a Documentation Page (SVG, Transparent, in an Image Tag)
 

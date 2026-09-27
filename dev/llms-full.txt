@@ -195,7 +195,7 @@ any page as markdown by appending index.md to its URL).
   ScatterChart, Histogram, ...) that takes a list of series, each a list of
   dicts. Look up the dict keys and parameters of a chart in its guide before
   using it: https://eriknovak.github.io/datachart/latest/how-to-guides/charts/
-- Style is global: `config.set_theme(THEME.X)` and `config.update_config(...)`
+- Style is global: `config.set_theme(THEME.X)` and `config.update(...)`
   from `datachart.config` and `datachart.constants`. Per-chart overrides go in
   the chart's `style` argument. Do not restyle through matplotlib directly.
 - Combine finished figures with `Panel` (overlay on shared axes) and `Grid`
@@ -1187,7 +1187,7 @@ The data is a list of series, one per source, the first at the bottom of the sta
 {source: points[:3] for source, points in zip(SOURCES, generation)}
 ```
 
-Seven sources outrun the palette: a theme's palette has six colors, and the seventh band would repeat the first, which the chart warns about. Colors carry meaning in a stack, so the guide sets its own palette on the configuration with [config.update_config](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.update_config), once, one color per source in stack order: the fossil sources warm, the low-carbon ones cool, the rest grey. Every chart below draws from it unless it sets its own colors; the [Band style](#band-style) section pins the colors per source, so a chart of a few sources keeps them, and where a few sources are the story, the [Emphasis](#emphasis) section mutes the rest.
+Seven sources outrun the palette: a theme's palette has six colors, and the seventh band would repeat the first, which the chart warns about. Colors carry meaning in a stack, so the guide sets its own palette on the configuration with [config.update](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.update), once, one color per source in stack order: the fossil sources warm, the low-carbon ones cool, the rest grey. Every chart below draws from it unless it sets its own colors; the [Band style](#band-style) section pins the colors per source, so a chart of a few sources keeps them, and where a few sources are the story, the [Emphasis](#emphasis) section mutes the rest.
 
 ```
 from datachart.config import config
@@ -1202,7 +1202,7 @@ SOURCE_COLORS = {
     "Solar": "#f4c542",
     "Other": "#b8b8b8",
 }
-config.update_config({"color_general_multiple": list(SOURCE_COLORS.values())})
+config.update({"color_general_multiple": list(SOURCE_COLORS.values())})
 ```
 
 **Basic example.** Only the `data` argument is required. Each source fills the band between the sources below it and its own value, so the top edge of the stack is the world's total generation, and the axes start where the stack does. A single list of points draws one band on its own. The bands take the palette set above, one color per source in stack order.
@@ -1823,7 +1823,7 @@ figure = StackedAreaChart(
     figsize=FIG_SIZE.FULL_MEDIUM,
     ymax=36000,
 )
-config.reset_config()
+config.reset()
 figure.show()
 ```
 
@@ -1974,7 +1974,7 @@ Each series is a list of `{x, y}` points, with the year as `x` and the populatio
 population[0][:2]
 ```
 
-Ten series outrun the palette. A theme's palette has six colors, and a seventh line would repeat the first, which the chart warns about. Where every line matters, as in the feature examples below, set a palette with one color per series on the configuration with [config.update_config](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.update_config), once, and every chart draws from it. Ten colors cannot all stay apart for color-blind readers, so the end labels carry the names; where the story is about a few lines, the [Emphasis](#emphasis) section mutes the rest instead.
+Ten series outrun the palette. A theme's palette has six colors, and a seventh line would repeat the first, which the chart warns about. Where every line matters, as in the feature examples below, set a palette with one color per series on the configuration with [config.update](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.update), once, and every chart draws from it. Ten colors cannot all stay apart for color-blind readers, so the end labels carry the names; where the story is about a few lines, the [Emphasis](#emphasis) section mutes the rest instead.
 
 ```
 from datachart.config import config
@@ -1992,7 +1992,7 @@ COUNTRY_COLORS = [
     "#AA4499",
     "#DDDDDD",
 ]
-config.update_config({"color_general_multiple": COUNTRY_COLORS})
+config.update({"color_general_multiple": COUNTRY_COLORS})
 ```
 
 **Basic example.** Only the `data` argument is required, and `subtitle` names the lines: each name prints beside the line's last point, in the line's color, so the chart needs no legend and no rank axis. At every year the most populous country takes rank 1 at the top:
@@ -2500,7 +2500,7 @@ figure = BumpChart(
     ylabel="Rank by population",
     figsize=FIG_SIZE.FULL_MEDIUM,
 )
-config.reset_config()
+config.reset()
 figure.show()
 ```
 
@@ -6739,7 +6739,7 @@ Histogram(
 
 ### Density curve
 
-A histogram's shape depends on where its bin edges fall; a kernel density estimate smooths the same values into a curve that does not. [datachart.utils.stats.kde1d](https://eriknovak.github.io/datachart/dev/references/utils/stats/#datachart.utils.stats.kde1d) computes the curve and returns `{x, y}` points that a [LineChart](https://eriknovak.github.io/datachart/dev/references/charts/linechart/#datachart.charts.LineChart) draws, and [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) lays the curve over a density histogram; both integrate to 1, so they share the y-axis. The `bandwidth` argument of `kde1d` sets how smooth the curve is: a [BANDWIDTH](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH) rule (Scott's by default) or a number, where smaller values follow the data more closely. The [Statistics](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/stats/index.md) guide covers the estimate in more depth.
+A histogram's shape depends on where its bin edges fall; a kernel density estimate smooths the same values into a curve that does not. [datachart.utils.stats.kde1d](https://eriknovak.github.io/datachart/dev/references/utils/stats/#datachart.utils.stats.kde1d) computes the curve and returns `{x, y}` columns that a [LineChart](https://eriknovak.github.io/datachart/dev/references/charts/linechart/#datachart.charts.LineChart) draws, and [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) lays the curve over a density histogram; both integrate to 1, so they share the y-axis. The `bandwidth` argument of `kde1d` sets how smooth the curve is: a [BANDWIDTH](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH) rule (Scott's by default) or a number, where smaller values follow the data more closely. The [Statistics](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/stats/index.md) guide covers the estimate in more depth.
 
 ```
 from datachart.charts import LineChart
@@ -13232,7 +13232,7 @@ figure = HexbinChart(
     figsize=FIG_SIZE.FULL_SHORT,
 )
 
-config.reset_config()
+config.reset()
 figure.show()
 ```
 
@@ -13627,7 +13627,7 @@ figure = SankeyChart(
     title="Where a country's energy goes",
     figsize=FIG_SIZE.FULL_MEDIUM,
 )
-config.reset_config()
+config.reset()
 figure.show()
 ```
 
@@ -14222,7 +14222,7 @@ figure = NetworkChart(
     title="How far the Medici reach",
     figsize=(4.8, 5.2),
 )
-config.reset_config()
+config.reset()
 figure.show()
 ```
 
@@ -14695,7 +14695,7 @@ figure = Treemap(
     title="World population by continent and country, 2024 (millions)",
     figsize=FIG_SIZE.FULL_MEDIUM,
 )
-config.reset_config()
+config.reset()
 figure.show()
 ```
 
@@ -15328,7 +15328,7 @@ figure = LineChart(
 )
 figure.show()
 
-config.reset_config()
+config.reset()
 ```
 
 ## A Cohort Inside a Scatter Cloud
@@ -16844,7 +16844,7 @@ Every customization is either a keyword argument of `Panel` or a per-figure opti
 | overlay several bar charts           | `bar_mode`                                                         | [Bar mode](#bar-mode)                                                                                   |
 | add a figure to an existing panel    | nest `Panel` figures                                               | [Nesting panels](#nesting-panels)                                                                       |
 | overlay horizontal bars              | `orientation` on the bar charts, the same `Panel` parameters       | [Horizontal panels](#horizontal-panels)                                                                 |
-| change the defaults of every panel   | `config.update_config` with the `overlay_*` settings               | [Panel configuration](#panel-configuration)                                                             |
+| change the defaults of every panel   | `config.update` with the `overlay_*` settings                      | [Panel configuration](#panel-configuration)                                                             |
 | save the panel to a file             | `save_figure`                                                      | [Saving Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md) guide |
 
 The full list of parameters and per-figure options is in the [datachart.utils.Panel](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) reference. The look of each figure (colors, line widths, markers) is set on the chart itself through its `style` attribute; see the guide of each chart in the [Charts](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/index.md) section.
@@ -17166,7 +17166,7 @@ Panel(
 
 ## Panel Configuration
 
-The defaults the panel falls back on (the automatic axis threshold, the transparency of overlaid bars and histograms, the default drawing order of each chart type, the bar mode) are part of the global configuration, under the keys that start with `overlay_`. They are changed like any other setting, through [datachart.config.config.update_config](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.update_config); see the [Themes](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) guide for the configuration system as a whole. The current keys and their values in the active theme are:
+The defaults the panel falls back on (the automatic axis threshold, the transparency of overlaid bars and histograms, the default drawing order of each chart type, the bar mode) are part of the global configuration, under the keys that start with `overlay_`. They are changed like any other setting, through [datachart.config.config.update](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.update); see the [Themes](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) guide for the configuration system as a whole. The current keys and their values in the active theme are:
 
 ```
 from datachart.config import config
@@ -17177,7 +17177,7 @@ from datachart.config import config
 A setting given to `Panel` directly, such as `auto_secondary_axis` or `bar_mode`, always wins over the configuration. The configuration is the place for a default that should hold for every panel of a document:
 
 ```
-config.update_config(
+config.update(
     {
         # split the value axes sooner
         "overlay_auto_threshold": 2.0,
@@ -17198,7 +17198,7 @@ Panel(
 ).show()
 
 # restore the defaults for the rest of the guide
-config.reset_config()
+config.reset()
 ```
 
 ## Real-World Examples
@@ -17387,6 +17387,7 @@ Every customization is either a keyword argument of `Grid` or the shape of the l
 | set the rows myself                   | nested rows                        | [Nested rows](#nested-rows)                                                                             |
 | leave a cell blank                    | `None` in a row                    | [Blank cells](#blank-cells)                                                                             |
 | compare the cells on one scale        | `sharex`, `sharey`                 | [Sharing axes](#sharing-axes)                                                                           |
+| put every cell on a log axis          | `scalex`, `scaley`                 | [Sharing axes](#sharing-axes)                                                                           |
 | span a figure across rows or columns  | per-figure `"layout_spec"`         | [Irregular layouts](#irregular-layouts)                                                                 |
 | use a grid or a panel as one cell     | nest `Grid` and `Panel` figures    | [Nesting grids and panels](#nesting-grids-and-panels)                                                   |
 | put a chart with subplots in one cell | a chart drawn with `subplots=True` | [Subplot figures](#subplot-figures)                                                                     |
@@ -17483,7 +17484,7 @@ Grid(
 ).show()
 ```
 
-`sharex` and `sharey` put every cell on one x or y scale. Sharing is honest when the cells hold the same quantity in the same units, as here; sharing a scale between a temperature and a precipitation would squeeze one of them flat and invite a comparison that means nothing. In an automatic (flat-list) grid, shared axes are also labeled only once per row or column, which declutters the cells. With a shared y-axis the three climates separate at a glance:
+`sharex` and `sharey` put every cell on one x or y scale. Sharing is honest when the cells hold the same quantity in the same units, as here; sharing a scale between a temperature and a precipitation would squeeze one of them flat and invite a comparison that means nothing. In an automatic (flat-list) grid, shared axes are also labeled only once per row or column, which declutters the cells. `scalex` and `scaley` set one axis scale for every cell the same way, `scaley="log"` for values that span orders of magnitude; a log axis raises on a cell holding zero or a negative value. With a shared y-axis the three climates separate at a glance:
 
 ```
 Grid(
@@ -17773,7 +17774,7 @@ Every customization is either a key of the annotation dictionary, a `plot_text_*
 | annotate a panel                                 | `Annotate` on the `Panel` figure                                          | [Annotating a panel](#annotating-a-panel)                                                               |
 | annotate one subplot of a finished figure        | `Annotate` with the `subplot` index                                       | [Annotating finished subplots](#annotating-finished-subplots)                                           |
 | annotate a figure that goes into a grid          | `Annotate` before `Grid`                                                  | [Annotations in a grid](#annotations-in-a-grid)                                                         |
-| change the defaults of every annotation          | `config.update_config` with the `plot_text_*` keys                        | [Text Configuration](#text-configuration)                                                               |
+| change the defaults of every annotation          | `config.update` with the `plot_text_*` keys                               | [Text Configuration](#text-configuration)                                                               |
 | save the chart to a file                         | `save_figure`                                                             | [Saving Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md) guide |
 
 The parameter that accepts a constant, with the class in [datachart.constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md) that lists its values:
@@ -18088,7 +18089,7 @@ except ValueError as error:
 
 ## Text Configuration
 
-The defaults every annotation falls back on (the font, the box face and edge, the connector look and color) are part of the global configuration, under the keys that start with `plot_text_`. Every predefined theme sets them to match its own look, and they are changed like any other setting, through [datachart.config.config.update_config](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.update_config); see the [Themes](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) guide for the configuration system as a whole. The current keys and their values in the active theme are:
+The defaults every annotation falls back on (the font, the box face and edge, the connector look and color) are part of the global configuration, under the keys that start with `plot_text_`. Every predefined theme sets them to match its own look, and they are changed like any other setting, through [datachart.config.config.update](https://eriknovak.github.io/datachart/dev/references/config/#datachart.config.Config.update); see the [Themes](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) guide for the configuration system as a whole. The current keys and their values in the active theme are:
 
 ```
 from datachart.config import config
@@ -18099,7 +18100,7 @@ from datachart.config import config
 A `plot_text_*` key in an annotation's `style` always wins over the configuration. The configuration is the place for a default that should hold for every annotation of a document, such as arrowheads on every connector and notes without a box:
 
 ```
-config.update_config(
+config.update(
     {
         # arrowheads and boxless notes for every annotation
         "plot_text_arrow_style": ARROW_STYLE.ARROW,
@@ -18119,7 +18120,7 @@ LineChart(
 ).show()
 
 # restore the defaults for the rest of the guide
-config.reset_config()
+config.reset()
 ```
 
 ## Real-World Examples
@@ -18276,15 +18277,15 @@ The styling guides cover everything that controls how charts look: the predefine
 
 A theme is the complete set of style attributes the charts read when they are built: the palettes, the fonts, the axes furniture, and the per-chart defaults, one value per key of [StyleAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.StyleAttrs). The package ships fourteen predefined themes, each named for its visual trait; the [Theme Gallery](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/index.md) shows their color swatches and signature charts, grouped by use. Themes are applied and built through the global [config](https://eriknovak.github.io/datachart/dev/references/config/index.md) instance:
 
-| Task                                     | Method                                     | Section                                                               |
-| ---------------------------------------- | ------------------------------------------ | --------------------------------------------------------------------- |
-| Switch the look of every chart           | `set_theme`, `list_themes`                 | [Applying a Theme](#applying-a-theme)                                 |
-| Switch it for one block only             | `using_theme`                              | [Applying a Theme](#applying-a-theme)                                 |
-| Read and change single attributes        | `config[...]`, `update_config`, `override` | [What a Theme Controls](#what-a-theme-controls)                       |
-| Make your own theme switchable by name   | `register_theme`                           | [Building Your Own Theme](#building-your-own-theme)                   |
-| Recolour a theme from a colormap         | `derive_theme`                             | [Deriving a Theme from a Colormap](#deriving-a-theme-from-a-colormap) |
-| Share a theme as a file and load it back | `save_theme`, `load_theme`                 | [Sharing a Theme](#sharing-a-theme)                                   |
-| Return to the default theme              | `reset_config`                             | [Applying a Theme](#applying-a-theme)                                 |
+| Task                                     | Method                              | Section                                                               |
+| ---------------------------------------- | ----------------------------------- | --------------------------------------------------------------------- |
+| Switch the look of every chart           | `set_theme`, `list_themes`          | [Applying a Theme](#applying-a-theme)                                 |
+| Switch it for one block only             | `using_theme`                       | [Applying a Theme](#applying-a-theme)                                 |
+| Read and change single attributes        | `config[...]`, `update`, `override` | [What a Theme Controls](#what-a-theme-controls)                       |
+| Make your own theme switchable by name   | `register_theme`                    | [Building Your Own Theme](#building-your-own-theme)                   |
+| Recolour a theme from a colormap         | `derive_theme`                      | [Deriving a Theme from a Colormap](#deriving-a-theme-from-a-colormap) |
+| Share a theme as a file and load it back | `save_theme`, `load_theme`          | [Sharing a Theme](#sharing-a-theme)                                   |
+| Return to the default theme              | `reset`                             | [Applying a Theme](#applying-a-theme)                                 |
 
 ```
 from datachart.config import config
@@ -18317,10 +18318,10 @@ with config.using_theme(THEME.INK):
 config.theme
 ```
 
-`reset_config` returns to the default theme, discarding every change made since:
+`reset` returns to the default theme, discarding every change made since:
 
 ```
-config.reset_config()
+config.reset()
 config.theme
 ```
 
@@ -18352,10 +18353,10 @@ config["color_general_multiple"], config.get("font_general_family")
 {key: value for key, value in config.config.items() if key.startswith("axes_")}
 ```
 
-`update_config` changes attributes on top of the active theme; the change persists until the next `set_theme` or `reset_config`, and unknown attribute names are skipped with a warning. `override` does the same for one `with` block, taking a dictionary or keyword arguments. Palette attributes also accept a single color, used for every series that asks for one.
+`update` changes attributes on top of the active theme; the change persists until the next `set_theme` or `reset`, and unknown attribute names are skipped with a warning. `override` does the same for one `with` block, taking a dictionary or keyword arguments. Palette attributes also accept a single color, used for every series that asks for one.
 
 ```
-config.update_config({"font_general_family": "serif", "plot_line_width": 3})
+config.update({"font_general_family": "serif", "plot_line_width": 3})
 demo().show()
 ```
 
@@ -18363,7 +18364,7 @@ demo().show()
 with config.override(color_general_multiple=["#0B3954", "#FF6663", "#E0FF4F"]):
     demo().show()
 
-config.reset_config()
+config.reset()
 ```
 
 ## Building Your Own Theme
@@ -18431,7 +18432,7 @@ with config.override(NEON):
 config.theme
 ```
 
-Register the dictionary under a name and it behaves like a predefined theme: it appears in `list_themes`, `set_theme` and `using_theme` apply it, and `update_config` tweaks on top of it, here lifting the axes off the ground with a lighter face:
+Register the dictionary under a name and it behaves like a predefined theme: it appears in `list_themes`, `set_theme` and `using_theme` apply it, and `update` tweaks on top of it, here lifting the axes off the ground with a lighter face:
 
 ```
 config.register_theme("neon", NEON)
@@ -18440,7 +18441,7 @@ config.list_themes()
 ```
 
 ```
-config.update_config({"axes_facecolor": "#131A2A"})
+config.update({"axes_facecolor": "#131A2A"})
 demo().show()
 ```
 
@@ -18503,7 +18504,7 @@ with config.override(derive_theme(THEME.MINIMAL, lead=COLORS.Contrast, traits=[T
 
 ## Sharing a Theme
 
-`save_theme` writes a theme file: a JSON document carrying a name, a format version, and only the attributes that differ from the default theme, so the file stays short and reviewable. A registered theme is saved by name; with no name the live configuration is saved, so a look assembled with `update_config` leaves the process too.
+`save_theme` writes a theme file: a JSON document carrying a name, a format version, and only the attributes that differ from the default theme, so the file stays short and reviewable. A registered theme is saved by name; with no name the live configuration is saved, so a look assembled with `update` leaves the process too.
 
 ```
 import tempfile
@@ -18527,7 +18528,7 @@ A companion package ships its themes the same way: it registers or loads them on
 Finally, reset the configuration back to the default theme:
 
 ```
-config.reset_config()
+config.reset()
 ```
 
 # Theme Gallery
@@ -18752,10 +18753,10 @@ signature(pair=("#1A120A", "#1A120A")).show()
 
 ______________________________________________________________________
 
-Applying a theme replaces the whole global configuration, so remember to call `config.set_theme(...)` (or `config.reset_config()`) before building the charts it should style. See the [themes how-to](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) for customizing themes attribute by attribute.
+Applying a theme replaces the whole global configuration, so remember to call `config.set_theme(...)` (or `config.reset()`) before building the charts it should style. See the [themes how-to](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) for customizing themes attribute by attribute.
 
 ```
-config.reset_config()
+config.reset()
 ```
 
 # Colormaps
@@ -18888,7 +18889,7 @@ The module is organised around the questions its functions answer. The table map
 | know where the values sit                              | `mean`, `median`, `mode`                                     | [Center](#center)                             |
 | know how far they spread                               | `stdev`, `variance`, `quantile`, `iqr`, `minimum`, `maximum` | [Spread](#spread)                             |
 | tell a skewed or heavy-tailed sample from a normal one | `skewness`, `kurtosis`                                       | [Shape](#shape)                               |
-| say how much two variables move together               | `correlation`, `spearman`                                    | [Association](#association)                   |
+| say how much two variables move together               | `pearson`, `spearman`                                        | [Association](#association)                   |
 | draw a trend line                                      | `linear_fit`                                                 | [Trend line](#trend-line)                     |
 | put an error bar on a mean                             | `bootstrap_ci`                                               | [Confidence intervals](#confidence-intervals) |
 | pick the bins of a histogram from the data             | `histogram`                                                  | [Binning](#binning)                           |
@@ -19004,10 +19005,10 @@ Histogram(
 
 ### Association
 
-*When one variable goes up, does the other?* `correlation` is Pearson's coefficient: the strength of a *straight-line* relationship, from -1 through 0 (none) to 1. `spearman` is the same coefficient computed on the ranks, so it measures any relationship that only goes one way (monotone), whether or not it is a straight line, and one outlier cannot move it much. When the two agree, the relationship is linear; when Spearman is clearly larger, the relationship bends or an outlier is dragging Pearson down. Flipper length and body mass:
+*When one variable goes up, does the other?* `pearson` is Pearson's coefficient: the strength of a *straight-line* relationship, from -1 through 0 (none) to 1. `spearman` is the same coefficient computed on the ranks, so it measures any relationship that only goes one way (monotone), whether or not it is a straight line, and one outlier cannot move it much. When the two agree, the relationship is linear; when Spearman is clearly larger, the relationship bends or an outlier is dragging Pearson down. Flipper length and body mass:
 
 ```
-stats.correlation(flipper, mass), stats.spearman(flipper, mass)
+stats.pearson(flipper, mass), stats.spearman(flipper, mass)
 ```
 
 A correlation belongs next to the scatter it summarises. The [Scatter Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/scatterchart/index.md) can print it by itself with `show_correlation`; computing it here instead lets the title carry both coefficients, and the per-species correlations show that the relationship holds *within* each species too, not only because the species differ in size:
@@ -19021,11 +19022,11 @@ ScatterChart(
         for species in SPECIES
     ],
     subtitle=[
-        f"{species} (r = {stats.correlation(flipper_by_species[species], mass_by_species[species]):.2f})"
+        f"{species} (r = {stats.pearson(flipper_by_species[species], mass_by_species[species]):.2f})"
         for species in SPECIES
     ],
     title=(
-        f"Flipper length against body mass: Pearson {stats.correlation(flipper, mass):.2f}, "
+        f"Flipper length against body mass: Pearson {stats.pearson(flipper, mass):.2f}, "
         f"Spearman {stats.spearman(flipper, mass):.2f}"
     ),
     xlabel="Flipper length (mm)",
@@ -19177,7 +19178,7 @@ LineChart(
 
 ### Density estimates
 
-*What does the distribution look like, without the bins?* A histogram's shape changes with its bin edges; a kernel density estimate smooths the same values into a curve that does not. `kde1d(values)` returns the curve as `{x, y}` points ready for a [Line Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/index.md); it integrates to 1, so it overlays a density [Histogram](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/histogram/index.md) of the same values on the same axis. Its `bandwidth` sets how smooth the curve is: a rule of [BANDWIDTH](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH) (Scott's by default) or a number, where smaller values follow the data more closely. `grid_size` is the number of points, and `cut` how many bandwidths the curve extends past the extremes (or `xlim` fixes the range, so several curves share one grid). One curve per species, with `show_area`, is the cleanest picture of the three flipper distributions:
+*What does the distribution look like, without the bins?* A histogram's shape changes with its bin edges; a kernel density estimate smooths the same values into a curve that does not. `kde1d(values)` returns the curve as `{x, y}` columns ready for a [Line Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/index.md); it integrates to 1, so it overlays a density [Histogram](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/histogram/index.md) of the same values on the same axis. Its `bandwidth` sets how smooth the curve is: a rule of [BANDWIDTH](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH) (Scott's by default) or a number, where smaller values follow the data more closely. `grid_size` is the number of points, and `cut` how many bandwidths the curve extends past the extremes (or `xlim` fixes the range, so several curves share one grid). One curve per species, with `show_area`, is the cleanest picture of the three flipper distributions:
 
 ```
 LineChart(
@@ -19378,14 +19379,14 @@ The function returns the list of paths it wrote, here `["chart.png"]`. The paren
 
 The format, resolution and background are the three choices, and the destination decides each of them. The table maps the common destinations to the arguments that fit; the [FIG_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_FORMAT) constant lists every supported format.
 
-| I want to…                                    | Use                                          | See                                                                                                      |
-| --------------------------------------------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| put the figure in a paper or a printed report | `format=FIG_FORMAT.PDF` or `.svg`            | [Vector or raster](#vector-or-raster)                                                                    |
-| upload it where only images are accepted      | `format=FIG_FORMAT.PNG`, `dpi=300` or higher | [Vector or raster](#vector-or-raster)                                                                    |
-| lay it on a colored slide or page             | `transparent=True`                           | [Transparent background](#transparent-background)                                                        |
-| write a PDF and a PNG of the same figure      | `format=[FIG_FORMAT.PDF, FIG_FORMAT.PNG]`    | [Several formats at once](#several-formats-at-once)                                                      |
-| show it on a web page                         | SVG in an `<img>` tag, or inline             | [Embedding in web pages](#embedding-in-web-pages)                                                        |
-| size it for the destination before saving     | `figsize` on the chart function              | [FIG_SIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE) |
+| I want to…                                    | Use                                       | See                                                                                                      |
+| --------------------------------------------- | ----------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| put the figure in a paper or a printed report | `fmt=FIG_FORMAT.PDF` or `.svg`            | [Vector or raster](#vector-or-raster)                                                                    |
+| upload it where only images are accepted      | `fmt=FIG_FORMAT.PNG`, `dpi=300` or higher | [Vector or raster](#vector-or-raster)                                                                    |
+| lay it on a colored slide or page             | `transparent=True`                        | [Transparent background](#transparent-background)                                                        |
+| write a PDF and a PNG of the same figure      | `fmt=[FIG_FORMAT.PDF, FIG_FORMAT.PNG]`    | [Several formats at once](#several-formats-at-once)                                                      |
+| show it on a web page                         | SVG in an `<img>` tag, or inline          | [Embedding in web pages](#embedding-in-web-pages)                                                        |
+| size it for the destination before saving     | `figsize` on the chart function           | [FIG_SIZE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE) |
 
 ### Vector or raster
 
@@ -19395,7 +19396,7 @@ The format, resolution and background are the three choices, and the destination
 from datachart.constants import FIG_FORMAT
 
 save_figure(figure, "chart.pdf")                       # vector, from the extension
-save_figure(figure, "chart", format=FIG_FORMAT.PNG, dpi=600)  # raster, at 600 dots per inch
+save_figure(figure, "chart", fmt=FIG_FORMAT.PNG, dpi=600)  # raster, at 600 dots per inch
 ```
 
 ### Transparent background
@@ -19413,7 +19414,7 @@ Text and marks keep their own colors, so a transparent figure meant for a dark b
 *Who else needs this figure?* A figure is often needed more than once: a PDF for the manuscript, a PNG for the preview, an SVG for the slides. Pass a list of formats and the same figure is written once per format.
 
 ```
-paths = save_figure(figure, "figures/growth", format=[FIG_FORMAT.PDF, FIG_FORMAT.PNG])
+paths = save_figure(figure, "figures/growth", fmt=[FIG_FORMAT.PDF, FIG_FORMAT.PNG])
 # ["figures/growth.pdf", "figures/growth.png"]
 ```
 
@@ -19479,7 +19480,7 @@ out.mkdir(parents=True, exist_ok=True)
 
 written = []
 for name, figure in figures.items():
-    written += save_figure(figure, str(out / name), format=[FIG_FORMAT.PDF, FIG_FORMAT.PNG], dpi=600)
+    written += save_figure(figure, out / name, fmt=[FIG_FORMAT.PDF, FIG_FORMAT.PNG], dpi=600)
 
 written
 # ["manuscript/figures/fig1_growth.pdf", "manuscript/figures/fig1_growth.png", ...]
@@ -19506,7 +19507,7 @@ figure = BarChart(
 save_figure(figure, "deck/revenue.png", dpi=200, transparent=True)
 ```
 
-Insert the PNG at full slide width and it lands pixel for pixel, with no resizing and no white frame. For a deck that will also be printed as a handout, add `FIG_FORMAT.PDF` to a `format` list in the same call.
+Insert the PNG at full slide width and it lands pixel for pixel, with no resizing and no white frame. For a deck that will also be printed as a handout, add `FIG_FORMAT.PDF` to an `fmt` list in the same call.
 
 ### Example 3: A Chart on a Documentation Page (SVG, Transparent, in an Image Tag)
 
@@ -28299,7 +28300,9 @@ Grid(
     xmax: float | None = None,
     ymin: int | float | None = None,
     ymax: int | float | None = None,
-    aspect_ratio: ASPECT_RATIO | str | None = None
+    aspect_ratio: ASPECT_RATIO | str | None = None,
+    scalex: AXIS_SCALE | str | None = None,
+    scaley: AXIS_SCALE | str | None = None
 ) -> plt.Figure
 ```
 
@@ -28309,7 +28312,7 @@ Each figure's chart is redrawn into its grid cell. Nested rows define the layout
 
 Grids nest: a Grid figure placed in a cell occupies exactly that cell and rebuilds its internal layout inside it, to any depth. The nested grid keeps its own title (a heading spanning its subgrid) and its own sharex/sharey among its own cells; the outer grid's sharex/sharey applies only to its top-level cells. Panel figures also nest in a cell; the reverse — a Grid figure inside a Panel — stays an error.
 
-The grid's title, axis labels and legend are drawn once for the whole figure. Its limits, `show_grid` and `aspect_ratio` apply to every cell, nested grids included; one left unset keeps what each cell's chart was built with.
+The grid's title, axis labels and legend are drawn once for the whole figure. Its limits, scales, `show_grid` and `aspect_ratio` apply to every cell, nested grids included; one left unset keeps what each cell's chart was built with.
 
 Examples:
 
@@ -28365,14 +28368,16 @@ Examples:
 | `ymin`         | Minimum value for the y-axis limits of every cell. **TYPE:** \`int                                                                                                                                                                                                                                                                                            |
 | `ymax`         | Maximum value for the y-axis limits of every cell. **TYPE:** \`int                                                                                                                                                                                                                                                                                            |
 | `aspect_ratio` | The aspect ratio of every cell's axes box; "geographic" keeps a map of longitude against latitude at true proportions. Default: each cell's own. See ASPECT_RATIO. **TYPE:** \`ASPECT_RATIO                                                                                                                                                                   |
+| `scalex`       | The x-axis scale of every cell ("linear", "log", "symlog", "asinh"). Default: each cell's own. **TYPE:** \`AXIS_SCALE                                                                                                                                                                                                                                         |
+| `scaley`       | The y-axis scale of every cell. Default: each cell's own. **TYPE:** \`AXIS_SCALE                                                                                                                                                                                                                                                                              |
 
 | RETURNS      | DESCRIPTION                                                     |
 | ------------ | --------------------------------------------------------------- |
 | `plt.Figure` | A new matplotlib Figure containing all charts in a grid layout. |
 
-| RAISES       | DESCRIPTION                                                                                                                                                                                                                  |
-| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ValueError` | If charts is empty, rows are mixed with flat items, a cell is invalid, two layout_spec cells overlap, max_cols is not a positive integer, the legend location is unknown, or a figure cannot be composed (missing metadata). |
+| RAISES       | DESCRIPTION                                                                                                                                                                                                                                                          |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ValueError` | If charts is empty, rows are mixed with flat items, a cell is invalid, two layout_spec cells overlap, max_cols is not a positive integer, the legend location is unknown, a figure cannot be composed (missing metadata), or a log scale meets a non-positive value. |
 
 ### datachart.utils.Annotate
 
@@ -28434,16 +28439,17 @@ Examples:
 ```
 save_figure(
     figure: plt.Figure,
-    path: str,
+    path: str | os.PathLike,
     dpi: int = 300,
-    format: FIG_FORMAT | list[FIG_FORMAT] | None = None,
+    fmt: FIG_FORMAT | list[FIG_FORMAT] | None = None,
     transparent: bool = False,
+    format: FIG_FORMAT | list[FIG_FORMAT] | None = None,
 ) -> list[str]
 ```
 
 Save the figure to one or more files.
 
-Writes the rendered figure to disk in the format given by `format` or, when omitted, by the file extension. Use a vector format (PDF, SVG) for print and papers, PNG with `dpi` >= 300 for raster deliverables, and `transparent=True` to drop the figure background for slides and web pages. The theme is already baked into the figure, so saving never consults the global config.
+Writes the rendered figure to disk in the format given by `fmt` or, when omitted, by the file extension. Use a vector format (PDF, SVG) for print and papers, PNG with `dpi` >= 300 for raster deliverables, and `transparent=True` to drop the figure background for slides and web pages. The theme is already baked into the figure, so saving never consults the global config.
 
 Pass a list of formats to write the same figure several times in one call. `path` is then a stem: its extension is dropped when it names a supported format, and one file per format is written next to it. `dpi` and `transparent` apply to every file.
 
@@ -28460,30 +28466,31 @@ Examples:
 >>> from datachart.utils.figure import save_figure
 >>> from datachart.constants import FIG_FORMAT
 >>> path = "/path/to/save/chart.png"
->>> save_figure(figure, path, dpi=300, format=FIG_FORMAT.PNG, transparent=True)
+>>> save_figure(figure, path, dpi=300, fmt=FIG_FORMAT.PNG, transparent=True)
 ```
 
 ```
 >>> # 3. save the same figure as a PDF and a PNG
->>> save_figure(figure, "/path/to/save/chart", format=[FIG_FORMAT.PDF, FIG_FORMAT.PNG])
+>>> save_figure(figure, "/path/to/save/chart", fmt=[FIG_FORMAT.PDF, FIG_FORMAT.PNG])
 ['/path/to/save/chart.pdf', '/path/to/save/chart.png']
 ```
 
 | PARAMETER     | DESCRIPTION                                                                                                                                     |
 | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | `figure`      | The figure to save. **TYPE:** `plt.Figure`                                                                                                      |
-| `path`        | The path where the figure is saved. A stem when format is a list. **TYPE:** `str`                                                               |
+| `path`        | The path where the figure is saved. A stem when fmt is a list. **TYPE:** \`str                                                                  |
 | `dpi`         | The DPI of the figure. **TYPE:** `int` **DEFAULT:** `300`                                                                                       |
-| `format`      | The format of the figure, or a list of formats to write. If None, the format will be determined from the file extension. **TYPE:** \`FIG_FORMAT |
+| `fmt`         | The format of the figure, or a list of formats to write. If None, the format will be determined from the file extension. **TYPE:** \`FIG_FORMAT |
 | `transparent` | Whether to make the background transparent. **TYPE:** `bool` **DEFAULT:** `False`                                                               |
+| `format`      | Deprecated; use fmt. **TYPE:** \`FIG_FORMAT                                                                                                     |
 
 | RETURNS     | DESCRIPTION                                             |
 | ----------- | ------------------------------------------------------- |
 | `list[str]` | The paths written, in the order the formats were given. |
 
-| RAISES       | DESCRIPTION                 |
-| ------------ | --------------------------- |
-| `ValueError` | If format is an empty list. |
+| RAISES       | DESCRIPTION                                                 |
+| ------------ | ----------------------------------------------------------- |
+| `ValueError` | If fmt is an empty list, or both fmt and format are passed. |
 
 # Stats Module
 
@@ -28502,7 +28509,7 @@ Every function takes plain Python lists and returns a number, a pair, or lists r
 | a center, count, or total       | [`mean`](#datachart.utils.stats.mean), [`median`](#datachart.utils.stats.median), [`mode`](#datachart.utils.stats.mode), [`count`](#datachart.utils.stats.count), [`sum_values`](#datachart.utils.stats.sum_values)                                                  |
 | how far the values spread       | [`stdev`](#datachart.utils.stats.stdev), [`variance`](#datachart.utils.stats.variance), [`quantile`](#datachart.utils.stats.quantile), [`iqr`](#datachart.utils.stats.iqr), [`minimum`](#datachart.utils.stats.minimum), [`maximum`](#datachart.utils.stats.maximum) |
 | the shape of a distribution     | [`skewness`](#datachart.utils.stats.skewness), [`kurtosis`](#datachart.utils.stats.kurtosis)                                                                                                                                                                         |
-| how two variables move together | [`correlation`](#datachart.utils.stats.correlation), [`spearman`](#datachart.utils.stats.spearman)                                                                                                                                                                   |
+| how two variables move together | [`pearson`](#datachart.utils.stats.pearson), [`spearman`](#datachart.utils.stats.spearman)                                                                                                                                                                           |
 | a trend line                    | [`linear_fit`](#datachart.utils.stats.linear_fit)                                                                                                                                                                                                                    |
 | an interval around a statistic  | [`bootstrap_ci`](#datachart.utils.stats.bootstrap_ci)                                                                                                                                                                                                                |
 | bins for a histogram            | [`histogram`](#datachart.utils.stats.histogram)                                                                                                                                                                                                                      |
@@ -28860,10 +28867,10 @@ Examples:
 
 ## Association
 
-### datachart.utils.stats.correlation
+### datachart.utils.stats.pearson
 
 ```
-correlation(
+pearson(
     x: list[int | float], y: list[int | float]
 ) -> float
 ```
@@ -28875,10 +28882,10 @@ The Pearson correlation coefficient measures the linear relationship between two
 Examples:
 
 ```
->>> from datachart.utils.stats import correlation
->>> round(correlation([1, 2, 3, 4, 5], [1, 2, 3, 4, 5]), 6)
+>>> from datachart.utils.stats import pearson
+>>> round(pearson([1, 2, 3, 4, 5], [1, 2, 3, 4, 5]), 6)
 1.0
->>> round(correlation([1, 2, 3, 4, 5], [5, 4, 3, 2, 1]), 6)
+>>> round(pearson([1, 2, 3, 4, 5], [5, 4, 3, 2, 1]), 6)
 -1.0
 ```
 
@@ -28906,7 +28913,7 @@ spearman(
 
 Calculates the Spearman rank correlation between two lists.
 
-The Spearman coefficient is the Pearson correlation of the ranks, so it measures any monotone relationship, not only a linear one, and is robust to outliers. It ranges from -1 to 1 like `correlation`, and likewise accepts a temporal `x`.
+The Spearman coefficient is the Pearson correlation of the ranks, so it measures any monotone relationship, not only a linear one, and is robust to outliers. It ranges from -1 to 1 like `pearson`, and likewise accepts a temporal `x`.
 
 Examples:
 
@@ -29142,7 +29149,7 @@ loess(
 
 Smooths the (x, y) points with a locally weighted linear fit.
 
-At each `x` a straight line is fitted to the nearest `frac` share of the points, weighted by a tricube kernel so closer points count more, and the smoothed `y` is that line's value there (LOESS/LOWESS). The result is a list of `{x, y}` points sorted by `x`, ready for `LineChart`, as `kde1d` returns. A smaller `frac` follows the data more closely. A temporal `x` (dates, datetimes, or `datetime64`) is smoothed as date numbers and the curve's `x` values come back as datetimes, in the input's zone.
+At each `x` a straight line is fitted to the nearest `frac` share of the points, weighted by a tricube kernel so closer points count more, and the smoothed `y` is that line's value there (LOESS/LOWESS). The result is a list of `{x, y}` points sorted by `x`, ready for `LineChart`. A smaller `frac` follows the data more closely. A temporal `x` (dates, datetimes, or `datetime64`) is smoothed as date numbers and the curve's `x` values come back as datetimes, in the input's zone.
 
 Examples:
 
@@ -29183,21 +29190,21 @@ kde1d(
     cut: float = 3,
     xlim: tuple[float, float] | None = None,
     gridsize: int | None = None
-) -> list[dict[str, float]]
+) -> dict[str, list[float]]
 ```
 
 Estimates the density of the values as a curve.
 
-A Gaussian kernel density estimate evaluated on `grid_size` evenly spaced points over the range of the values, extended by `cut` bandwidths on each side so the curve tails off instead of being clipped at the extremes, or over an explicit `xlim` so several curves share one grid. The result is a list of `{x, y}` points ready for `LineChart`; the curve integrates to 1, so it overlays a density `Histogram` of the same values.
+A Gaussian kernel density estimate evaluated on `grid_size` evenly spaced points over the range of the values, extended by `cut` bandwidths on each side so the curve tails off instead of being clipped at the extremes, or over an explicit `xlim` so several curves share one grid. The result is an `{x, y}` dict of columns ready for `LineChart`, the shape `kde2d` returns; the curve integrates to 1, so it overlays a density `Histogram` of the same values.
 
 Examples:
 
 ```
 >>> from datachart.utils.stats import kde1d
 >>> curve = kde1d([1, 2, 2, 3, 3, 3, 4, 4, 5], grid_size=5, cut=0)
->>> [round(point["x"], 2) for point in curve]
+>>> [round(x, 2) for x in curve["x"]]
 [1.0, 2.0, 3.0, 4.0, 5.0]
->>> round(sum(point["y"] for point in curve), 2)
+>>> round(sum(curve["y"]), 2)
 0.94
 ```
 
@@ -29210,9 +29217,9 @@ Examples:
 | `xlim`      | The (min, max) range of the grid; overrides the padded range. **TYPE:** \`tuple[float, float]                               |
 | `gridsize`  | Deprecated; use grid_size. Removed in the next release. **TYPE:** \`int                                                     |
 
-| RETURNS                  | DESCRIPTION                             |
-| ------------------------ | --------------------------------------- |
-| `list[dict[str, float]]` | The {x, y} points of the density curve. |
+| RETURNS                  | DESCRIPTION                                                 |
+| ------------------------ | ----------------------------------------------------------- |
+| `dict[str, list[float]]` | The density curve as {"x": [...], "y": [...]}, one y per x. |
 
 | RAISES       | DESCRIPTION                                                                                       |
 | ------------ | ------------------------------------------------------------------------------------------------- |
@@ -29292,9 +29299,9 @@ One `config` instance holds the style every chart is drawn with. Its methods cha
 | I want to…                                  | Call                                                         | See                                                                                                  |
 | ------------------------------------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
 | switch the look of every chart              | `config.set_theme(THEME.INK)`                                | [set_theme](#datachart.config.Config.set_theme)                                                      |
-| change a few attributes on top of the theme | `config.update_config({"font_general_size": 12})`            | [update_config](#datachart.config.Config.update_config)                                              |
+| change a few attributes on top of the theme | `config.update({"font_general_size": 12})`                   | [update](#datachart.config.Config.update)                                                            |
 | change the look for one block of code       | `with config.override(...)`, `with config.using_theme(...)`  | [override](#datachart.config.Config.override), [using_theme](#datachart.config.Config.using_theme)   |
-| go back to the default theme                | `config.reset_config()`                                      | [reset_config](#datachart.config.Config.reset_config)                                                |
+| go back to the default theme                | `config.reset()`                                             | [reset](#datachart.config.Config.reset)                                                              |
 | add a theme of my own                       | `config.register_theme(name, theme)`, then `set_theme(name)` | [register_theme](#datachart.config.Config.register_theme)                                            |
 | see which names `set_theme` accepts         | `config.list_themes()`                                       | [list_themes](#datachart.config.Config.list_themes)                                                  |
 | share a theme as a file                     | `config.save_theme(path)`, `config.load_theme(path)`         | [save_theme](#datachart.config.Config.save_theme), [load_theme](#datachart.config.Config.load_theme) |
@@ -29326,8 +29333,8 @@ The class representing the configuration options.
 | METHOD           | DESCRIPTION                                                   |
 | ---------------- | ------------------------------------------------------------- |
 | `set_theme`      | Set the global configuration to match the theme.              |
-| `reset_config`   | Resets the global configuration.                              |
-| `update_config`  | Updates the global configuration.                             |
+| `reset`          | Resets the global configuration.                              |
+| `update`         | Updates the global configuration.                             |
 | `override`       | Applies attribute overrides for the duration of a with block. |
 | `using_theme`    | Applies a theme for the duration of a with block.             |
 | `register_theme` | Registers a custom theme for use with set_theme.              |
@@ -29339,12 +29346,12 @@ The class representing the configuration options.
 #### set_theme
 
 ```
-set_theme(theme: THEME) -> None
+set_theme(theme: THEME | str) -> None
 ```
 
 Sets the global configuration to match the theme.
 
-Replaces the whole style configuration with a deep copy of the theme: one of the THEME constants or a name registered with `register_theme`. Use it to switch the look of every chart rendered afterwards; call `update_config` on top for per-attribute tweaks.
+Replaces the whole style configuration with a deep copy of the theme: one of the THEME constants or a name registered with `register_theme`. Use it to switch the look of every chart rendered afterwards; call `update` on top for per-attribute tweaks.
 
 Examples:
 
@@ -29358,7 +29365,7 @@ Examples:
 
 | PARAMETER | DESCRIPTION                            |
 | --------- | -------------------------------------- |
-| `theme`   | The theme to be set. **TYPE:** `THEME` |
+| `theme`   | The theme to be set. **TYPE:** \`THEME |
 
 #### register_theme
 
@@ -29390,24 +29397,55 @@ Examples:
 | ------------ | ------------------------------------------------------------------ |
 | `ValueError` | If name is a predefined theme or theme holds an unknown attribute. |
 
+#### reset
+
+```
+reset() -> None
+```
+
+Resets the global configuration.
+
+Restores the default theme, discarding the current theme and every `update` override, and resets the active theme name to match. Use it to return to a known state, for example at the start of a notebook section or between tests.
+
+Examples:
+
+```
+>>> from datachart.config import config
+>>> config.reset()
+>>> config.theme
+'default'
+```
+
 #### reset_config
 
 ```
 reset_config() -> None
 ```
 
-Resets the global configuration.
+Deprecated: use `reset`, which it forwards to.
 
-Restores the default theme, discarding the current theme and every `update_config` override, and resets the active theme name to match. Use it to return to a known state, for example at the start of a notebook section or between tests.
+#### update
+
+```
+update(config: StyleAttrs) -> None
+```
+
+Updates the global configuration.
+
+Overrides individual style attributes on top of the current theme; the change persists until the next `set_theme` or `reset`. Use it for global tweaks such as font family or default colors; the values are copied, and unknown attribute names are skipped with a warning.
 
 Examples:
 
 ```
 >>> from datachart.config import config
->>> config.reset_config()
->>> config.theme
-'default'
+>>> config.update({"font_general_color": "#FFFFFF"})
+>>> config.get("font_general_color")
+'#FFFFFF'
 ```
+
+| PARAMETER | DESCRIPTION                                                        |
+| --------- | ------------------------------------------------------------------ |
+| `config`  | The configuration attributes to be updated. **TYPE:** `StyleAttrs` |
 
 #### update_config
 
@@ -29415,18 +29453,7 @@ Examples:
 update_config(config: StyleAttrs) -> None
 ```
 
-Updates the global configuration.
-
-Overrides individual style attributes on top of the current theme; the change persists until the next `set_theme` or `reset_config`. Use it for global tweaks such as font family or default colors; the values are copied, and unknown attribute names are skipped with a warning.
-
-Examples:
-
-```
->>> from datachart.config import config
->>> config.update_config({"font_general_color": "#FFFFFF"})
->>> config.get("font_general_color")
-'#FFFFFF'
-```
+Deprecated: use `update`; it applies the attributes the same way.
 
 | PARAMETER | DESCRIPTION                                                        |
 | --------- | ------------------------------------------------------------------ |
@@ -29438,7 +29465,7 @@ Examples:
 _update(config: StyleAttrs, stacklevel: int) -> None
 ```
 
-`update_config`, warning at `stacklevel` counted from the caller.
+`update`, warning at `stacklevel` counted from the caller.
 
 #### \_scope
 
@@ -29458,7 +29485,7 @@ override(
 
 Applies style overrides for the duration of a `with` block.
 
-On entry the attributes are applied the way `update_config` applies them; on exit the configuration that entered the block is restored, also when the block raises. Any `set_theme` or `update_config` performed inside the block is discarded at exit. Use it for a one-off figure that needs a different font or palette without touching the global state. The scope is plain save-and-restore on the global configuration: it is neither thread-safe nor async-safe.
+On entry the attributes are applied the way `update` applies them; on exit the configuration that entered the block is restored, also when the block raises. Any `set_theme` or `update` performed inside the block is discarded at exit. Use it for a one-off figure that needs a different font or palette without touching the global state. The scope is plain save-and-restore on the global configuration: it is neither thread-safe nor async-safe.
 
 Examples:
 
@@ -29479,12 +29506,12 @@ Examples:
 #### using_theme
 
 ```
-using_theme(theme: THEME) -> Iterator[None]
+using_theme(theme: THEME | str) -> Iterator[None]
 ```
 
 Applies a theme for the duration of a `with` block.
 
-On entry the theme is applied the way `set_theme` applies it; on exit both the configuration and the active theme name that entered the block are restored, also when the block raises. Any `set_theme` or `update_config` performed inside the block is discarded at exit. The scope is plain save-and-restore on the global configuration: it is neither thread-safe nor async-safe.
+On entry the theme is applied the way `set_theme` applies it; on exit both the configuration and the active theme name that entered the block are restored, also when the block raises. Any `set_theme` or `update` performed inside the block is discarded at exit. The scope is plain save-and-restore on the global configuration: it is neither thread-safe nor async-safe.
 
 Examples:
 
@@ -29500,7 +29527,7 @@ Examples:
 
 | PARAMETER | DESCRIPTION                                                                            |
 | --------- | -------------------------------------------------------------------------------------- |
-| `theme`   | The theme to apply: one of the THEME constants or a registered name. **TYPE:** `THEME` |
+| `theme`   | The theme to apply: one of the THEME constants or a registered name. **TYPE:** \`THEME |
 
 #### list_themes
 
@@ -29534,13 +29561,13 @@ save_theme(
 
 Writes a theme file.
 
-With no name the live configuration is saved, so a look assembled with `update_config` can be shared or committed directly; the file is named after its stem. With a name that registered theme is saved instead. The file is JSON and carries only the attributes that differ from the default theme, so it stays short and reviewable; load it back with `load_theme`. The parent directory must exist.
+With no name the live configuration is saved, so a look assembled with `update` can be shared or committed directly; the file is named after its stem. With a name that registered theme is saved instead. The file is JSON and carries only the attributes that differ from the default theme, so it stays short and reviewable; load it back with `load_theme`. The parent directory must exist.
 
 Examples:
 
 ```
 >>> from datachart.config import config
->>> config.update_config({"font_general_size": 14})
+>>> config.update({"font_general_size": 14})
 >>> config.save_theme("house.json")
 >>> config.save_theme("ink.json", name="ink")
 ```

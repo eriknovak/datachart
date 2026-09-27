@@ -509,7 +509,7 @@ figure = NetworkChart(
     title="How far the Medici reach",
     figsize=(4.8, 5.2),
 )
-config.reset_config()
+config.reset()
 figure.show()
 ```
 

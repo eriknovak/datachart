@@ -63,7 +63,7 @@ figure = LineChart(
 )
 figure.show()
 
-config.reset_config()
+config.reset()
 ```
 
 ## A Cohort Inside a Scatter Cloud

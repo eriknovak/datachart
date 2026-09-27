@@ -5555,6 +5555,11 @@ def city_chart(city, **kwargs):
 <td style="text-align:left"><a href="#sharing-axes">Sharing axes</a></td>
 </tr>
 <tr>
+<td style="text-align:left">put every cell on a log axis</td>
+<td style="text-align:left"><code>scalex</code>, <code>scaley</code></td>
+<td style="text-align:left"><a href="#sharing-axes">Sharing axes</a></td>
+</tr>
+<tr>
 <td style="text-align:left">span a figure across rows or columns</td>
 <td style="text-align:left">per-figure <code>"layout_spec"</code></td>
 <td style="text-align:left"><a href="#irregular-layouts">Irregular layouts</a></td>
@@ -5972,7 +5977,7 @@ Grid(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><code>sharex</code> and <code>sharey</code> put every cell on one x or y scale. Sharing is honest when the cells hold the same quantity in the same units, as here; sharing a scale between a temperature and a precipitation would squeeze one of them flat and invite a comparison that means nothing. In an automatic (flat-list) grid, shared axes are also labeled only once per row or column, which declutters the cells. With a shared y-axis the three climates separate at a glance:</p>
+<p><code>sharex</code> and <code>sharey</code> put every cell on one x or y scale. Sharing is honest when the cells hold the same quantity in the same units, as here; sharing a scale between a temperature and a precipitation would squeeze one of them flat and invite a comparison that means nothing. In an automatic (flat-list) grid, shared axes are also labeled only once per row or column, which declutters the cells. <code>scalex</code> and <code>scaley</code> set one axis scale for every cell the same way, <code>scaley="log"</code> for values that span orders of magnitude; a log axis raises on a cell holding zero or a negative value. With a shared y-axis the three climates separate at a glance:</p>
 </div>
 </div>
 </div>

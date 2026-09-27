@@ -5577,7 +5577,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Seven sources outrun the palette: a theme's palette has six colors, and the seventh band would repeat the first, which the chart warns about. Colors carry meaning in a stack, so the guide sets its own palette on the configuration with <a href="../../../references/config/#datachart.config.Config.update_config">config.update_config</a>, once, one color per source in stack order: the fossil sources warm, the low-carbon ones cool, the rest grey. Every chart below draws from it unless it sets its own colors; the <a href="#band-style">Band style</a> section pins the colors per source, so a chart of a few sources keeps them, and where a few sources are the story, the <a href="#emphasis">Emphasis</a> section mutes the rest.</p>
+<p>Seven sources outrun the palette: a theme's palette has six colors, and the seventh band would repeat the first, which the chart warns about. Colors carry meaning in a stack, so the guide sets its own palette on the configuration with <a href="../../../references/config/#datachart.config.Config.update">config.update</a>, once, one color per source in stack order: the fossil sources warm, the low-carbon ones cool, the rest grey. Every chart below draws from it unless it sets its own colors; the <a href="#band-style">Band style</a> section pins the colors per source, so a chart of a few sources keeps them, and where a few sources are the story, the <a href="#emphasis">Emphasis</a> section mutes the rest.</p>
 </div>
 </div>
 </div>
@@ -5612,7 +5612,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="s2">"Solar"</span><span class="p">:</span> <span class="s2">"#f4c542"</span><span class="p">,</span>
     <span class="s2">"Other"</span><span class="p">:</span> <span class="s2">"#b8b8b8"</span><span class="p">,</span>
 <span class="p">}</span>
-<span class="n">config</span><span class="o">.</span><span class="n">update_config</span><span class="p">({</span><span class="s2">"color_general_multiple"</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">SOURCE_COLORS</span><span class="o">.</span><span class="n">values</span><span class="p">())})</span>
+<span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">"color_general_multiple"</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">SOURCE_COLORS</span><span class="o">.</span><span class="n">values</span><span class="p">())})</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-3">from datachart.config import config
 
@@ -5626,7 +5626,7 @@ SOURCE_COLORS = {
     "Solar": "#f4c542",
     "Other": "#b8b8b8",
 }
-config.update_config({"color_general_multiple": list(SOURCE_COLORS.values())})</div>
+config.update({"color_general_multiple": list(SOURCE_COLORS.values())})</div>
 </div>
 </div>
 </div>
@@ -7719,7 +7719,7 @@ generation_records[0][:2]</div>
     <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_MEDIUM</span><span class="p">,</span>
     <span class="n">ymax</span><span class="o">=</span><span class="mi">36000</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">config</span><span class="o">.</span><span class="n">reset_config</span><span class="p">()</span>
+<span class="n">config</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
 <span class="n">figure</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-25">from datachart.constants import THEME
@@ -7743,7 +7743,7 @@ figure = StackedAreaChart(
     figsize=FIG_SIZE.FULL_MEDIUM,
     ymax=36000,
 )
-config.reset_config()
+config.reset()
 figure.show()</div>
 </div>
 </div>
