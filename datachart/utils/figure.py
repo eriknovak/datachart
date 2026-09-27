@@ -11,7 +11,6 @@ Methods:
 import copy
 import math
 import os
-import warnings
 from typing import FrozenSet, List, Mapping, Optional, Tuple, Union, Dict, Any
 
 import numpy as np
@@ -27,7 +26,7 @@ from ._internal.config_helpers import (
 )
 from ._internal.figures import new_figure
 from ._internal.plot_engine import SUBPLOT_FURNITURE_KEYS
-from ._internal.validate import validate_layout_specs
+from ._internal.validate import validate_layout_specs, warn_renamed
 
 # =====================================
 # Helper functions
@@ -146,18 +145,21 @@ def _render_cell(
     if panel.layers:
         if overrides:
             panel = copy.copy(panel)
-            panel.settings = {**panel.settings, **_literal_scales(overrides, panel)}
+            panel.settings = {
+                **panel.settings,
+                **_literal_scales(overrides, panel.horizontal),
+            }
         panel.render(target_ax)
     return target_ax, panel
 
 
-def _literal_scales(overrides: Dict[str, Any], panel: Any) -> Dict[str, Any]:
+def _literal_scales(overrides: Dict[str, Any], horizontal: bool) -> Dict[str, Any]:
     """The overrides with the grid's scales on the panel's literal axes.
 
     A grid's `scalex` names the category axis and its `scaley` the value
     axis, as a `Panel`'s do, so a horizontal panel takes them swapped.
     """
-    if not panel.horizontal:
+    if not horizontal:
         return overrides
     swapped = {k: v for k, v in overrides.items() if k not in ("scalex", "scaley")}
     for key, literal in (("scalex", "scaley"), ("scaley", "scalex")):
@@ -760,12 +762,7 @@ def save_figure(
     """
 
     if format is not None:
-        warnings.warn(
-            "`format` is deprecated and will be removed in the next release; "
-            "use `fmt` instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
+        warn_renamed("format", "fmt")
         if fmt is not None:
             raise ValueError("Pass `fmt` only; `format` is its deprecated name.")
         fmt = format

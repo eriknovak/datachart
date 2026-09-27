@@ -8,7 +8,6 @@ over the finite values, and a pair with a missing half is left out.
 
 """
 
-import warnings
 from datetime import datetime, timezone
 from numbers import Real
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
@@ -18,7 +17,7 @@ import numpy as np
 from matplotlib.mlab import GaussianKDE
 
 from ..constants import BANDWIDTH
-from ._internal.validate import is_missing, validate_bandwidth
+from ._internal.validate import is_missing, validate_bandwidth, warn_renamed
 
 # ================================================
 # Missing values
@@ -351,12 +350,7 @@ def correlation(x: List[Union[int, float]], y: List[Union[int, float]]) -> float
     Returns:
         The Pearson correlation coefficient.
     """
-    warnings.warn(
-        "`correlation` is deprecated and will be removed in the next release; "
-        "use `pearson` instead.",
-        DeprecationWarning,
-        stacklevel=2,
-    )
+    warn_renamed("correlation", "pearson")
     return pearson(x, y)
 
 
@@ -803,9 +797,10 @@ def loess(
     At each `x` a straight line is fitted to the nearest `frac` share of the
     points, weighted by a tricube kernel so closer points count more, and the
     smoothed `y` is that line's value there (LOESS/LOWESS). The result is a
-    list of `{x, y}` points sorted by `x`, ready for `LineChart`. A smaller `frac` follows the data more closely. A temporal `x`
-    (dates, datetimes, or `datetime64`) is smoothed as date numbers and the
-    curve's `x` values come back as datetimes, in the input's zone.
+    list of `{x, y}` points sorted by `x`, ready for `LineChart`. A smaller `frac` follows the
+    data more closely. A temporal `x` (dates, datetimes, or `datetime64`) is
+    smoothed as date numbers and the curve's `x` values come back as
+    datetimes, in the input's zone.
 
     Examples:
         >>> from datachart.utils.stats import loess

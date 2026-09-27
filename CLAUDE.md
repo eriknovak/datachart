@@ -88,8 +88,8 @@ deprecated `gridsize` keyword of `kde1d`/`kde2d` with its `_grid_size`
 helper in `datachart/utils/stats.py` once it has shipped. Remove the
 deprecated wrappers that already shipped: `stats.correlation`,
 `Config.update_config`, `Config.reset_config`, and `save_figure`'s `format`
-keyword. Publishing the
-GitHub release then triggers PyPI and the versioned docs.
+keyword. Publishing the GitHub release then triggers PyPI and the versioned
+docs.
 
 ## Architecture
 

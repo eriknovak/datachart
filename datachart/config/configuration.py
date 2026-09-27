@@ -57,18 +57,6 @@ BUILTIN_THEMES = frozenset(THEMES)
 THEME_FILE_VERSION = 1
 
 
-def _warn_renamed(old: str, new: str) -> None:
-    """Warn at the deprecated method's caller that `old` is now `new`."""
-
-    # this function, the deprecated method, then its caller
-    warnings.warn(
-        f"`{old}` is deprecated and will be removed in the next release; "
-        f"use `{new}` instead.",
-        DeprecationWarning,
-        stacklevel=3,
-    )
-
-
 class Config:
     """The class representing the configuration options.
 
@@ -190,7 +178,9 @@ class Config:
     def reset_config(self) -> None:
         """Deprecated: use `reset`, which it forwards to."""
 
-        _warn_renamed("reset_config", "reset")
+        from ..utils._internal.validate import warn_renamed
+
+        warn_renamed("reset_config", "reset")
         self.reset()
 
     def update(self, config: StyleAttrs) -> None:
@@ -215,14 +205,16 @@ class Config:
         self._update(config, stacklevel=2)
 
     def update_config(self, config: StyleAttrs) -> None:
-        """Deprecated: use `update`, which it forwards to.
+        """Deprecated: use `update`; it applies the attributes the same way.
 
         Args:
             config: The configuration attributes to be updated.
 
         """
 
-        _warn_renamed("update_config", "update")
+        from ..utils._internal.validate import warn_renamed
+
+        warn_renamed("update_config", "update")
         self._update(config, stacklevel=2)
 
     def _update(self, config: StyleAttrs, stacklevel: int) -> None:
