@@ -14,7 +14,11 @@ Rank over time, one line per series. The [Bump Chart guide](../../how-to-guides/
 
 ## Data
 
-Each record in `data` is a [`LineRecordAttrs`](linechart.md#datachart.typings.LineRecordAttrs); the `x` and `y` parameters rename its keys.
+Each record in `data` is a [`BumpRecordAttrs`](#datachart.typings.BumpRecordAttrs); the `x` and `y` parameters rename its keys.
+
+::: datachart.typings.BumpRecordAttrs
+    options:
+        heading_level: 3
 
 ## Style
 

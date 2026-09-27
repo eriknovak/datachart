@@ -4,6 +4,7 @@ import ast
 import inspect
 import unittest
 import warnings
+from typing import List, Union
 
 import datachart.typings as typings
 from datachart.themes._base import BASE_THEME
@@ -97,6 +98,19 @@ class TestTypingRoles(unittest.TestCase):
                     self.assertTrue(hasattr(typings, old))
 
 
+class TestRecordTypings(unittest.TestCase):
+    def test_stacked_area_and_bump_records_carry_no_yerr(self):
+        for record, chart in (
+            ("StackedAreaRecordAttrs", "_StackedAreaSingleChartAttrs"),
+            ("BumpRecordAttrs", "_BumpSingleChartAttrs"),
+        ):
+            with self.subTest(record=record):
+                attrs = getattr(typings, record)
+                self.assertEqual(set(attrs.__annotations__), {"x", "y"})
+                data = getattr(typings, chart).__annotations__["data"]
+                self.assertEqual(data.__args__, (attrs,))
+
+
 class TestThemeConformance(unittest.TestCase):
     """Every theme key is declared by exactly one style group, and back."""
 
@@ -142,6 +156,11 @@ class TestThemeConformance(unittest.TestCase):
     def test_overlay_group_is_in_the_union(self):
         self.assertIn("OverlayStyleAttrs", self.classes()["StyleAttrs"][0])
         self.assertEqual(len(typings.OverlayStyleAttrs.__annotations__), 11)
+
+    def test_linestyle_cycle_accepts_a_dash_pattern(self):
+        hint = typings.ThemeDefaultAttrs.__annotations__["plot_linestyle_cycle"]
+        entry = hint.__args__[0].__args__[0]
+        self.assertIn(List[Union[float, List[float]]], entry.__args__)
 
     def test_subtitle_font_accepts_str(self):
         hints = typings.FontStyleAttrs.__annotations__
