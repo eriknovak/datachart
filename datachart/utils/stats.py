@@ -607,12 +607,15 @@ def histogram(
 
     Raises:
         TypeError: If values is not a list or numpy array.
-        ValueError: If the bin rule is unknown.
+        ValueError: If a value is NaN, or the bin rule is unknown.
     """
     if not isinstance(values, (list, np.ndarray)):
         raise TypeError("The values variable must be a list or numpy array.")
     if len(values) == 0:
         return ([], [])
+    # NaN has no bin, and a count cannot pass it through as NaN
+    if np.isnan(np.asarray(values, dtype=float)).any():
+        raise ValueError("The `values` contain NaN, which falls in no bin.")
     edges = np.histogram_bin_edges(values, bins=bins)
     counts, _ = np.histogram(values, bins=edges)
     return (counts.tolist(), edges.tolist())
@@ -720,7 +723,8 @@ def loess(
 
     Returns:
         The `{x, y}` points of the smoothed curve, sorted by `x`; the `y` is
-        `nan` for fewer than two points.
+        `nan` for fewer than two points. NaN passes through: a NaN `y` enters
+        every local fit, so every smoothed `y` is `nan`.
 
     Raises:
         TypeError: If x or y is not a list or numpy array, or x mixes

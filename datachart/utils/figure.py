@@ -26,6 +26,7 @@ from ._internal.config_helpers import (
 )
 from ._internal.figures import new_figure
 from ._internal.plot_engine import SUBPLOT_FURNITURE_KEYS
+from ._internal.validate import validate_layout_specs
 
 # =====================================
 # Helper functions
@@ -123,7 +124,8 @@ def _render_cell(
 
     `overrides` are the enclosing grids' furniture, laid over the cell
     panel's own settings for this draw only; the stored panel keeps its own.
-    Returns the axes the panel drew into; None for a nested grid.
+    Returns the axes the panel drew into and the panel drawn; None for a
+    nested grid.
     """
     if "grid" in cell:
         subplot_spec = target_ax.get_subplotspec()
@@ -145,7 +147,7 @@ def _render_cell(
             panel = copy.copy(panel)
             panel.settings = {**panel.settings, **overrides}
         panel.render(target_ax)
-    return target_ax
+    return target_ax, panel
 
 
 def _render_subplot_panels(
@@ -312,28 +314,28 @@ def _render_grid_node(
 
     cell_axes = {}
     for index, (cell, ax) in enumerate(zip(node["cells"], placed)):
-        ax = _render_cell(owner, cell, ax, overrides)
-        if ax is None:
+        drawn = _render_cell(owner, cell, ax, overrides)
+        if drawn is None:
             continue
         if node.get("box_aspect"):
-            ax.set_box_aspect(node["box_aspect"])
-        cell_axes[index] = ax
+            drawn[0].set_box_aspect(node["box_aspect"])
+        cell_axes[index] = drawn
 
-    legend_ax = None
+    entries = None
     if legend and legend.get("cell") is not None:
-        legend_ax = cell_axes.get(legend["cell"])
+        drawn = cell_axes.get(legend["cell"])
+        entries = drawn[1].legend_entries(drawn[0]) if drawn else None
     elif legend:
-        legend_ax = next(
-            (ax for ax in cell_axes.values() if _legend_entries(ax)[1]), None
-        )
-    if legend_ax is not None:
+        found = (panel.legend_entries(ax) for ax, panel in cell_axes.values())
+        entries = next((e for e in found if e[1]), None)
+    if entries is not None:
         spec = {
             "right": sub_gs[body_rows, -1],
             "left": sub_gs[body_rows, 0],
             "top": sub_gs[row_offset - 1, body_cols],
             "bottom": sub_gs[-1, body_cols],
         }[edge]
-        _legend_axes(owner, spec, legend_ax, legend)
+        _legend_axes(owner, spec, entries, legend)
 
 
 def _label_axes(
@@ -361,13 +363,16 @@ def _label_axes(
 
 
 def _legend_axes(
-    owner: plt.Figure, spec: SubplotSpec, source: plt.Axes, legend: Dict[str, Any]
+    owner: plt.Figure,
+    spec: SubplotSpec,
+    entries: Tuple[list, list],
+    legend: Dict[str, Any],
 ) -> None:
-    """An invisible axes in `spec` carrying the legend of `source`'s entries.
+    """An invisible axes in `spec` carrying the legend of a cell's `entries`.
 
     A row legend with no column count lays its entries side by side.
     """
-    handles, labels = _legend_entries(source)
+    handles, labels = entries
     if not labels:
         return
     ax = owner.add_subplot(spec)
@@ -381,17 +386,6 @@ def _legend_axes(
     if legend.get("family"):
         for text in drawn.get_texts() + [drawn.get_title()]:
             text.set_fontfamily(legend["family"])
-
-
-def _legend_entries(source: plt.Axes) -> Tuple[list, list]:
-    """The legend handles and labels of a cell's axes and its twins."""
-    # the marks may sit on a hidden twin of the cell's axes
-    handles, labels = [], []
-    for sibling in source._twinned_axes.get_siblings(source):
-        entries = sibling.get_legend_handles_labels()
-        handles += entries[0]
-        labels += entries[1]
-    return handles, labels
 
 
 def node_legend(
@@ -781,17 +775,7 @@ def _grid_from_dicts(
         # Check if custom layout_spec is provided
         if "layout_spec" in chart_config:
             has_custom_layout = True
-            spec = chart_config["layout_spec"]
-
-            # Validate layout spec
-            required_keys = {"row", "col", "rowspan", "colspan"}
-            if not required_keys.issubset(spec.keys()):
-                missing = required_keys - set(spec.keys())
-                raise ValueError(
-                    f"charts[{idx}]['layout_spec'] missing required keys: {missing}"
-                )
-
-            layout_specs.append(spec)
+            layout_specs.append(chart_config["layout_spec"])
         else:
             layout_specs.append(None)
 
@@ -803,6 +787,7 @@ def _grid_from_dicts(
                 "When using custom layout, all charts must have 'layout_spec'. "
                 "Mix of custom and automatic layout is not supported."
             )
+        validate_layout_specs(layout_specs)
         use_custom_layout = True
     else:
         use_custom_layout = False
