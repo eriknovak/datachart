@@ -107,9 +107,9 @@ theme faces out of the wheel.
 - [0014](0014-histogram-stacking-and-step-defaults.md) — Histogram stacking moves to bar_mode; step edges follow the series (amended by [0080](0080-per-axis-stacking.md))
 - [0015](0015-radial-chart.md) — RadialChart is one front with a visual switch, on a projection-aware Panel (amended by [0052](0052-chart-prefixed-constants.md))
 - [0017](0017-pyramid-chart.md) — PyramidChart is a mirrored two-series bar front speaking spatial axes
-- [0019](0019-violin-plot.md) — ViolinPlot mirrors BoxPlot and draws its inner marks itself
+- [0019](0019-violin-plot.md) — ViolinPlot mirrors BoxPlot and draws its inner marks itself (amended by [0081](0081-violin-and-ridge-theme-defaults.md))
 - [0020](0020-swarm-plot-category-index.md) — SwarmPlot aligns with boxes through a panel category index, not bar slots (amended by [0079](0079-one-category-index-per-panel.md))
-- [0021](0021-raincloud-plot.md) — RaincloudPlot assembles the violin, swarm, and box layers with per-layer offsets
+- [0021](0021-raincloud-plot.md) — RaincloudPlot assembles the violin, swarm, and box layers with per-layer offsets (amended by [0081](0081-violin-and-ridge-theme-defaults.md))
 - [0022](0022-contour-chart.md) — ContourChart draws a gridded surface as lines or fills through one layer
 - [0023](0023-heatmap-chart-dicts.md) — Heatmap takes `{x, y, z}` chart dicts; `x` and `y` are labels, not coordinates
 - [0024](0024-hexbin-chart.md) — HexbinChart bins dense scatter data into colormapped hexagons (amended by [0035](0035-colorbar-setting.md))

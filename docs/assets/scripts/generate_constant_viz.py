@@ -828,7 +828,7 @@ def bandwidth():
         ("1.0", 1.0),
     ]
     figs = [
-        ViolinPlot(data=_violin_data(), bandwidth=value, inner=None, title=label)
+        ViolinPlot(data=_violin_data(), bandwidth=value, inner=VIOLIN_INNER.NO_INNER, title=label)
         for label, value in members
     ]
     chart_grid(

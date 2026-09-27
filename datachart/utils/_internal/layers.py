@@ -6059,8 +6059,10 @@ class ViolinLayer(GroupLayer):
 
     def _resolve_style(self):
         super()._resolve_style()
-        inner = (
-            theme_default("violinplot", self.settings, "inner") or VIOLIN_INNER.DEFAULT
+        inner = VIOLIN_INNER.check(
+            theme_default("violinplot", self.settings, "inner") or VIOLIN_INNER.DEFAULT,
+            # the front checks a call's inner; only a theme's fails here
+            "chart_default_violin_inner",
         )
         self.inner = None if inner == VIOLIN_INNER.NO_INNER else inner
         self.bandwidth = self.settings.get("bandwidth")

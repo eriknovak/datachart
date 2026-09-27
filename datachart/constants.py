@@ -1026,8 +1026,9 @@ class SWARM_MODE(Domain):
 class VIOLIN_INNER(Domain):
     """The supported violin inner marks.
 
-    Passed as the `inner` setting of violin and ridgeline plots; `None` takes
-    the theme's default.
+    Passed as the `inner` setting of violin and ridgeline plots. On a violin
+    plot `None` takes the theme's default; on a ridgeline plot it draws no
+    marks.
 
     ![VIOLIN_INNER at a glance](../assets/imgs/const-violin-inner.svg){ width="100%" }
 
@@ -1037,7 +1038,8 @@ class VIOLIN_INNER(Domain):
         "box"
 
     Attributes:
-        DEFAULT (str): The violin plot's default inner marks. Same as `VIOLIN_INNER.BOX`.
+        DEFAULT (str): The violin plot's inner marks when the theme sets none.
+            Same as `VIOLIN_INNER.BOX`.
         BOX (str): A thin quartile bar, a 1.5·IQR whisker line, and a median
             dot. Equals to `"box"`.
         QUARTILES (str): A dashed median line and dotted first and third

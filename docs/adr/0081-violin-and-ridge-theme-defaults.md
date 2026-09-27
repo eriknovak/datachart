@@ -10,7 +10,8 @@ A few front parameters hard-coded their default in the signature (issue
 could not change them, although every other default of these fronts
 resolves `None` against the config. ADR 0004 keeps the set of theme-backed
 settings enumerated and ADR 0071 says it does not grow there; this record
-grows it by four.
+grows it by four. It also amends ADR 0019, where `None` drew the body alone,
+and ADR 0021, whose cloud drew with `inner=None`.
 
 ## Commitments
 

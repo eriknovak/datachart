@@ -198,7 +198,8 @@ _Avoid_: density plot, bean plot
 **Inner**:
 The summary marks a violin draws inside its body from the data: `"box"` (thin
 quartile bar, 1.5·IQR whisker, median dot), `"quartiles"` (dashed/dotted lines
-clipped to the body), `"median"` (one line), or `None`. One enum, never
+clipped to the body), `"median"` (one line), or `"none"` (the body alone);
+`None` takes the theme's default. One enum, never
 matplotlib's `showmeans`/`showextrema`/`quantiles` switches.
 _Avoid_: inner box flag, show_median
 
