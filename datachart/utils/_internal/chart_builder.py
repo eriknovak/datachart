@@ -6,7 +6,10 @@ there are, and every record comes out under the row's canonical keys
 """
 
 import warnings
+from collections.abc import Iterable, Iterator
 from typing import Any, Dict, List, Optional, Tuple
+
+import numpy as np
 
 from .chart_kinds import ChartKind, chart_kind
 
@@ -310,13 +313,102 @@ def dict_datasets(chart_type: str, data: Any) -> List[dict]:
     kind = chart_kind(chart_type)
     datasets = data if isinstance(data, list) else [data]
     keys = kind.data_keys or ()
-    if not all(isinstance(d, dict) and all(k in d for k in keys) for d in datasets):
-        shape = " and ".join(f"`{k}`" for k in keys)
-        raise ValueError(
-            f"{kind.label[0].upper()}{kind.label[1:]} `data` must be a dict"
-            f"{' with ' + shape if shape else ''}, or a list of such dicts."
-        )
+    for dataset in datasets:
+        if not (isinstance(dataset, dict) and all(k in dataset for k in keys)):
+            shape = " and ".join(f"`{k}`" for k in keys)
+            raise ValueError(
+                f"{_front(kind)} `data` must be a dict"
+                f"{' with ' + shape if shape else ''}, or a list of such dicts; "
+                f"got {_type_name(dataset)}."
+            )
     return datasets
+
+
+def _record_datasets(kind: ChartKind, data: Any) -> Any:
+    """A record front's `data`, its tuples and generators read as lists.
+
+    Args:
+        kind: The front's row.
+        data: A list of records, a list of such lists, or a dict of columns.
+
+    Returns:
+        The data in the same shape, every sequence a list.
+
+    Raises:
+        ValueError: If the data has none of the three shapes, naming the
+            first chart, record, or column that breaks it.
+    """
+    data = _as_list(data)
+    if isinstance(data, dict):
+        return _columns(kind, data, "data")
+    if not isinstance(data, list):
+        raise ValueError(
+            f"{_front(kind)} `data` must be a list of records (dicts), a list "
+            f"of such lists, or a dict of columns; got {_type_name(data)}."
+        )
+    data = [_as_list(chart) for chart in data]
+    is_multi_chart = bool(data) and isinstance(data[0], list)
+    for index, chart in enumerate(data if is_multi_chart else [data]):
+        where = f"data[{index}]" if is_multi_chart else "data"
+        if isinstance(chart, dict):
+            data[index] = _columns(kind, chart, where)
+            continue
+        if not isinstance(chart, list):
+            raise ValueError(
+                f"{_front(kind)} `{where}` must be a list of records or a dict "
+                f"of columns; got {_type_name(chart)}."
+            )
+        for position, record in enumerate(chart):
+            if not isinstance(record, dict):
+                raise ValueError(
+                    f"{_front(kind)} record `{where}[{position}]` must be a "
+                    f"dict; got {_type_name(record)}."
+                )
+    return data
+
+
+def _columns(kind: ChartKind, data: dict, where: str) -> dict:
+    # a dict of columns: each value one sequence, never a scalar
+    columns = {key: _as_list(values) for key, values in data.items()}
+    for key, values in columns.items():
+        if not isinstance(values, (list, np.ndarray)):
+            raise ValueError(
+                f"{_front(kind)} column `{where}[{key!r}]` must be a list; "
+                f"got {_type_name(values)}."
+            )
+    return columns
+
+
+def _dict_datasets(data: Any) -> Any:
+    # a generator in a dict reads once as a list; tuples already serialise
+    data = _as_list(data)
+    datasets = data if isinstance(data, list) else [data]
+    read = [
+        (
+            {k: list(v) if isinstance(v, Iterator) else v for k, v in d.items()}
+            if isinstance(d, dict)
+            else d
+        )
+        for d in datasets
+    ]
+    return read if isinstance(data, list) else read[0]
+
+
+def _as_list(value: Any) -> Any:
+    # tuples and generators read as lists; dicts, strings and arrays stay whole
+    if isinstance(value, Iterable) and not isinstance(
+        value, (list, dict, str, bytes, np.ndarray)
+    ):
+        return list(value)
+    return value
+
+
+def _front(kind: ChartKind) -> str:
+    return f"{kind.label[0].upper()}{kind.label[1:]}"
+
+
+def _type_name(value: Any) -> str:
+    return type(value).__name__
 
 
 def _is_record_rows(kind: ChartKind, data: Any) -> bool:
@@ -386,6 +478,7 @@ def build_charts_structure(
             dict shape, or a record misses a required key.
     """
     kind = chart_kind(chart_type)
+    data = _dict_datasets(data) if kind.dict_data else _record_datasets(kind, data)
     if kind.data_keys is not None and isinstance(data, list) and not data:
         # no datasets draw one empty panel, like a bar chart without records
         return []
@@ -499,7 +592,7 @@ def canonical_records(
             for key in required:
                 if sources[key] is not None and sources[key] not in record:
                     raise ValueError(
-                        f"{kind.label[0].upper()}{kind.label[1:]} record "
+                        f"{_front(kind)} record "
                         f"`{where}[{index}]` has no `{sources[key]}` key."
                     )
             record = _canonical(record, sources)

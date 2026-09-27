@@ -373,9 +373,7 @@ class TestLogBars(ValueLabelCase):
     """A bar on a log axis draws and labels its true value."""
 
     def test_vertical_log_bar_keeps_its_value(self):
-        figure = BarChart(
-            [{"label": "A", "y": 10}], scaley="log", show_values=True
-        )
+        figure = BarChart([{"label": "A", "y": 10}], scaley="log", show_values=True)
         ax = figure.axes[0]
         self.assertEqual(ax.patches[0].get_height(), 10)
         self.assertEqual(texts(ax), ["10"])

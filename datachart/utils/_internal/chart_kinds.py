@@ -838,6 +838,7 @@ _KINDS = (
             {"colorbar", "norm", "value_format", "vcenter", "vmax", "vmin"}
         ),
         dict_data=True,
+        data_keys=(),
         renamed={"valfmt": "value_format"},
         # filled contour bands cover the grid
         gridless=_filled,
@@ -864,6 +865,7 @@ _KINDS = (
         ),
         defaults={"show_colorbars": True},
         dict_data=True,
+        data_keys=(),
         rejects=_no_emphasis(
             "HexbinChart",
             "a hexbin chart is a single colormapped layer with no series to "
@@ -907,7 +909,7 @@ _KINDS = (
         datasets=DatasetPolicy.SUBPLOT,
         overlayable=False,
     ),
-    ChartKind("imagechart", "image chart", ImageLayer, dict_data=True),
+    ChartKind("imagechart", "image chart", ImageLayer, dict_data=True, data_keys=()),
     ChartKind(
         "basemapchart",
         "basemap chart",

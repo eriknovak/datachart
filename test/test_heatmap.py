@@ -38,6 +38,12 @@ class TestHeatmapData(unittest.TestCase):
         with self.assertRaises(ValueError):
             Heatmap({"x": [1, 2, 3]})
 
+    def test_ragged_rows_name_the_row(self):
+        for z in ([[1, 2], [3]], [["a", "b"], ["c"]]):
+            with self.subTest(z=z):
+                with self.assertRaisesRegex(ValueError, r"row 1 has 1 value.*2"):
+                    Heatmap({"z": z})
+
     def test_x_length_mismatch_raises(self):
         with self.assertRaises(ValueError) as cm:
             Heatmap({"x": ["a", "b"], "z": Z})
