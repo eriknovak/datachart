@@ -51,7 +51,7 @@ def SwarmPlot(
     legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
     mode: Optional[Union[SWARM_MODE, str]] = None,
-    jitter: float = 0.4,
+    jitter: Optional[float] = None,
     show_values: Optional[bool] = None,
     value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
@@ -188,7 +188,8 @@ def SwarmPlot(
             none overlap, from the marker size at draw time (axis limits changed
             afterwards can shift the spacing); "strip" jitters them uniformly.
         jitter: The strip jitter width, as a fraction of the category width.
-            Only used with `mode="strip"`.
+            Only used with `mode="strip"`. None takes the theme's
+            `chart_default_jitter`.
         show_values: Whether to print each group's minimum, median, and
             maximum beside the points nearest them.
         value_format: Format string for the value labels: a

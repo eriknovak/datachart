@@ -166,6 +166,27 @@ class TestRidgelineMarks(unittest.TestCase):
         no_outline = RidgelinePlot(ridge_data(), show_outline=False).axes[0]
         self.assertEqual((len(fills(no_outline)), len(no_outline.lines)), (3, 0))
 
+    def test_theme_sets_the_marks_and_a_call_overrides_them(self):
+        config.update_config({"chart_default_ridgeline_fill": False})
+        ax = RidgelinePlot(ridge_data()).axes[0]
+        self.assertEqual((len(fills(ax)), len(ax.lines)), (0, 3))
+        self.assertEqual(len(fills(RidgelinePlot(ridge_data(), fill=True).axes[0])), 3)
+        config.update_config(
+            {
+                "chart_default_ridgeline_fill": True,
+                "chart_default_ridgeline_show_outline": False,
+            }
+        )
+        ax = RidgelinePlot(ridge_data()).axes[0]
+        self.assertEqual((len(fills(ax)), len(ax.lines)), (3, 0))
+        ax = RidgelinePlot(ridge_data(), show_outline=True).axes[0]
+        self.assertEqual(len(ax.lines), 3)
+
+    def test_inner_none_draws_no_marks(self):
+        for inner in (None, "none"):
+            ax = RidgelinePlot(ridge_data(), inner=inner, show_outline=False).axes[0]
+            self.assertEqual(len(ax.lines), 0)
+
     def test_inner_marks_stop_at_the_ridge(self):
         ax = RidgelinePlot(ridge_data(), inner="median", show_outline=False).axes[0]
         self.assertEqual(len(ax.lines), 3)

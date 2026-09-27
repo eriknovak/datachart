@@ -1,6 +1,6 @@
 ---
 status: accepted
-amended-by: [0033, 0048, 0071]
+amended-by: [0033, 0048, 0071, 0081]
 ---
 
 # Themes may supply defaults for chart settings and per-series hatch cycles

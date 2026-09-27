@@ -62,18 +62,19 @@ adds no tag; one that reverses, narrows, widens or replaces a commitment does.
 
 ## Themes and styling
 
-- [0004](0004-theme-driven-defaults-and-cycles.md) — Themes may supply defaults for chart settings and per-series hatch cycles (amended by [0033](0033-value-labels-across-charts.md), [0048](0048-ink-rendering-attributes-in-themes.md), [0071](0071-theme-default-naming-and-resolver.md))
+- [0004](0004-theme-driven-defaults-and-cycles.md) — Themes may supply defaults for chart settings and per-series hatch cycles (amended by [0033](0033-value-labels-across-charts.md), [0048](0048-ink-rendering-attributes-in-themes.md), [0071](0071-theme-default-naming-and-resolver.md), [0081](0081-violin-and-ridge-theme-defaults.md))
 - [0027](0027-render-scoped-rc-attributes-in-themes.md) — Render-scoped rc attributes in themes (amended by [0048](0048-ink-rendering-attributes-in-themes.md))
 - [0040](0040-json-theme-files-and-config-scopes.md) — Themes travel as JSON diff files, and temporary style changes are context-managed scopes
 - [0048](0048-ink-rendering-attributes-in-themes.md) — Ink rendering attributes in themes
 - [0058](0058-dark-theme.md) — A dark theme inverts the furniture, not the marks
-- [0071](0071-theme-default-naming-and-resolver.md) — A theme default is named for its parameter and read through one resolver
+- [0071](0071-theme-default-naming-and-resolver.md) — A theme default is named for its parameter and read through one resolver (amended by [0081](0081-violin-and-ridge-theme-defaults.md))
 - [0072](0072-typing-roles-and-theme-conformance.md) — Every public typing carries one of four role suffixes, and the theme keys are the style types
 - [0073](0073-palette-score-gate.md) — A palette is scored by one function, and every predefined theme passes its gate (amended by [0078](0078-palette-gate-warns-at-registration.md))
 - [0074](0074-theme-traits-and-palette-leads.md) — A look owns its furniture, a trait composes, a palette is a lead (amended by [0075](0075-furniture-defaults-follow-the-guidelines.md))
 - [0075](0075-furniture-defaults-follow-the-guidelines.md) — Furniture defaults follow the guidelines: no legend title, solid grids, and a warning when series outrun the palette (amended by [0077](0077-own-colored-series-take-no-palette-slot.md))
 - [0077](0077-own-colored-series-take-no-palette-slot.md) — A series with its own colour draws none from the palette
 - [0078](0078-palette-gate-warns-at-registration.md) — The palette gate warns when a theme is registered, not when one is derived
+- [0081](0081-violin-and-ridge-theme-defaults.md) — Themes set the violin inner, the strip jitter and the ridge marks
 
 See also 0009, which names the themes for their look, and 0063, which moves the
 theme faces out of the wheel.
@@ -106,9 +107,9 @@ theme faces out of the wheel.
 - [0014](0014-histogram-stacking-and-step-defaults.md) — Histogram stacking moves to bar_mode; step edges follow the series (amended by [0080](0080-per-axis-stacking.md))
 - [0015](0015-radial-chart.md) — RadialChart is one front with a visual switch, on a projection-aware Panel (amended by [0052](0052-chart-prefixed-constants.md))
 - [0017](0017-pyramid-chart.md) — PyramidChart is a mirrored two-series bar front speaking spatial axes
-- [0019](0019-violin-plot.md) — ViolinPlot mirrors BoxPlot and draws its inner marks itself
+- [0019](0019-violin-plot.md) — ViolinPlot mirrors BoxPlot and draws its inner marks itself (amended by [0081](0081-violin-and-ridge-theme-defaults.md))
 - [0020](0020-swarm-plot-category-index.md) — SwarmPlot aligns with boxes through a panel category index, not bar slots (amended by [0079](0079-one-category-index-per-panel.md))
-- [0021](0021-raincloud-plot.md) — RaincloudPlot assembles the violin, swarm, and box layers with per-layer offsets
+- [0021](0021-raincloud-plot.md) — RaincloudPlot assembles the violin, swarm, and box layers with per-layer offsets (amended by [0081](0081-violin-and-ridge-theme-defaults.md))
 - [0022](0022-contour-chart.md) — ContourChart draws a gridded surface as lines or fills through one layer
 - [0023](0023-heatmap-chart-dicts.md) — Heatmap takes `{x, y, z}` chart dicts; `x` and `y` are labels, not coordinates
 - [0024](0024-hexbin-chart.md) — HexbinChart bins dense scatter data into colormapped hexagons (amended by [0035](0035-colorbar-setting.md))

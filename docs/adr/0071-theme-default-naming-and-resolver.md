@@ -1,5 +1,6 @@
 ---
 status: accepted
+amended-by: [0081]
 ---
 
 # A theme default is named for its parameter and read through one resolver

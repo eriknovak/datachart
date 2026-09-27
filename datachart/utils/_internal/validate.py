@@ -224,7 +224,7 @@ def validate_ridgeline_inner(inner) -> None:
         raise ValueError(
             f"RidgelinePlot does not draw `inner` {inner!r}: a ridge has no "
             f"room for a box. Pass {VIOLIN_INNER.QUARTILES!r}, "
-            f"{VIOLIN_INNER.MEDIAN!r}, or None."
+            f"{VIOLIN_INNER.MEDIAN!r}, or {VIOLIN_INNER.NO_INNER!r}."
         )
 
 

@@ -884,7 +884,7 @@ def violin_horizontal_median():
 def violin_panel_box():
     data = violin_data(seed=7)
     return Panel(
-        [ViolinPlot(data=data, inner=None), BoxPlot(data=data, show_outliers=False)],
+        [ViolinPlot(data=data, inner="none"), BoxPlot(data=data, show_outliers=False)],
         title="Violin + box",
     )
 

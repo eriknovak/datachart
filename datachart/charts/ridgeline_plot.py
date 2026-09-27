@@ -131,8 +131,8 @@ def RidgelinePlot(
     overlap: Optional[float] = None,
     ridge_scale: Optional[Union[RIDGELINE_SCALE, str]] = None,
     inner: Optional[Union[VIOLIN_INNER, str]] = None,
-    fill: bool = True,
-    show_outline: bool = True,
+    fill: Optional[bool] = None,
+    show_outline: Optional[bool] = None,
     sort: Optional[Union[SORT, str]] = SORT.NONE,
     normalize: Optional[Union[RIDGELINE_SCALE, str]] = None,
 ) -> plt.Figure:
@@ -238,10 +238,12 @@ def RidgelinePlot(
             shapes compare; "common" keeps one density scale so heights compare. See
             [`RIDGELINE_SCALE`][datachart.constants.RIDGELINE_SCALE].
         inner: The marks drawn inside each ridge, up to its height: "median" (one line),
-            "quartiles" (dashed median, dotted Q1/Q3), or None. See
+            "quartiles" (dashed median, dotted Q1/Q3), or None or "none" (no marks). See
             [`VIOLIN_INNER`][datachart.constants.VIOLIN_INNER]; "box" is not supported.
-        fill: Whether to fill each ridge.
-        show_outline: Whether to stroke each ridge's density curve.
+        fill: Whether to fill each ridge. None takes the theme's
+            `chart_default_ridgeline_fill`.
+        show_outline: Whether to stroke each ridge's density curve. None takes
+            the theme's `chart_default_ridgeline_show_outline`.
         sort: The row order: None keeps input order, "ascending" or
             "descending" orders the rows by their median; ties keep input
             order. See [`SORT`][datachart.constants.SORT].
