@@ -41,6 +41,7 @@ adds no tag; one that reverses, narrows, widens or replaces a commitment does.
 - [0066](0066-front-body-one-call.md) — A chart front's body is one engine call; the row declares the key split (amended by [0067](0067-shared-parameter-table.md), [0069](0069-record-reading-seam.md))
 - [0067](0067-shared-parameter-table.md) — A shared parameter has one name, type and default; a table enforces it (amended by [0069](0069-record-reading-seam.md), [0083](0083-front-parameter-naming-rule.md))
 - [0083](0083-front-parameter-naming-rule.md) — A front parameter is snake_case, a mode is named for what it modes, and a toggle is `show_<singular>`
+- [0084](0084-public-names-outside-the-fronts.md) — Public names outside the fronts follow the front rule, and a stats helper returns columns
 - [0069](0069-record-reading-seam.md) — The builder is the one record-reading seam; the row declares the record shape and the dataset policy (amended by [0082](0082-missing-values-not-drawn.md))
 - [0082](0082-missing-values-not-drawn.md) — A missing value is not drawn; the builder normalises it once
 
