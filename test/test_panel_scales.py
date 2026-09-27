@@ -611,12 +611,21 @@ class TestGridScales:
             ("linear", "linear"),
         ]
 
-    def test_scaley_is_the_value_axis_of_a_horizontal_cell(self):
-        grid = Grid([hbar(), LineChart(data=LINE)], scaley="log")
+    def test_scales_name_the_literal_axes_of_a_horizontal_cell(self):
+        grid = Grid([hbar(), LineChart(data=LINE)], scalex="log")
         assert [scales(ax) for ax in render(grid)] == [
             ("log", "linear"),
-            ("linear", "log"),
+            ("log", "linear"),
         ]
+
+    def test_horizontal_cell_error_names_the_grid_key(self):
+        bars = [{"label": "A", "y": 0}, {"label": "B", "y": 3}]
+        horizontal = BarChart(data=bars, orientation=ORIENTATION.HORIZONTAL)
+        with pytest.raises(ValueError, match=r"`scalex` 'log' cannot show the value 0"):
+            Grid([horizontal], scalex="log")
+        box = BoxPlot(data=ZERO_GROUPS, orientation=ORIENTATION.HORIZONTAL)
+        with pytest.raises(ValueError, match=r"`scalex` 'log' cannot show the value 0"):
+            Grid([box], scalex="log")
 
     def test_nested_grid_takes_the_outer_scales(self):
         inner = Grid([LineChart(data=LINE), LineChart(data=LINE2)])

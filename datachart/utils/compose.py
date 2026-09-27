@@ -877,10 +877,9 @@ def Grid(
             keeps a map of longitude against latitude at true proportions.
             Default: each cell's own. See
             [`ASPECT_RATIO`][datachart.constants.ASPECT_RATIO].
-        scalex: The category-axis scale of every cell ("linear", "log",
-            "symlog", "asinh"). Default: each cell's own.
-        scaley: The value-axis scale of every cell, the x axis of a
-            horizontal chart. Default: each cell's own.
+        scalex: The x-axis scale of every cell ("linear", "log", "symlog",
+            "asinh"). Default: each cell's own.
+        scaley: The y-axis scale of every cell. Default: each cell's own.
 
     Returns:
         A new matplotlib Figure containing all charts in a grid layout.

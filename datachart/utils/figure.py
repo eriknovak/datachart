@@ -145,27 +145,9 @@ def _render_cell(
     if panel.layers:
         if overrides:
             panel = copy.copy(panel)
-            panel.settings = {
-                **panel.settings,
-                **_literal_scales(overrides, panel.horizontal),
-            }
+            panel.settings = {**panel.settings, **overrides}
         panel.render(target_ax)
     return target_ax, panel
-
-
-def _literal_scales(overrides: Dict[str, Any], horizontal: bool) -> Dict[str, Any]:
-    """The overrides with the grid's scales on the panel's literal axes.
-
-    A grid's `scalex` names the category axis and its `scaley` the value
-    axis, as a `Panel`'s do, so a horizontal panel takes them swapped.
-    """
-    if not horizontal:
-        return overrides
-    swapped = {k: v for k, v in overrides.items() if k not in ("scalex", "scaley")}
-    for key, literal in (("scalex", "scaley"), ("scaley", "scalex")):
-        if key in overrides:
-            swapped[literal] = overrides[key]
-    return swapped
 
 
 def _render_subplot_panels(
@@ -610,8 +592,7 @@ def _figure_grid_layout_impl(
         show_legend: Whether to draw one legend for the whole grid.
         legend: The legend setting; its location picks the grid edge.
         show_grid, xmin, xmax, ymin, ymax, aspect_ratio, scalex, scaley: Laid
-            over every cell's own setting when given; the scales name the
-            category and value axes.
+            over every cell's own setting when given.
 
     Returns:
         A new matplotlib Figure containing all charts in a grid layout.
@@ -674,6 +655,9 @@ def _figure_grid_layout_impl(
     if "show_grid" in overrides:
         # an explicit value, as a front's: a polar cell draws only what it names
         overrides["show_grid_explicit"] = True
+    if "scalex" in overrides or "scaley" in overrides:
+        # the grid's scales name literal axes, so a log error names them so
+        overrides["literal_scale_keys"] = True
 
     # the recursive cell tree lets this grid nest inside another Grid (ADR 0006)
     node = {
