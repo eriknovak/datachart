@@ -570,6 +570,13 @@ def get_chart_grid(chart: dict, kind: str, dtype=float) -> tuple:
     z = get_chart_data("z", chart)
     if z is None:
         raise ValueError(f"A {kind} chart requires the `z` grid in `data`.")
+    if isinstance(z, (list, tuple)) and all(isinstance(r, (list, tuple)) for r in z):
+        for index, row in enumerate(z[1:], start=1):
+            if len(row) != len(z[0]):
+                raise ValueError(
+                    f"The {kind} `z` grid is ragged: row {index} has {len(row)} "
+                    f"value(s), row 0 has {len(z[0])}."
+                )
     z = np.asarray(z, dtype=dtype)
     if z.ndim != 2:
         raise ValueError(

@@ -129,7 +129,7 @@ class TestDumbbellValidation(unittest.TestCase):
 
     def test_single_dict_raises(self):
         self.assertRaisesWith(
-            "non-empty list", data={"label": "A", "start": 1, "end": 2}
+            "must be a list", data={"label": "A", "start": 1, "end": 2}
         )
 
     def test_numpy_numbers_accepted(self):

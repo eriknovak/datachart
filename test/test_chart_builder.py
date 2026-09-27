@@ -6,8 +6,15 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import numpy as np
 
-from datachart.charts import CalendarHeatmap, DumbbellChart, GanttChart, LineChart
+from datachart.charts import (
+    CalendarHeatmap,
+    DumbbellChart,
+    GanttChart,
+    LineChart,
+    ScatterChart,
+)
 from datachart.utils._internal.chart_builder import build_charts_structure
 from datachart.utils._internal.chart_kinds import CHART_KINDS
 
@@ -83,7 +90,8 @@ class TestRecordRows(unittest.TestCase):
 
     def test_columns_are_renamed_too(self):
         charts = build_charts_structure("linechart", {"t": [1, 2], "y": [3, 4]}, x="t")
-        self.assertEqual(charts, [{"data": {"t": [1, 2], "x": [1, 2], "y": [3, 4]}}])
+        records = [{"t": 1, "x": 1, "y": 3}, {"t": 2, "x": 2, "y": 4}]
+        self.assertEqual(charts, [{"data": records}])
 
     def test_caller_records_are_not_mutated(self):
         data = [{"t": 1, "v": 2}]
@@ -125,6 +133,87 @@ class TestGridRows(unittest.TestCase):
                     build_charts_structure(name, [grid, grid]),
                     [{"data": grid}, {"data": grid}],
                 )
+
+
+class TestMalformedData(unittest.TestCase):
+    RECORDS = [{"x": 1, "y": 2}, {"x": 2, "y": 3}]
+
+    def assertRejects(self, chart_type, data, pattern):
+        with self.assertRaisesRegex(ValueError, pattern):
+            build_charts_structure(chart_type, data)
+
+    def test_non_list_data_names_front_shape_and_type(self):
+        for data, got in (
+            (None, "NoneType"),
+            (5, "int"),
+            ("abc", "str"),
+            (np.array([1, 2, 3]), "ndarray"),
+        ):
+            with self.subTest(data=data):
+                self.assertRejects(
+                    "linechart", data, rf"Line chart `data` must be .*records.*{got}"
+                )
+
+    def test_a_record_that_is_not_a_dict_is_named(self):
+        self.assertRejects("linechart", [1, 2], r"`data\[0\]` must be a dict.*int")
+        self.assertRejects(
+            "linechart",
+            [[{"x": 1, "y": 2}], [{"x": 1, "y": 2}, 5]],
+            r"`data\[1\]\[1\]`",
+        )
+
+    def test_a_column_that_is_not_a_list_is_named(self):
+        self.assertRejects("linechart", {"x": 1, "y": 2}, r"`data\['x'\]`.*int")
+
+    def test_columns_read_as_records(self):
+        columns = {"x": (1, 2), "y": np.array([3, 4])}
+        self.assertEqual(
+            build_charts_structure("linechart", columns),
+            [{"data": [{"x": 1, "y": 3}, {"x": 2, "y": 4}]}],
+        )
+
+    def test_columns_of_unequal_length_are_named(self):
+        self.assertRejects(
+            "linechart", {"x": [1, 2], "y": [3]}, r"equal lengths.*'x': 2, 'y': 1"
+        )
+
+    def test_scatter_draws_columns_like_records(self):
+        figure = ScatterChart({"x": [1, 2], "y": [3, 4]})
+        offsets = figure.axes[0].collections[0].get_offsets()
+        self.assertEqual(offsets.tolist(), [[1, 3], [2, 4]])
+        plt.close(figure)
+
+    def test_empty_data_still_passes(self):
+        self.assertEqual(build_charts_structure("linechart", []), [{"data": []}])
+
+    def test_tuples_and_generators_read_as_lists(self):
+        expected = build_charts_structure("linechart", self.RECORDS)
+        for data in (tuple(self.RECORDS), (r for r in self.RECORDS)):
+            with self.subTest(data=type(data).__name__):
+                self.assertEqual(build_charts_structure("linechart", data), expected)
+        nested = build_charts_structure("linechart", (tuple(self.RECORDS),) * 2)
+        self.assertEqual(
+            nested, build_charts_structure("linechart", [self.RECORDS] * 2)
+        )
+
+    def test_a_generator_draws_like_a_list(self):
+        figure = LineChart(r for r in self.RECORDS)
+        self.assertEqual(len(figure.axes[0].lines), 1)
+        plt.close(figure)
+
+    def test_a_generator_inside_a_grid_dict_reads_as_a_list(self):
+        grid = {"z": (row for row in [[1, 2], [3, 4]])}
+        self.assertEqual(
+            build_charts_structure("heatmap", grid), [{"data": {"z": [[1, 2], [3, 4]]}}]
+        )
+
+    def test_grid_fronts_reject_a_non_dict(self):
+        for name in GRIDS:
+            # a basemap's data may also be a feature name or a list of them
+            if name == "basemapchart":
+                continue
+            with self.subTest(kind=name):
+                self.assertRejects(name, 5, "`data` must be a dict")
 
 
 class TestFrontsThroughTheBuilder(unittest.TestCase):
