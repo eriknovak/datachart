@@ -2,6 +2,7 @@ import copy
 import json
 import tempfile
 import unittest
+import warnings
 from pathlib import Path
 
 from datachart.config import config
@@ -61,6 +62,35 @@ class TestConfig(unittest.TestCase):
         with self.assertRaises(ValueError):
             config.register_theme("bad", {"not_a_key": 1})
 
+    def test_register_theme_rejects_builtin_names(self):
+        for name in (THEME.DEFAULT, THEME.INK, "dark"):
+            with self.subTest(name=name):
+                with self.assertRaises(ValueError):
+                    config.register_theme(name, {"font_general_size": 42})
+        config.reset_config()
+        reset = copy.deepcopy(config.config)
+        config.set_theme("default")
+        self.assertEqual(config.config, reset)
+        self.assertEqual(config.config, DEFAULT_THEME)
+
+    def test_register_theme_replaces_a_custom_theme(self):
+        config.register_theme("mine", {"font_general_size": 7})
+        config.register_theme("mine", {"font_general_size": 9})
+        config.set_theme("mine")
+        self.assertEqual(config["font_general_size"], 9)
+
+    def test_update_config_copies_its_values(self):
+        colors = ["#111111", "#222222"]
+        config.update_config({"color_general_multiple": colors})
+        colors.append("#333333")
+        self.assertEqual(config["color_general_multiple"], ["#111111", "#222222"])
+
+    def test_update_config_warns_on_unknown_keys(self):
+        with self.assertWarnsRegex(UserWarning, "not_a_key") as caught:
+            config.update_config({"not_a_key": 1})
+        self.assertEqual(caught.filename, __file__)
+        self.assertNotIn("not_a_key", config.config)
+
 
 class TestScopes(unittest.TestCase):
     def tearDown(self):
@@ -80,6 +110,20 @@ class TestScopes(unittest.TestCase):
         self.assertEqual(
             config["font_general_size"], DEFAULT_THEME["font_general_size"]
         )
+
+    def test_override_alias_warning_points_at_the_caller(self):
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            with config.override(plot_bar_value_fontsize=12):
+                self.assertEqual(config["plot_value_fontsize"], 12)
+        deprecations = [w for w in caught if w.category is DeprecationWarning]
+        self.assertEqual(len(deprecations), 1)
+        self.assertEqual(deprecations[0].filename, __file__)
+
+    def test_update_config_alias_warning_points_at_the_caller(self):
+        with self.assertWarns(DeprecationWarning) as caught:
+            config.update_config({"plot_bar_value_fontsize": 12})
+        self.assertEqual(caught.filename, __file__)
 
     def test_override_restores_after_exception(self):
         before = copy.deepcopy(config.config)
@@ -202,6 +246,13 @@ class TestThemeFiles(unittest.TestCase):
         self.assertEqual(config.load_theme(path, name="caller"), "caller")
         for name in ("stem", "in-file", "caller"):
             self.assertIn(name, config.list_themes())
+
+    def test_load_builtin_name_raises_unless_renamed(self):
+        path = self.dir / "ink.json"
+        config.save_theme(path, name=THEME.INK)
+        with self.assertRaises(ValueError):
+            config.load_theme(path)
+        self.assertEqual(config.load_theme(path, name="my-ink"), "my-ink")
 
     def test_load_unknown_key_raises(self):
         path = self.dir / "bad.json"

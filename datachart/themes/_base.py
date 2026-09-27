@@ -573,3 +573,18 @@ def make_theme(overrides: StyleAttrs) -> StyleAttrs:
     theme = copy.deepcopy(BASE_THEME)
     theme.update(copy.deepcopy(overrides))
     return theme
+
+
+def complete_theme(theme: dict, stacklevel: int = 2) -> StyleAttrs:
+    """A complete theme from a partial one, filled from the default theme.
+
+    Alias keys warn and are renamed; an unknown key raises `ValueError`.
+    `stacklevel` counts from the caller of this function, as in `warnings.warn`.
+    """
+
+    warn_aliases(theme, stacklevel=stacklevel + 1)
+    theme = canonical_style(theme)
+    unknown = set(theme) - set(BASE_THEME)
+    if unknown:
+        raise ValueError(f"Unknown theme attributes: {sorted(unknown)}")
+    return make_theme(theme)
