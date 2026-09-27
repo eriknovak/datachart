@@ -1,6 +1,6 @@
 ---
 status: accepted
-amended-by: [0069]
+amended-by: [0069, 0083]
 ---
 
 # A shared parameter has one name, type and default; a table enforces it
