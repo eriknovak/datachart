@@ -349,7 +349,9 @@ def _record_datasets(kind: ChartKind, data: Any) -> Any:
             f"of such lists, or a dict of columns; got {_type_name(data)}."
         )
     data = [_as_list(chart) for chart in data]
-    is_multi_chart = bool(data) and isinstance(data[0], list)
+    is_multi_chart = bool(data) and (
+        isinstance(data[0], list) or _is_column_dict(data[0])
+    )
     for index, chart in enumerate(data if is_multi_chart else [data]):
         where = f"data[{index}]" if is_multi_chart else "data"
         if isinstance(chart, dict):
@@ -367,6 +369,18 @@ def _record_datasets(kind: ChartKind, data: Any) -> Any:
                     f"dict; got {_type_name(record)}."
                 )
     return data
+
+
+def _is_column_dict(chart: Any) -> bool:
+    # every value a column; a record holds at least one scalar, its data keys
+    return (
+        isinstance(chart, dict)
+        and bool(chart)
+        and all(
+            isinstance(v, Iterable) and not isinstance(v, (dict, str, bytes))
+            for v in chart.values()
+        )
+    )
 
 
 def _columns(kind: ChartKind, data: dict, where: str) -> List[dict]:
