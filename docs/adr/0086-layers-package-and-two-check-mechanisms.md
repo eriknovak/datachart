@@ -21,17 +21,20 @@ answer.
   `datachart/utils/_internal/layers/` re-exports from `__init__.py` exactly
   the names the other internal modules import from `layers` today; no import
   outside the package changes. Modules, in dependency order: `base`
-  (`Layer`, `DrawContext`, the mixins, `BarSlot`/`HistSlot`/`StackSlot`),
+  (`Layer`, `DrawContext`, the mixins, `BarSlot`/`HistSlot`/`StackSlot`,
+  and the ink path effects `_TextHalo`, `InkStroke`, `Etch`, which `Layer`
+  itself draws with),
   `ticks` (the locators and formatters), then one per family — `line`
   (`LineLayer`, `BumpLayer`, `StackedAreaLayer`), `bar` (`BarLayer`,
-  `GanttLayer`, `HistogramLayer`, `_LockedBarLocator`), `scatter`, `group`
+  `GanttLayer`, `HistogramLayer`, `KdeLayer`, `_LockedBarLocator`),
+  `scatter`, `group`
   (`GroupLayer`, `BoxLayer`, `SwarmLayer`, `DumbbellLayer`, `ViolinLayer`,
   `RidgelineLayer`), `grid` (`HeatmapLayer`, `CalendarHeatmapLayer`,
   `ContourLayer`, `HexbinLayer`), `position` (`DrawPositionLayer`,
   `ImageLayer`, `BasemapLayer`), `parallel` (`ParallelCoordsLayer`),
   `radial` (`RadialLayer` and its four subclasses), `relational`
   (`SankeyLayer`, `TreemapLayer`, `NetworkLayer` and their helper types),
-  `text` (`TextLayer`, `_TextHalo`, `InkStroke`, `Etch`) — and `panel`
+  `text` (`TextLayer`) — and `panel`
   (`Panel`, `LayerGroup`, `ScaledAxis`) last, importing from every family.
   The split is a move: classes already sit adjacent by family in the file.
 - **A capability is a mixin.** A check that asks whether a layer itself can
@@ -46,7 +49,8 @@ answer.
   dumbbell's minor grid — reads a boolean the front's `ChartKind` row
   declares (ADR 0065), copied onto the layer at build so `Panel` reads
   `layer.<field>` and never names a class. A new chart type opts in on its
-  row.
+  row. The row fields already naming such a policy (`tighten_xlim`,
+  `shared_bins`) are copied the same way rather than duplicated.
 - **`Panel` names no concrete layer class.** After the two rules, the only
   `isinstance` calls left in `panel` are against `Layer`, the mixins, and
   non-layer values (lists, tz objects). A test asserts it.
