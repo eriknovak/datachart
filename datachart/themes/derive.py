@@ -70,7 +70,7 @@ def _check_palette(lead: str) -> None:
         return
     try:
         load_palette(lead)
-    except Exception:
+    except ValueError:
         raise ValueError(
             f"Unknown lead palette: {lead!r}. Use a `COLORS` constant, a "
             "pypalettes palette name, or a list of colors."
