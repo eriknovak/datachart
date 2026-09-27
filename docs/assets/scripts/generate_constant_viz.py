@@ -807,13 +807,13 @@ def violin_inner():
         ("BOX", VIOLIN_INNER.BOX),
         ("QUARTILES", VIOLIN_INNER.QUARTILES),
         ("MEDIAN", VIOLIN_INNER.MEDIAN),
-        ("None", None),
+        ("NO_INNER", VIOLIN_INNER.NO_INNER),
     ]
     figs = [
         ViolinPlot(
             data=_violin_data(),
             inner=value,
-            title=f"VIOLIN_INNER.{label}" if value else "None",
+            title=f"VIOLIN_INNER.{label}",
         )
         for label, value in members
     ]

@@ -111,6 +111,15 @@ class TestSwarmPlot(unittest.TestCase):
         xs = _swarm_collections(ax)[0].get_offsets()[:, 0]
         self.assertLessEqual(np.abs(xs - np.round(xs)).max(), 0.1)
 
+    def test_theme_sets_the_jitter_and_a_call_overrides_it(self):
+        config.update_config({"chart_default_jitter": 0.0})
+        ax = SwarmPlot(group_data(), mode="strip").axes[0]
+        xs = _swarm_collections(ax)[0].get_offsets()[:, 0]
+        np.testing.assert_array_equal(xs, np.round(xs))
+        ax = SwarmPlot(group_data(), mode="strip", jitter=0.2).axes[0]
+        xs = _swarm_collections(ax)[0].get_offsets()[:, 0]
+        self.assertGreater(np.abs(xs - np.round(xs)).max(), 0)
+
     def test_invalid_mode_raises(self):
         with self.assertRaises(ValueError):
             SwarmPlot(group_data(), mode="dodge")

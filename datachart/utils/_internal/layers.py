@@ -5405,7 +5405,7 @@ class SwarmLayer(UnclippedMarksMixin, PointLabelMixin, GroupLayer):
                 else POINT_LABEL_SPOTS_VERTICAL
             )
         self.mode = self.settings.get("mode") or DEFAULT_SWARM_MODE
-        jitter = self.settings.get("jitter")
+        jitter = theme_default(None, self.settings, "jitter")
         self.jitter = DEFAULT_SWARM_JITTER if jitter is None else float(jitter)
         # a raincloud's rain sits off-center in a narrower cell (ADR 0021)
         self.offset = self.settings.get("offset") or 0.0
@@ -6059,7 +6059,10 @@ class ViolinLayer(GroupLayer):
 
     def _resolve_style(self):
         super()._resolve_style()
-        self.inner = self.settings.get("inner")
+        inner = (
+            theme_default("violinplot", self.settings, "inner") or VIOLIN_INNER.DEFAULT
+        )
+        self.inner = None if inner == VIOLIN_INNER.NO_INNER else inner
         self.bandwidth = self.settings.get("bandwidth")
         self.split = self.settings.get("split")
         # a raincloud keeps one half of the body: -1 the low side, +1 the high
@@ -6321,10 +6324,13 @@ class RidgelineLayer(GroupLayer):
             self.orientation = ORIENTATION.HORIZONTAL
             self.is_horizontal = True
         self.bandwidth = self.settings.get("bandwidth")
-        self.inner = self.settings.get("inner")
+        inner = self.settings.get("inner")
+        self.inner = None if inner == VIOLIN_INNER.NO_INNER else inner
         self.ridge_scale = self.settings.get("ridge_scale") or RIDGELINE_SCALE.DEFAULT
-        self.fill = self.settings.get("fill") is not False
-        self.show_outline = self.settings.get("show_outline") is not False
+        self.fill = theme_default("ridgelineplot", self.settings, "fill") is not False
+        self.show_outline = (
+            theme_default("ridgelineplot", self.settings, "show_outline") is not False
+        )
         validate_ridge_marks(self.fill, self.show_outline)
         self.ridge_style = get_ridgeline_style(self.style)
         self.overlap = validate_overlap(
@@ -11020,7 +11026,7 @@ def build_raincloud_layers(chart: dict, settings: dict) -> List[Layer]:
             **settings,
             # the box prints the median and the rain the extremes (ADR 0033)
             "show_values": False,
-            "inner": None,
+            "inner": VIOLIN_INNER.NO_INNER,
             "split": None,
             "side": 1,
             "offset": RAINCLOUD_CLOUD_OFFSET,

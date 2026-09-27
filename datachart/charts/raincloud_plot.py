@@ -56,7 +56,7 @@ def RaincloudPlot(
     show_values: Optional[bool] = None,
     value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     mode: Optional[Union[SWARM_MODE, str]] = None,
-    jitter: float = 0.4,
+    jitter: Optional[float] = None,
     bandwidth: Optional[Union[BANDWIDTH, str, float]] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     orientation: Optional[Union[ORIENTATION, str]] = None,
@@ -200,7 +200,8 @@ def RaincloudPlot(
             none overlap; "strip" jitters them uniformly.
         jitter: The strip jitter width, as a fraction of the category width
             like `SwarmPlot`, scaled down to the rain's narrower cell. Only
-            used with `mode="strip"`.
+            used with `mode="strip"`. None takes the theme's
+            `chart_default_jitter`.
         bandwidth: The cloud's KDE bandwidth: None or "scott" (Scott's rule),
             "silverman" (Silverman's rule), or a scalar factor. See
             [`BANDWIDTH`][datachart.constants.BANDWIDTH].

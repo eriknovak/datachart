@@ -42,6 +42,7 @@ from .constants import (
     ORIENTATION,
     SHOW_GRID,
     VALUE_FORMAT,
+    VIOLIN_INNER,
 )
 
 # ================================================
@@ -1160,6 +1161,17 @@ class ThemeDefaultAttrs(TypedDict):
         chart_default_ridgeline_overlap (Union[float, None]): The theme default
             for the ridgeline plot's `overlap`, how far a peak rises into the
             row above, in `[0, 1]`.
+        chart_default_ridgeline_fill (Union[bool, None]): The theme default
+            for the ridgeline plot's `fill`, whether each ridge is filled.
+        chart_default_ridgeline_show_outline (Union[bool, None]): The theme
+            default for the ridgeline plot's `show_outline`, whether each
+            ridge's density curve is stroked.
+        chart_default_violin_inner (Union[VIOLIN_INNER, str, None]): The theme
+            default for the violin plot's `inner`, the marks drawn inside
+            each body.
+        chart_default_jitter (Union[float, None]): The theme default for
+            `jitter`, the strip width of swarm and raincloud points, as a
+            fraction of the category width.
         chart_default_network_label_position (Union[NETWORK_LABEL_POSITION, str, None]):
             The theme default for the network chart's `label_position`, applied
             when the chart call leaves it unset. `None` means the theme has no
@@ -1185,6 +1197,10 @@ class ThemeDefaultAttrs(TypedDict):
     chart_default_show_values: Union[bool, None]
     chart_default_calendar_heatmap_week_start: Union[CALENDAR_WEEKDAY, str, None]
     chart_default_ridgeline_overlap: Union[float, None]
+    chart_default_ridgeline_fill: Union[bool, None]
+    chart_default_ridgeline_show_outline: Union[bool, None]
+    chart_default_violin_inner: Union[VIOLIN_INNER, str, None]
+    chart_default_jitter: Union[float, None]
     chart_default_network_label_position: Union[NETWORK_LABEL_POSITION, str, None]
     plot_hatch_cycle: Union[List[str], None]
     # a dash pattern is a list, not a tuple, so it survives a JSON round trip

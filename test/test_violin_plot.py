@@ -45,7 +45,7 @@ class TestViolinPlot(unittest.TestCase):
         self.assertEqual(list(ax.get_xticks()), [0, 1, 2])
 
     def test_inner_modes_draw_expected_marks(self):
-        base = len(ViolinPlot(violin_data(), inner=None).axes[0].lines)
+        base = len(ViolinPlot(violin_data(), inner="none").axes[0].lines)
         self.assertEqual(base, 0)
         # box: whisker + quartile bar + median dot per violin
         self.assertEqual(len(ViolinPlot(violin_data(), inner="box").axes[0].lines), 9)
@@ -57,6 +57,20 @@ class TestViolinPlot(unittest.TestCase):
         self.assertEqual(
             len(ViolinPlot(violin_data(), inner="median").axes[0].lines), 3
         )
+
+    def test_theme_sets_the_inner_and_a_call_overrides_it(self):
+        config.update_config({"chart_default_violin_inner": VIOLIN_INNER.MEDIAN})
+        self.assertEqual(len(ViolinPlot(violin_data()).axes[0].lines), 3)
+        self.assertEqual(len(ViolinPlot(violin_data(), inner="box").axes[0].lines), 9)
+
+    def test_a_theme_without_an_inner_draws_the_box(self):
+        config.update_config({"chart_default_violin_inner": None})
+        self.assertEqual(len(ViolinPlot(violin_data()).axes[0].lines), 9)
+
+    def test_raincloud_cloud_ignores_the_violin_inner_default(self):
+        before = len(RaincloudPlot(violin_data()).axes[0].lines)
+        config.update_config({"chart_default_violin_inner": VIOLIN_INNER.QUARTILES})
+        self.assertEqual(len(RaincloudPlot(violin_data()).axes[0].lines), before)
 
     def test_invalid_inner_raises(self):
         with self.assertRaises(ValueError):
@@ -135,7 +149,7 @@ class TestViolinPlot(unittest.TestCase):
     def test_panel_with_box_plot(self):
         data = violin_data()
         figure = Panel(
-            [ViolinPlot(data, inner=None), BoxPlot(data, show_outliers=False)]
+            [ViolinPlot(data, inner="none"), BoxPlot(data, show_outliers=False)]
         )
         ax = figure.axes[0]
         self.assertEqual(len(bodies(ax)), 3)
@@ -229,7 +243,7 @@ class TestSubtitleLegend(unittest.TestCase):
         data = violin_data()
         figure = Panel(
             [
-                ViolinPlot(data, inner=None, subtitle="density"),
+                ViolinPlot(data, inner="none", subtitle="density"),
                 BoxPlot(data, show_outliers=False, subtitle="quartiles"),
                 SwarmPlot(data, subtitle="runs"),
             ],

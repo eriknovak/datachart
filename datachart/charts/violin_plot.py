@@ -127,7 +127,7 @@ def ViolinPlot(
     ] = None,
     label: Optional[Union[str, List[Optional[str]]]] = None,
     value: Optional[Union[str, List[Optional[str]]]] = None,
-    inner: Optional[Union[VIOLIN_INNER, str]] = VIOLIN_INNER.BOX,
+    inner: Optional[Union[VIOLIN_INNER, str]] = None,
     bandwidth: Optional[Union[BANDWIDTH, str, float]] = None,
     split: Optional[str] = None,
 ) -> plt.Figure:
@@ -230,7 +230,9 @@ def ViolinPlot(
         value: The key name in data for numeric values (default: "value").
         inner: The marks drawn inside each body: "box" (quartile bar, 1.5·IQR whisker,
             median dot), "quartiles" (dashed median, dotted Q1/Q3), "median" (one line),
-            or None (body only). See [`VIOLIN_INNER`][datachart.constants.VIOLIN_INNER].
+            or "none" (body only). None takes the theme's
+            `chart_default_violin_inner`. See
+            [`VIOLIN_INNER`][datachart.constants.VIOLIN_INNER].
         bandwidth: The KDE bandwidth: None or "scott" (Scott's rule), "silverman", or a
             scalar factor. See [`BANDWIDTH`][datachart.constants.BANDWIDTH].
         split: The key name in data whose exactly two distinct values become the

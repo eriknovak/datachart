@@ -1026,7 +1026,8 @@ class SWARM_MODE(Domain):
 class VIOLIN_INNER(Domain):
     """The supported violin inner marks.
 
-    Passed as the `inner` setting of violin plots; `None` draws the body only.
+    Passed as the `inner` setting of violin and ridgeline plots; `None` takes
+    the theme's default.
 
     ![VIOLIN_INNER at a glance](../assets/imgs/const-violin-inner.svg){ width="100%" }
 
@@ -1043,6 +1044,7 @@ class VIOLIN_INNER(Domain):
             quartile lines, clipped to the body. Equals to `"quartiles"`.
         MEDIAN (str): A single solid median line clipped to the body. Equals
             to `"median"`.
+        NO_INNER (str): No inner marks, the body alone. Equals to `"none"`.
 
     """
 
@@ -1050,6 +1052,7 @@ class VIOLIN_INNER(Domain):
     BOX = "box"
     QUARTILES = "quartiles"
     MEDIAN = "median"
+    NO_INNER = "none"
 
 
 class RIDGELINE_SCALE(Domain):

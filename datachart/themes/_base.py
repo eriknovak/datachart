@@ -20,6 +20,7 @@ from ..constants import (
     LINE_STYLE,
     SHOW_GRID,
     TRAIT,
+    VIOLIN_INNER,
 )
 
 # renamed style keys, each kept for one release (ADRs 0033, 0071, 0072)
@@ -139,6 +140,10 @@ BASE_THEME: StyleAttrs = {
     "chart_default_show_values": None,
     "chart_default_calendar_heatmap_week_start": CALENDAR_WEEKDAY.MONDAY,
     "chart_default_ridgeline_overlap": 0.5,
+    "chart_default_ridgeline_fill": True,
+    "chart_default_ridgeline_show_outline": True,
+    "chart_default_violin_inner": VIOLIN_INNER.BOX,
+    "chart_default_jitter": 0.4,
     "chart_default_network_label_position": None,
     "plot_hatch_cycle": None,
     "plot_linestyle_cycle": None,
