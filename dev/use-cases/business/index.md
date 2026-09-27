@@ -138,7 +138,7 @@ signups_figure = CalendarHeatmap(
     aspect_ratio=ASPECT_RATIO.AUTO,
     # cap the scale so the launch saturates instead of washing out the rhythm
     vmax=130,
-    show_colorbars=True,
+    show_colorbar=True,
     colorbar={"label": "Sign-ups"},
 )
 signups_figure.show()

@@ -690,21 +690,22 @@ kde1d(
     values: list[int | float],
     *,
     bandwidth: BANDWIDTH | str | float | None = None,
-    gridsize: int = 100,
+    grid_size: int | None = None,
     cut: float = 3,
-    xlim: tuple[float, float] | None = None
+    xlim: tuple[float, float] | None = None,
+    gridsize: int | None = None
 ) -> list[dict[str, float]]
 ```
 
 Estimates the density of the values as a curve.
 
-A Gaussian kernel density estimate evaluated on `gridsize` evenly spaced points over the range of the values, extended by `cut` bandwidths on each side so the curve tails off instead of being clipped at the extremes, or over an explicit `xlim` so several curves share one grid. The result is a list of `{x, y}` points ready for `LineChart`; the curve integrates to 1, so it overlays a density `Histogram` of the same values.
+A Gaussian kernel density estimate evaluated on `grid_size` evenly spaced points over the range of the values, extended by `cut` bandwidths on each side so the curve tails off instead of being clipped at the extremes, or over an explicit `xlim` so several curves share one grid. The result is a list of `{x, y}` points ready for `LineChart`; the curve integrates to 1, so it overlays a density `Histogram` of the same values.
 
 Examples:
 
 ```
 >>> from datachart.utils.stats import kde1d
->>> curve = kde1d([1, 2, 2, 3, 3, 3, 4, 4, 5], gridsize=5, cut=0)
+>>> curve = kde1d([1, 2, 2, 3, 3, 3, 4, 4, 5], grid_size=5, cut=0)
 >>> [round(point["x"], 2) for point in curve]
 [1.0, 2.0, 3.0, 4.0, 5.0]
 >>> round(sum(point["y"] for point in curve), 2)
@@ -715,9 +716,10 @@ Examples:
 | ----------- | --------------------------------------------------------------------------------------------------------------------------- |
 | `values`    | The values to estimate the density of. **TYPE:** \`list\[int                                                                |
 | `bandwidth` | The kernel bandwidth: None or "scott" (Scott's rule), "silverman", or a scalar factor. See BANDWIDTH. **TYPE:** \`BANDWIDTH |
-| `gridsize`  | The number of points the curve is evaluated on. **TYPE:** `int` **DEFAULT:** `100`                                          |
+| `grid_size` | The number of points the curve is evaluated on; 100 by default. **TYPE:** \`int                                             |
 | `cut`       | How many bandwidths to extend the grid past the extremes. **TYPE:** `float` **DEFAULT:** `3`                                |
 | `xlim`      | The (min, max) range of the grid; overrides the padded range. **TYPE:** \`tuple[float, float]                               |
+| `gridsize`  | Deprecated; use grid_size. Removed in the next release. **TYPE:** \`int                                                     |
 
 | RETURNS                  | DESCRIPTION                             |
 | ------------------------ | --------------------------------------- |
@@ -735,22 +737,23 @@ kde2d(
     y: list[int | float],
     *,
     bandwidth: BANDWIDTH | str | float | None = None,
-    gridsize: int | tuple[int, int] = 100,
+    grid_size: int | tuple[int, int] | None = None,
     cut: float = 3,
     xlim: tuple[Any, Any] | None = None,
-    ylim: tuple[float, float] | None = None
+    ylim: tuple[float, float] | None = None,
+    gridsize: int | tuple[int, int] | None = None
 ) -> dict[str, list]
 ```
 
 Estimates the density of the (x, y) points as a gridded surface.
 
-A Gaussian kernel density estimate evaluated on a `gridsize` × `gridsize` grid over the range of the points, extended by `cut` bandwidths on each side so the outer contours close instead of being clipped, or over explicit `xlim`/`ylim` so several surfaces share one grid. The result is an `{x, y, z}` chart dict ready for `ContourChart` — the density chart of a scattered dataset is `ContourChart(kde2d(x, y))`. A temporal `x` (dates, datetimes, or `datetime64`) gives a grid of datetime `x` values, in the input's zone, and `xlim` may then be a pair of datetimes.
+A Gaussian kernel density estimate evaluated on a `grid_size` × `grid_size` grid over the range of the points, extended by `cut` bandwidths on each side so the outer contours close instead of being clipped, or over explicit `xlim`/`ylim` so several surfaces share one grid. The result is an `{x, y, z}` chart dict ready for `ContourChart` — the density chart of a scattered dataset is `ContourChart(kde2d(x, y))`. A temporal `x` (dates, datetimes, or `datetime64`) gives a grid of datetime `x` values, in the input's zone, and `xlim` may then be a pair of datetimes.
 
 Examples:
 
 ```
 >>> from datachart.utils.stats import kde2d
->>> surface = kde2d([1, 2, 3, 4], [1, 3, 2, 4], gridsize=(3, 2), cut=0)
+>>> surface = kde2d([1, 2, 3, 4], [1, 3, 2, 4], grid_size=(3, 2), cut=0)
 >>> surface["x"], surface["y"]
 ([1.0, 2.5, 4.0], [1.0, 4.0])
 >>> [[round(z, 3) for z in row] for row in surface["z"]]
@@ -762,10 +765,11 @@ Examples:
 | `x`         | The x values of the points, numeric or temporal. **TYPE:** \`list\[int                                                      |
 | `y`         | The y values of the points, one per x value. **TYPE:** \`list\[int                                                          |
 | `bandwidth` | The kernel bandwidth: None or "scott" (Scott's rule), "silverman", or a scalar factor. See BANDWIDTH. **TYPE:** \`BANDWIDTH |
-| `gridsize`  | The number of grid columns and rows, as one number or an (x, y) pair. **TYPE:** \`int                                       |
+| `grid_size` | The number of grid columns and rows, as one number or an (x, y) pair; 100 by default. **TYPE:** \`int                       |
 | `cut`       | How many bandwidths to extend the grid past the extremes. **TYPE:** `float` **DEFAULT:** `3`                                |
 | `xlim`      | The (min, max) x range of the grid; overrides the padded range. **TYPE:** \`tuple[Any, Any]                                 |
 | `ylim`      | The (min, max) y range of the grid; overrides the padded range. **TYPE:** \`tuple[float, float]                             |
+| `gridsize`  | Deprecated; use grid_size. Removed in the next release. **TYPE:** \`int                                                     |
 
 | RETURNS           | DESCRIPTION                                      |
 | ----------------- | ------------------------------------------------ |

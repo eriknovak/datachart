@@ -38,7 +38,7 @@ Every customization is either a keyword argument of `SwarmPlot` or a `plot_swarm
 | resize the figure                             | `figsize`                                                 | [Figure size and grid](#figure-size-and-grid)                                                           |
 | show grid lines                               | `show_grid`                                               | [Figure size and grid](#figure-size-and-grid)                                                           |
 | change the point color, size, marker, or edge | `style={"plot_swarm_color": ..., "plot_swarm_size": ...}` | [Point style](#point-style)                                                                             |
-| jitter the points instead of packing them     | `mode`, `jitter`                                          | [Swarm and strip modes](#swarm-and-strip-modes)                                                         |
+| jitter the points instead of packing them     | `swarm_mode`, `jitter`                                    | [Swarm and strip modes](#swarm-and-strip-modes)                                                         |
 | draw the swarms horizontally                  | `orientation`                                             | [Horizontal swarms](#horizontal-swarms)                                                                 |
 | change the order of the groups                | the order of `data`                                       | [Horizontal swarms](#horizontal-swarms)                                                                 |
 | print each group's min, median, and max       | `show_values`, `value_format`                             | [Value labels](#value-labels)                                                                           |
@@ -65,7 +65,7 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `figsize`                                    | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                                                                                                                                   |
 | `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN) |
 | `show_grid`                                  | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                                                                                                                                 |
-| `mode`                                       | [`SWARM_MODE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SWARM_MODE)                                                                                                                               |
+| `swarm_mode`                                 | [`SWARM_MODE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SWARM_MODE)                                                                                                                               |
 | `value_format`                               | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                           |
 | `aspect_ratio`                               | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                           |
 | `orientation`                                | [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)                                                                                                                             |
@@ -144,7 +144,7 @@ SwarmPlot(
 
 ### Swarm and strip modes
 
-A swarm computes a place for every point so none overlap, which is what makes single points readable. With thousands of points that placement adds nothing: the swarm fills its whole width anyway, and grows wider than the category. `mode` picks the placement from [SWARM_MODE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SWARM_MODE): `SWARM_MODE.SWARM` packs the points from the marker size at the moment the chart is drawn (the default; axis limits changed on the figure afterwards can shift the spacing), and `SWARM_MODE.STRIP` scatters them at random across the category, a *strip plot*. `jitter` sets the width of the strip as a fraction of the category width (0.4 by default), and the jitter is seeded, so the same data draws the same chart. On the presidents the strip lets points overlap, so the swarm is the better choice for a sample this small; the strip earns its place in [Example 1](#example-1-which-services-breach-the-sla-strip-mode-log-scale-and-an-sla-line), with 1,200 points.
+A swarm computes a place for every point so none overlap, which is what makes single points readable. With thousands of points that placement adds nothing: the swarm fills its whole width anyway, and grows wider than the category. `swarm_mode` picks the placement from [SWARM_MODE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SWARM_MODE): `SWARM_MODE.SWARM` packs the points from the marker size at the moment the chart is drawn (the default; axis limits changed on the figure afterwards can shift the spacing), and `SWARM_MODE.STRIP` scatters them at random across the category, a *strip plot*. `jitter` sets the width of the strip as a fraction of the category width (0.4 by default), and the jitter is seeded, so the same data draws the same chart. On the presidents the strip lets points overlap, so the swarm is the better choice for a sample this small; the strip earns its place in [Example 1](#example-1-which-services-breach-the-sla-strip-mode-log-scale-and-an-sla-line), with 1,200 points.
 
 ```
 from datachart.constants import SWARM_MODE
@@ -152,7 +152,7 @@ from datachart.constants import SWARM_MODE
 SwarmPlot(
     data=inauguration_ages,
     # scatter the points at random instead of packing them
-    mode=SWARM_MODE.STRIP,
+    swarm_mode=SWARM_MODE.STRIP,
     # a strip a quarter of the category wide
     jitter=0.25,
     title="Age of US presidents at inauguration, strip mode",
@@ -603,7 +603,7 @@ The examples below put the features above to work on realistic data, each one an
 SwarmPlot(
     data=response_times,
     # scatter the many points across the category width
-    mode=SWARM_MODE.STRIP,
+    swarm_mode=SWARM_MODE.STRIP,
     # small, translucent points
     style={"plot_swarm_size": 6, "plot_swarm_alpha": 0.4, "plot_swarm_edge_width": 0},
     # the long tail reads at the same resolution as the bulk

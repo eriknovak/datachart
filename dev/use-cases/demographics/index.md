@@ -188,7 +188,7 @@ region_figure = Heatmap(
     ylabel="Statistical region, by median age in 2025",
     show_values=True,
     value_format="{x:.1f}",
-    show_colorbars=True,
+    show_colorbar=True,
     colorbar={"label": "Median age (years)"},
     figsize=(9.0, 5.5),
 )

@@ -47,9 +47,9 @@ Every customization is either a keyword argument of `HexbinChart` or a `plot_hex
 | format or rotate the tick labels           | `xticks_format`, `yticks_format`, `xticklabels`, `xtickrotate`   | [Title, axis labels and ticks](#title-axis-labels-and-ticks)                                            |
 | resize the figure                          | `figsize`                                                        | [Figure size and grid](#figure-size-and-grid)                                                           |
 | show the grid lines                        | `show_grid`                                                      | [Figure size and grid](#figure-size-and-grid)                                                           |
-| caption, move, or hide the colorbar        | `colorbar`, `value_format`, `show_colorbars`                     | [Colorbar](#colorbar)                                                                                   |
-| make the hexagons larger or smaller        | `gridsize`                                                       | [Grid size](#grid-size)                                                                                 |
-| leave the sparse hexagons blank            | `mincnt`                                                         | [Minimum count](#minimum-count)                                                                         |
+| caption, move, or hide the colorbar        | `colorbar`, `value_format`, `show_colorbar`                      | [Colorbar](#colorbar)                                                                                   |
+| make the hexagons larger or smaller        | `grid_size`                                                      | [Grid size](#grid-size)                                                                                 |
+| leave the sparse hexagons blank            | `min_count`                                                      | [Minimum count](#minimum-count)                                                                         |
 | spread heavy-tailed counts over the colors | `norm`, `vmin`, `vmax`                                           | [Normalization](#normalization)                                                                         |
 | color the hexagons by a value              | `c` in `data`, `reduce`                                          | [Aggregating a value](#aggregating-a-value)                                                             |
 | change the colormap or draw hexagon edges  | `style={"plot_hexbin_cmap": ..., "plot_hexbin_edge_width": ...}` | [Hexagon style](#hexagon-style)                                                                         |
@@ -130,7 +130,7 @@ HexbinChart(
 
 ### Colorbar
 
-The colorbar is the legend of a hexbin chart: without a caption, the reader does not know that the colors count listings. `colorbar` takes a [ColorbarSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ColorbarSettingAttrs) dictionary: `label` captions the bar, `location` moves it to any edge with a [COLORBAR_LOCATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORBAR_LOCATION) member, `ticks` places its ticks, and `format` formats their labels (the `value_format` parameter does the same when `format` is not set). A bar above a wide chart takes less width from the hexagons than one beside it. `show_colorbars=False` hides the bar, which suits a chart whose colors are explained elsewhere, as in the [Composing with Panel](#composing-with-panel) section.
+The colorbar is the legend of a hexbin chart: without a caption, the reader does not know that the colors count listings. `colorbar` takes a [ColorbarSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ColorbarSettingAttrs) dictionary: `label` captions the bar, `location` moves it to any edge with a [COLORBAR_LOCATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORBAR_LOCATION) member, `ticks` places its ticks, and `format` formats their labels (the `value_format` parameter does the same when `format` is not set). A bar above a wide chart takes less width from the hexagons than one beside it. `show_colorbar=False` hides the bar, which suits a chart whose colors are explained elsewhere, as in the [Composing with Panel](#composing-with-panel) section.
 
 ```
 from datachart.constants import COLORBAR_LOCATION
@@ -153,15 +153,15 @@ HexbinChart(
 
 ### Grid size
 
-The hexagon size decides what the chart can show. Large hexagons hold many points each, so the colors are smooth but the shape is coarse; small hexagons resolve finer structure until each holds too few points to color reliably. `gridsize` sets the number of hexagons across the x-axis (30 by default, from the `plot_hexbin_gridsize` style attribute). With 12 hexagons the listings reduce to a rough diagonal; with 60 the core shows its finer shape, at the price of a noisier color.
+The hexagon size decides what the chart can show. Large hexagons hold many points each, so the colors are smooth but the shape is coarse; small hexagons resolve finer structure until each holds too few points to color reliably. `grid_size` sets the number of hexagons across the x-axis (30 by default, from the `plot_hexbin_gridsize` style attribute). With 12 hexagons the listings reduce to a rough diagonal; with 60 the core shows its finer shape, at the price of a noisier color.
 
 ```
-for gridsize in [12, 60]:
+for grid_size in [12, 60]:
     HexbinChart(
         data=points,
         # the number of hexagons across the x-axis
-        gridsize=gridsize,
-        title=f"Apartment listings, {gridsize} hexagons across",
+        grid_size=grid_size,
+        title=f"Apartment listings, {grid_size} hexagons across",
         xlabel="Floor area (m²)",
         ylabel="Rent (€/month)",
         figsize=FIG_SIZE.FULL_SHORT,
@@ -170,13 +170,13 @@ for gridsize in [12, 60]:
 
 ### Minimum count
 
-Every hexagon of the tiling is drawn by default, so the tiling fills the whole bounding box of the points and empty plane looks like a region with few listings. `mincnt` leaves a hexagon blank unless at least that many points fall in it. `mincnt=1` draws only the hexagons that hold a listing, which shows the real outline of the data; a higher value also hides the hexagons with too few listings to trust.
+Every hexagon of the tiling is drawn by default, so the tiling fills the whole bounding box of the points and empty plane looks like a region with few listings. `min_count` leaves a hexagon blank unless at least that many points fall in it. `min_count=1` draws only the hexagons that hold a listing, which shows the real outline of the data; a higher value also hides the hexagons with too few listings to trust.
 
 ```
 HexbinChart(
     data=points,
     # blank the hexagons with fewer than five listings
-    mincnt=5,
+    min_count=5,
     title="Apartment listings",
     xlabel="Floor area (m²)",
     ylabel="Rent (€/month)",
@@ -186,7 +186,7 @@ HexbinChart(
 
 ### Normalization
 
-Counts are heavy-tailed: a few hexagons in the core hold hundreds of listings while most hold a handful, so on a linear color scale nearly every hexagon draws in the palest shade. `norm` changes how the values map to colors with a [COLOR_NORM](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLOR_NORM) member; `COLOR_NORM.LOG` spreads the counts, so the tail of the distribution becomes visible. A log scale needs positive values, so pair it with `mincnt=1`. `vmin` and `vmax` pin the color range instead of taking it from the data, which keeps the colors of several charts comparable.
+Counts are heavy-tailed: a few hexagons in the core hold hundreds of listings while most hold a handful, so on a linear color scale nearly every hexagon draws in the palest shade. `norm` changes how the values map to colors with a [COLOR_NORM](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLOR_NORM) member; `COLOR_NORM.LOG` spreads the counts, so the tail of the distribution becomes visible. A log scale needs positive values, so pair it with `min_count=1`. `vmin` and `vmax` pin the color range instead of taking it from the data, which keeps the colors of several charts comparable.
 
 ```
 from datachart.constants import COLOR_NORM
@@ -195,7 +195,7 @@ HexbinChart(
     data=points,
     # log-scaled counts, so the sparse tail stays visible
     norm=COLOR_NORM.LOG,
-    mincnt=1,
+    min_count=1,
     # the color range, from one listing to 300
     vmin=1,
     vmax=300,
@@ -209,7 +209,7 @@ HexbinChart(
 
 ### Aggregating a value
 
-Density is one question; the other is how a third value varies across the plane. With a `c` column in the data, each hexagon shows an aggregate of the `c` values of its points instead of the count. `reduce` picks the aggregate with a [HEXBIN_REDUCE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.HEXBIN_REDUCE) member: the mean by default, or the sum, median, minimum, or maximum. Only the hexagons holding a point are drawn, since an empty hexagon has nothing to aggregate, and an aggregate of one or two points is noisy, so `mincnt` hides those. Here `c` is the number of days a listing stayed on the market: the mean rises with the floor area and, at every area, with the rent.
+Density is one question; the other is how a third value varies across the plane. With a `c` column in the data, each hexagon shows an aggregate of the `c` values of its points instead of the count. `reduce` picks the aggregate with a [HEXBIN_REDUCE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.HEXBIN_REDUCE) member: the mean by default, or the sum, median, minimum, or maximum. Only the hexagons holding a point are drawn, since an empty hexagon has nothing to aggregate, and an aggregate of one or two points is noisy, so `min_count` hides those. Here `c` is the number of days a listing stayed on the market: the mean rises with the floor area and, at every area, with the rent.
 
 ```
 from datachart.constants import HEXBIN_REDUCE
@@ -220,7 +220,7 @@ HexbinChart(
     # the mean of the c values in every hexagon
     reduce=HEXBIN_REDUCE.MEAN,
     # blank the hexagons with fewer than three listings
-    mincnt=3,
+    min_count=3,
     colorbar={"label": "Mean days on the market"},
     title="How long apartments take to rent",
     xlabel="Floor area (m²)",
@@ -236,7 +236,7 @@ HexbinChart(
     data=listings,
     # the longest-listed apartment in every hexagon
     reduce=HEXBIN_REDUCE.MAX,
-    mincnt=3,
+    min_count=3,
     colorbar={"label": "Longest time on the market (days)"},
     title="The slowest listings",
     xlabel="Floor area (m²)",
@@ -255,14 +255,14 @@ from datachart.constants import COLORS
 HexbinChart(
     data=listings,
     reduce=HEXBIN_REDUCE.MEAN,
-    mincnt=3,
+    min_count=3,
     # a warm colormap and white edges between the hexagons
     style={
         "plot_hexbin_cmap": COLORS.YlOrRd,
         "plot_hexbin_edge_width": 0.6,
         "plot_hexbin_edge_color": "#FFFFFF",
     },
-    gridsize=20,
+    grid_size=20,
     colorbar={"label": "Mean days on the market"},
     title="How long apartments take to rent",
     xlabel="Floor area (m²)",
@@ -278,7 +278,7 @@ Sometimes the question is not the whole distribution but a part of it: where mos
 ```
 HexbinChart(
     data=listings,
-    mincnt=3,
+    min_count=3,
     # outline the hexagons with a mean wait above 40 days, fade the rest
     emphasis_rule={"above": 40},
     colorbar={"label": "Mean days on the market"},
@@ -314,7 +314,7 @@ HexbinChart(
     },
     # a rent budget of 800 to 1,200 €
     hspans={"ymin": 800, "ymax": 1200, "style": BUDGET_STYLE},
-    mincnt=1,
+    min_count=1,
     title="Apartment listings against a rent budget",
     xlabel="Floor area (m²)",
     ylabel="Rent (€/month)",
@@ -334,7 +334,7 @@ HexbinChart(
         "label": f"median rate, {rate:.0f} €/m²",
         "style": {"plot_dline_color": "#1d3557", "plot_dline_style": LINE_STYLE.DASHED},
     },
-    mincnt=1,
+    min_count=1,
     title="Apartment listings against the median rent per square metre",
     xlabel="Floor area (m²)",
     ylabel="Rent (€/month)",
@@ -352,7 +352,7 @@ A note on the chart says what the reader should see. `texts` places text at a po
 ```
 HexbinChart(
     data=points,
-    mincnt=1,
+    min_count=1,
     norm=COLOR_NORM.LOG,
     # a note in the empty corner, pointing at the tail
     texts={
@@ -371,7 +371,7 @@ HexbinChart(
 
 ## Multiple Hexbin Charts
 
-To compare several groups of points, pass a list of datasets to `data` and set `subplots=True`. Hexagons are opaque, so several datasets on one axes would cover each other; subplots keep each group visible. `subtitle` titles the subplots, while `title`, `xlabel` and `ylabel` stay global; `max_cols` limits the subplots per row, and `sharex` and `sharey` put the subplots on one axis range. The per-chart parameters (`subtitle`, `style`, `gridsize`, `reduce`, `mincnt`, `norm`, `vmin`, `vmax`, `value_format`, `colorbar`) take either one value for every chart or a list with one value per chart. Each subplot scales its colors to its own data, so the same `vmin` and `vmax` on every subplot are what makes the shades comparable. `points_by_district`, defined in a hidden cell, splits the listings by district: the center has fewer listings, and they sit higher on the rent axis.
+To compare several groups of points, pass a list of datasets to `data` and set `subplots=True`. Hexagons are opaque, so several datasets on one axes would cover each other; subplots keep each group visible. `subtitle` titles the subplots, while `title`, `xlabel` and `ylabel` stay global; `max_cols` limits the subplots per row, and `sharex` and `sharey` put the subplots on one axis range. The per-chart parameters (`subtitle`, `style`, `grid_size`, `reduce`, `min_count`, `norm`, `vmin`, `vmax`, `value_format`, `colorbar`) take either one value for every chart or a list with one value per chart. Each subplot scales its colors to its own data, so the same `vmin` and `vmax` on every subplot are what makes the shades comparable. `points_by_district`, defined in a hidden cell, splits the listings by district: the center has fewer listings, and they sit higher on the rent axis.
 
 ```
 HexbinChart(
@@ -388,8 +388,8 @@ HexbinChart(
     # the same color range for every district
     vmin=1,
     vmax=60,
-    mincnt=1,
-    gridsize=40,
+    min_count=1,
+    grid_size=40,
     title="Apartment listings by district",
     xlabel="Floor area (m²)",
     ylabel="Rent (€/month)",
@@ -420,12 +420,12 @@ Panel(
         {
             "figure": HexbinChart(
                 data=points,
-                mincnt=1,
+                min_count=1,
                 norm=COLOR_NORM.LOG,
                 # the budget band, labeled in the panel legend
                 hspans={"ymin": 800, "ymax": 1200, "label": "Budget", "style": BUDGET_STYLE},
                 style={"plot_hexbin_cmap": COLORS.Greys},
-                show_colorbars=False,
+                show_colorbar=False,
             ),
             "y_axis": "left",
         },
@@ -465,7 +465,7 @@ Grid(
         [
             HexbinChart(
                 data=points,
-                mincnt=1,
+                min_count=1,
                 norm=COLOR_NORM.LOG,
                 title="Listings",
                 xlabel="Floor area (m²)",
@@ -475,7 +475,7 @@ Grid(
         [
             HexbinChart(
                 data=listings,
-                mincnt=3,
+                min_count=3,
                 colorbar={"location": COLORBAR_LOCATION.BOTTOM},
                 title="Mean days on the market",
                 xlabel="Floor area (m²)",
@@ -506,7 +506,7 @@ HexbinChart(
     data=locations,
     # one kilometer is as long on both axes
     aspect_ratio=ASPECT_RATIO.EQUAL,
-    mincnt=1,
+    min_count=1,
     xmin=-10,
     xmax=10,
     ymin=-8,
@@ -525,8 +525,8 @@ Points spread over time are often too many for a scatter chart too: every listin
 ```
 HexbinChart(
     data=rents_by_date,
-    mincnt=1,
-    gridsize=24,
+    min_count=1,
+    grid_size=24,
     # one tick per quarter, labeled with the month name
     xticks=[date(2024, month, 1) for month in (1, 4, 7, 10)] + [date(2025, 1, 1)],
     xticks_format="%b",
@@ -552,7 +552,7 @@ config.set_theme(THEME.INK)
 
 figure = HexbinChart(
     data=points,
-    mincnt=1,
+    min_count=1,
     norm=COLOR_NORM.LOG,
     title="Apartment listings",
     xlabel="Floor area (m²)",
@@ -580,8 +580,8 @@ Panel(
         HexbinChart(
             data={"x": listings["x"], "y": listings["y"], "c": per_m2},
             reduce=HEXBIN_REDUCE.MEAN,
-            mincnt=3,
-            gridsize=40,
+            min_count=3,
+            grid_size=40,
             # a diverging colormap centered on the city-wide mean;
             # the "_r" suffix reverses it, so the cheap side is blue
             style={"plot_hexbin_cmap": "RdBu_r"},
@@ -615,8 +615,8 @@ Panel(
 ```
 HexbinChart(
     data=locations,
-    mincnt=1,
-    gridsize=40,
+    min_count=1,
+    grid_size=40,
     norm=COLOR_NORM.LOG,
     aspect_ratio=ASPECT_RATIO.EQUAL,
     # outline the 25 fullest hexagons
@@ -645,11 +645,11 @@ HexbinChart(
 ```
 def district_row(name, data):
     # the listings and the median wait of one district, on the same axes
-    frame = dict(gridsize=18, xmin=15, xmax=160, ymin=0, ymax=3500)
+    frame = dict(grid_size=18, xmin=15, xmax=160, ymin=0, ymax=3500)
     count = HexbinChart(
         data={"x": data["x"], "y": data["y"]},
         norm=COLOR_NORM.LOG,
-        mincnt=1,
+        min_count=1,
         vmin=1,
         vmax=300,
         title=f"{name}: listings",
@@ -658,7 +658,7 @@ def district_row(name, data):
     wait = HexbinChart(
         data=data,
         reduce=HEXBIN_REDUCE.MEDIAN,
-        mincnt=3,
+        min_count=3,
         # the same range in every district, so the shades compare
         vmin=5,
         vmax=45,

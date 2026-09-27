@@ -40,7 +40,7 @@ The hidden cell below holds the three tables. `EVENTS` is one tuple per earthqua
 
 ### Where does the seismicity concentrate?
 
-The first figure of an earthquake report is the map of the epicentres, and eight hundred points on one axes overplot wherever the activity is densest, which is exactly where the reader looks. A [hexbin chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/hexbinchart/index.md) bins them instead: the plane is tiled with hexagons and each one is coloured by the number of events inside it, so density reads as colour and nothing hides behind a marker. The counts span three orders of magnitude between a quiet hexagon and the aftershock zone, so `norm=COLOR_NORM.LOG` gives the colour scale a logarithmic reach and keeps the sparse cells visible. `mincnt=1` leaves the empty cells blank rather than colouring them as zero, and through them shows the ground: an [image chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/imagechart/index.md) draws the relief grid as a faded grey picture stretched over its extent, a [basemap chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/basemapchart/index.md) traces the coastline over it, and [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) puts both under the hexagons, so the density reads against the land and the sea it falls on. The grid's first row is its southern edge while a picture's first row is its top, so the rows are flipped. A degree of longitude at 38 degrees north is a fifth shorter than a degree of latitude, so `aspect_ratio=ASPECT_RATIO.GEOGRAPHIC` narrows it by that much and the region keeps its true shape.
+The first figure of an earthquake report is the map of the epicentres, and eight hundred points on one axes overplot wherever the activity is densest, which is exactly where the reader looks. A [hexbin chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/hexbinchart/index.md) bins them instead: the plane is tiled with hexagons and each one is coloured by the number of events inside it, so density reads as colour and nothing hides behind a marker. The counts span three orders of magnitude between a quiet hexagon and the aftershock zone, so `norm=COLOR_NORM.LOG` gives the colour scale a logarithmic reach and keeps the sparse cells visible. `min_count=1` leaves the empty cells blank rather than colouring them as zero, and through them shows the ground: an [image chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/imagechart/index.md) draws the relief grid as a faded grey picture stretched over its extent, a [basemap chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/basemapchart/index.md) traces the coastline over it, and [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) puts both under the hexagons, so the density reads against the land and the sea it falls on. The grid's first row is its southern edge while a picture's first row is its top, so the rows are flipped. A degree of longitude at 38 degrees north is a fifth shorter than a degree of latitude, so `aspect_ratio=ASPECT_RATIO.GEOGRAPHIC` narrows it by that much and the region keeps its true shape.
 
 ```
 LATITUDE, LONGITUDE, DEPTH, MAGNITUDE = 1, 2, 3, 4
@@ -70,13 +70,13 @@ relief_image = ImageChart(
 
 density = HexbinChart(
     {"x": longitude.tolist(), "y": latitude.tolist()},
-    gridsize=42,
+    grid_size=42,
     # counts run from 1 to several hundred, so the colour scale is logarithmic
     norm=COLOR_NORM.LOG,
-    mincnt=1,
+    min_count=1,
     # a hairline edge keeps the single-event cells visible on white
     style={"plot_hexbin_edge_width": 0.3, "plot_hexbin_edge_color": "#d0d0d0"},
-    show_colorbars=True,
+    show_colorbar=True,
     colorbar={"label": "Earthquakes of magnitude 4 and above"},
     texts={
         "text": "Kahramanmaraş\nsequence",
@@ -112,7 +112,7 @@ The bright cells trace lines rather than filling the box, and the lines are the 
 
 ### What does the ground under them look like?
 
-Epicentres are points on a surface, and the surface is what a reader needs in order to place them. A [contour chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/contourchart/index.md) draws a gridded field as filled bands between its level lines, so the ETOPO relief becomes the shape of the region: the Aegean basin, the Anatolian plateau, and the mountain front between them. The grid goes in as `z` with its `lat` and `lon` axes, `filled` shades the bands, and `levels` sets how many are drawn. Elevation is signed, so the colormap is a diverging one and `vmin` and `vmax` are set symmetrically about zero: sea level lands on its pale midpoint, and the coastline appears without a coastline dataset. The two mainshocks are `texts` notes anchored to their own coordinates.
+Epicentres are points on a surface, and the surface is what a reader needs in order to place them. A [contour chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/contourchart/index.md) draws a gridded field as filled bands between its level lines, so the ETOPO relief becomes the shape of the region: the Aegean basin, the Anatolian plateau, and the mountain front between them. The grid goes in as `z` with its `lat` and `lon` axes, `fill` shades the bands, and `levels` sets how many are drawn. Elevation is signed, so the colormap is a diverging one and `vmin` and `vmax` are set symmetrically about zero: sea level lands on its pale midpoint, and the coastline appears without a coastline dataset. The two mainshocks are `texts` notes anchored to their own coordinates.
 
 ```
 relief_figure = ContourChart(
@@ -120,14 +120,14 @@ relief_figure = ContourChart(
     title="The Aegean basin, the Anatolian plateau, and the front between them",
     xlabel="Longitude (°E)",
     ylabel="Latitude (°N)",
-    filled=True,
+    fill=True,
     levels=14,
     # a diverging colormap with the range symmetric about zero, so sea
     # level falls on its pale midpoint and the coastline draws itself
     style={"plot_contour_cmap": "BrBG_r"},
     vmin=-4500,
     vmax=4500,
-    show_colorbars=True,
+    show_colorbar=True,
     colorbar={"label": "Elevation (m)"},
     texts=[
         {
@@ -259,7 +259,7 @@ calendar_figure = CalendarHeatmap(
     aspect_ratio=ASPECT_RATIO.AUTO,
     # the mainshock day is an order of magnitude above any other
     vmax=12,
-    show_colorbars=True,
+    show_colorbar=True,
     colorbar={"label": "Earthquakes of magnitude 4 and above"},
 )
 calendar_figure.show()

@@ -24,7 +24,7 @@ HexbinChart(
     show_legend: bool | None = None,
     legend: LegendSettingAttrs | None = None,
     show_grid: SHOW_GRID | str | bool | None = None,
-    show_colorbars: bool | None = None,
+    show_colorbar: bool | None = None,
     aspect_ratio: ASPECT_RATIO | str | None = None,
     scalex: AXIS_SCALE | str | None = None,
     scaley: AXIS_SCALE | str | None = None,
@@ -37,11 +37,11 @@ HexbinChart(
         | list[HexbinStyleAttrs | None]
         | None
     ) = None,
-    gridsize: int | list[int | None] | None = None,
+    grid_size: int | list[int | None] | None = None,
     reduce: (
         HEXBIN_REDUCE | str | list[str | None] | None
     ) = None,
-    mincnt: int | list[int | None] | None = None,
+    min_count: int | list[int | None] | None = None,
     norm: COLOR_NORM | str | list[str | None] | None = None,
     vmin: float | list[float | None] | None = None,
     vmax: float | list[float | None] | None = None,
@@ -142,7 +142,10 @@ HexbinChart(
     ) = None,
     valfmt: (
         VALUE_FORMAT | str | list[str | None] | None
-    ) = None
+    ) = None,
+    show_colorbars: bool | None = None,
+    gridsize: int | list[int | None] | None = None,
+    mincnt: int | list[int | None] | None = None
 ) -> plt.Figure
 ```
 
@@ -182,7 +185,7 @@ Examples:
 | `show_legend`    | Whether to show the legend; it lists the labelled reference lines and bands. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                   |
 | `legend`         | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** \`LegendSettingAttrs                                                                                                                                                                                                                                                                          |
 | `show_grid`      | Which grid lines to show (e.g., "both", "x", "y"); False draws none. Off by default: the hexagons cover it. **TYPE:** \`SHOW_GRID                                                                                                                                                                                                                                                                                                               |
-| `show_colorbars` | Whether to show the colorbar(s). **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                               |
+| `show_colorbar`  | Whether to show the colorbar(s). **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                               |
 | `aspect_ratio`   | The aspect ratio of the axes ("auto" or "equal"). See ASPECT_RATIO. **TYPE:** \`ASPECT_RATIO                                                                                                                                                                                                                                                                                                                                                    |
 | `scalex`         | The x-axis scale (e.g., "log", "linear"). **TYPE:** \`AXIS_SCALE                                                                                                                                                                                                                                                                                                                                                                                |
 | `scaley`         | The y-axis scale (e.g., "log", "linear"). **TYPE:** \`AXIS_SCALE                                                                                                                                                                                                                                                                                                                                                                                |
@@ -191,9 +194,9 @@ Examples:
 | `sharex`         | Whether to share the x-axis in subplots. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                       |
 | `sharey`         | Whether to share the y-axis in subplots. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                       |
 | `style`          | Style configuration(s) for the hexbin chart(s). **TYPE:** \`HexbinStyleAttrs                                                                                                                                                                                                                                                                                                                                                                    |
-| `gridsize`       | The number of hexagons across the x-axis; the plot_hexbin_gridsize config value by default. **TYPE:** \`int                                                                                                                                                                                                                                                                                                                                     |
+| `grid_size`      | The number of hexagons across the x-axis; the plot_hexbin_gridsize config value by default. **TYPE:** \`int                                                                                                                                                                                                                                                                                                                                     |
 | `reduce`         | How the c values in a hexagon collapse into its color, one of HEXBIN_REDUCE (the mean by default). Ignored without c, where every hexagon shows its point count. **TYPE:** \`HEXBIN_REDUCE                                                                                                                                                                                                                                                      |
-| `mincnt`         | The point count below which a hexagon stays blank; every hexagon is drawn by default. **TYPE:** \`int                                                                                                                                                                                                                                                                                                                                           |
+| `min_count`      | The point count below which a hexagon stays blank; every hexagon is drawn by default. **TYPE:** \`int                                                                                                                                                                                                                                                                                                                                           |
 | `norm`           | Value normalization method(s) of the colormap; "log" spreads heavy-tailed counts. "centered" and "twoslope" hold vcenter in the middle of the theme's diverging colormap; see COLOR_NORM. **TYPE:** \`COLOR_NORM                                                                                                                                                                                                                                |
 | `vmin`           | Minimum value(s) for normalization. **TYPE:** \`float                                                                                                                                                                                                                                                                                                                                                                                           |
 | `vmax`           | Maximum value(s) for normalization. **TYPE:** \`float                                                                                                                                                                                                                                                                                                                                                                                           |
@@ -216,6 +219,9 @@ Examples:
 | `colorbar`       | The colorbar setting(s): label, location, tick format, and tick positions. See ColorbarSettingAttrs. **TYPE:** \`ColorbarSettingAttrs                                                                                                                                                                                                                                                                                                           |
 | `texts`          | Text annotation(s) to draw. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                                                                                                                                                                                                                        |
 | `valfmt`         | Deprecated; use value_format. Removed in the next release. **TYPE:** \`VALUE_FORMAT                                                                                                                                                                                                                                                                                                                                                             |
+| `show_colorbars` | Deprecated; use show_colorbar. Removed in the next release. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                    |
+| `gridsize`       | Deprecated; use grid_size. Removed in the next release. **TYPE:** \`int                                                                                                                                                                                                                                                                                                                                                                         |
+| `mincnt`         | Deprecated; use min_count. Removed in the next release. **TYPE:** \`int                                                                                                                                                                                                                                                                                                                                                                         |
 
 | RETURNS      | DESCRIPTION                             |
 | ------------ | --------------------------------------- |
@@ -253,7 +259,7 @@ The typing for the hexbin chart style.
 | `plot_hexbin_alpha`      | The alpha value of the hexagons. **TYPE:** \`float                                                                                           |
 | `plot_hexbin_edge_width` | The width of the hexagon edges; 0 draws none. **TYPE:** \`int                                                                                |
 | `plot_hexbin_edge_color` | The color of the hexagon edges. **TYPE:** \`str                                                                                              |
-| `plot_hexbin_gridsize`   | The number of hexagons across the x-axis when the chart sets no gridsize. **TYPE:** \`int                                                    |
+| `plot_hexbin_gridsize`   | The number of hexagons across the x-axis when the chart sets no grid_size. **TYPE:** \`int                                                   |
 
 ## Constants
 

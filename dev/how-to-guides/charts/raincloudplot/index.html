@@ -5705,7 +5705,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </tr>
 <tr>
 <td style="text-align:left">jitter the rain instead of packing it</td>
-<td style="text-align:left"><code>mode</code>, <code>jitter</code></td>
+<td style="text-align:left"><code>swarm_mode</code>, <code>jitter</code></td>
 <td style="text-align:left"><a href="#rain-modes">Rain modes</a></td>
 </tr>
 <tr>
@@ -5814,7 +5814,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <td style="text-align:left"><a href="../../../references/constants/#datachart.constants.VALUE_FORMAT"><code>VALUE_FORMAT</code></a></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>mode</code></td>
+<td style="text-align:left"><code>swarm_mode</code></td>
 <td style="text-align:left"><a href="../../../references/constants/#datachart.constants.SWARM_MODE"><code>SWARM_MODE</code></a></td>
 </tr>
 <tr>
@@ -6150,7 +6150,7 @@ RaincloudPlot(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="rain-modes">Rain modes<a class="anchor-link" href="#rain-modes">¶</a></h3><p>A swarm packs the rain so no two points overlap, which is exact but costs width and time as the groups grow. <code>mode</code> chooses how the rain spreads, with a <a href="../../../references/constants/#datachart.constants.SWARM_MODE">SWARM_MODE</a> member: <code>SWARM_MODE.SWARM</code> (the default) packs the points outward from the box, <code>SWARM_MODE.STRIP</code> scatters them at random across the rain's width. <code>jitter</code> sets the width of that band as a fraction of the category width (0.4, the default, fills the rain's cell); the jitter is seeded, so the same data draws the same chart. The strip mode suits many thousands of points, where a swarm would fill its whole width anyway.</p>
+<h3 id="rain-modes">Rain modes<a class="anchor-link" href="#rain-modes">¶</a></h3><p>A swarm packs the rain so no two points overlap, which is exact but costs width and time as the groups grow. <code>swarm_mode</code> chooses how the rain spreads, with a <a href="../../../references/constants/#datachart.constants.SWARM_MODE">SWARM_MODE</a> member: <code>SWARM_MODE.SWARM</code> (the default) packs the points outward from the box, <code>SWARM_MODE.STRIP</code> scatters them at random across the rain's width. <code>jitter</code> sets the width of that band as a fraction of the category width (0.4, the default, fills the rain's cell); the jitter is seeded, so the same data draws the same chart. The strip mode suits many thousands of points, where a swarm would fill its whole width anyway.</p>
 </div>
 </div>
 </div>
@@ -6178,7 +6178,7 @@ RaincloudPlot(
 <span class="n">RaincloudPlot</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">chart_data</span><span class="p">,</span>
     <span class="c1"># scatter the rain instead of packing it</span>
-    <span class="n">mode</span><span class="o">=</span><span class="n">SWARM_MODE</span><span class="o">.</span><span class="n">STRIP</span><span class="p">,</span>
+    <span class="n">swarm_mode</span><span class="o">=</span><span class="n">SWARM_MODE</span><span class="o">.</span><span class="n">STRIP</span><span class="p">,</span>
     <span class="c1"># in a band half as wide as the rain's cell</span>
     <span class="n">jitter</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Body mass of Palmer penguins, strip rain"</span><span class="p">,</span>
@@ -6193,7 +6193,7 @@ RaincloudPlot(
 RaincloudPlot(
     data=chart_data,
     # scatter the rain instead of packing it
-    mode=SWARM_MODE.STRIP,
+    swarm_mode=SWARM_MODE.STRIP,
     # in a band half as wide as the rain's cell
     jitter=0.2,
     title="Body mass of Palmer penguins, strip rain",
@@ -7781,7 +7781,7 @@ flipper_records[:2]</div>
     <span class="n">data</span><span class="o">=</span><span class="n">stroop_trials</span><span class="p">,</span>
     <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">"plot_swarm_size"</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">"plot_swarm_alpha"</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s2">"plot_value_fontsize"</span><span class="p">:</span> <span class="mi">8</span><span class="p">},</span>
     <span class="c1"># 300 trials per condition: scatter instead of packing</span>
-    <span class="n">mode</span><span class="o">=</span><span class="n">SWARM_MODE</span><span class="o">.</span><span class="n">STRIP</span><span class="p">,</span>
+    <span class="n">swarm_mode</span><span class="o">=</span><span class="n">SWARM_MODE</span><span class="o">.</span><span class="n">STRIP</span><span class="p">,</span>
     <span class="c1"># reaction times are right-skewed</span>
     <span class="n">scaley</span><span class="o">=</span><span class="n">AXIS_SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
     <span class="n">yticks</span><span class="o">=</span><span class="p">[</span><span class="mi">400</span><span class="p">,</span> <span class="mi">600</span><span class="p">,</span> <span class="mi">800</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">1500</span><span class="p">],</span>
@@ -7806,7 +7806,7 @@ flipper_records[:2]</div>
     data=stroop_trials,
     style={"plot_swarm_size": 3, "plot_swarm_alpha": 0.5, "plot_value_fontsize": 8},
     # 300 trials per condition: scatter instead of packing
-    mode=SWARM_MODE.STRIP,
+    swarm_mode=SWARM_MODE.STRIP,
     # reaction times are right-skewed
     scaley=AXIS_SCALE.LOG,
     yticks=[400, 600, 800, 1000, 1500],

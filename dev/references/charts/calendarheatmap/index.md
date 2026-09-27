@@ -23,7 +23,7 @@ CalendarHeatmap(
     figsize: FIG_SIZE | tuple[float, float] | None = None,
     aspect_ratio: ASPECT_RATIO | str | None = None,
     max_cols: int | None = None,
-    show_colorbars: bool | None = None,
+    show_colorbar: bool | None = None,
     show_values: bool | None = None,
     value_format: VALUE_FORMAT | str | None = None,
     style: (
@@ -47,7 +47,8 @@ CalendarHeatmap(
             TextSettingAttrs | list[TextSettingAttrs] | None
         ]
         | None
-    ) = None
+    ) = None,
+    show_colorbars: bool | None = None
 ) -> plt.Figure
 ```
 
@@ -64,7 +65,7 @@ Examples:
 >>> figure = CalendarHeatmap(
 ...     data={"date": days, "value": [i % 7 for i in range(366)]},
 ...     title="Daily values, 2024",
-...     show_colorbars=True,
+...     show_colorbar=True,
 ... )
 ```
 
@@ -81,7 +82,7 @@ Examples:
 | `figsize`             | The size of the figure. Defaults to the default width at a short height per row of calendars, the shape a calendar fills. **TYPE:** \`FIG_SIZE                                                                                                                                                                                                                                                                                   |
 | `aspect_ratio`        | The aspect ratio of the cells: ASPECT_RATIO.EQUAL (the default) keeps them square, ASPECT_RATIO.AUTO stretches them to the figure. See ASPECT_RATIO. **TYPE:** \`ASPECT_RATIO                                                                                                                                                                                                                                                    |
 | `max_cols`            | Maximum number of calendars per row when several are drawn. Defaults to 1, one calendar per row. **TYPE:** \`int                                                                                                                                                                                                                                                                                                                 |
-| `show_colorbars`      | Whether to show the colorbar(s). **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                |
+| `show_colorbar`       | Whether to show the colorbar(s). **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                |
 | `show_values`         | Whether to write each day's value into its cell. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                |
 | `value_format`        | The format of the cell values: a VALUE_FORMAT constant (default VALUE_FORMAT.DEFAULT) or any "{x:.1f}", "{:.1f}", or "%g" style string. **TYPE:** \`VALUE_FORMAT                                                                                                                                                                                                                                                                 |
 | `style`               | Style configuration(s) for the calendar(s). **TYPE:** \`CalendarHeatmapStyleAttrs                                                                                                                                                                                                                                                                                                                                                |
@@ -91,6 +92,7 @@ Examples:
 | `vcenter`             | The value(s) a centred normalization holds in the middle of the colormap (0 by default); ignored by every other norm. **TYPE:** \`float                                                                                                                                                                                                                                                                                          |
 | `colorbar`            | The colorbar setting(s): label, location, tick format, and tick positions. See ColorbarSettingAttrs. **TYPE:** \`ColorbarSettingAttrs                                                                                                                                                                                                                                                                                            |
 | `texts`               | Text annotation(s) to draw, on every calendar of their dataset. The cells sit at integer positions: the week column along x, the weekday row along y, counted from zero at the top-left cell of the drawn range. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                    |
+| `show_colorbars`      | Deprecated; use show_colorbar. Removed in the next release. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                     |
 
 | RETURNS      | DESCRIPTION                                    |
 | ------------ | ---------------------------------------------- |

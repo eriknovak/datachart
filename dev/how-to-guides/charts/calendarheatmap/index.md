@@ -37,7 +37,7 @@ Every customization is either a keyword argument of `CalendarHeatmap` or a `plot
 | resize the figure or stretch the cells      | `figsize`, `aspect_ratio`                                                                        | [Title and figure size](#title-and-figure-size)                                                         |
 | start the week on Sunday                    | `week_start`                                                                                     | [Week start](#week-start)                                                                               |
 | hide the month or weekday labels            | `show_month_labels`, `show_weekday_labels`                                                       | [Month and weekday labels](#month-and-weekday-labels)                                                   |
-| show and label the colorbar                 | `show_colorbars`, `colorbar`                                                                     | [Colorbar and cell values](#colorbar-and-cell-values)                                                   |
+| show and label the colorbar                 | `show_colorbar`, `colorbar`                                                                      | [Colorbar and cell values](#colorbar-and-cell-values)                                                   |
 | write the values into the cells             | `show_values`, `value_format`                                                                    | [Colorbar and cell values](#colorbar-and-cell-values)                                                   |
 | change the colormap or transparency         | `style={"plot_calendar_heatmap_cmap": ..., "plot_calendar_heatmap_alpha": ...}`                  | [Calendar style](#calendar-style)                                                                       |
 | style the cell values                       | `style={"plot_calendar_heatmap_font_size": ..., ...}`                                            | [Calendar style](#calendar-style)                                                                       |
@@ -117,7 +117,7 @@ CalendarHeatmap(
 
 ### Colorbar and cell values
 
-A calendar on its own shows which days are busier and which are quieter, not by how much. `show_colorbars` draws the colorbar that maps the colors back to values, and `colorbar` says how: a `label` for the unit, a `location` from [COLORBAR_LOCATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORBAR_LOCATION), a `format` for its tick labels (a [VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) member or a `"{x:.0f}"` style string), and explicit `ticks`; the fields are listed in [ColorbarSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ColorbarSettingAttrs). A calendar is wide and short, so a colorbar along the bottom costs the least space.
+A calendar on its own shows which days are busier and which are quieter, not by how much. `show_colorbar` draws the colorbar that maps the colors back to values, and `colorbar` says how: a `label` for the unit, a `location` from [COLORBAR_LOCATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORBAR_LOCATION), a `format` for its tick labels (a [VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) member or a `"{x:.0f}"` style string), and explicit `ticks`; the fields are listed in [ColorbarSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ColorbarSettingAttrs). A calendar is wide and short, so a colorbar along the bottom costs the least space.
 
 ```
 from datachart.constants import COLORBAR_LOCATION, VALUE_FORMAT
@@ -126,7 +126,7 @@ CalendarHeatmap(
     data=cyclists,
     title="Cyclists counted per day, 2024",
     # a colorbar along the bottom, labelled and ticked every 300
-    show_colorbars=True,
+    show_colorbar=True,
     colorbar={
         "label": "Cyclists per day",
         "location": COLORBAR_LOCATION.BOTTOM,
@@ -188,7 +188,7 @@ CalendarHeatmap(
     vmin=0,
     vmax=1200,
     title="Cyclists counted per day, 2024",
-    show_colorbars=True,
+    show_colorbar=True,
     colorbar={"ticks": [0, 400, 800, 1200]},
 ).show()
 ```
@@ -203,7 +203,7 @@ CalendarHeatmap(
     # spread the quiet days over more of the colormap
     norm=COLOR_NORM.LOG,
     title="Cyclists counted per day, 2024",
-    show_colorbars=True,
+    show_colorbar=True,
 ).show()
 ```
 
@@ -224,7 +224,7 @@ CalendarHeatmap(
     # zero, the year's mean, sits in the middle of the diverging colormap
     norm=COLOR_NORM.CENTERED,
     title="Cyclists per day against the 2024 mean",
-    show_colorbars=True,
+    show_colorbar=True,
     colorbar={"label": "Departure from the mean"},
 ).show()
 ```
@@ -276,7 +276,7 @@ CalendarHeatmap(
     # two years of data: one calendar per year, on one value range
     data=two_years,
     title="Cyclists counted per day",
-    show_colorbars=True,
+    show_colorbar=True,
 ).show()
 ```
 
@@ -309,7 +309,7 @@ CalendarHeatmap(
     # the first keeps the theme colormap, the second gets its own
     style=[None, {"plot_calendar_heatmap_cmap": COLORS.Oranges}],
     title="Cyclists counted per day, 2024",
-    show_colorbars=True,
+    show_colorbar=True,
 ).show()
 ```
 
@@ -405,7 +405,7 @@ CalendarHeatmap(
     style={"plot_calendar_heatmap_cmap": COLORS.Blues},
     title="Daily rainfall",
     # one colorbar for the three years, in whole millimetres
-    show_colorbars=True,
+    show_colorbar=True,
     colorbar={"label": "mm", "format": VALUE_FORMAT.INTEGER},
 ).show()
 ```

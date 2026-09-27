@@ -287,7 +287,7 @@ Panel(
 ).show()
 ```
 
-A chart that fills its whole frame hides the map under it. A hexbin draws its empty cells too, as the palest hexagons, so give it `mincnt=1` to leave those out and let the land show between the cells, and `plot_hexbin_alpha` below 1 to let it show through the cells as well; a filled contour paints its lowest band over the whole grid, so a `plot_contour_alpha` below 1 does the same there. The basemap is for charts whose x and y are longitude and latitude, so `Panel` refuses to put it beside a chart with categories or dates on an axis, such as a bar chart, a box plot or a line over time: there is no longitude there to draw the land at. `Grid` places the two side by side instead.
+A chart that fills its whole frame hides the map under it. A hexbin draws its empty cells too, as the palest hexagons, so give it `min_count=1` to leave those out and let the land show between the cells, and `plot_hexbin_alpha` below 1 to let it show through the cells as well; a filled contour paints its lowest band over the whole grid, so a `plot_contour_alpha` below 1 does the same there. The basemap is for charts whose x and y are longitude and latitude, so `Panel` refuses to put it beside a chart with categories or dates on an axis, such as a bar chart, a box plot or a line over time: there is no longitude there to draw the land at. `Grid` places the two side by side instead.
 
 `DRAW_POSITION.ABOVE` draws the map over the marks instead, and still under reference lines and text notes. Its use is a map drawn as lines only, over a chart that would otherwise cover the coast: a hexbin fills its cells edge to edge, and a coastline above it keeps the reader oriented.
 
@@ -298,8 +298,8 @@ Panel(
     [
         HexbinChart(
             {"x": [q[2] for q in QUAKES], "y": [q[1] for q in QUAKES]},
-            gridsize=12,
-            mincnt=1,
+            grid_size=12,
+            min_count=1,
         ),
         BasemapChart(BASEMAP_FEATURE.COASTLINE, position=DRAW_POSITION.ABOVE),
     ],

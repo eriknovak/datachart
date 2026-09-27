@@ -322,7 +322,7 @@ LineChart(
 
 ### Density estimates
 
-*What does the distribution look like, without the bins?* A histogram's shape changes with its bin edges; a kernel density estimate smooths the same values into a curve that does not. `kde1d(values)` returns the curve as `{x, y}` points ready for a [Line Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/index.md); it integrates to 1, so it overlays a density [Histogram](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/histogram/index.md) of the same values on the same axis. Its `bandwidth` sets how smooth the curve is: a rule of [BANDWIDTH](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH) (Scott's by default) or a number, where smaller values follow the data more closely. `gridsize` is the number of points, and `cut` how many bandwidths the curve extends past the extremes (or `xlim` fixes the range, so several curves share one grid). One curve per species, with `show_area`, is the cleanest picture of the three flipper distributions:
+*What does the distribution look like, without the bins?* A histogram's shape changes with its bin edges; a kernel density estimate smooths the same values into a curve that does not. `kde1d(values)` returns the curve as `{x, y}` points ready for a [Line Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/index.md); it integrates to 1, so it overlays a density [Histogram](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/histogram/index.md) of the same values on the same axis. Its `bandwidth` sets how smooth the curve is: a rule of [BANDWIDTH](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH) (Scott's by default) or a number, where smaller values follow the data more closely. `grid_size` is the number of points, and `cut` how many bandwidths the curve extends past the extremes (or `xlim` fixes the range, so several curves share one grid). One curve per species, with `show_area`, is the cleanest picture of the three flipper distributions:
 
 ```
 LineChart(
@@ -338,7 +338,7 @@ LineChart(
 ).show()
 ```
 
-`kde2d(x, y)` does the same for pairs of values and returns the `{x, y, z}` surface a [Contour Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/contourchart/index.md) draws: the density contours of a scatter, which show where the points crowd when they overplot. The `gridsize` can be one number or an `(x, y)` pair of column and row counts, and `xlim` and `ylim` fix the grid so several surfaces share it. Flipper length against body mass forms two clusters, the Gentoo one apart from the rest:
+`kde2d(x, y)` does the same for pairs of values and returns the `{x, y, z}` surface a [Contour Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/contourchart/index.md) draws: the density contours of a scatter, which show where the points crowd when they overplot. The `grid_size` can be one number or an `(x, y)` pair of column and row counts, and `xlim` and `ylim` fix the grid so several surfaces share it. Flipper length against body mass forms two clusters, the Gentoo one apart from the rest:
 
 ```
 from datachart.charts import ContourChart
@@ -348,7 +348,7 @@ ContourChart(
     title="Where the penguins crowd: density of flipper length against body mass",
     xlabel="Flipper length (mm)",
     ylabel="Body mass (g)",
-    filled=True,
+    fill=True,
     figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
 ```

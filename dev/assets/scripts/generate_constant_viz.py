@@ -891,8 +891,8 @@ def hexbin_reduce():
         HexbinChart(
             data=data,
             reduce=value,
-            gridsize=12,
-            show_colorbars=False,
+            grid_size=12,
+            show_colorbar=False,
             title=f"HEXBIN_REDUCE.{label}",
         )
         for label, value in members
@@ -1006,7 +1006,7 @@ def basemap_resolution():
 def swarm_mode():
     members = [("SWARM", SWARM_MODE.SWARM), ("STRIP", SWARM_MODE.STRIP)]
     figs = [
-        SwarmPlot(data=_violin_data(), mode=value, title=f"SWARM_MODE.{label}")
+        SwarmPlot(data=_violin_data(), swarm_mode=value, title=f"SWARM_MODE.{label}")
         for label, value in members
     ]
     chart_grid(
@@ -1141,7 +1141,7 @@ def normalize():
         Heatmap(
             data=data,
             norm=value,
-            show_colorbars=False,
+            show_colorbar=False,
             title=f"COLOR_NORM.{label}",
         )
         for label, value in members
@@ -1154,7 +1154,7 @@ def normalize():
             norm=value,
             vmin=-0.6,
             vmax=0.95,
-            show_colorbars=False,
+            show_colorbar=False,
             title=f"COLOR_NORM.{label}",
         )
         for label, value in (

@@ -323,7 +323,7 @@ marker_figure = Heatmap(
     # zero in the middle of the diverging colormap, equal reach each way
     norm=COLOR_NORM.CENTERED,
     show_values=True,
-    show_colorbars=True,
+    show_colorbar=True,
     value_format="{x:+.1f}%",
     colorbar={"label": "Change from baseline (%)"},
     figsize=FIG_SIZE.FULL_MEDIUM,

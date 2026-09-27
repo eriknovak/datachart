@@ -271,9 +271,9 @@ figure.show()
 points = rng.multivariate_normal([0, 0], [[1, 0.6], [0.6, 1]], size=3000)
 figure = HexbinChart(
     data={"x": points[:, 0].tolist(), "y": points[:, 1].tolist()},
-    gridsize=20,
+    grid_size=20,
     emphasis_rule={"above": 40},
-    show_colorbars=True,
+    show_colorbar=True,
     title="Bins with more than 40 points",
 )
 figure.show()

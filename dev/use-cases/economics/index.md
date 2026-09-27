@@ -145,7 +145,7 @@ inflation_figure = Heatmap(
     norm=COLOR_NORM.SYMLOG,
     show_values=True,
     value_format="{x:.1f}",
-    show_colorbars=True,
+    show_colorbar=True,
     colorbar={"label": "Inflation (%)"},
     figsize=(8.0, 6.5),
 )

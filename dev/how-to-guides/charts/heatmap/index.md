@@ -37,7 +37,7 @@ Every customization is either a keyword argument of `Heatmap` or a `plot_heatmap
 | tick only some rows or columns             | `xticks`, `xticklabels`, `yticks`, `yticklabels`                             | [Ticks and labels](#ticks-and-labels)                                                                   |
 | rotate the tick labels                     | `xtickrotate`, `ytickrotate`                                                 | [Ticks and labels](#ticks-and-labels)                                                                   |
 | resize the figure or keep the cells square | `figsize`, `aspect_ratio`                                                    | [Figure size and aspect ratio](#figure-size-and-aspect-ratio)                                           |
-| show the colorbar                          | `show_colorbars`                                                             | [Colorbar and cell values](#colorbar-and-cell-values)                                                   |
+| show the colorbar                          | `show_colorbar`                                                              | [Colorbar and cell values](#colorbar-and-cell-values)                                                   |
 | write the values into the cells            | `show_values`, `value_format`                                                | [Colorbar and cell values](#colorbar-and-cell-values)                                                   |
 | caption, move, or format the colorbar      | `colorbar={"label": ..., "location": ..., "format": ..., "ticks": ...}`      | [Colorbar placement](#colorbar-placement)                                                               |
 | change the colormap or transparency        | `style={"plot_heatmap_cmap": ..., "plot_heatmap_alpha": ...}`                | [Heatmap style](#heatmap-style)                                                                         |
@@ -125,7 +125,7 @@ Heatmap(
 
 ### Colorbar and cell values
 
-Colors show which cells are warmer, not by how much. `show_colorbars` adds the scale that maps colors back to values, and `show_values` writes each value into its cell; a value on a dark cell is written in white, so it stays legible across the colormap. `value_format` formats the cell values: a [VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) member or a format string that names the value `x`, such as `"{x:.1f}"` (a string without `x`, such as `"{z:.1f}"`, is not valid). The temperatures carry one decimal, so `VALUE_FORMAT.DECIMAL` keeps it. With the values written in, the chart answers both questions: the pattern from the colors, the exact numbers from the cells.
+Colors show which cells are warmer, not by how much. `show_colorbar` adds the scale that maps colors back to values, and `show_values` writes each value into its cell; a value on a dark cell is written in white, so it stays legible across the colormap. `value_format` formats the cell values: a [VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) member or a format string that names the value `x`, such as `"{x:.1f}"` (a string without `x`, such as `"{z:.1f}"`, is not valid). The temperatures carry one decimal, so `VALUE_FORMAT.DECIMAL` keeps it. With the values written in, the chart answers both questions: the pattern from the colors, the exact numbers from the cells.
 
 ```
 from datachart.constants import VALUE_FORMAT
@@ -137,7 +137,7 @@ Heatmap(
     ylabel="City",
     figsize=FIG_SIZE.FULL_MEDIUM,
     # add the color scale
-    show_colorbars=True,
+    show_colorbar=True,
     # write the values into the cells, with one decimal
     show_values=True,
     value_format=VALUE_FORMAT.DECIMAL,
@@ -156,7 +156,7 @@ Heatmap(
     title="Mean monthly temperature",
     ylabel="City",
     figsize=FIG_SIZE.FULL_MEDIUM,
-    show_colorbars=True,
+    show_colorbar=True,
     # a captioned colorbar under the table, ticked every 5 degrees
     colorbar={
         "location": COLORBAR_LOCATION.BOTTOM,
@@ -194,7 +194,7 @@ Heatmap(
     xlabel="Month",
     ylabel="City",
     figsize=FIG_SIZE.FULL_MEDIUM,
-    show_colorbars=True,
+    show_colorbar=True,
     show_values=True,
     value_format=VALUE_FORMAT.DECIMAL,
 ).show()
@@ -217,7 +217,7 @@ Heatmap(
     xlabel="Month",
     ylabel="City",
     figsize=FIG_SIZE.FULL_MEDIUM,
-    show_colorbars=True,
+    show_colorbar=True,
     show_values=True,
     value_format=VALUE_FORMAT.DECIMAL,
 ).show()
@@ -239,7 +239,7 @@ for norm in [COLOR_NORM.LINEAR, COLOR_NORM.SYMLOG]:
         xlabel="Month",
         ylabel="City",
         figsize=FIG_SIZE.FULL_MEDIUM,
-        show_colorbars=True,
+        show_colorbar=True,
         show_values=True,
         value_format=VALUE_FORMAT.INTEGER,
     ).show()
@@ -262,7 +262,7 @@ for centre, label in [(0, "freezing"), (18, "room temperature")]:
         xlabel="Month",
         ylabel="City",
         figsize=FIG_SIZE.FULL_MEDIUM,
-        show_colorbars=True,
+        show_colorbar=True,
         show_values=True,
         value_format=VALUE_FORMAT.DECIMAL,
     ).show()
@@ -327,7 +327,7 @@ Heatmap(
     xlabel="Month",
     ylabel="City",
     figsize=FIG_SIZE.FULL_MEDIUM,
-    show_colorbars=True,
+    show_colorbar=True,
 ).show()
 ```
 
@@ -349,7 +349,7 @@ Heatmap(
     xticks=[0, 3, 6, 9],
     xticklabels=["Jan", "Apr", "Jul", "Oct"],
     figsize=FIG_SIZE.FULL_SHORT,
-    show_colorbars=True,
+    show_colorbar=True,
 ).show()
 ```
 
@@ -369,7 +369,7 @@ Heatmap(
     xlabel="Month",
     ylabel="City",
     figsize=FIG_SIZE.FULL_TALL,
-    show_colorbars=True,
+    show_colorbar=True,
     show_values=True,
     # stack the tables, one month axis for both
     max_cols=1,
@@ -412,7 +412,7 @@ Heatmap(
     ymax=-0.5,
     title="Winter in Europe (°C)",
     figsize=FIG_SIZE.HALF_SQUARE,
-    show_colorbars=True,
+    show_colorbar=True,
 ).show()
 ```
 
@@ -466,7 +466,7 @@ Heatmap(
     xtickrotate=30,
     figsize=FIG_SIZE.SQUARE,
     aspect_ratio=ASPECT_RATIO.EQUAL,
-    show_colorbars=True,
+    show_colorbar=True,
     colorbar={"label": "Pearson r", "ticks": [-1, -0.5, 0, 0.5, 1]},
     show_values=True,
     value_format=VALUE_FORMAT.DECIMAL_2,

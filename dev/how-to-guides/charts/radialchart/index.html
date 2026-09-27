@@ -5678,7 +5678,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </tr>
 <tr>
 <td style="text-align:left">rotate where the circle starts</td>
-<td style="text-align:left"><code>startangle</code></td>
+<td style="text-align:left"><code>start_angle</code></td>
 <td style="text-align:left"><a href="#start-angle-and-direction">Start angle and direction</a></td>
 </tr>
 <tr>
@@ -5688,7 +5688,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </tr>
 <tr>
 <td style="text-align:left">cut a donut hole in the middle</td>
-<td style="text-align:left"><code>innerradius</code></td>
+<td style="text-align:left"><code>inner_radius</code></td>
 <td style="text-align:left"><a href="#inner-radius">Inner radius</a></td>
 </tr>
 <tr>
@@ -6114,7 +6114,7 @@ RadialChart(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="start-angle-and-direction">Start angle and direction<a class="anchor-link" href="#start-angle-and-direction">¶</a></h3><p>Where the circle starts and which way it runs is a convention the reader brings along, and the chart should meet it. The default puts the first label at the top and runs clockwise, which is how a compass and a clock work, so directions and months read without instructions. <code>startangle</code> moves the first label: a compass point (<code>"N"</code>, <code>"NE"</code>, <code>"E"</code>, <code>"SE"</code>, <code>"S"</code>, <code>"SW"</code>, <code>"W"</code>, <code>"NW"</code>) or a bearing in degrees clockwise from the top. <code>direction</code> flips the way the angles increase, with a <a href="../../../references/constants/#datachart.constants.RADIAL_DIRECTION">RADIAL_DIRECTION</a> member. Readers of scientific polar plots expect the mathematical convention instead, zero at the right and angles increasing counterclockwise; the example follows it, so January sits at the right and the year runs the other way round.</p>
+<h3 id="start-angle-and-direction">Start angle and direction<a class="anchor-link" href="#start-angle-and-direction">¶</a></h3><p>Where the circle starts and which way it runs is a convention the reader brings along, and the chart should meet it. The default puts the first label at the top and runs clockwise, which is how a compass and a clock work, so directions and months read without instructions. <code>start_angle</code> moves the first label: a compass point (<code>"N"</code>, <code>"NE"</code>, <code>"E"</code>, <code>"SE"</code>, <code>"S"</code>, <code>"SW"</code>, <code>"W"</code>, <code>"NW"</code>) or a bearing in degrees clockwise from the top. <code>direction</code> flips the way the angles increase, with a <a href="../../../references/constants/#datachart.constants.RADIAL_DIRECTION">RADIAL_DIRECTION</a> member. Readers of scientific polar plots expect the mathematical convention instead, zero at the right and angles increasing counterclockwise; the example follows it, so January sits at the right and the year runs the other way round.</p>
 </div>
 </div>
 </div>
@@ -6144,7 +6144,7 @@ RadialChart(
     <span class="n">mark</span><span class="o">=</span><span class="n">RADIAL_TYPE</span><span class="o">.</span><span class="n">BAR</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Monthly sunshine hours"</span><span class="p">,</span>
     <span class="c1"># the mathematical convention: start at the right, run counterclockwise</span>
-    <span class="n">startangle</span><span class="o">=</span><span class="s2">"E"</span><span class="p">,</span>
+    <span class="n">start_angle</span><span class="o">=</span><span class="s2">"E"</span><span class="p">,</span>
     <span class="n">direction</span><span class="o">=</span><span class="n">RADIAL_DIRECTION</span><span class="o">.</span><span class="n">COUNTERCLOCKWISE</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
@@ -6155,7 +6155,7 @@ RadialChart(
     mark=RADIAL_TYPE.BAR,
     title="Monthly sunshine hours",
     # the mathematical convention: start at the right, run counterclockwise
-    startangle="E",
+    start_angle="E",
     direction=RADIAL_DIRECTION.COUNTERCLOCKWISE,
 ).show()</div>
 </div>
@@ -6182,7 +6182,7 @@ RadialChart(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="inner-radius">Inner radius<a class="anchor-link" href="#inner-radius">¶</a></h3><p>Sectors that meet at the center shrink to slivers there, so the small values, and the bottom segments of stacked bars, are hard to read. <code>innerradius</code> cuts a donut hole, given as a fraction (between 0 and 1) of the radial extent: every bar starts at the hole instead of the center and keeps a readable width along its whole length. The short winter sectors, thin wedges near the center above, get a readable width with a quarter of the radius reserved for the hole.</p>
+<h3 id="inner-radius">Inner radius<a class="anchor-link" href="#inner-radius">¶</a></h3><p>Sectors that meet at the center shrink to slivers there, so the small values, and the bottom segments of stacked bars, are hard to read. <code>inner_radius</code> cuts a donut hole, given as a fraction (between 0 and 1) of the radial extent: every bar starts at the hole instead of the center and keeps a readable width along its whole length. The short winter sectors, thin wedges near the center above, get a readable width with a quarter of the radius reserved for the hole.</p>
 </div>
 </div>
 </div>
@@ -6210,7 +6210,7 @@ RadialChart(
     <span class="n">mark</span><span class="o">=</span><span class="n">RADIAL_TYPE</span><span class="o">.</span><span class="n">BAR</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Monthly sunshine hours"</span><span class="p">,</span>
     <span class="c1"># reserve the middle quarter of the radius for the hole</span>
-    <span class="n">innerradius</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
+    <span class="n">inner_radius</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-9">RadialChart(
@@ -6218,7 +6218,7 @@ RadialChart(
     mark=RADIAL_TYPE.BAR,
     title="Monthly sunshine hours",
     # reserve the middle quarter of the radius for the hole
-    innerradius=0.25,
+    inner_radius=0.25,
 ).show()</div>
 </div>
 </div>
@@ -6488,7 +6488,7 @@ RadialChart(
     <span class="n">mark</span><span class="o">=</span><span class="n">RADIAL_TYPE</span><span class="o">.</span><span class="n">BAR</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Monthly sunshine hours"</span><span class="p">,</span>
     <span class="c1"># a wider hole spreads the short winter labels apart</span>
-    <span class="n">innerradius</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span>
+    <span class="n">inner_radius</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span>
     <span class="c1"># print each month's hours at the tip of its bar</span>
     <span class="n">show_values</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">value_format</span><span class="o">=</span><span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">INTEGER</span><span class="p">,</span>
@@ -6501,7 +6501,7 @@ RadialChart(
     mark=RADIAL_TYPE.BAR,
     title="Monthly sunshine hours",
     # a wider hole spreads the short winter labels apart
-    innerradius=0.4,
+    inner_radius=0.4,
     # print each month's hours at the tip of its bar
     show_values=True,
     value_format=VALUE_FORMAT.INTEGER,
@@ -6557,7 +6557,7 @@ RadialChart(
     <span class="n">data</span><span class="o">=</span><span class="n">sunshine_by_month</span><span class="p">,</span>
     <span class="n">mark</span><span class="o">=</span><span class="n">RADIAL_TYPE</span><span class="o">.</span><span class="n">BAR</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Monthly sunshine hours"</span><span class="p">,</span>
-    <span class="n">innerradius</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+    <span class="n">inner_radius</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
     <span class="c1"># the month names ride the bar tips, and the border circle goes</span>
     <span class="n">show_tip_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">show_border</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -6568,7 +6568,7 @@ RadialChart(
     data=sunshine_by_month,
     mark=RADIAL_TYPE.BAR,
     title="Monthly sunshine hours",
-    innerradius=0.3,
+    inner_radius=0.3,
     # the month names ride the bar tips, and the border circle goes
     show_tip_labels=True,
     show_border=False,
@@ -6942,7 +6942,7 @@ RadialChart(
     <span class="n">title</span><span class="o">=</span><span class="s2">"Monthly sunshine hours"</span><span class="p">,</span>
     <span class="n">show_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">legend</span><span class="o">=</span><span class="p">{</span><span class="s2">"location"</span><span class="p">:</span> <span class="n">LEGEND_LOCATION</span><span class="o">.</span><span class="n">OUTSIDE_RIGHT</span><span class="p">},</span>
-    <span class="n">innerradius</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
+    <span class="n">inner_radius</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-19">from datachart.constants import BAR_MODE
@@ -6956,7 +6956,7 @@ RadialChart(
     title="Monthly sunshine hours",
     show_legend=True,
     legend={"location": LEGEND_LOCATION.OUTSIDE_RIGHT},
-    innerradius=0.25,
+    inner_radius=0.25,
 ).show()</div>
 </div>
 </div>
@@ -7013,7 +7013,7 @@ RadialChart(
     <span class="n">title</span><span class="o">=</span><span class="s2">"Months ranked by afternoon sunshine"</span><span class="p">,</span>
     <span class="n">show_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">legend</span><span class="o">=</span><span class="p">{</span><span class="s2">"location"</span><span class="p">:</span> <span class="n">LEGEND_LOCATION</span><span class="o">.</span><span class="n">OUTSIDE_RIGHT</span><span class="p">},</span>
-    <span class="n">innerradius</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
+    <span class="n">inner_radius</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
     <span class="c1"># one order for both series, keyed by one of them</span>
     <span class="n">sort</span><span class="o">=</span><span class="n">SORT</span><span class="o">.</span><span class="n">DESCENDING</span><span class="p">,</span>
     <span class="n">sort_by</span><span class="o">=</span><span class="s2">"Afternoon"</span><span class="p">,</span>
@@ -7027,7 +7027,7 @@ RadialChart(
     title="Months ranked by afternoon sunshine",
     show_legend=True,
     legend={"location": LEGEND_LOCATION.OUTSIDE_RIGHT},
-    innerradius=0.25,
+    inner_radius=0.25,
     # one order for both series, keyed by one of them
     sort=SORT.DESCENDING,
     sort_by="Afternoon",
@@ -7743,7 +7743,7 @@ Grid(
     <span class="n">subtitle</span><span class="o">=</span><span class="p">[</span><span class="s2">"Weekdays"</span><span class="p">,</span> <span class="s2">"Weekends"</span><span class="p">],</span>
     <span class="c1"># stacked, so the outer edge is the month's total</span>
     <span class="n">bar_mode</span><span class="o">=</span><span class="n">BAR_MODE</span><span class="o">.</span><span class="n">STACK</span><span class="p">,</span>
-    <span class="n">innerradius</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+    <span class="n">inner_radius</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">last_year</span> <span class="o">=</span> <span class="n">RadialChart</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">visits_last_year</span><span class="p">,</span>
@@ -7770,7 +7770,7 @@ this_year = RadialChart(
     subtitle=["Weekdays", "Weekends"],
     # stacked, so the outer edge is the month's total
     bar_mode=BAR_MODE.STACK,
-    innerradius=0.3,
+    inner_radius=0.3,
 )
 last_year = RadialChart(
     data=visits_last_year,

@@ -5629,7 +5629,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </tr>
 <tr>
 <td style="text-align:left">show and label the colorbar</td>
-<td style="text-align:left"><code>show_colorbars</code>, <code>colorbar</code></td>
+<td style="text-align:left"><code>show_colorbar</code>, <code>colorbar</code></td>
 <td style="text-align:left"><a href="#colorbar-and-cell-values">Colorbar and cell values</a></td>
 </tr>
 <tr>
@@ -5956,7 +5956,7 @@ CalendarHeatmap(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="colorbar-and-cell-values">Colorbar and cell values<a class="anchor-link" href="#colorbar-and-cell-values">¶</a></h3><p>A calendar on its own shows which days are busier and which are quieter, not by how much. <code>show_colorbars</code> draws the colorbar that maps the colors back to values, and <code>colorbar</code> says how: a <code>label</code> for the unit, a <code>location</code> from <a href="../../../references/constants/#datachart.constants.COLORBAR_LOCATION">COLORBAR_LOCATION</a>, a <code>format</code> for its tick labels (a <a href="../../../references/constants/#datachart.constants.VALUE_FORMAT">VALUE_FORMAT</a> member or a <code>"{x:.0f}"</code> style string), and explicit <code>ticks</code>; the fields are listed in <a href="../../../references/typings/#datachart.typings.ColorbarSettingAttrs">ColorbarSettingAttrs</a>. A calendar is wide and short, so a colorbar along the bottom costs the least space.</p>
+<h3 id="colorbar-and-cell-values">Colorbar and cell values<a class="anchor-link" href="#colorbar-and-cell-values">¶</a></h3><p>A calendar on its own shows which days are busier and which are quieter, not by how much. <code>show_colorbar</code> draws the colorbar that maps the colors back to values, and <code>colorbar</code> says how: a <code>label</code> for the unit, a <code>location</code> from <a href="../../../references/constants/#datachart.constants.COLORBAR_LOCATION">COLORBAR_LOCATION</a>, a <code>format</code> for its tick labels (a <a href="../../../references/constants/#datachart.constants.VALUE_FORMAT">VALUE_FORMAT</a> member or a <code>"{x:.0f}"</code> style string), and explicit <code>ticks</code>; the fields are listed in <a href="../../../references/typings/#datachart.typings.ColorbarSettingAttrs">ColorbarSettingAttrs</a>. A calendar is wide and short, so a colorbar along the bottom costs the least space.</p>
 </div>
 </div>
 </div>
@@ -5985,7 +5985,7 @@ CalendarHeatmap(
     <span class="n">data</span><span class="o">=</span><span class="n">cyclists</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Cyclists counted per day, 2024"</span><span class="p">,</span>
     <span class="c1"># a colorbar along the bottom, labelled and ticked every 300</span>
-    <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">show_colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">colorbar</span><span class="o">=</span><span class="p">{</span>
         <span class="s2">"label"</span><span class="p">:</span> <span class="s2">"Cyclists per day"</span><span class="p">,</span>
         <span class="s2">"location"</span><span class="p">:</span> <span class="n">COLORBAR_LOCATION</span><span class="o">.</span><span class="n">BOTTOM</span><span class="p">,</span>
@@ -6000,7 +6000,7 @@ CalendarHeatmap(
     data=cyclists,
     title="Cyclists counted per day, 2024",
     # a colorbar along the bottom, labelled and ticked every 300
-    show_colorbars=True,
+    show_colorbar=True,
     colorbar={
         "label": "Cyclists per day",
         "location": COLORBAR_LOCATION.BOTTOM,
@@ -6215,7 +6215,7 @@ CalendarHeatmap(
     <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
     <span class="n">vmax</span><span class="o">=</span><span class="mi">1200</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Cyclists counted per day, 2024"</span><span class="p">,</span>
-    <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">show_colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">colorbar</span><span class="o">=</span><span class="p">{</span><span class="s2">"ticks"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">400</span><span class="p">,</span> <span class="mi">800</span><span class="p">,</span> <span class="mi">1200</span><span class="p">]},</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
@@ -6225,7 +6225,7 @@ CalendarHeatmap(
     vmin=0,
     vmax=1200,
     title="Cyclists counted per day, 2024",
-    show_colorbars=True,
+    show_colorbar=True,
     colorbar={"ticks": [0, 400, 800, 1200]},
 ).show()</div>
 </div>
@@ -6282,7 +6282,7 @@ CalendarHeatmap(
     <span class="c1"># spread the quiet days over more of the colormap</span>
     <span class="n">norm</span><span class="o">=</span><span class="n">COLOR_NORM</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Cyclists counted per day, 2024"</span><span class="p">,</span>
-    <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">show_colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-11">from datachart.constants import COLOR_NORM
@@ -6292,7 +6292,7 @@ CalendarHeatmap(
     # spread the quiet days over more of the colormap
     norm=COLOR_NORM.LOG,
     title="Cyclists counted per day, 2024",
-    show_colorbars=True,
+    show_colorbar=True,
 ).show()</div>
 </div>
 </div>
@@ -6354,7 +6354,7 @@ CalendarHeatmap(
     <span class="c1"># zero, the year's mean, sits in the middle of the diverging colormap</span>
     <span class="n">norm</span><span class="o">=</span><span class="n">COLOR_NORM</span><span class="o">.</span><span class="n">CENTERED</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Cyclists per day against the 2024 mean"</span><span class="p">,</span>
-    <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">show_colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">colorbar</span><span class="o">=</span><span class="p">{</span><span class="s2">"label"</span><span class="p">:</span> <span class="s2">"Departure from the mean"</span><span class="p">},</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
@@ -6370,7 +6370,7 @@ CalendarHeatmap(
     # zero, the year's mean, sits in the middle of the diverging colormap
     norm=COLOR_NORM.CENTERED,
     title="Cyclists per day against the 2024 mean",
-    show_colorbars=True,
+    show_colorbar=True,
     colorbar={"label": "Departure from the mean"},
 ).show()</div>
 </div>
@@ -6526,7 +6526,7 @@ CalendarHeatmap(
     <span class="c1"># two years of data: one calendar per year, on one value range</span>
     <span class="n">data</span><span class="o">=</span><span class="n">two_years</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Cyclists counted per day"</span><span class="p">,</span>
-    <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">show_colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-14">DATES_2023, COUNTS_2023 = daily_cyclists(2023, seed=3)
@@ -6540,7 +6540,7 @@ CalendarHeatmap(
     # two years of data: one calendar per year, on one value range
     data=two_years,
     title="Cyclists counted per day",
-    show_colorbars=True,
+    show_colorbar=True,
 ).show()</div>
 </div>
 </div>
@@ -6660,7 +6660,7 @@ CalendarHeatmap(
     <span class="c1"># the first keeps the theme colormap, the second gets its own</span>
     <span class="n">style</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">{</span><span class="s2">"plot_calendar_heatmap_cmap"</span><span class="p">:</span> <span class="n">COLORS</span><span class="o">.</span><span class="n">Oranges</span><span class="p">}],</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Cyclists counted per day, 2024"</span><span class="p">,</span>
-    <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">show_colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-16">DATES_B, COUNTS_B = daily_cyclists(2024, seed=11)
@@ -6674,7 +6674,7 @@ CalendarHeatmap(
     # the first keeps the theme colormap, the second gets its own
     style=[None, {"plot_calendar_heatmap_cmap": COLORS.Oranges}],
     title="Cyclists counted per day, 2024",
-    show_colorbars=True,
+    show_colorbar=True,
 ).show()</div>
 </div>
 </div>
@@ -7044,7 +7044,7 @@ CalendarHeatmap(
     <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">"plot_calendar_heatmap_cmap"</span><span class="p">:</span> <span class="n">COLORS</span><span class="o">.</span><span class="n">Blues</span><span class="p">},</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Daily rainfall"</span><span class="p">,</span>
     <span class="c1"># one colorbar for the three years, in whole millimetres</span>
-    <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">show_colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">colorbar</span><span class="o">=</span><span class="p">{</span><span class="s2">"label"</span><span class="p">:</span> <span class="s2">"mm"</span><span class="p">,</span> <span class="s2">"format"</span><span class="p">:</span> <span class="n">VALUE_FORMAT</span><span class="o">.</span><span class="n">INTEGER</span><span class="p">},</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
@@ -7053,7 +7053,7 @@ CalendarHeatmap(
     style={"plot_calendar_heatmap_cmap": COLORS.Blues},
     title="Daily rainfall",
     # one colorbar for the three years, in whole millimetres
-    show_colorbars=True,
+    show_colorbar=True,
     colorbar={"label": "mm", "format": VALUE_FORMAT.INTEGER},
 ).show()</div>
 </div>

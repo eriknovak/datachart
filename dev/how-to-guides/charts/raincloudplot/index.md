@@ -39,7 +39,7 @@ Every customization is either a keyword argument of `RaincloudPlot` or an attrib
 | show grid lines                                    | `show_grid`                                                                           | [Figure size and grid](#figure-size-and-grid)                                                           |
 | change the cloud, rain, or box style               | `style={"plot_violin_alpha": ..., "plot_swarm_size": ..., "plot_box_linewidth": ...}` | [Cloud, rain and box style](#cloud-rain-and-box-style)                                                  |
 | smooth or sharpen the cloud                        | `bandwidth`                                                                           | [Cloud bandwidth](#cloud-bandwidth)                                                                     |
-| jitter the rain instead of packing it              | `mode`, `jitter`                                                                      | [Rain modes](#rain-modes)                                                                               |
+| jitter the rain instead of packing it              | `swarm_mode`, `jitter`                                                                | [Rain modes](#rain-modes)                                                                               |
 | hide the box outliers                              | `show_outliers`                                                                       | [Box outliers](#box-outliers)                                                                           |
 | print each group's median, min and max             | `show_values`, `value_format`                                                         | [Value labels](#value-labels)                                                                           |
 | draw the rainclouds horizontally                   | `orientation`                                                                         | [Horizontal rainclouds](#horizontal-rainclouds)                                                         |
@@ -65,7 +65,7 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN) |
 | `show_grid`                                  | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                                                                                                                                 |
 | `value_format`                               | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                           |
-| `mode`                                       | [`SWARM_MODE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SWARM_MODE)                                                                                                                               |
+| `swarm_mode`                                 | [`SWARM_MODE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SWARM_MODE)                                                                                                                               |
 | `bandwidth`                                  | [`BANDWIDTH`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH)                                                                                                                                 |
 | `aspect_ratio`                               | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                           |
 | `orientation`                                | [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)                                                                                                                             |
@@ -158,7 +158,7 @@ RaincloudPlot(
 
 ### Rain modes
 
-A swarm packs the rain so no two points overlap, which is exact but costs width and time as the groups grow. `mode` chooses how the rain spreads, with a [SWARM_MODE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SWARM_MODE) member: `SWARM_MODE.SWARM` (the default) packs the points outward from the box, `SWARM_MODE.STRIP` scatters them at random across the rain's width. `jitter` sets the width of that band as a fraction of the category width (0.4, the default, fills the rain's cell); the jitter is seeded, so the same data draws the same chart. The strip mode suits many thousands of points, where a swarm would fill its whole width anyway.
+A swarm packs the rain so no two points overlap, which is exact but costs width and time as the groups grow. `swarm_mode` chooses how the rain spreads, with a [SWARM_MODE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SWARM_MODE) member: `SWARM_MODE.SWARM` (the default) packs the points outward from the box, `SWARM_MODE.STRIP` scatters them at random across the rain's width. `jitter` sets the width of that band as a fraction of the category width (0.4, the default, fills the rain's cell); the jitter is seeded, so the same data draws the same chart. The strip mode suits many thousands of points, where a swarm would fill its whole width anyway.
 
 ```
 from datachart.constants import SWARM_MODE
@@ -166,7 +166,7 @@ from datachart.constants import SWARM_MODE
 RaincloudPlot(
     data=chart_data,
     # scatter the rain instead of packing it
-    mode=SWARM_MODE.STRIP,
+    swarm_mode=SWARM_MODE.STRIP,
     # in a band half as wide as the rain's cell
     jitter=0.2,
     title="Body mass of Palmer penguins, strip rain",
@@ -617,7 +617,7 @@ RaincloudPlot(
     data=stroop_trials,
     style={"plot_swarm_size": 3, "plot_swarm_alpha": 0.5, "plot_value_fontsize": 8},
     # 300 trials per condition: scatter instead of packing
-    mode=SWARM_MODE.STRIP,
+    swarm_mode=SWARM_MODE.STRIP,
     # reaction times are right-skewed
     scaley=AXIS_SCALE.LOG,
     yticks=[400, 600, 800, 1000, 1500],

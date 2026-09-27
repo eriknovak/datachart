@@ -38,8 +38,8 @@ Every customization is either a keyword argument of `ContourChart` or a `plot_co
 | resize the figure                        | `figsize`                                                           | [Figure size, grid and aspect ratio](#figure-size-grid-and-aspect-ratio)                                |
 | show grid lines                          | `show_grid`                                                         | [Figure size, grid and aspect ratio](#figure-size-grid-and-aspect-ratio)                                |
 | keep one unit equal on both axes         | `aspect_ratio`                                                      | [Figure size, grid and aspect ratio](#figure-size-grid-and-aspect-ratio)                                |
-| fill the bands between the levels        | `filled`                                                            | [Filled contours and colorbar](#filled-contours-and-colorbar)                                           |
-| add and caption a colorbar               | `show_colorbars`, `colorbar`                                        | [Filled contours and colorbar](#filled-contours-and-colorbar)                                           |
+| fill the bands between the levels        | `fill`                                                              | [Filled contours and colorbar](#filled-contours-and-colorbar)                                           |
+| add and caption a colorbar               | `show_colorbar`, `colorbar`                                         | [Filled contours and colorbar](#filled-contours-and-colorbar)                                           |
 | write the level values on the lines      | `show_labels`, `value_format`                                       | [Inline labels](#inline-labels)                                                                         |
 | choose the values that cut the surface   | `levels`                                                            | [Levels](#levels)                                                                                       |
 | change the line color, width, or style   | `style={"plot_contour_color": ..., "plot_contour_line_width": ...}` | [Contour style](#contour-style)                                                                         |
@@ -122,7 +122,7 @@ ContourChart(
 
 ### Filled contours and colorbar
 
-Iso-lines show the shape of the surface, but the eye has to count lines to tell high from low. `filled=True` colors the bands between the levels by their value instead (with the heatmap colormap by default), so the high ground reads at a glance; grid lines are off by default, as the bands would cover them. `show_colorbars=True` adds a colorbar that maps the shades back to values, and `colorbar` configures it ([ColorbarSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ColorbarSettingAttrs)): `label` names the quantity, `location` places it with a [COLORBAR_LOCATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORBAR_LOCATION) member, `format` formats its ticks and `ticks` places them. An `orientation` ([ORIENTATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)) on its own also works.
+Iso-lines show the shape of the surface, but the eye has to count lines to tell high from low. `fill=True` colors the bands between the levels by their value instead (with the heatmap colormap by default), so the high ground reads at a glance; grid lines are off by default, as the bands would cover them. `show_colorbar=True` adds a colorbar that maps the shades back to values, and `colorbar` configures it ([ColorbarSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ColorbarSettingAttrs)): `label` names the quantity, `location` places it with a [COLORBAR_LOCATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORBAR_LOCATION) member, `format` formats its ticks and `ticks` places them. An `orientation` ([ORIENTATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)) on its own also works.
 
 ```
 from datachart.constants import COLORBAR_LOCATION
@@ -130,9 +130,9 @@ from datachart.constants import COLORBAR_LOCATION
 ContourChart(
     data=terrain,
     # fill the bands between the levels
-    filled=True,
+    fill=True,
     # a captioned colorbar on the right, one tick every 400 m
-    show_colorbars=True,
+    show_colorbar=True,
     colorbar={
         "label": "Elevation (m)",
         "location": COLORBAR_LOCATION.RIGHT,
@@ -279,8 +279,8 @@ TERRAIN_COLORS = ["#d9f0d3", "#a6d96a", "#e6c587", "#a6611a", "#5c3310"]
 
 ContourChart(
     data=terrain,
-    filled=True,
-    show_colorbars=True,
+    fill=True,
+    show_colorbar=True,
     colorbar={"label": "Elevation (m)"},
     # a custom colormap, from a green valley to brown summits
     style={"plot_contour_cmap": TERRAIN_COLORS},
@@ -300,8 +300,8 @@ The colors of a filled contour come from two steps: each level is normalized to 
 ```
 ContourChart(
     data=terrain,
-    filled=True,
-    show_colorbars=True,
+    fill=True,
+    show_colorbar=True,
     colorbar={"label": "Elevation (m)"},
     levels=list(range(300, 1900, 100)),
     # the color range of the whole region, not of this hill
@@ -322,8 +322,8 @@ from datachart.constants import COLOR_NORM
 
 ContourChart(
     data=sighting_density,
-    filled=True,
-    show_colorbars=True,
+    fill=True,
+    show_colorbar=True,
     colorbar={"label": "Sightings per km²", "ticks": [0.01, 0.1, 1, 10], "format": "{x:g}"},
     # log-spaced levels, one shade per step
     levels=[0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30, 100],
@@ -451,7 +451,7 @@ ContourChart(
 
 ### Emphasis
 
-A chart usually makes one point, and emphasis makes it visible. `emphasis` takes one role per surface, aligned with `data`: `"highlight"` bolds the iso-lines and brings them to the front, `"background"` mutes them into the theme's muted color and drops them from the legend, and `None` leaves them as they are. The roles are also the [EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS) constants, and the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/index.md) guide covers emphasis across every chart type. Emphasis bolds and mutes lines, so it applies to iso-lines only: with `filled=True` it raises a `ValueError`. Asking where the herd spends the winter turns the other seasons into context:
+A chart usually makes one point, and emphasis makes it visible. `emphasis` takes one role per surface, aligned with `data`: `"highlight"` bolds the iso-lines and brings them to the front, `"background"` mutes them into the theme's muted color and drops them from the legend, and `None` leaves them as they are. The roles are also the [EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS) constants, and the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/index.md) guide covers emphasis across every chart type. Emphasis bolds and mutes lines, so it applies to iso-lines only: with `fill=True` it raises a `ValueError`. Asking where the herd spends the winter turns the other seasons into context:
 
 ```
 from datachart.constants import EMPHASIS
@@ -498,7 +498,7 @@ ContourChart(
     data=season_density,
     subtitle=SEASONS,
     # one filled panel per season, side by side
-    filled=True,
+    fill=True,
     subplots=True,
     max_cols=3,
     # the same axes for every season
@@ -530,7 +530,7 @@ Panel(
         {
             "figure": ContourChart(
                 data=terrain,
-                filled=True,
+                fill=True,
                 levels=list(range(300, 1900, 100)),
                 style={"plot_contour_cmap": TERRAIN_COLORS},
             ),
@@ -579,7 +579,7 @@ Grid(
             ),
             ContourChart(
                 data=sighting_density,
-                filled=True,
+                fill=True,
                 levels=[0.5, 1, 2, 4, 8, 16, 32, 64],
                 norm=COLOR_NORM.LOG,
                 style={"plot_contour_cmap": COLORS.YlGnBu},
@@ -600,7 +600,7 @@ Grid(
 A contour of a density is the two-dimensional counterpart of a histogram: it shows where scattered points concentrate, without the overplotting of a crowded scatter chart. [datachart.utils.stats.kde2d](https://eriknovak.github.io/datachart/dev/references/utils/stats/#datachart.utils.stats.kde2d) estimates the density with a Gaussian kernel and returns the `{x, y, z}` surface that `ContourChart` takes, so `ContourChart(data=kde2d(x, y))` is a density chart. Its options:
 
 - `bandwidth` sets how smooth the estimate is: a [BANDWIDTH](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH) rule (Scott's by default, or Silverman's) or a number that replaces the rule's factor, where smaller values follow the points more closely.
-- `gridsize` sets the resolution of the surface.
+- `grid_size` sets the resolution of the surface.
 - `cut` extends the grid past the points by that many bandwidths, so the outer contours close instead of being clipped; `xlim` and `ylim` fix the grid instead, so several surfaces share one (as `season_density` does).
 
 The result is a probability density (it integrates to 1); multiplied by the number of points, it reads as points per unit area. The autumn sightings come from two groups: Scott's rule shows both, while a wide bandwidth (`2.0`) smooths them into one blob, the classic way a density estimate hides structure.
@@ -618,14 +618,14 @@ Grid(
             ContourChart(
                 # Scott's rule: two groups
                 data=kde2d(autumn_east, autumn_north, bandwidth=BANDWIDTH.SCOTT, xlim=(0, 10), ylim=(0, 8)),
-                filled=True,
+                fill=True,
                 title="Scott's rule",
                 aspect_ratio=ASPECT_RATIO.EQUAL,
             ),
             ContourChart(
                 # a wide kernel: one blob, on the same map extent
                 data=kde2d(autumn_east, autumn_north, bandwidth=2.0, xlim=(0, 10), ylim=(0, 8)),
-                filled=True,
+                fill=True,
                 title="bandwidth=2.0",
                 aspect_ratio=ASPECT_RATIO.EQUAL,
             ),
@@ -650,8 +650,8 @@ ContourChart(
     # both hyperparameters on a log scale
     scalex=AXIS_SCALE.LOG,
     scaley=AXIS_SCALE.LOG,
-    filled=True,
-    show_colorbars=True,
+    fill=True,
+    show_colorbar=True,
     colorbar={"label": "Validation loss"},
     levels=[0.32, 0.35, 0.4, 0.5, 0.6, 0.8, 1.0, 1.4, 2.0],
     style={"plot_contour_cmap": COLORS.YlGnBu},
@@ -672,8 +672,8 @@ from datachart.constants import DATE_FORMAT
 ContourChart(
     # dates on the x-axis
     data=snow,
-    filled=True,
-    show_colorbars=True,
+    fill=True,
+    show_colorbar=True,
     colorbar={"label": "Snow depth (cm)"},
     levels=[1, 20, 40, 60, 80, 100, 120, 140, 160],
     style={"plot_contour_cmap": COLORS.Blues},
@@ -790,7 +790,7 @@ def species_panel(index):
     # one species as a filled density, on the shared levels
     return ContourChart(
         data=species_density[index],
-        filled=True,
+        fill=True,
         levels=DENSITY_LEVELS,
         style={"plot_contour_cmap": COLORS.YlGnBu},
         title=SPECIES[index],

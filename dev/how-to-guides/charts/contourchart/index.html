@@ -5676,12 +5676,12 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </tr>
 <tr>
 <td style="text-align:left">fill the bands between the levels</td>
-<td style="text-align:left"><code>filled</code></td>
+<td style="text-align:left"><code>fill</code></td>
 <td style="text-align:left"><a href="#filled-contours-and-colorbar">Filled contours and colorbar</a></td>
 </tr>
 <tr>
 <td style="text-align:left">add and caption a colorbar</td>
-<td style="text-align:left"><code>show_colorbars</code>, <code>colorbar</code></td>
+<td style="text-align:left"><code>show_colorbar</code>, <code>colorbar</code></td>
 <td style="text-align:left"><a href="#filled-contours-and-colorbar">Filled contours and colorbar</a></td>
 </tr>
 <tr>
@@ -5991,7 +5991,7 @@ ContourChart(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="filled-contours-and-colorbar">Filled contours and colorbar<a class="anchor-link" href="#filled-contours-and-colorbar">¶</a></h3><p>Iso-lines show the shape of the surface, but the eye has to count lines to tell high from low. <code>filled=True</code> colors the bands between the levels by their value instead (with the heatmap colormap by default), so the high ground reads at a glance; grid lines are off by default, as the bands would cover them. <code>show_colorbars=True</code> adds a colorbar that maps the shades back to values, and <code>colorbar</code> configures it (<a href="../../../references/typings/#datachart.typings.ColorbarSettingAttrs">ColorbarSettingAttrs</a>): <code>label</code> names the quantity, <code>location</code> places it with a <a href="../../../references/constants/#datachart.constants.COLORBAR_LOCATION">COLORBAR_LOCATION</a> member, <code>format</code> formats its ticks and <code>ticks</code> places them. An <code>orientation</code> (<a href="../../../references/constants/#datachart.constants.ORIENTATION">ORIENTATION</a>) on its own also works.</p>
+<h3 id="filled-contours-and-colorbar">Filled contours and colorbar<a class="anchor-link" href="#filled-contours-and-colorbar">¶</a></h3><p>Iso-lines show the shape of the surface, but the eye has to count lines to tell high from low. <code>fill=True</code> colors the bands between the levels by their value instead (with the heatmap colormap by default), so the high ground reads at a glance; grid lines are off by default, as the bands would cover them. <code>show_colorbar=True</code> adds a colorbar that maps the shades back to values, and <code>colorbar</code> configures it (<a href="../../../references/typings/#datachart.typings.ColorbarSettingAttrs">ColorbarSettingAttrs</a>): <code>label</code> names the quantity, <code>location</code> places it with a <a href="../../../references/constants/#datachart.constants.COLORBAR_LOCATION">COLORBAR_LOCATION</a> member, <code>format</code> formats its ticks and <code>ticks</code> places them. An <code>orientation</code> (<a href="../../../references/constants/#datachart.constants.ORIENTATION">ORIENTATION</a>) on its own also works.</p>
 </div>
 </div>
 </div>
@@ -6019,9 +6019,9 @@ ContourChart(
 <span class="n">ContourChart</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">terrain</span><span class="p">,</span>
     <span class="c1"># fill the bands between the levels</span>
-    <span class="n">filled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="c1"># a captioned colorbar on the right, one tick every 400 m</span>
-    <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">show_colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">colorbar</span><span class="o">=</span><span class="p">{</span>
         <span class="s2">"label"</span><span class="p">:</span> <span class="s2">"Elevation (m)"</span><span class="p">,</span>
         <span class="s2">"location"</span><span class="p">:</span> <span class="n">COLORBAR_LOCATION</span><span class="o">.</span><span class="n">RIGHT</span><span class="p">,</span>
@@ -6040,9 +6040,9 @@ ContourChart(
 ContourChart(
     data=terrain,
     # fill the bands between the levels
-    filled=True,
+    fill=True,
     # a captioned colorbar on the right, one tick every 400 m
-    show_colorbars=True,
+    show_colorbar=True,
     colorbar={
         "label": "Elevation (m)",
         "location": COLORBAR_LOCATION.RIGHT,
@@ -6531,8 +6531,8 @@ ContourChart(
 
 <span class="n">ContourChart</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">terrain</span><span class="p">,</span>
-    <span class="n">filled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">show_colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">colorbar</span><span class="o">=</span><span class="p">{</span><span class="s2">"label"</span><span class="p">:</span> <span class="s2">"Elevation (m)"</span><span class="p">},</span>
     <span class="c1"># a custom colormap, from a green valley to brown summits</span>
     <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">"plot_contour_cmap"</span><span class="p">:</span> <span class="n">TERRAIN_COLORS</span><span class="p">},</span>
@@ -6562,8 +6562,8 @@ TERRAIN_COLORS = ["#d9f0d3", "#a6d96a", "#e6c587", "#a6611a", "#5c3310"]
 
 ContourChart(
     data=terrain,
-    filled=True,
-    show_colorbars=True,
+    fill=True,
+    show_colorbar=True,
     colorbar={"label": "Elevation (m)"},
     # a custom colormap, from a green valley to brown summits
     style={"plot_contour_cmap": TERRAIN_COLORS},
@@ -6629,8 +6629,8 @@ ContourChart(
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">ContourChart</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">terrain</span><span class="p">,</span>
-    <span class="n">filled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">show_colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">colorbar</span><span class="o">=</span><span class="p">{</span><span class="s2">"label"</span><span class="p">:</span> <span class="s2">"Elevation (m)"</span><span class="p">},</span>
     <span class="n">levels</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mi">1900</span><span class="p">,</span> <span class="mi">100</span><span class="p">)),</span>
     <span class="c1"># the color range of the whole region, not of this hill</span>
@@ -6645,8 +6645,8 @@ ContourChart(
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-13">ContourChart(
     data=terrain,
-    filled=True,
-    show_colorbars=True,
+    fill=True,
+    show_colorbar=True,
     colorbar={"label": "Elevation (m)"},
     levels=list(range(300, 1900, 100)),
     # the color range of the whole region, not of this hill
@@ -6712,8 +6712,8 @@ ContourChart(
 
 <span class="n">ContourChart</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">sighting_density</span><span class="p">,</span>
-    <span class="n">filled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">show_colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">colorbar</span><span class="o">=</span><span class="p">{</span><span class="s2">"label"</span><span class="p">:</span> <span class="s2">"Sightings per km²"</span><span class="p">,</span> <span class="s2">"ticks"</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="s2">"format"</span><span class="p">:</span> <span class="s2">"</span><span class="si">{x:g}</span><span class="s2">"</span><span class="p">},</span>
     <span class="c1"># log-spaced levels, one shade per step</span>
     <span class="n">levels</span><span class="o">=</span><span class="p">[</span><span class="mf">0.003</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span>
@@ -6729,8 +6729,8 @@ ContourChart(
 
 ContourChart(
     data=sighting_density,
-    filled=True,
-    show_colorbars=True,
+    fill=True,
+    show_colorbar=True,
     colorbar={"label": "Sightings per km²", "ticks": [0.01, 0.1, 1, 10], "format": "{x:g}"},
     # log-spaced levels, one shade per step
     levels=[0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30, 100],
@@ -7152,7 +7152,7 @@ ContourChart(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="emphasis">Emphasis<a class="anchor-link" href="#emphasis">¶</a></h3><p>A chart usually makes one point, and emphasis makes it visible. <code>emphasis</code> takes one role per surface, aligned with <code>data</code>: <code>"highlight"</code> bolds the iso-lines and brings them to the front, <code>"background"</code> mutes them into the theme's muted color and drops them from the legend, and <code>None</code> leaves them as they are. The roles are also the <a href="../../../references/constants/#datachart.constants.EMPHASIS">EMPHASIS</a> constants, and the <a href="../../styling/highlighting/">Highlighting</a> guide covers emphasis across every chart type. Emphasis bolds and mutes lines, so it applies to iso-lines only: with <code>filled=True</code> it raises a <code>ValueError</code>. Asking where the herd spends the winter turns the other seasons into context:</p>
+<h3 id="emphasis">Emphasis<a class="anchor-link" href="#emphasis">¶</a></h3><p>A chart usually makes one point, and emphasis makes it visible. <code>emphasis</code> takes one role per surface, aligned with <code>data</code>: <code>"highlight"</code> bolds the iso-lines and brings them to the front, <code>"background"</code> mutes them into the theme's muted color and drops them from the legend, and <code>None</code> leaves them as they are. The roles are also the <a href="../../../references/constants/#datachart.constants.EMPHASIS">EMPHASIS</a> constants, and the <a href="../../styling/highlighting/">Highlighting</a> guide covers emphasis across every chart type. Emphasis bolds and mutes lines, so it applies to iso-lines only: with <code>fill=True</code> it raises a <code>ValueError</code>. Asking where the herd spends the winter turns the other seasons into context:</p>
 </div>
 </div>
 </div>
@@ -7331,7 +7331,7 @@ ContourChart(
     <span class="n">data</span><span class="o">=</span><span class="n">season_density</span><span class="p">,</span>
     <span class="n">subtitle</span><span class="o">=</span><span class="n">SEASONS</span><span class="p">,</span>
     <span class="c1"># one filled panel per season, side by side</span>
-    <span class="n">filled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">subplots</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">max_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
     <span class="c1"># the same axes for every season</span>
@@ -7352,7 +7352,7 @@ ContourChart(
     data=season_density,
     subtitle=SEASONS,
     # one filled panel per season, side by side
-    filled=True,
+    fill=True,
     subplots=True,
     max_cols=3,
     # the same axes for every season
@@ -7427,7 +7427,7 @@ ContourChart(
         <span class="p">{</span>
             <span class="s2">"figure"</span><span class="p">:</span> <span class="n">ContourChart</span><span class="p">(</span>
                 <span class="n">data</span><span class="o">=</span><span class="n">terrain</span><span class="p">,</span>
-                <span class="n">filled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">levels</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mi">1900</span><span class="p">,</span> <span class="mi">100</span><span class="p">)),</span>
                 <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">"plot_contour_cmap"</span><span class="p">:</span> <span class="n">TERRAIN_COLORS</span><span class="p">},</span>
             <span class="p">),</span>
@@ -7466,7 +7466,7 @@ Panel(
         {
             "figure": ContourChart(
                 data=terrain,
-                filled=True,
+                fill=True,
                 levels=list(range(300, 1900, 100)),
                 style={"plot_contour_cmap": TERRAIN_COLORS},
             ),
@@ -7557,7 +7557,7 @@ Panel(
             <span class="p">),</span>
             <span class="n">ContourChart</span><span class="p">(</span>
                 <span class="n">data</span><span class="o">=</span><span class="n">sighting_density</span><span class="p">,</span>
-                <span class="n">filled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">levels</span><span class="o">=</span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">64</span><span class="p">],</span>
                 <span class="n">norm</span><span class="o">=</span><span class="n">COLOR_NORM</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
                 <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">"plot_contour_cmap"</span><span class="p">:</span> <span class="n">COLORS</span><span class="o">.</span><span class="n">YlGnBu</span><span class="p">},</span>
@@ -7585,7 +7585,7 @@ Grid(
             ),
             ContourChart(
                 data=sighting_density,
-                filled=True,
+                fill=True,
                 levels=[0.5, 1, 2, 4, 8, 16, 32, 64],
                 norm=COLOR_NORM.LOG,
                 style={"plot_contour_cmap": COLORS.YlGnBu},
@@ -7635,7 +7635,7 @@ Grid(
 <h3 id="density-of-scattered-points">Density of scattered points<a class="anchor-link" href="#density-of-scattered-points">¶</a></h3><p>A contour of a density is the two-dimensional counterpart of a histogram: it shows where scattered points concentrate, without the overplotting of a crowded scatter chart. <a href="../../../references/utils/stats/#datachart.utils.stats.kde2d">datachart.utils.stats.kde2d</a> estimates the density with a Gaussian kernel and returns the <code>{x, y, z}</code> surface that <code>ContourChart</code> takes, so <code>ContourChart(data=kde2d(x, y))</code> is a density chart. Its options:</p>
 <ul>
 <li><code>bandwidth</code> sets how smooth the estimate is: a <a href="../../../references/constants/#datachart.constants.BANDWIDTH">BANDWIDTH</a> rule (Scott's by default, or Silverman's) or a number that replaces the rule's factor, where smaller values follow the points more closely.</li>
-<li><code>gridsize</code> sets the resolution of the surface.</li>
+<li><code>grid_size</code> sets the resolution of the surface.</li>
 <li><code>cut</code> extends the grid past the points by that many bandwidths, so the outer contours close instead of being clipped; <code>xlim</code> and <code>ylim</code> fix the grid instead, so several surfaces share one (as <code>season_density</code> does).</li>
 </ul>
 <p>The result is a probability density (it integrates to 1); multiplied by the number of points, it reads as points per unit area. The autumn sightings come from two groups: Scott's rule shows both, while a wide bandwidth (<code>2.0</code>) smooths them into one blob, the classic way a density estimate hides structure.</p>
@@ -7673,14 +7673,14 @@ Grid(
             <span class="n">ContourChart</span><span class="p">(</span>
                 <span class="c1"># Scott's rule: two groups</span>
                 <span class="n">data</span><span class="o">=</span><span class="n">kde2d</span><span class="p">(</span><span class="n">autumn_east</span><span class="p">,</span> <span class="n">autumn_north</span><span class="p">,</span> <span class="n">bandwidth</span><span class="o">=</span><span class="n">BANDWIDTH</span><span class="o">.</span><span class="n">SCOTT</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="p">)),</span>
-                <span class="n">filled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">title</span><span class="o">=</span><span class="s2">"Scott's rule"</span><span class="p">,</span>
                 <span class="n">aspect_ratio</span><span class="o">=</span><span class="n">ASPECT_RATIO</span><span class="o">.</span><span class="n">EQUAL</span><span class="p">,</span>
             <span class="p">),</span>
             <span class="n">ContourChart</span><span class="p">(</span>
                 <span class="c1"># a wide kernel: one blob, on the same map extent</span>
                 <span class="n">data</span><span class="o">=</span><span class="n">kde2d</span><span class="p">(</span><span class="n">autumn_east</span><span class="p">,</span> <span class="n">autumn_north</span><span class="p">,</span> <span class="n">bandwidth</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="p">)),</span>
-                <span class="n">filled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">title</span><span class="o">=</span><span class="s2">"bandwidth=2.0"</span><span class="p">,</span>
                 <span class="n">aspect_ratio</span><span class="o">=</span><span class="n">ASPECT_RATIO</span><span class="o">.</span><span class="n">EQUAL</span><span class="p">,</span>
             <span class="p">),</span>
@@ -7704,14 +7704,14 @@ Grid(
             ContourChart(
                 # Scott's rule: two groups
                 data=kde2d(autumn_east, autumn_north, bandwidth=BANDWIDTH.SCOTT, xlim=(0, 10), ylim=(0, 8)),
-                filled=True,
+                fill=True,
                 title="Scott's rule",
                 aspect_ratio=ASPECT_RATIO.EQUAL,
             ),
             ContourChart(
                 # a wide kernel: one blob, on the same map extent
                 data=kde2d(autumn_east, autumn_north, bandwidth=2.0, xlim=(0, 10), ylim=(0, 8)),
-                filled=True,
+                fill=True,
                 title="bandwidth=2.0",
                 aspect_ratio=ASPECT_RATIO.EQUAL,
             ),
@@ -7779,8 +7779,8 @@ Grid(
     <span class="c1"># both hyperparameters on a log scale</span>
     <span class="n">scalex</span><span class="o">=</span><span class="n">AXIS_SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
     <span class="n">scaley</span><span class="o">=</span><span class="n">AXIS_SCALE</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
-    <span class="n">filled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">show_colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">colorbar</span><span class="o">=</span><span class="p">{</span><span class="s2">"label"</span><span class="p">:</span> <span class="s2">"Validation loss"</span><span class="p">},</span>
     <span class="n">levels</span><span class="o">=</span><span class="p">[</span><span class="mf">0.32</span><span class="p">,</span> <span class="mf">0.35</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.4</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">],</span>
     <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">"plot_contour_cmap"</span><span class="p">:</span> <span class="n">COLORS</span><span class="o">.</span><span class="n">YlGnBu</span><span class="p">},</span>
@@ -7797,8 +7797,8 @@ ContourChart(
     # both hyperparameters on a log scale
     scalex=AXIS_SCALE.LOG,
     scaley=AXIS_SCALE.LOG,
-    filled=True,
-    show_colorbars=True,
+    fill=True,
+    show_colorbar=True,
     colorbar={"label": "Validation loss"},
     levels=[0.32, 0.35, 0.4, 0.5, 0.6, 0.8, 1.0, 1.4, 2.0],
     style={"plot_contour_cmap": COLORS.YlGnBu},
@@ -7862,8 +7862,8 @@ ContourChart(
 <span class="n">ContourChart</span><span class="p">(</span>
     <span class="c1"># dates on the x-axis</span>
     <span class="n">data</span><span class="o">=</span><span class="n">snow</span><span class="p">,</span>
-    <span class="n">filled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">show_colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">colorbar</span><span class="o">=</span><span class="p">{</span><span class="s2">"label"</span><span class="p">:</span> <span class="s2">"Snow depth (cm)"</span><span class="p">},</span>
     <span class="n">levels</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">120</span><span class="p">,</span> <span class="mi">140</span><span class="p">,</span> <span class="mi">160</span><span class="p">],</span>
     <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">"plot_contour_cmap"</span><span class="p">:</span> <span class="n">COLORS</span><span class="o">.</span><span class="n">Blues</span><span class="p">},</span>
@@ -7879,8 +7879,8 @@ ContourChart(
 ContourChart(
     # dates on the x-axis
     data=snow,
-    filled=True,
-    show_colorbars=True,
+    fill=True,
+    show_colorbar=True,
     colorbar={"label": "Snow depth (cm)"},
     levels=[1, 20, 40, 60, 80, 100, 120, 140, 160],
     style={"plot_contour_cmap": COLORS.Blues},
@@ -8193,7 +8193,7 @@ Panel(
     <span class="c1"># one species as a filled density, on the shared levels</span>
     <span class="k">return</span> <span class="n">ContourChart</span><span class="p">(</span>
         <span class="n">data</span><span class="o">=</span><span class="n">species_density</span><span class="p">[</span><span class="n">index</span><span class="p">],</span>
-        <span class="n">filled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">levels</span><span class="o">=</span><span class="n">DENSITY_LEVELS</span><span class="p">,</span>
         <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">"plot_contour_cmap"</span><span class="p">:</span> <span class="n">COLORS</span><span class="o">.</span><span class="n">YlGnBu</span><span class="p">},</span>
         <span class="n">title</span><span class="o">=</span><span class="n">SPECIES</span><span class="p">[</span><span class="n">index</span><span class="p">],</span>
@@ -8235,7 +8235,7 @@ def species_panel(index):
     # one species as a filled density, on the shared levels
     return ContourChart(
         data=species_density[index],
-        filled=True,
+        fill=True,
         levels=DENSITY_LEVELS,
         style={"plot_contour_cmap": COLORS.YlGnBu},
         title=SPECIES[index],

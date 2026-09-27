@@ -6661,7 +6661,7 @@ LineChart(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="density-estimates">Density estimates<a class="anchor-link" href="#density-estimates">¶</a></h3><p><em>What does the distribution look like, without the bins?</em> A histogram's shape changes with its bin edges; a kernel density estimate smooths the same values into a curve that does not. <code>kde1d(values)</code> returns the curve as <code>{x, y}</code> points ready for a <a href="../../charts/linechart/">Line Chart</a>; it integrates to 1, so it overlays a density <a href="../../charts/histogram/">Histogram</a> of the same values on the same axis. Its <code>bandwidth</code> sets how smooth the curve is: a rule of <a href="../../../references/constants/#datachart.constants.BANDWIDTH">BANDWIDTH</a> (Scott's by default) or a number, where smaller values follow the data more closely. <code>gridsize</code> is the number of points, and <code>cut</code> how many bandwidths the curve extends past the extremes (or <code>xlim</code> fixes the range, so several curves share one grid). One curve per species, with <code>show_area</code>, is the cleanest picture of the three flipper distributions:</p>
+<h3 id="density-estimates">Density estimates<a class="anchor-link" href="#density-estimates">¶</a></h3><p><em>What does the distribution look like, without the bins?</em> A histogram's shape changes with its bin edges; a kernel density estimate smooths the same values into a curve that does not. <code>kde1d(values)</code> returns the curve as <code>{x, y}</code> points ready for a <a href="../../charts/linechart/">Line Chart</a>; it integrates to 1, so it overlays a density <a href="../../charts/histogram/">Histogram</a> of the same values on the same axis. Its <code>bandwidth</code> sets how smooth the curve is: a rule of <a href="../../../references/constants/#datachart.constants.BANDWIDTH">BANDWIDTH</a> (Scott's by default) or a number, where smaller values follow the data more closely. <code>grid_size</code> is the number of points, and <code>cut</code> how many bandwidths the curve extends past the extremes (or <code>xlim</code> fixes the range, so several curves share one grid). One curve per species, with <code>show_area</code>, is the cleanest picture of the three flipper distributions:</p>
 </div>
 </div>
 </div>
@@ -6731,7 +6731,7 @@ LineChart(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><code>kde2d(x, y)</code> does the same for pairs of values and returns the <code>{x, y, z}</code> surface a <a href="../../charts/contourchart/">Contour Chart</a> draws: the density contours of a scatter, which show where the points crowd when they overplot. The <code>gridsize</code> can be one number or an <code>(x, y)</code> pair of column and row counts, and <code>xlim</code> and <code>ylim</code> fix the grid so several surfaces share it. Flipper length against body mass forms two clusters, the Gentoo one apart from the rest:</p>
+<p><code>kde2d(x, y)</code> does the same for pairs of values and returns the <code>{x, y, z}</code> surface a <a href="../../charts/contourchart/">Contour Chart</a> draws: the density contours of a scatter, which show where the points crowd when they overplot. The <code>grid_size</code> can be one number or an <code>(x, y)</code> pair of column and row counts, and <code>xlim</code> and <code>ylim</code> fix the grid so several surfaces share it. Flipper length against body mass forms two clusters, the Gentoo one apart from the rest:</p>
 </div>
 </div>
 </div>
@@ -6761,7 +6761,7 @@ LineChart(
     <span class="n">title</span><span class="o">=</span><span class="s2">"Where the penguins crowd: density of flipper length against body mass"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Flipper length (mm)"</span><span class="p">,</span>
     <span class="n">ylabel</span><span class="o">=</span><span class="s2">"Body mass (g)"</span><span class="p">,</span>
-    <span class="n">filled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_MEDIUM</span><span class="p">,</span>
 <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
@@ -6772,7 +6772,7 @@ ContourChart(
     title="Where the penguins crowd: density of flipper length against body mass",
     xlabel="Flipper length (mm)",
     ylabel="Body mass (g)",
-    filled=True,
+    fill=True,
     figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()</div>
 </div>

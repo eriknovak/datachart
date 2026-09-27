@@ -6107,9 +6107,9 @@ figure.show()</div>
 <span class="n">points</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span> <span class="n">size</span><span class="o">=</span><span class="mi">3000</span><span class="p">)</span>
 <span class="n">figure</span> <span class="o">=</span> <span class="n">HexbinChart</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">"x"</span><span class="p">:</span> <span class="n">points</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="s2">"y"</span><span class="p">:</span> <span class="n">points</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()},</span>
-    <span class="n">gridsize</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+    <span class="n">grid_size</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
     <span class="n">emphasis_rule</span><span class="o">=</span><span class="p">{</span><span class="s2">"above"</span><span class="p">:</span> <span class="mi">40</span><span class="p">},</span>
-    <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">show_colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Bins with more than 40 points"</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">figure</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
@@ -6134,9 +6134,9 @@ figure.show()
 points = rng.multivariate_normal([0, 0], [[1, 0.6], [0.6, 1]], size=3000)
 figure = HexbinChart(
     data={"x": points[:, 0].tolist(), "y": points[:, 1].tolist()},
-    gridsize=20,
+    grid_size=20,
     emphasis_rule={"above": 40},
-    show_colorbars=True,
+    show_colorbar=True,
     title="Bins with more than 40 points",
 )
 figure.show()</div>

@@ -38,9 +38,9 @@ RadialChart(
     sort_by: str | None = None,
     emphasis_rule: EmphasisRuleAttrs | None = None,
     num_bins: int | None = None,
-    startangle: str | int | float | None = None,
+    start_angle: str | int | float | None = None,
     direction: RADIAL_DIRECTION | str | None = None,
-    innerradius: float | None = None,
+    inner_radius: float | None = None,
     scalex: None = None,
     scaley: AXIS_SCALE | str | None = None,
     subplots: bool | None = None,
@@ -88,7 +88,9 @@ RadialChart(
     x: str | list[str | None] | None = None,
     y: str | list[str | None] | None = None,
     yerr: str | list[str | None] | None = None,
-    type: RADIAL_TYPE | str | None = None
+    type: RADIAL_TYPE | str | None = None,
+    startangle: str | int | float | None = None,
+    innerradius: float | None = None
 ) -> plt.Figure
 ```
 
@@ -137,9 +139,9 @@ Examples:
 | `sort_by`         | The subtitle of the one series whose values key the sort instead of the total (bar visual). A category that series lacks sorts last. **TYPE:** \`str                                                                                                                                                                                                                           |
 | `emphasis_rule`   | A one-key dict that highlights the bars matching it and mutes the rest (bar visual): {"above": v} or {"below": v} (strict), {"between": (lo, hi)} (inclusive), {"top": n} or {"bottom": n}. Reads each bar's own value; a record's own emphasis key wins over the rule. **TYPE:** \`EmphasisRuleAttrs                                                                          |
 | `num_bins`        | The number of angular bins over \[0, 360) (histogram visual). **TYPE:** \`int                                                                                                                                                                                                                                                                                                  |
-| `startangle`      | Where the first point sits: a compass location ("N", "NE", "E", "SE", "S", "SW", "W", "NW") or a numeric compass bearing in degrees clockwise from north. Defaults to "N". **TYPE:** \`str                                                                                                                                                                                     |
+| `start_angle`     | Where the first point sits: a compass location ("N", "NE", "E", "SE", "S", "SW", "W", "NW") or a numeric compass bearing in degrees clockwise from north. Defaults to "N". **TYPE:** \`str                                                                                                                                                                                     |
 | `direction`       | Which way the angles increase: "clockwise" (default) or "counterclockwise". See RADIAL_DIRECTION. **TYPE:** \`RADIAL_DIRECTION                                                                                                                                                                                                                                                 |
-| `innerradius`     | The donut hole, as a fraction (0 \<= f < 1) of the radial extent. Defaults to 0. **TYPE:** \`float                                                                                                                                                                                                                                                                             |
+| `inner_radius`    | The donut hole, as a fraction (0 \<= f < 1) of the radial extent. Defaults to 0. **TYPE:** \`float                                                                                                                                                                                                                                                                             |
 | `scalex`          | Not supported; the angular axis has no scale. Raises when passed. **TYPE:** `None` **DEFAULT:** `None`                                                                                                                                                                                                                                                                         |
 | `scaley`          | The radial-axis scale (e.g., "log", "linear"). **TYPE:** \`AXIS_SCALE                                                                                                                                                                                                                                                                                                          |
 | `subplots`        | Whether to create separate polar subplots for each chart. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                     |
@@ -159,6 +161,8 @@ Examples:
 | `y`               | The key name in data for radial values (default: "y"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                         |
 | `yerr`            | The key name in data for radial error values (default: "yerr"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                |
 | `type`            | Deprecated; use mark. Removed in the next release. **TYPE:** \`RADIAL_TYPE                                                                                                                                                                                                                                                                                                     |
+| `startangle`      | Deprecated; use start_angle. Removed in the next release. **TYPE:** \`str                                                                                                                                                                                                                                                                                                      |
+| `innerradius`     | Deprecated; use inner_radius. Removed in the next release. **TYPE:** \`float                                                                                                                                                                                                                                                                                                   |
 
 | RETURNS      | DESCRIPTION                             |
 | ------------ | --------------------------------------- |

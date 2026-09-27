@@ -284,7 +284,7 @@ def contour():
 def hexbin():
     figure = HexbinChart(
         data={"x": rng.normal(0, 1, 800).tolist(), "y": rng.normal(0, 1, 800).tolist()},
-        gridsize=12,
+        grid_size=12,
         xlabel="x",
         ylabel="y",
         figsize=FIGSIZE,

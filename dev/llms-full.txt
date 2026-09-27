@@ -3928,9 +3928,9 @@ Every customization is either a keyword argument of `RadialChart` or an attribut
 | fix the radial range                      | `ymin`, `ymax`                                          | [Title, axis labels and radial range](#title-axis-labels-and-radial-range)                              |
 | resize the figure                         | `figsize`                                               | [Figure size and grid](#figure-size-and-grid)                                                           |
 | show the rings and spokes                 | `show_grid`                                             | [Figure size and grid](#figure-size-and-grid)                                                           |
-| rotate where the circle starts            | `startangle`                                            | [Start angle and direction](#start-angle-and-direction)                                                 |
+| rotate where the circle starts            | `start_angle`                                           | [Start angle and direction](#start-angle-and-direction)                                                 |
 | flip the angular direction                | `direction`                                             | [Start angle and direction](#start-angle-and-direction)                                                 |
-| cut a donut hole in the middle            | `innerradius`                                           | [Inner radius](#inner-radius)                                                                           |
+| cut a donut hole in the middle            | `inner_radius`                                          | [Inner radius](#inner-radius)                                                                           |
 | change the color, width, marker, or hatch | `style={"plot_line_color": ..., "plot_bar_hatch": ...}` | [Mark style](#mark-style)                                                                               |
 | highlight some bars, mute the rest        | `emphasis_rule`, the `"emphasis"` key of a data point   | [Sorting and emphasis](#sorting-and-emphasis)                                                           |
 | order the sectors by value                | `sort`, `sort_by`                                       | [Sorting and emphasis](#sorting-and-emphasis)                                                           |
@@ -4040,7 +4040,7 @@ RadialChart(
 
 ### Start angle and direction
 
-Where the circle starts and which way it runs is a convention the reader brings along, and the chart should meet it. The default puts the first label at the top and runs clockwise, which is how a compass and a clock work, so directions and months read without instructions. `startangle` moves the first label: a compass point (`"N"`, `"NE"`, `"E"`, `"SE"`, `"S"`, `"SW"`, `"W"`, `"NW"`) or a bearing in degrees clockwise from the top. `direction` flips the way the angles increase, with a [RADIAL_DIRECTION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.RADIAL_DIRECTION) member. Readers of scientific polar plots expect the mathematical convention instead, zero at the right and angles increasing counterclockwise; the example follows it, so January sits at the right and the year runs the other way round.
+Where the circle starts and which way it runs is a convention the reader brings along, and the chart should meet it. The default puts the first label at the top and runs clockwise, which is how a compass and a clock work, so directions and months read without instructions. `start_angle` moves the first label: a compass point (`"N"`, `"NE"`, `"E"`, `"SE"`, `"S"`, `"SW"`, `"W"`, `"NW"`) or a bearing in degrees clockwise from the top. `direction` flips the way the angles increase, with a [RADIAL_DIRECTION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.RADIAL_DIRECTION) member. Readers of scientific polar plots expect the mathematical convention instead, zero at the right and angles increasing counterclockwise; the example follows it, so January sits at the right and the year runs the other way round.
 
 ```
 from datachart.constants import RADIAL_DIRECTION
@@ -4050,14 +4050,14 @@ RadialChart(
     mark=RADIAL_TYPE.BAR,
     title="Monthly sunshine hours",
     # the mathematical convention: start at the right, run counterclockwise
-    startangle="E",
+    start_angle="E",
     direction=RADIAL_DIRECTION.COUNTERCLOCKWISE,
 ).show()
 ```
 
 ### Inner radius
 
-Sectors that meet at the center shrink to slivers there, so the small values, and the bottom segments of stacked bars, are hard to read. `innerradius` cuts a donut hole, given as a fraction (between 0 and 1) of the radial extent: every bar starts at the hole instead of the center and keeps a readable width along its whole length. The short winter sectors, thin wedges near the center above, get a readable width with a quarter of the radius reserved for the hole.
+Sectors that meet at the center shrink to slivers there, so the small values, and the bottom segments of stacked bars, are hard to read. `inner_radius` cuts a donut hole, given as a fraction (between 0 and 1) of the radial extent: every bar starts at the hole instead of the center and keeps a readable width along its whole length. The short winter sectors, thin wedges near the center above, get a readable width with a quarter of the radius reserved for the hole.
 
 ```
 RadialChart(
@@ -4065,7 +4065,7 @@ RadialChart(
     mark=RADIAL_TYPE.BAR,
     title="Monthly sunshine hours",
     # reserve the middle quarter of the radius for the hole
-    innerradius=0.25,
+    inner_radius=0.25,
 ).show()
 ```
 
@@ -4135,7 +4135,7 @@ RadialChart(
     mark=RADIAL_TYPE.BAR,
     title="Monthly sunshine hours",
     # a wider hole spreads the short winter labels apart
-    innerradius=0.4,
+    inner_radius=0.4,
     # print each month's hours at the tip of its bar
     show_values=True,
     value_format=VALUE_FORMAT.INTEGER,
@@ -4149,7 +4149,7 @@ RadialChart(
     data=sunshine_by_month,
     mark=RADIAL_TYPE.BAR,
     title="Monthly sunshine hours",
-    innerradius=0.3,
+    inner_radius=0.3,
     # the month names ride the bar tips, and the border circle goes
     show_tip_labels=True,
     show_border=False,
@@ -4255,7 +4255,7 @@ RadialChart(
     title="Monthly sunshine hours",
     show_legend=True,
     legend={"location": LEGEND_LOCATION.OUTSIDE_RIGHT},
-    innerradius=0.25,
+    inner_radius=0.25,
 ).show()
 ```
 
@@ -4270,7 +4270,7 @@ RadialChart(
     title="Months ranked by afternoon sunshine",
     show_legend=True,
     legend={"location": LEGEND_LOCATION.OUTSIDE_RIGHT},
-    innerradius=0.25,
+    inner_radius=0.25,
     # one order for both series, keyed by one of them
     sort=SORT.DESCENDING,
     sort_by="Afternoon",
@@ -4453,7 +4453,7 @@ this_year = RadialChart(
     subtitle=["Weekdays", "Weekends"],
     # stacked, so the outer edge is the month's total
     bar_mode=BAR_MODE.STACK,
-    innerradius=0.3,
+    inner_radius=0.3,
 )
 last_year = RadialChart(
     data=visits_last_year,
@@ -5855,7 +5855,7 @@ Every customization is either a keyword argument of `CalendarHeatmap` or a `plot
 | resize the figure or stretch the cells      | `figsize`, `aspect_ratio`                                                                        | [Title and figure size](#title-and-figure-size)                                                         |
 | start the week on Sunday                    | `week_start`                                                                                     | [Week start](#week-start)                                                                               |
 | hide the month or weekday labels            | `show_month_labels`, `show_weekday_labels`                                                       | [Month and weekday labels](#month-and-weekday-labels)                                                   |
-| show and label the colorbar                 | `show_colorbars`, `colorbar`                                                                     | [Colorbar and cell values](#colorbar-and-cell-values)                                                   |
+| show and label the colorbar                 | `show_colorbar`, `colorbar`                                                                      | [Colorbar and cell values](#colorbar-and-cell-values)                                                   |
 | write the values into the cells             | `show_values`, `value_format`                                                                    | [Colorbar and cell values](#colorbar-and-cell-values)                                                   |
 | change the colormap or transparency         | `style={"plot_calendar_heatmap_cmap": ..., "plot_calendar_heatmap_alpha": ...}`                  | [Calendar style](#calendar-style)                                                                       |
 | style the cell values                       | `style={"plot_calendar_heatmap_font_size": ..., ...}`                                            | [Calendar style](#calendar-style)                                                                       |
@@ -5935,7 +5935,7 @@ CalendarHeatmap(
 
 ### Colorbar and cell values
 
-A calendar on its own shows which days are busier and which are quieter, not by how much. `show_colorbars` draws the colorbar that maps the colors back to values, and `colorbar` says how: a `label` for the unit, a `location` from [COLORBAR_LOCATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORBAR_LOCATION), a `format` for its tick labels (a [VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) member or a `"{x:.0f}"` style string), and explicit `ticks`; the fields are listed in [ColorbarSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ColorbarSettingAttrs). A calendar is wide and short, so a colorbar along the bottom costs the least space.
+A calendar on its own shows which days are busier and which are quieter, not by how much. `show_colorbar` draws the colorbar that maps the colors back to values, and `colorbar` says how: a `label` for the unit, a `location` from [COLORBAR_LOCATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORBAR_LOCATION), a `format` for its tick labels (a [VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) member or a `"{x:.0f}"` style string), and explicit `ticks`; the fields are listed in [ColorbarSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ColorbarSettingAttrs). A calendar is wide and short, so a colorbar along the bottom costs the least space.
 
 ```
 from datachart.constants import COLORBAR_LOCATION, VALUE_FORMAT
@@ -5944,7 +5944,7 @@ CalendarHeatmap(
     data=cyclists,
     title="Cyclists counted per day, 2024",
     # a colorbar along the bottom, labelled and ticked every 300
-    show_colorbars=True,
+    show_colorbar=True,
     colorbar={
         "label": "Cyclists per day",
         "location": COLORBAR_LOCATION.BOTTOM,
@@ -6006,7 +6006,7 @@ CalendarHeatmap(
     vmin=0,
     vmax=1200,
     title="Cyclists counted per day, 2024",
-    show_colorbars=True,
+    show_colorbar=True,
     colorbar={"ticks": [0, 400, 800, 1200]},
 ).show()
 ```
@@ -6021,7 +6021,7 @@ CalendarHeatmap(
     # spread the quiet days over more of the colormap
     norm=COLOR_NORM.LOG,
     title="Cyclists counted per day, 2024",
-    show_colorbars=True,
+    show_colorbar=True,
 ).show()
 ```
 
@@ -6042,7 +6042,7 @@ CalendarHeatmap(
     # zero, the year's mean, sits in the middle of the diverging colormap
     norm=COLOR_NORM.CENTERED,
     title="Cyclists per day against the 2024 mean",
-    show_colorbars=True,
+    show_colorbar=True,
     colorbar={"label": "Departure from the mean"},
 ).show()
 ```
@@ -6094,7 +6094,7 @@ CalendarHeatmap(
     # two years of data: one calendar per year, on one value range
     data=two_years,
     title="Cyclists counted per day",
-    show_colorbars=True,
+    show_colorbar=True,
 ).show()
 ```
 
@@ -6127,7 +6127,7 @@ CalendarHeatmap(
     # the first keeps the theme colormap, the second gets its own
     style=[None, {"plot_calendar_heatmap_cmap": COLORS.Oranges}],
     title="Cyclists counted per day, 2024",
-    show_colorbars=True,
+    show_colorbar=True,
 ).show()
 ```
 
@@ -6223,7 +6223,7 @@ CalendarHeatmap(
     style={"plot_calendar_heatmap_cmap": COLORS.Blues},
     title="Daily rainfall",
     # one colorbar for the three years, in whole millimetres
-    show_colorbars=True,
+    show_colorbar=True,
     colorbar={"label": "mm", "format": VALUE_FORMAT.INTEGER},
 ).show()
 ```
@@ -8517,7 +8517,7 @@ Every customization is either a keyword argument of `SwarmPlot` or a `plot_swarm
 | resize the figure                             | `figsize`                                                 | [Figure size and grid](#figure-size-and-grid)                                                           |
 | show grid lines                               | `show_grid`                                               | [Figure size and grid](#figure-size-and-grid)                                                           |
 | change the point color, size, marker, or edge | `style={"plot_swarm_color": ..., "plot_swarm_size": ...}` | [Point style](#point-style)                                                                             |
-| jitter the points instead of packing them     | `mode`, `jitter`                                          | [Swarm and strip modes](#swarm-and-strip-modes)                                                         |
+| jitter the points instead of packing them     | `swarm_mode`, `jitter`                                    | [Swarm and strip modes](#swarm-and-strip-modes)                                                         |
 | draw the swarms horizontally                  | `orientation`                                             | [Horizontal swarms](#horizontal-swarms)                                                                 |
 | change the order of the groups                | the order of `data`                                       | [Horizontal swarms](#horizontal-swarms)                                                                 |
 | print each group's min, median, and max       | `show_values`, `value_format`                             | [Value labels](#value-labels)                                                                           |
@@ -8544,7 +8544,7 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `figsize`                                    | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                                                                                                                                   |
 | `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN) |
 | `show_grid`                                  | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                                                                                                                                 |
-| `mode`                                       | [`SWARM_MODE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SWARM_MODE)                                                                                                                               |
+| `swarm_mode`                                 | [`SWARM_MODE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SWARM_MODE)                                                                                                                               |
 | `value_format`                               | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                           |
 | `aspect_ratio`                               | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                           |
 | `orientation`                                | [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)                                                                                                                             |
@@ -8623,7 +8623,7 @@ SwarmPlot(
 
 ### Swarm and strip modes
 
-A swarm computes a place for every point so none overlap, which is what makes single points readable. With thousands of points that placement adds nothing: the swarm fills its whole width anyway, and grows wider than the category. `mode` picks the placement from [SWARM_MODE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SWARM_MODE): `SWARM_MODE.SWARM` packs the points from the marker size at the moment the chart is drawn (the default; axis limits changed on the figure afterwards can shift the spacing), and `SWARM_MODE.STRIP` scatters them at random across the category, a *strip plot*. `jitter` sets the width of the strip as a fraction of the category width (0.4 by default), and the jitter is seeded, so the same data draws the same chart. On the presidents the strip lets points overlap, so the swarm is the better choice for a sample this small; the strip earns its place in [Example 1](#example-1-which-services-breach-the-sla-strip-mode-log-scale-and-an-sla-line), with 1,200 points.
+A swarm computes a place for every point so none overlap, which is what makes single points readable. With thousands of points that placement adds nothing: the swarm fills its whole width anyway, and grows wider than the category. `swarm_mode` picks the placement from [SWARM_MODE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SWARM_MODE): `SWARM_MODE.SWARM` packs the points from the marker size at the moment the chart is drawn (the default; axis limits changed on the figure afterwards can shift the spacing), and `SWARM_MODE.STRIP` scatters them at random across the category, a *strip plot*. `jitter` sets the width of the strip as a fraction of the category width (0.4 by default), and the jitter is seeded, so the same data draws the same chart. On the presidents the strip lets points overlap, so the swarm is the better choice for a sample this small; the strip earns its place in [Example 1](#example-1-which-services-breach-the-sla-strip-mode-log-scale-and-an-sla-line), with 1,200 points.
 
 ```
 from datachart.constants import SWARM_MODE
@@ -8631,7 +8631,7 @@ from datachart.constants import SWARM_MODE
 SwarmPlot(
     data=inauguration_ages,
     # scatter the points at random instead of packing them
-    mode=SWARM_MODE.STRIP,
+    swarm_mode=SWARM_MODE.STRIP,
     # a strip a quarter of the category wide
     jitter=0.25,
     title="Age of US presidents at inauguration, strip mode",
@@ -9082,7 +9082,7 @@ The examples below put the features above to work on realistic data, each one an
 SwarmPlot(
     data=response_times,
     # scatter the many points across the category width
-    mode=SWARM_MODE.STRIP,
+    swarm_mode=SWARM_MODE.STRIP,
     # small, translucent points
     style={"plot_swarm_size": 6, "plot_swarm_alpha": 0.4, "plot_swarm_edge_width": 0},
     # the long tail reads at the same resolution as the bulk
@@ -9213,7 +9213,7 @@ Every customization is either a keyword argument of `RaincloudPlot` or an attrib
 | show grid lines                                    | `show_grid`                                                                           | [Figure size and grid](#figure-size-and-grid)                                                           |
 | change the cloud, rain, or box style               | `style={"plot_violin_alpha": ..., "plot_swarm_size": ..., "plot_box_linewidth": ...}` | [Cloud, rain and box style](#cloud-rain-and-box-style)                                                  |
 | smooth or sharpen the cloud                        | `bandwidth`                                                                           | [Cloud bandwidth](#cloud-bandwidth)                                                                     |
-| jitter the rain instead of packing it              | `mode`, `jitter`                                                                      | [Rain modes](#rain-modes)                                                                               |
+| jitter the rain instead of packing it              | `swarm_mode`, `jitter`                                                                | [Rain modes](#rain-modes)                                                                               |
 | hide the box outliers                              | `show_outliers`                                                                       | [Box outliers](#box-outliers)                                                                           |
 | print each group's median, min and max             | `show_values`, `value_format`                                                         | [Value labels](#value-labels)                                                                           |
 | draw the rainclouds horizontally                   | `orientation`                                                                         | [Horizontal rainclouds](#horizontal-rainclouds)                                                         |
@@ -9239,7 +9239,7 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN) |
 | `show_grid`                                  | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                                                                                                                                 |
 | `value_format`                               | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                           |
-| `mode`                                       | [`SWARM_MODE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SWARM_MODE)                                                                                                                               |
+| `swarm_mode`                                 | [`SWARM_MODE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SWARM_MODE)                                                                                                                               |
 | `bandwidth`                                  | [`BANDWIDTH`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH)                                                                                                                                 |
 | `aspect_ratio`                               | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                           |
 | `orientation`                                | [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)                                                                                                                             |
@@ -9332,7 +9332,7 @@ RaincloudPlot(
 
 ### Rain modes
 
-A swarm packs the rain so no two points overlap, which is exact but costs width and time as the groups grow. `mode` chooses how the rain spreads, with a [SWARM_MODE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SWARM_MODE) member: `SWARM_MODE.SWARM` (the default) packs the points outward from the box, `SWARM_MODE.STRIP` scatters them at random across the rain's width. `jitter` sets the width of that band as a fraction of the category width (0.4, the default, fills the rain's cell); the jitter is seeded, so the same data draws the same chart. The strip mode suits many thousands of points, where a swarm would fill its whole width anyway.
+A swarm packs the rain so no two points overlap, which is exact but costs width and time as the groups grow. `swarm_mode` chooses how the rain spreads, with a [SWARM_MODE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SWARM_MODE) member: `SWARM_MODE.SWARM` (the default) packs the points outward from the box, `SWARM_MODE.STRIP` scatters them at random across the rain's width. `jitter` sets the width of that band as a fraction of the category width (0.4, the default, fills the rain's cell); the jitter is seeded, so the same data draws the same chart. The strip mode suits many thousands of points, where a swarm would fill its whole width anyway.
 
 ```
 from datachart.constants import SWARM_MODE
@@ -9340,7 +9340,7 @@ from datachart.constants import SWARM_MODE
 RaincloudPlot(
     data=chart_data,
     # scatter the rain instead of packing it
-    mode=SWARM_MODE.STRIP,
+    swarm_mode=SWARM_MODE.STRIP,
     # in a band half as wide as the rain's cell
     jitter=0.2,
     title="Body mass of Palmer penguins, strip rain",
@@ -9791,7 +9791,7 @@ RaincloudPlot(
     data=stroop_trials,
     style={"plot_swarm_size": 3, "plot_swarm_alpha": 0.5, "plot_value_fontsize": 8},
     # 300 trials per condition: scatter instead of packing
-    mode=SWARM_MODE.STRIP,
+    swarm_mode=SWARM_MODE.STRIP,
     # reaction times are right-skewed
     scaley=AXIS_SCALE.LOG,
     yticks=[400, 600, 800, 1000, 1500],
@@ -10498,7 +10498,7 @@ Panel(
         SwarmPlot(
             data=scores,
             orientation=ORIENTATION.HORIZONTAL,
-            mode=SWARM_MODE.STRIP,
+            swarm_mode=SWARM_MODE.STRIP,
             jitter=0.5,
             style={"plot_swarm_color": "#2C3E50", "plot_swarm_size": 6, "plot_swarm_alpha": 0.6},
         ),
@@ -11345,7 +11345,7 @@ Every customization is either a keyword argument of `Heatmap` or a `plot_heatmap
 | tick only some rows or columns             | `xticks`, `xticklabels`, `yticks`, `yticklabels`                             | [Ticks and labels](#ticks-and-labels)                                                                   |
 | rotate the tick labels                     | `xtickrotate`, `ytickrotate`                                                 | [Ticks and labels](#ticks-and-labels)                                                                   |
 | resize the figure or keep the cells square | `figsize`, `aspect_ratio`                                                    | [Figure size and aspect ratio](#figure-size-and-aspect-ratio)                                           |
-| show the colorbar                          | `show_colorbars`                                                             | [Colorbar and cell values](#colorbar-and-cell-values)                                                   |
+| show the colorbar                          | `show_colorbar`                                                              | [Colorbar and cell values](#colorbar-and-cell-values)                                                   |
 | write the values into the cells            | `show_values`, `value_format`                                                | [Colorbar and cell values](#colorbar-and-cell-values)                                                   |
 | caption, move, or format the colorbar      | `colorbar={"label": ..., "location": ..., "format": ..., "ticks": ...}`      | [Colorbar placement](#colorbar-placement)                                                               |
 | change the colormap or transparency        | `style={"plot_heatmap_cmap": ..., "plot_heatmap_alpha": ...}`                | [Heatmap style](#heatmap-style)                                                                         |
@@ -11433,7 +11433,7 @@ Heatmap(
 
 ### Colorbar and cell values
 
-Colors show which cells are warmer, not by how much. `show_colorbars` adds the scale that maps colors back to values, and `show_values` writes each value into its cell; a value on a dark cell is written in white, so it stays legible across the colormap. `value_format` formats the cell values: a [VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) member or a format string that names the value `x`, such as `"{x:.1f}"` (a string without `x`, such as `"{z:.1f}"`, is not valid). The temperatures carry one decimal, so `VALUE_FORMAT.DECIMAL` keeps it. With the values written in, the chart answers both questions: the pattern from the colors, the exact numbers from the cells.
+Colors show which cells are warmer, not by how much. `show_colorbar` adds the scale that maps colors back to values, and `show_values` writes each value into its cell; a value on a dark cell is written in white, so it stays legible across the colormap. `value_format` formats the cell values: a [VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) member or a format string that names the value `x`, such as `"{x:.1f}"` (a string without `x`, such as `"{z:.1f}"`, is not valid). The temperatures carry one decimal, so `VALUE_FORMAT.DECIMAL` keeps it. With the values written in, the chart answers both questions: the pattern from the colors, the exact numbers from the cells.
 
 ```
 from datachart.constants import VALUE_FORMAT
@@ -11445,7 +11445,7 @@ Heatmap(
     ylabel="City",
     figsize=FIG_SIZE.FULL_MEDIUM,
     # add the color scale
-    show_colorbars=True,
+    show_colorbar=True,
     # write the values into the cells, with one decimal
     show_values=True,
     value_format=VALUE_FORMAT.DECIMAL,
@@ -11464,7 +11464,7 @@ Heatmap(
     title="Mean monthly temperature",
     ylabel="City",
     figsize=FIG_SIZE.FULL_MEDIUM,
-    show_colorbars=True,
+    show_colorbar=True,
     # a captioned colorbar under the table, ticked every 5 degrees
     colorbar={
         "location": COLORBAR_LOCATION.BOTTOM,
@@ -11502,7 +11502,7 @@ Heatmap(
     xlabel="Month",
     ylabel="City",
     figsize=FIG_SIZE.FULL_MEDIUM,
-    show_colorbars=True,
+    show_colorbar=True,
     show_values=True,
     value_format=VALUE_FORMAT.DECIMAL,
 ).show()
@@ -11525,7 +11525,7 @@ Heatmap(
     xlabel="Month",
     ylabel="City",
     figsize=FIG_SIZE.FULL_MEDIUM,
-    show_colorbars=True,
+    show_colorbar=True,
     show_values=True,
     value_format=VALUE_FORMAT.DECIMAL,
 ).show()
@@ -11547,7 +11547,7 @@ for norm in [COLOR_NORM.LINEAR, COLOR_NORM.SYMLOG]:
         xlabel="Month",
         ylabel="City",
         figsize=FIG_SIZE.FULL_MEDIUM,
-        show_colorbars=True,
+        show_colorbar=True,
         show_values=True,
         value_format=VALUE_FORMAT.INTEGER,
     ).show()
@@ -11570,7 +11570,7 @@ for centre, label in [(0, "freezing"), (18, "room temperature")]:
         xlabel="Month",
         ylabel="City",
         figsize=FIG_SIZE.FULL_MEDIUM,
-        show_colorbars=True,
+        show_colorbar=True,
         show_values=True,
         value_format=VALUE_FORMAT.DECIMAL,
     ).show()
@@ -11635,7 +11635,7 @@ Heatmap(
     xlabel="Month",
     ylabel="City",
     figsize=FIG_SIZE.FULL_MEDIUM,
-    show_colorbars=True,
+    show_colorbar=True,
 ).show()
 ```
 
@@ -11657,7 +11657,7 @@ Heatmap(
     xticks=[0, 3, 6, 9],
     xticklabels=["Jan", "Apr", "Jul", "Oct"],
     figsize=FIG_SIZE.FULL_SHORT,
-    show_colorbars=True,
+    show_colorbar=True,
 ).show()
 ```
 
@@ -11677,7 +11677,7 @@ Heatmap(
     xlabel="Month",
     ylabel="City",
     figsize=FIG_SIZE.FULL_TALL,
-    show_colorbars=True,
+    show_colorbar=True,
     show_values=True,
     # stack the tables, one month axis for both
     max_cols=1,
@@ -11720,7 +11720,7 @@ Heatmap(
     ymax=-0.5,
     title="Winter in Europe (°C)",
     figsize=FIG_SIZE.HALF_SQUARE,
-    show_colorbars=True,
+    show_colorbar=True,
 ).show()
 ```
 
@@ -11774,7 +11774,7 @@ Heatmap(
     xtickrotate=30,
     figsize=FIG_SIZE.SQUARE,
     aspect_ratio=ASPECT_RATIO.EQUAL,
-    show_colorbars=True,
+    show_colorbar=True,
     colorbar={"label": "Pearson r", "ticks": [-1, -0.5, 0, 0.5, 1]},
     show_values=True,
     value_format=VALUE_FORMAT.DECIMAL_2,
@@ -11899,8 +11899,8 @@ Every customization is either a keyword argument of `ContourChart` or a `plot_co
 | resize the figure                        | `figsize`                                                           | [Figure size, grid and aspect ratio](#figure-size-grid-and-aspect-ratio)                                |
 | show grid lines                          | `show_grid`                                                         | [Figure size, grid and aspect ratio](#figure-size-grid-and-aspect-ratio)                                |
 | keep one unit equal on both axes         | `aspect_ratio`                                                      | [Figure size, grid and aspect ratio](#figure-size-grid-and-aspect-ratio)                                |
-| fill the bands between the levels        | `filled`                                                            | [Filled contours and colorbar](#filled-contours-and-colorbar)                                           |
-| add and caption a colorbar               | `show_colorbars`, `colorbar`                                        | [Filled contours and colorbar](#filled-contours-and-colorbar)                                           |
+| fill the bands between the levels        | `fill`                                                              | [Filled contours and colorbar](#filled-contours-and-colorbar)                                           |
+| add and caption a colorbar               | `show_colorbar`, `colorbar`                                         | [Filled contours and colorbar](#filled-contours-and-colorbar)                                           |
 | write the level values on the lines      | `show_labels`, `value_format`                                       | [Inline labels](#inline-labels)                                                                         |
 | choose the values that cut the surface   | `levels`                                                            | [Levels](#levels)                                                                                       |
 | change the line color, width, or style   | `style={"plot_contour_color": ..., "plot_contour_line_width": ...}` | [Contour style](#contour-style)                                                                         |
@@ -11983,7 +11983,7 @@ ContourChart(
 
 ### Filled contours and colorbar
 
-Iso-lines show the shape of the surface, but the eye has to count lines to tell high from low. `filled=True` colors the bands between the levels by their value instead (with the heatmap colormap by default), so the high ground reads at a glance; grid lines are off by default, as the bands would cover them. `show_colorbars=True` adds a colorbar that maps the shades back to values, and `colorbar` configures it ([ColorbarSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ColorbarSettingAttrs)): `label` names the quantity, `location` places it with a [COLORBAR_LOCATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORBAR_LOCATION) member, `format` formats its ticks and `ticks` places them. An `orientation` ([ORIENTATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)) on its own also works.
+Iso-lines show the shape of the surface, but the eye has to count lines to tell high from low. `fill=True` colors the bands between the levels by their value instead (with the heatmap colormap by default), so the high ground reads at a glance; grid lines are off by default, as the bands would cover them. `show_colorbar=True` adds a colorbar that maps the shades back to values, and `colorbar` configures it ([ColorbarSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ColorbarSettingAttrs)): `label` names the quantity, `location` places it with a [COLORBAR_LOCATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORBAR_LOCATION) member, `format` formats its ticks and `ticks` places them. An `orientation` ([ORIENTATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)) on its own also works.
 
 ```
 from datachart.constants import COLORBAR_LOCATION
@@ -11991,9 +11991,9 @@ from datachart.constants import COLORBAR_LOCATION
 ContourChart(
     data=terrain,
     # fill the bands between the levels
-    filled=True,
+    fill=True,
     # a captioned colorbar on the right, one tick every 400 m
-    show_colorbars=True,
+    show_colorbar=True,
     colorbar={
         "label": "Elevation (m)",
         "location": COLORBAR_LOCATION.RIGHT,
@@ -12140,8 +12140,8 @@ TERRAIN_COLORS = ["#d9f0d3", "#a6d96a", "#e6c587", "#a6611a", "#5c3310"]
 
 ContourChart(
     data=terrain,
-    filled=True,
-    show_colorbars=True,
+    fill=True,
+    show_colorbar=True,
     colorbar={"label": "Elevation (m)"},
     # a custom colormap, from a green valley to brown summits
     style={"plot_contour_cmap": TERRAIN_COLORS},
@@ -12161,8 +12161,8 @@ The colors of a filled contour come from two steps: each level is normalized to 
 ```
 ContourChart(
     data=terrain,
-    filled=True,
-    show_colorbars=True,
+    fill=True,
+    show_colorbar=True,
     colorbar={"label": "Elevation (m)"},
     levels=list(range(300, 1900, 100)),
     # the color range of the whole region, not of this hill
@@ -12183,8 +12183,8 @@ from datachart.constants import COLOR_NORM
 
 ContourChart(
     data=sighting_density,
-    filled=True,
-    show_colorbars=True,
+    fill=True,
+    show_colorbar=True,
     colorbar={"label": "Sightings per km²", "ticks": [0.01, 0.1, 1, 10], "format": "{x:g}"},
     # log-spaced levels, one shade per step
     levels=[0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30, 100],
@@ -12312,7 +12312,7 @@ ContourChart(
 
 ### Emphasis
 
-A chart usually makes one point, and emphasis makes it visible. `emphasis` takes one role per surface, aligned with `data`: `"highlight"` bolds the iso-lines and brings them to the front, `"background"` mutes them into the theme's muted color and drops them from the legend, and `None` leaves them as they are. The roles are also the [EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS) constants, and the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/index.md) guide covers emphasis across every chart type. Emphasis bolds and mutes lines, so it applies to iso-lines only: with `filled=True` it raises a `ValueError`. Asking where the herd spends the winter turns the other seasons into context:
+A chart usually makes one point, and emphasis makes it visible. `emphasis` takes one role per surface, aligned with `data`: `"highlight"` bolds the iso-lines and brings them to the front, `"background"` mutes them into the theme's muted color and drops them from the legend, and `None` leaves them as they are. The roles are also the [EMPHASIS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.EMPHASIS) constants, and the [Highlighting](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/highlighting/index.md) guide covers emphasis across every chart type. Emphasis bolds and mutes lines, so it applies to iso-lines only: with `fill=True` it raises a `ValueError`. Asking where the herd spends the winter turns the other seasons into context:
 
 ```
 from datachart.constants import EMPHASIS
@@ -12359,7 +12359,7 @@ ContourChart(
     data=season_density,
     subtitle=SEASONS,
     # one filled panel per season, side by side
-    filled=True,
+    fill=True,
     subplots=True,
     max_cols=3,
     # the same axes for every season
@@ -12391,7 +12391,7 @@ Panel(
         {
             "figure": ContourChart(
                 data=terrain,
-                filled=True,
+                fill=True,
                 levels=list(range(300, 1900, 100)),
                 style={"plot_contour_cmap": TERRAIN_COLORS},
             ),
@@ -12440,7 +12440,7 @@ Grid(
             ),
             ContourChart(
                 data=sighting_density,
-                filled=True,
+                fill=True,
                 levels=[0.5, 1, 2, 4, 8, 16, 32, 64],
                 norm=COLOR_NORM.LOG,
                 style={"plot_contour_cmap": COLORS.YlGnBu},
@@ -12461,7 +12461,7 @@ Grid(
 A contour of a density is the two-dimensional counterpart of a histogram: it shows where scattered points concentrate, without the overplotting of a crowded scatter chart. [datachart.utils.stats.kde2d](https://eriknovak.github.io/datachart/dev/references/utils/stats/#datachart.utils.stats.kde2d) estimates the density with a Gaussian kernel and returns the `{x, y, z}` surface that `ContourChart` takes, so `ContourChart(data=kde2d(x, y))` is a density chart. Its options:
 
 - `bandwidth` sets how smooth the estimate is: a [BANDWIDTH](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH) rule (Scott's by default, or Silverman's) or a number that replaces the rule's factor, where smaller values follow the points more closely.
-- `gridsize` sets the resolution of the surface.
+- `grid_size` sets the resolution of the surface.
 - `cut` extends the grid past the points by that many bandwidths, so the outer contours close instead of being clipped; `xlim` and `ylim` fix the grid instead, so several surfaces share one (as `season_density` does).
 
 The result is a probability density (it integrates to 1); multiplied by the number of points, it reads as points per unit area. The autumn sightings come from two groups: Scott's rule shows both, while a wide bandwidth (`2.0`) smooths them into one blob, the classic way a density estimate hides structure.
@@ -12479,14 +12479,14 @@ Grid(
             ContourChart(
                 # Scott's rule: two groups
                 data=kde2d(autumn_east, autumn_north, bandwidth=BANDWIDTH.SCOTT, xlim=(0, 10), ylim=(0, 8)),
-                filled=True,
+                fill=True,
                 title="Scott's rule",
                 aspect_ratio=ASPECT_RATIO.EQUAL,
             ),
             ContourChart(
                 # a wide kernel: one blob, on the same map extent
                 data=kde2d(autumn_east, autumn_north, bandwidth=2.0, xlim=(0, 10), ylim=(0, 8)),
-                filled=True,
+                fill=True,
                 title="bandwidth=2.0",
                 aspect_ratio=ASPECT_RATIO.EQUAL,
             ),
@@ -12511,8 +12511,8 @@ ContourChart(
     # both hyperparameters on a log scale
     scalex=AXIS_SCALE.LOG,
     scaley=AXIS_SCALE.LOG,
-    filled=True,
-    show_colorbars=True,
+    fill=True,
+    show_colorbar=True,
     colorbar={"label": "Validation loss"},
     levels=[0.32, 0.35, 0.4, 0.5, 0.6, 0.8, 1.0, 1.4, 2.0],
     style={"plot_contour_cmap": COLORS.YlGnBu},
@@ -12533,8 +12533,8 @@ from datachart.constants import DATE_FORMAT
 ContourChart(
     # dates on the x-axis
     data=snow,
-    filled=True,
-    show_colorbars=True,
+    fill=True,
+    show_colorbar=True,
     colorbar={"label": "Snow depth (cm)"},
     levels=[1, 20, 40, 60, 80, 100, 120, 140, 160],
     style={"plot_contour_cmap": COLORS.Blues},
@@ -12651,7 +12651,7 @@ def species_panel(index):
     # one species as a filled density, on the shared levels
     return ContourChart(
         data=species_density[index],
-        filled=True,
+        fill=True,
         levels=DENSITY_LEVELS,
         style={"plot_contour_cmap": COLORS.YlGnBu},
         title=SPECIES[index],
@@ -12719,9 +12719,9 @@ Every customization is either a keyword argument of `HexbinChart` or a `plot_hex
 | format or rotate the tick labels           | `xticks_format`, `yticks_format`, `xticklabels`, `xtickrotate`   | [Title, axis labels and ticks](#title-axis-labels-and-ticks)                                            |
 | resize the figure                          | `figsize`                                                        | [Figure size and grid](#figure-size-and-grid)                                                           |
 | show the grid lines                        | `show_grid`                                                      | [Figure size and grid](#figure-size-and-grid)                                                           |
-| caption, move, or hide the colorbar        | `colorbar`, `value_format`, `show_colorbars`                     | [Colorbar](#colorbar)                                                                                   |
-| make the hexagons larger or smaller        | `gridsize`                                                       | [Grid size](#grid-size)                                                                                 |
-| leave the sparse hexagons blank            | `mincnt`                                                         | [Minimum count](#minimum-count)                                                                         |
+| caption, move, or hide the colorbar        | `colorbar`, `value_format`, `show_colorbar`                      | [Colorbar](#colorbar)                                                                                   |
+| make the hexagons larger or smaller        | `grid_size`                                                      | [Grid size](#grid-size)                                                                                 |
+| leave the sparse hexagons blank            | `min_count`                                                      | [Minimum count](#minimum-count)                                                                         |
 | spread heavy-tailed counts over the colors | `norm`, `vmin`, `vmax`                                           | [Normalization](#normalization)                                                                         |
 | color the hexagons by a value              | `c` in `data`, `reduce`                                          | [Aggregating a value](#aggregating-a-value)                                                             |
 | change the colormap or draw hexagon edges  | `style={"plot_hexbin_cmap": ..., "plot_hexbin_edge_width": ...}` | [Hexagon style](#hexagon-style)                                                                         |
@@ -12802,7 +12802,7 @@ HexbinChart(
 
 ### Colorbar
 
-The colorbar is the legend of a hexbin chart: without a caption, the reader does not know that the colors count listings. `colorbar` takes a [ColorbarSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ColorbarSettingAttrs) dictionary: `label` captions the bar, `location` moves it to any edge with a [COLORBAR_LOCATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORBAR_LOCATION) member, `ticks` places its ticks, and `format` formats their labels (the `value_format` parameter does the same when `format` is not set). A bar above a wide chart takes less width from the hexagons than one beside it. `show_colorbars=False` hides the bar, which suits a chart whose colors are explained elsewhere, as in the [Composing with Panel](#composing-with-panel) section.
+The colorbar is the legend of a hexbin chart: without a caption, the reader does not know that the colors count listings. `colorbar` takes a [ColorbarSettingAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ColorbarSettingAttrs) dictionary: `label` captions the bar, `location` moves it to any edge with a [COLORBAR_LOCATION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLORBAR_LOCATION) member, `ticks` places its ticks, and `format` formats their labels (the `value_format` parameter does the same when `format` is not set). A bar above a wide chart takes less width from the hexagons than one beside it. `show_colorbar=False` hides the bar, which suits a chart whose colors are explained elsewhere, as in the [Composing with Panel](#composing-with-panel) section.
 
 ```
 from datachart.constants import COLORBAR_LOCATION
@@ -12825,15 +12825,15 @@ HexbinChart(
 
 ### Grid size
 
-The hexagon size decides what the chart can show. Large hexagons hold many points each, so the colors are smooth but the shape is coarse; small hexagons resolve finer structure until each holds too few points to color reliably. `gridsize` sets the number of hexagons across the x-axis (30 by default, from the `plot_hexbin_gridsize` style attribute). With 12 hexagons the listings reduce to a rough diagonal; with 60 the core shows its finer shape, at the price of a noisier color.
+The hexagon size decides what the chart can show. Large hexagons hold many points each, so the colors are smooth but the shape is coarse; small hexagons resolve finer structure until each holds too few points to color reliably. `grid_size` sets the number of hexagons across the x-axis (30 by default, from the `plot_hexbin_gridsize` style attribute). With 12 hexagons the listings reduce to a rough diagonal; with 60 the core shows its finer shape, at the price of a noisier color.
 
 ```
-for gridsize in [12, 60]:
+for grid_size in [12, 60]:
     HexbinChart(
         data=points,
         # the number of hexagons across the x-axis
-        gridsize=gridsize,
-        title=f"Apartment listings, {gridsize} hexagons across",
+        grid_size=grid_size,
+        title=f"Apartment listings, {grid_size} hexagons across",
         xlabel="Floor area (m²)",
         ylabel="Rent (€/month)",
         figsize=FIG_SIZE.FULL_SHORT,
@@ -12842,13 +12842,13 @@ for gridsize in [12, 60]:
 
 ### Minimum count
 
-Every hexagon of the tiling is drawn by default, so the tiling fills the whole bounding box of the points and empty plane looks like a region with few listings. `mincnt` leaves a hexagon blank unless at least that many points fall in it. `mincnt=1` draws only the hexagons that hold a listing, which shows the real outline of the data; a higher value also hides the hexagons with too few listings to trust.
+Every hexagon of the tiling is drawn by default, so the tiling fills the whole bounding box of the points and empty plane looks like a region with few listings. `min_count` leaves a hexagon blank unless at least that many points fall in it. `min_count=1` draws only the hexagons that hold a listing, which shows the real outline of the data; a higher value also hides the hexagons with too few listings to trust.
 
 ```
 HexbinChart(
     data=points,
     # blank the hexagons with fewer than five listings
-    mincnt=5,
+    min_count=5,
     title="Apartment listings",
     xlabel="Floor area (m²)",
     ylabel="Rent (€/month)",
@@ -12858,7 +12858,7 @@ HexbinChart(
 
 ### Normalization
 
-Counts are heavy-tailed: a few hexagons in the core hold hundreds of listings while most hold a handful, so on a linear color scale nearly every hexagon draws in the palest shade. `norm` changes how the values map to colors with a [COLOR_NORM](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLOR_NORM) member; `COLOR_NORM.LOG` spreads the counts, so the tail of the distribution becomes visible. A log scale needs positive values, so pair it with `mincnt=1`. `vmin` and `vmax` pin the color range instead of taking it from the data, which keeps the colors of several charts comparable.
+Counts are heavy-tailed: a few hexagons in the core hold hundreds of listings while most hold a handful, so on a linear color scale nearly every hexagon draws in the palest shade. `norm` changes how the values map to colors with a [COLOR_NORM](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.COLOR_NORM) member; `COLOR_NORM.LOG` spreads the counts, so the tail of the distribution becomes visible. A log scale needs positive values, so pair it with `min_count=1`. `vmin` and `vmax` pin the color range instead of taking it from the data, which keeps the colors of several charts comparable.
 
 ```
 from datachart.constants import COLOR_NORM
@@ -12867,7 +12867,7 @@ HexbinChart(
     data=points,
     # log-scaled counts, so the sparse tail stays visible
     norm=COLOR_NORM.LOG,
-    mincnt=1,
+    min_count=1,
     # the color range, from one listing to 300
     vmin=1,
     vmax=300,
@@ -12881,7 +12881,7 @@ HexbinChart(
 
 ### Aggregating a value
 
-Density is one question; the other is how a third value varies across the plane. With a `c` column in the data, each hexagon shows an aggregate of the `c` values of its points instead of the count. `reduce` picks the aggregate with a [HEXBIN_REDUCE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.HEXBIN_REDUCE) member: the mean by default, or the sum, median, minimum, or maximum. Only the hexagons holding a point are drawn, since an empty hexagon has nothing to aggregate, and an aggregate of one or two points is noisy, so `mincnt` hides those. Here `c` is the number of days a listing stayed on the market: the mean rises with the floor area and, at every area, with the rent.
+Density is one question; the other is how a third value varies across the plane. With a `c` column in the data, each hexagon shows an aggregate of the `c` values of its points instead of the count. `reduce` picks the aggregate with a [HEXBIN_REDUCE](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.HEXBIN_REDUCE) member: the mean by default, or the sum, median, minimum, or maximum. Only the hexagons holding a point are drawn, since an empty hexagon has nothing to aggregate, and an aggregate of one or two points is noisy, so `min_count` hides those. Here `c` is the number of days a listing stayed on the market: the mean rises with the floor area and, at every area, with the rent.
 
 ```
 from datachart.constants import HEXBIN_REDUCE
@@ -12892,7 +12892,7 @@ HexbinChart(
     # the mean of the c values in every hexagon
     reduce=HEXBIN_REDUCE.MEAN,
     # blank the hexagons with fewer than three listings
-    mincnt=3,
+    min_count=3,
     colorbar={"label": "Mean days on the market"},
     title="How long apartments take to rent",
     xlabel="Floor area (m²)",
@@ -12908,7 +12908,7 @@ HexbinChart(
     data=listings,
     # the longest-listed apartment in every hexagon
     reduce=HEXBIN_REDUCE.MAX,
-    mincnt=3,
+    min_count=3,
     colorbar={"label": "Longest time on the market (days)"},
     title="The slowest listings",
     xlabel="Floor area (m²)",
@@ -12927,14 +12927,14 @@ from datachart.constants import COLORS
 HexbinChart(
     data=listings,
     reduce=HEXBIN_REDUCE.MEAN,
-    mincnt=3,
+    min_count=3,
     # a warm colormap and white edges between the hexagons
     style={
         "plot_hexbin_cmap": COLORS.YlOrRd,
         "plot_hexbin_edge_width": 0.6,
         "plot_hexbin_edge_color": "#FFFFFF",
     },
-    gridsize=20,
+    grid_size=20,
     colorbar={"label": "Mean days on the market"},
     title="How long apartments take to rent",
     xlabel="Floor area (m²)",
@@ -12950,7 +12950,7 @@ Sometimes the question is not the whole distribution but a part of it: where mos
 ```
 HexbinChart(
     data=listings,
-    mincnt=3,
+    min_count=3,
     # outline the hexagons with a mean wait above 40 days, fade the rest
     emphasis_rule={"above": 40},
     colorbar={"label": "Mean days on the market"},
@@ -12986,7 +12986,7 @@ HexbinChart(
     },
     # a rent budget of 800 to 1,200 €
     hspans={"ymin": 800, "ymax": 1200, "style": BUDGET_STYLE},
-    mincnt=1,
+    min_count=1,
     title="Apartment listings against a rent budget",
     xlabel="Floor area (m²)",
     ylabel="Rent (€/month)",
@@ -13006,7 +13006,7 @@ HexbinChart(
         "label": f"median rate, {rate:.0f} €/m²",
         "style": {"plot_dline_color": "#1d3557", "plot_dline_style": LINE_STYLE.DASHED},
     },
-    mincnt=1,
+    min_count=1,
     title="Apartment listings against the median rent per square metre",
     xlabel="Floor area (m²)",
     ylabel="Rent (€/month)",
@@ -13024,7 +13024,7 @@ A note on the chart says what the reader should see. `texts` places text at a po
 ```
 HexbinChart(
     data=points,
-    mincnt=1,
+    min_count=1,
     norm=COLOR_NORM.LOG,
     # a note in the empty corner, pointing at the tail
     texts={
@@ -13043,7 +13043,7 @@ HexbinChart(
 
 ## Multiple Hexbin Charts
 
-To compare several groups of points, pass a list of datasets to `data` and set `subplots=True`. Hexagons are opaque, so several datasets on one axes would cover each other; subplots keep each group visible. `subtitle` titles the subplots, while `title`, `xlabel` and `ylabel` stay global; `max_cols` limits the subplots per row, and `sharex` and `sharey` put the subplots on one axis range. The per-chart parameters (`subtitle`, `style`, `gridsize`, `reduce`, `mincnt`, `norm`, `vmin`, `vmax`, `value_format`, `colorbar`) take either one value for every chart or a list with one value per chart. Each subplot scales its colors to its own data, so the same `vmin` and `vmax` on every subplot are what makes the shades comparable. `points_by_district`, defined in a hidden cell, splits the listings by district: the center has fewer listings, and they sit higher on the rent axis.
+To compare several groups of points, pass a list of datasets to `data` and set `subplots=True`. Hexagons are opaque, so several datasets on one axes would cover each other; subplots keep each group visible. `subtitle` titles the subplots, while `title`, `xlabel` and `ylabel` stay global; `max_cols` limits the subplots per row, and `sharex` and `sharey` put the subplots on one axis range. The per-chart parameters (`subtitle`, `style`, `grid_size`, `reduce`, `min_count`, `norm`, `vmin`, `vmax`, `value_format`, `colorbar`) take either one value for every chart or a list with one value per chart. Each subplot scales its colors to its own data, so the same `vmin` and `vmax` on every subplot are what makes the shades comparable. `points_by_district`, defined in a hidden cell, splits the listings by district: the center has fewer listings, and they sit higher on the rent axis.
 
 ```
 HexbinChart(
@@ -13060,8 +13060,8 @@ HexbinChart(
     # the same color range for every district
     vmin=1,
     vmax=60,
-    mincnt=1,
-    gridsize=40,
+    min_count=1,
+    grid_size=40,
     title="Apartment listings by district",
     xlabel="Floor area (m²)",
     ylabel="Rent (€/month)",
@@ -13092,12 +13092,12 @@ Panel(
         {
             "figure": HexbinChart(
                 data=points,
-                mincnt=1,
+                min_count=1,
                 norm=COLOR_NORM.LOG,
                 # the budget band, labeled in the panel legend
                 hspans={"ymin": 800, "ymax": 1200, "label": "Budget", "style": BUDGET_STYLE},
                 style={"plot_hexbin_cmap": COLORS.Greys},
-                show_colorbars=False,
+                show_colorbar=False,
             ),
             "y_axis": "left",
         },
@@ -13137,7 +13137,7 @@ Grid(
         [
             HexbinChart(
                 data=points,
-                mincnt=1,
+                min_count=1,
                 norm=COLOR_NORM.LOG,
                 title="Listings",
                 xlabel="Floor area (m²)",
@@ -13147,7 +13147,7 @@ Grid(
         [
             HexbinChart(
                 data=listings,
-                mincnt=3,
+                min_count=3,
                 colorbar={"location": COLORBAR_LOCATION.BOTTOM},
                 title="Mean days on the market",
                 xlabel="Floor area (m²)",
@@ -13178,7 +13178,7 @@ HexbinChart(
     data=locations,
     # one kilometer is as long on both axes
     aspect_ratio=ASPECT_RATIO.EQUAL,
-    mincnt=1,
+    min_count=1,
     xmin=-10,
     xmax=10,
     ymin=-8,
@@ -13197,8 +13197,8 @@ Points spread over time are often too many for a scatter chart too: every listin
 ```
 HexbinChart(
     data=rents_by_date,
-    mincnt=1,
-    gridsize=24,
+    min_count=1,
+    grid_size=24,
     # one tick per quarter, labeled with the month name
     xticks=[date(2024, month, 1) for month in (1, 4, 7, 10)] + [date(2025, 1, 1)],
     xticks_format="%b",
@@ -13224,7 +13224,7 @@ config.set_theme(THEME.INK)
 
 figure = HexbinChart(
     data=points,
-    mincnt=1,
+    min_count=1,
     norm=COLOR_NORM.LOG,
     title="Apartment listings",
     xlabel="Floor area (m²)",
@@ -13252,8 +13252,8 @@ Panel(
         HexbinChart(
             data={"x": listings["x"], "y": listings["y"], "c": per_m2},
             reduce=HEXBIN_REDUCE.MEAN,
-            mincnt=3,
-            gridsize=40,
+            min_count=3,
+            grid_size=40,
             # a diverging colormap centered on the city-wide mean;
             # the "_r" suffix reverses it, so the cheap side is blue
             style={"plot_hexbin_cmap": "RdBu_r"},
@@ -13287,8 +13287,8 @@ Panel(
 ```
 HexbinChart(
     data=locations,
-    mincnt=1,
-    gridsize=40,
+    min_count=1,
+    grid_size=40,
     norm=COLOR_NORM.LOG,
     aspect_ratio=ASPECT_RATIO.EQUAL,
     # outline the 25 fullest hexagons
@@ -13317,11 +13317,11 @@ HexbinChart(
 ```
 def district_row(name, data):
     # the listings and the median wait of one district, on the same axes
-    frame = dict(gridsize=18, xmin=15, xmax=160, ymin=0, ymax=3500)
+    frame = dict(grid_size=18, xmin=15, xmax=160, ymin=0, ymax=3500)
     count = HexbinChart(
         data={"x": data["x"], "y": data["y"]},
         norm=COLOR_NORM.LOG,
-        mincnt=1,
+        min_count=1,
         vmin=1,
         vmax=300,
         title=f"{name}: listings",
@@ -13330,7 +13330,7 @@ def district_row(name, data):
     wait = HexbinChart(
         data=data,
         reduce=HEXBIN_REDUCE.MEDIAN,
-        mincnt=3,
+        min_count=3,
         # the same range in every district, so the shades compare
         vmin=5,
         vmax=45,
@@ -15536,9 +15536,9 @@ figure.show()
 points = rng.multivariate_normal([0, 0], [[1, 0.6], [0.6, 1]], size=3000)
 figure = HexbinChart(
     data={"x": points[:, 0].tolist(), "y": points[:, 1].tolist()},
-    gridsize=20,
+    grid_size=20,
     emphasis_rule={"above": 40},
-    show_colorbars=True,
+    show_colorbar=True,
     title="Bins with more than 40 points",
 )
 figure.show()
@@ -16641,7 +16641,7 @@ Panel(
 ).show()
 ```
 
-A chart that fills its whole frame hides the map under it. A hexbin draws its empty cells too, as the palest hexagons, so give it `mincnt=1` to leave those out and let the land show between the cells, and `plot_hexbin_alpha` below 1 to let it show through the cells as well; a filled contour paints its lowest band over the whole grid, so a `plot_contour_alpha` below 1 does the same there. The basemap is for charts whose x and y are longitude and latitude, so `Panel` refuses to put it beside a chart with categories or dates on an axis, such as a bar chart, a box plot or a line over time: there is no longitude there to draw the land at. `Grid` places the two side by side instead.
+A chart that fills its whole frame hides the map under it. A hexbin draws its empty cells too, as the palest hexagons, so give it `min_count=1` to leave those out and let the land show between the cells, and `plot_hexbin_alpha` below 1 to let it show through the cells as well; a filled contour paints its lowest band over the whole grid, so a `plot_contour_alpha` below 1 does the same there. The basemap is for charts whose x and y are longitude and latitude, so `Panel` refuses to put it beside a chart with categories or dates on an axis, such as a bar chart, a box plot or a line over time: there is no longitude there to draw the land at. `Grid` places the two side by side instead.
 
 `DRAW_POSITION.ABOVE` draws the map over the marks instead, and still under reference lines and text notes. Its use is a map drawn as lines only, over a chart that would otherwise cover the coast: a hexbin fills its cells edge to edge, and a coastline above it keeps the reader oriented.
 
@@ -16652,8 +16652,8 @@ Panel(
     [
         HexbinChart(
             {"x": [q[2] for q in QUAKES], "y": [q[1] for q in QUAKES]},
-            gridsize=12,
-            mincnt=1,
+            grid_size=12,
+            min_count=1,
         ),
         BasemapChart(BASEMAP_FEATURE.COASTLINE, position=DRAW_POSITION.ABOVE),
     ],
@@ -19177,7 +19177,7 @@ LineChart(
 
 ### Density estimates
 
-*What does the distribution look like, without the bins?* A histogram's shape changes with its bin edges; a kernel density estimate smooths the same values into a curve that does not. `kde1d(values)` returns the curve as `{x, y}` points ready for a [Line Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/index.md); it integrates to 1, so it overlays a density [Histogram](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/histogram/index.md) of the same values on the same axis. Its `bandwidth` sets how smooth the curve is: a rule of [BANDWIDTH](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH) (Scott's by default) or a number, where smaller values follow the data more closely. `gridsize` is the number of points, and `cut` how many bandwidths the curve extends past the extremes (or `xlim` fixes the range, so several curves share one grid). One curve per species, with `show_area`, is the cleanest picture of the three flipper distributions:
+*What does the distribution look like, without the bins?* A histogram's shape changes with its bin edges; a kernel density estimate smooths the same values into a curve that does not. `kde1d(values)` returns the curve as `{x, y}` points ready for a [Line Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/linechart/index.md); it integrates to 1, so it overlays a density [Histogram](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/histogram/index.md) of the same values on the same axis. Its `bandwidth` sets how smooth the curve is: a rule of [BANDWIDTH](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH) (Scott's by default) or a number, where smaller values follow the data more closely. `grid_size` is the number of points, and `cut` how many bandwidths the curve extends past the extremes (or `xlim` fixes the range, so several curves share one grid). One curve per species, with `show_area`, is the cleanest picture of the three flipper distributions:
 
 ```
 LineChart(
@@ -19193,7 +19193,7 @@ LineChart(
 ).show()
 ```
 
-`kde2d(x, y)` does the same for pairs of values and returns the `{x, y, z}` surface a [Contour Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/contourchart/index.md) draws: the density contours of a scatter, which show where the points crowd when they overplot. The `gridsize` can be one number or an `(x, y)` pair of column and row counts, and `xlim` and `ylim` fix the grid so several surfaces share it. Flipper length against body mass forms two clusters, the Gentoo one apart from the rest:
+`kde2d(x, y)` does the same for pairs of values and returns the `{x, y, z}` surface a [Contour Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/contourchart/index.md) draws: the density contours of a scatter, which show where the points crowd when they overplot. The `grid_size` can be one number or an `(x, y)` pair of column and row counts, and `xlim` and `ylim` fix the grid so several surfaces share it. Flipper length against body mass forms two clusters, the Gentoo one apart from the rest:
 
 ```
 from datachart.charts import ContourChart
@@ -19203,7 +19203,7 @@ ContourChart(
     title="Where the penguins crowd: density of flipper length against body mass",
     xlabel="Flipper length (mm)",
     ylabel="Body mass (g)",
-    filled=True,
+    fill=True,
     figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
 ```
@@ -19934,7 +19934,7 @@ confusion_figure = Heatmap(
     xlabel="Predicted class",
     ylabel="True class",
     show_values=True,
-    show_colorbars=True,
+    show_colorbar=True,
     value_format=VALUE_FORMAT.DECIMAL_2,
     aspect_ratio=ASPECT_RATIO.EQUAL,
     xtickrotate=30,
@@ -20612,7 +20612,7 @@ marker_figure = Heatmap(
     # zero in the middle of the diverging colormap, equal reach each way
     norm=COLOR_NORM.CENTERED,
     show_values=True,
-    show_colorbars=True,
+    show_colorbar=True,
     value_format="{x:+.1f}%",
     colorbar={"label": "Change from baseline (%)"},
     figsize=FIG_SIZE.FULL_MEDIUM,
@@ -20894,7 +20894,7 @@ region_figure = Heatmap(
     ylabel="Statistical region, by median age in 2025",
     show_values=True,
     value_format="{x:.1f}",
-    show_colorbars=True,
+    show_colorbar=True,
     colorbar={"label": "Median age (years)"},
     figsize=(9.0, 5.5),
 )
@@ -21156,7 +21156,7 @@ signups_figure = CalendarHeatmap(
     aspect_ratio=ASPECT_RATIO.AUTO,
     # cap the scale so the launch saturates instead of washing out the rhythm
     vmax=130,
-    show_colorbars=True,
+    show_colorbar=True,
     colorbar={"label": "Sign-ups"},
 )
 signups_figure.show()
@@ -21377,7 +21377,7 @@ inflation_figure = Heatmap(
     norm=COLOR_NORM.SYMLOG,
     show_values=True,
     value_format="{x:.1f}",
-    show_colorbars=True,
+    show_colorbar=True,
     colorbar={"label": "Inflation (%)"},
     figsize=(8.0, 6.5),
 )
@@ -21518,7 +21518,7 @@ The hidden cell below holds the three tables. `EVENTS` is one tuple per earthqua
 
 ### Where does the seismicity concentrate?
 
-The first figure of an earthquake report is the map of the epicentres, and eight hundred points on one axes overplot wherever the activity is densest, which is exactly where the reader looks. A [hexbin chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/hexbinchart/index.md) bins them instead: the plane is tiled with hexagons and each one is coloured by the number of events inside it, so density reads as colour and nothing hides behind a marker. The counts span three orders of magnitude between a quiet hexagon and the aftershock zone, so `norm=COLOR_NORM.LOG` gives the colour scale a logarithmic reach and keeps the sparse cells visible. `mincnt=1` leaves the empty cells blank rather than colouring them as zero, and through them shows the ground: an [image chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/imagechart/index.md) draws the relief grid as a faded grey picture stretched over its extent, a [basemap chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/basemapchart/index.md) traces the coastline over it, and [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) puts both under the hexagons, so the density reads against the land and the sea it falls on. The grid's first row is its southern edge while a picture's first row is its top, so the rows are flipped. A degree of longitude at 38 degrees north is a fifth shorter than a degree of latitude, so `aspect_ratio=ASPECT_RATIO.GEOGRAPHIC` narrows it by that much and the region keeps its true shape.
+The first figure of an earthquake report is the map of the epicentres, and eight hundred points on one axes overplot wherever the activity is densest, which is exactly where the reader looks. A [hexbin chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/hexbinchart/index.md) bins them instead: the plane is tiled with hexagons and each one is coloured by the number of events inside it, so density reads as colour and nothing hides behind a marker. The counts span three orders of magnitude between a quiet hexagon and the aftershock zone, so `norm=COLOR_NORM.LOG` gives the colour scale a logarithmic reach and keeps the sparse cells visible. `min_count=1` leaves the empty cells blank rather than colouring them as zero, and through them shows the ground: an [image chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/imagechart/index.md) draws the relief grid as a faded grey picture stretched over its extent, a [basemap chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/basemapchart/index.md) traces the coastline over it, and [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) puts both under the hexagons, so the density reads against the land and the sea it falls on. The grid's first row is its southern edge while a picture's first row is its top, so the rows are flipped. A degree of longitude at 38 degrees north is a fifth shorter than a degree of latitude, so `aspect_ratio=ASPECT_RATIO.GEOGRAPHIC` narrows it by that much and the region keeps its true shape.
 
 ```
 LATITUDE, LONGITUDE, DEPTH, MAGNITUDE = 1, 2, 3, 4
@@ -21548,13 +21548,13 @@ relief_image = ImageChart(
 
 density = HexbinChart(
     {"x": longitude.tolist(), "y": latitude.tolist()},
-    gridsize=42,
+    grid_size=42,
     # counts run from 1 to several hundred, so the colour scale is logarithmic
     norm=COLOR_NORM.LOG,
-    mincnt=1,
+    min_count=1,
     # a hairline edge keeps the single-event cells visible on white
     style={"plot_hexbin_edge_width": 0.3, "plot_hexbin_edge_color": "#d0d0d0"},
-    show_colorbars=True,
+    show_colorbar=True,
     colorbar={"label": "Earthquakes of magnitude 4 and above"},
     texts={
         "text": "Kahramanmaraş\nsequence",
@@ -21590,7 +21590,7 @@ The bright cells trace lines rather than filling the box, and the lines are the 
 
 ### What does the ground under them look like?
 
-Epicentres are points on a surface, and the surface is what a reader needs in order to place them. A [contour chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/contourchart/index.md) draws a gridded field as filled bands between its level lines, so the ETOPO relief becomes the shape of the region: the Aegean basin, the Anatolian plateau, and the mountain front between them. The grid goes in as `z` with its `lat` and `lon` axes, `filled` shades the bands, and `levels` sets how many are drawn. Elevation is signed, so the colormap is a diverging one and `vmin` and `vmax` are set symmetrically about zero: sea level lands on its pale midpoint, and the coastline appears without a coastline dataset. The two mainshocks are `texts` notes anchored to their own coordinates.
+Epicentres are points on a surface, and the surface is what a reader needs in order to place them. A [contour chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/contourchart/index.md) draws a gridded field as filled bands between its level lines, so the ETOPO relief becomes the shape of the region: the Aegean basin, the Anatolian plateau, and the mountain front between them. The grid goes in as `z` with its `lat` and `lon` axes, `fill` shades the bands, and `levels` sets how many are drawn. Elevation is signed, so the colormap is a diverging one and `vmin` and `vmax` are set symmetrically about zero: sea level lands on its pale midpoint, and the coastline appears without a coastline dataset. The two mainshocks are `texts` notes anchored to their own coordinates.
 
 ```
 relief_figure = ContourChart(
@@ -21598,14 +21598,14 @@ relief_figure = ContourChart(
     title="The Aegean basin, the Anatolian plateau, and the front between them",
     xlabel="Longitude (°E)",
     ylabel="Latitude (°N)",
-    filled=True,
+    fill=True,
     levels=14,
     # a diverging colormap with the range symmetric about zero, so sea
     # level falls on its pale midpoint and the coastline draws itself
     style={"plot_contour_cmap": "BrBG_r"},
     vmin=-4500,
     vmax=4500,
-    show_colorbars=True,
+    show_colorbar=True,
     colorbar={"label": "Elevation (m)"},
     texts=[
         {
@@ -21737,7 +21737,7 @@ calendar_figure = CalendarHeatmap(
     aspect_ratio=ASPECT_RATIO.AUTO,
     # the mainshock day is an order of magnitude above any other
     vmax=12,
-    show_colorbars=True,
+    show_colorbar=True,
     colorbar={"label": "Earthquakes of magnitude 4 and above"},
 )
 calendar_figure.show()
@@ -23321,9 +23321,9 @@ RadialChart(
     sort_by: str | None = None,
     emphasis_rule: EmphasisRuleAttrs | None = None,
     num_bins: int | None = None,
-    startangle: str | int | float | None = None,
+    start_angle: str | int | float | None = None,
     direction: RADIAL_DIRECTION | str | None = None,
-    innerradius: float | None = None,
+    inner_radius: float | None = None,
     scalex: None = None,
     scaley: AXIS_SCALE | str | None = None,
     subplots: bool | None = None,
@@ -23371,7 +23371,9 @@ RadialChart(
     x: str | list[str | None] | None = None,
     y: str | list[str | None] | None = None,
     yerr: str | list[str | None] | None = None,
-    type: RADIAL_TYPE | str | None = None
+    type: RADIAL_TYPE | str | None = None,
+    startangle: str | int | float | None = None,
+    innerradius: float | None = None
 ) -> plt.Figure
 ```
 
@@ -23420,9 +23422,9 @@ Examples:
 | `sort_by`         | The subtitle of the one series whose values key the sort instead of the total (bar visual). A category that series lacks sorts last. **TYPE:** \`str                                                                                                                                                                                                                           |
 | `emphasis_rule`   | A one-key dict that highlights the bars matching it and mutes the rest (bar visual): {"above": v} or {"below": v} (strict), {"between": (lo, hi)} (inclusive), {"top": n} or {"bottom": n}. Reads each bar's own value; a record's own emphasis key wins over the rule. **TYPE:** \`EmphasisRuleAttrs                                                                          |
 | `num_bins`        | The number of angular bins over \[0, 360) (histogram visual). **TYPE:** \`int                                                                                                                                                                                                                                                                                                  |
-| `startangle`      | Where the first point sits: a compass location ("N", "NE", "E", "SE", "S", "SW", "W", "NW") or a numeric compass bearing in degrees clockwise from north. Defaults to "N". **TYPE:** \`str                                                                                                                                                                                     |
+| `start_angle`     | Where the first point sits: a compass location ("N", "NE", "E", "SE", "S", "SW", "W", "NW") or a numeric compass bearing in degrees clockwise from north. Defaults to "N". **TYPE:** \`str                                                                                                                                                                                     |
 | `direction`       | Which way the angles increase: "clockwise" (default) or "counterclockwise". See RADIAL_DIRECTION. **TYPE:** \`RADIAL_DIRECTION                                                                                                                                                                                                                                                 |
-| `innerradius`     | The donut hole, as a fraction (0 \<= f < 1) of the radial extent. Defaults to 0. **TYPE:** \`float                                                                                                                                                                                                                                                                             |
+| `inner_radius`    | The donut hole, as a fraction (0 \<= f < 1) of the radial extent. Defaults to 0. **TYPE:** \`float                                                                                                                                                                                                                                                                             |
 | `scalex`          | Not supported; the angular axis has no scale. Raises when passed. **TYPE:** `None` **DEFAULT:** `None`                                                                                                                                                                                                                                                                         |
 | `scaley`          | The radial-axis scale (e.g., "log", "linear"). **TYPE:** \`AXIS_SCALE                                                                                                                                                                                                                                                                                                          |
 | `subplots`        | Whether to create separate polar subplots for each chart. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                     |
@@ -23442,6 +23444,8 @@ Examples:
 | `y`               | The key name in data for radial values (default: "y"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                         |
 | `yerr`            | The key name in data for radial error values (default: "yerr"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                |
 | `type`            | Deprecated; use mark. Removed in the next release. **TYPE:** \`RADIAL_TYPE                                                                                                                                                                                                                                                                                                     |
+| `startangle`      | Deprecated; use start_angle. Removed in the next release. **TYPE:** \`str                                                                                                                                                                                                                                                                                                      |
+| `innerradius`     | Deprecated; use inner_radius. Removed in the next release. **TYPE:** \`float                                                                                                                                                                                                                                                                                                   |
 
 | RETURNS      | DESCRIPTION                             |
 | ------------ | --------------------------------------- |
@@ -23522,7 +23526,7 @@ CalendarHeatmap(
     figsize: FIG_SIZE | tuple[float, float] | None = None,
     aspect_ratio: ASPECT_RATIO | str | None = None,
     max_cols: int | None = None,
-    show_colorbars: bool | None = None,
+    show_colorbar: bool | None = None,
     show_values: bool | None = None,
     value_format: VALUE_FORMAT | str | None = None,
     style: (
@@ -23546,7 +23550,8 @@ CalendarHeatmap(
             TextSettingAttrs | list[TextSettingAttrs] | None
         ]
         | None
-    ) = None
+    ) = None,
+    show_colorbars: bool | None = None
 ) -> plt.Figure
 ```
 
@@ -23563,7 +23568,7 @@ Examples:
 >>> figure = CalendarHeatmap(
 ...     data={"date": days, "value": [i % 7 for i in range(366)]},
 ...     title="Daily values, 2024",
-...     show_colorbars=True,
+...     show_colorbar=True,
 ... )
 ```
 
@@ -23580,7 +23585,7 @@ Examples:
 | `figsize`             | The size of the figure. Defaults to the default width at a short height per row of calendars, the shape a calendar fills. **TYPE:** \`FIG_SIZE                                                                                                                                                                                                                                                                                   |
 | `aspect_ratio`        | The aspect ratio of the cells: ASPECT_RATIO.EQUAL (the default) keeps them square, ASPECT_RATIO.AUTO stretches them to the figure. See ASPECT_RATIO. **TYPE:** \`ASPECT_RATIO                                                                                                                                                                                                                                                    |
 | `max_cols`            | Maximum number of calendars per row when several are drawn. Defaults to 1, one calendar per row. **TYPE:** \`int                                                                                                                                                                                                                                                                                                                 |
-| `show_colorbars`      | Whether to show the colorbar(s). **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                |
+| `show_colorbar`       | Whether to show the colorbar(s). **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                |
 | `show_values`         | Whether to write each day's value into its cell. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                |
 | `value_format`        | The format of the cell values: a VALUE_FORMAT constant (default VALUE_FORMAT.DEFAULT) or any "{x:.1f}", "{:.1f}", or "%g" style string. **TYPE:** \`VALUE_FORMAT                                                                                                                                                                                                                                                                 |
 | `style`               | Style configuration(s) for the calendar(s). **TYPE:** \`CalendarHeatmapStyleAttrs                                                                                                                                                                                                                                                                                                                                                |
@@ -23590,6 +23595,7 @@ Examples:
 | `vcenter`             | The value(s) a centred normalization holds in the middle of the colormap (0 by default); ignored by every other norm. **TYPE:** \`float                                                                                                                                                                                                                                                                                          |
 | `colorbar`            | The colorbar setting(s): label, location, tick format, and tick positions. See ColorbarSettingAttrs. **TYPE:** \`ColorbarSettingAttrs                                                                                                                                                                                                                                                                                            |
 | `texts`               | Text annotation(s) to draw, on every calendar of their dataset. The cells sit at integer positions: the week column along x, the weekday row along y, counted from zero at the top-left cell of the drawn range. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                    |
+| `show_colorbars`      | Deprecated; use show_colorbar. Removed in the next release. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                     |
 
 | RETURNS      | DESCRIPTION                                    |
 | ------------ | ---------------------------------------------- |
@@ -25033,7 +25039,7 @@ SwarmPlot(
     show_legend: bool | None = None,
     legend: LegendSettingAttrs | None = None,
     show_grid: SHOW_GRID | str | bool | None = None,
-    mode: SWARM_MODE | str | None = None,
+    swarm_mode: SWARM_MODE | str | None = None,
     jitter: float | None = None,
     show_values: bool | None = None,
     value_format: VALUE_FORMAT | str | None = None,
@@ -25134,7 +25140,8 @@ SwarmPlot(
         | None
     ) = None,
     label: str | list[str | None] | None = None,
-    value: str | list[str | None] | None = None
+    value: str | list[str | None] | None = None,
+    mode: SWARM_MODE | str | None = None
 ) -> plt.Figure
 ```
 
@@ -25178,8 +25185,8 @@ Examples:
 | `show_legend`   | Whether to show the legend. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                        |
 | `legend`        | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** \`LegendSettingAttrs                                                                                                                                                                                                                                                              |
 | `show_grid`     | Which grid lines to show (e.g., "both", "x", "y"); False draws none. **TYPE:** \`SHOW_GRID                                                                                                                                                                                                                                                                                                                                          |
-| `mode`          | How the points spread across the category width. See SWARM_MODE: "swarm" packs the points so none overlap, from the marker size at draw time (axis limits changed afterwards can shift the spacing); "strip" jitters them uniformly. **TYPE:** \`SWARM_MODE                                                                                                                                                                         |
-| `jitter`        | The strip jitter width, as a fraction of the category width. Only used with mode="strip". None takes the theme's chart_default_jitter. **TYPE:** \`float                                                                                                                                                                                                                                                                            |
+| `swarm_mode`    | How the points spread across the category width. See SWARM_MODE: "swarm" packs the points so none overlap, from the marker size at draw time (axis limits changed afterwards can shift the spacing); "strip" jitters them uniformly. **TYPE:** \`SWARM_MODE                                                                                                                                                                         |
+| `jitter`        | The strip jitter width, as a fraction of the category width. Only used with swarm_mode="strip". None takes the theme's chart_default_jitter. **TYPE:** \`float                                                                                                                                                                                                                                                                      |
 | `show_values`   | Whether to print each group's minimum, median, and maximum beside the points nearest them. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                         |
 | `value_format`  | Format string for the value labels: a VALUE_FORMAT constant or any "{x:.1f}", "{:.1f}%", or "%g" style string. **TYPE:** \`VALUE_FORMAT                                                                                                                                                                                                                                                                                             |
 | `aspect_ratio`  | The aspect ratio of the axes ("auto" or "equal"). See ASPECT_RATIO. **TYPE:** \`ASPECT_RATIO                                                                                                                                                                                                                                                                                                                                        |
@@ -25207,6 +25214,7 @@ Examples:
 | `texts`         | Text annotation(s) to draw. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                                                                                                                                                                                                            |
 | `label`         | The key name in data for label/category values (default: "label"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                  |
 | `value`         | The key name in data for numeric values (default: "value"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                         |
+| `mode`          | Deprecated; use swarm_mode. Removed in the next release. **TYPE:** \`SWARM_MODE                                                                                                                                                                                                                                                                                                                                                     |
 
 | RETURNS      | DESCRIPTION                           |
 | ------------ | ------------------------------------- |
@@ -25259,7 +25267,7 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `figsize`                                    | [`FIG_SIZE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.FIG_SIZE)                                                                                                                                   |
 | `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN) |
 | `show_grid`                                  | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                                                                                                                                 |
-| `mode`                                       | [`SWARM_MODE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SWARM_MODE)                                                                                                                               |
+| `swarm_mode`                                 | [`SWARM_MODE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SWARM_MODE)                                                                                                                               |
 | `value_format`                               | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                           |
 | `aspect_ratio`                               | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                           |
 | `orientation`                                | [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)                                                                                                                             |
@@ -25309,7 +25317,7 @@ RaincloudPlot(
     show_outliers: bool | None = None,
     show_values: bool | None = None,
     value_format: VALUE_FORMAT | str | None = None,
-    mode: SWARM_MODE | str | None = None,
+    swarm_mode: SWARM_MODE | str | None = None,
     jitter: float | None = None,
     bandwidth: BANDWIDTH | str | float | None = None,
     aspect_ratio: ASPECT_RATIO | str | None = None,
@@ -25409,7 +25417,8 @@ RaincloudPlot(
         | None
     ) = None,
     label: str | list[str | None] | None = None,
-    value: str | list[str | None] | None = None
+    value: str | list[str | None] | None = None,
+    mode: SWARM_MODE | str | None = None
 ) -> plt.Figure
 ```
 
@@ -25456,8 +25465,8 @@ Examples:
 | `show_outliers` | Whether the box shows outliers. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                    |
 | `show_values`   | Whether to print each group's median beside its box, and its minimum and maximum beside the rain points holding them. **TYPE:** \`bool                                                                                                                                                                                                                                                                                              |
 | `value_format`  | Format string for the value labels: a VALUE_FORMAT constant or any "{x:.1f}", "{:.1f}%", or "%g" style string. **TYPE:** \`VALUE_FORMAT                                                                                                                                                                                                                                                                                             |
-| `mode`          | How the rain spreads across its width. See SWARM_MODE: "swarm" packs the points so none overlap; "strip" jitters them uniformly. **TYPE:** \`SWARM_MODE                                                                                                                                                                                                                                                                             |
-| `jitter`        | The strip jitter width, as a fraction of the category width like SwarmPlot, scaled down to the rain's narrower cell. Only used with mode="strip". None takes the theme's chart_default_jitter. **TYPE:** \`float                                                                                                                                                                                                                    |
+| `swarm_mode`    | How the rain spreads across its width. See SWARM_MODE: "swarm" packs the points so none overlap; "strip" jitters them uniformly. **TYPE:** \`SWARM_MODE                                                                                                                                                                                                                                                                             |
+| `jitter`        | The strip jitter width, as a fraction of the category width like SwarmPlot, scaled down to the rain's narrower cell. Only used with swarm_mode="strip". None takes the theme's chart_default_jitter. **TYPE:** \`float                                                                                                                                                                                                              |
 | `bandwidth`     | The cloud's KDE bandwidth: None or "scott" (Scott's rule), "silverman" (Silverman's rule), or a scalar factor. See BANDWIDTH. **TYPE:** \`BANDWIDTH                                                                                                                                                                                                                                                                                 |
 | `aspect_ratio`  | The aspect ratio of the axes ("auto" or "equal"). See ASPECT_RATIO. **TYPE:** \`ASPECT_RATIO                                                                                                                                                                                                                                                                                                                                        |
 | `orientation`   | The orientation of the rainclouds (vertical or horizontal). **TYPE:** \`ORIENTATION                                                                                                                                                                                                                                                                                                                                                 |
@@ -25484,6 +25493,7 @@ Examples:
 | `texts`         | Text annotation(s) to draw. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                                                                                                                                                                                                            |
 | `label`         | The key name in data for label/category values (default: "label"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                  |
 | `value`         | The key name in data for numeric values (default: "value"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                         |
+| `mode`          | Deprecated; use swarm_mode. Removed in the next release. **TYPE:** \`SWARM_MODE                                                                                                                                                                                                                                                                                                                                                     |
 
 | RETURNS      | DESCRIPTION                               |
 | ------------ | ----------------------------------------- |
@@ -25528,7 +25538,7 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.LEGEND_ALIGN) |
 | `show_grid`                                  | [`SHOW_GRID`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SHOW_GRID)                                                                                                                                 |
 | `value_format`                               | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                           |
-| `mode`                                       | [`SWARM_MODE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SWARM_MODE)                                                                                                                               |
+| `swarm_mode`                                 | [`SWARM_MODE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SWARM_MODE)                                                                                                                               |
 | `bandwidth`                                  | [`BANDWIDTH`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BANDWIDTH)                                                                                                                                 |
 | `aspect_ratio`                               | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                           |
 | `orientation`                                | [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)                                                                                                                             |
@@ -26205,7 +26215,7 @@ Heatmap(
     show_legend: bool | None = None,
     legend: LegendSettingAttrs | None = None,
     show_grid: SHOW_GRID | str | bool | None = None,
-    show_colorbars: bool | None = None,
+    show_colorbar: bool | None = None,
     show_values: bool | None = None,
     aspect_ratio: ASPECT_RATIO | str | None = None,
     subplots: bool | None = None,
@@ -26256,7 +26266,8 @@ Heatmap(
     show_heatmap_values: bool | None = None,
     valfmt: (
         VALUE_FORMAT | str | list[str | None] | None
-    ) = None
+    ) = None,
+    show_colorbars: bool | None = None
 ) -> plt.Figure
 ```
 
@@ -26301,7 +26312,7 @@ Examples:
 | `show_legend`         | Whether to show the legend (not typical for heatmaps). **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | `legend`              | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** \`LegendSettingAttrs                                                                                                                                                                                                                                                                                                                                                                                                              |
 | `show_grid`           | Which grid lines to show (e.g., "both", "x", "y"); False draws none. **TYPE:** \`SHOW_GRID                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| `show_colorbars`      | Whether to show the colorbar(s). **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `show_colorbar`       | Whether to show the colorbar(s). **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `show_values`         | Whether to write each cell's value in the cell. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | `aspect_ratio`        | The aspect ratio of the axes ("auto" or "equal"). See ASPECT_RATIO. **TYPE:** \`ASPECT_RATIO                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | `subplots`            | Whether to create separate subplots for each heatmap. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
@@ -26326,6 +26337,7 @@ Examples:
 | `texts`               | Text annotation(s) to draw. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | `show_heatmap_values` | Deprecated; use show_values. Removed in the next release. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | `valfmt`              | Deprecated; use value_format. Removed in the next release. **TYPE:** \`VALUE_FORMAT                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `show_colorbars`      | Deprecated; use show_colorbar. Removed in the next release. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 
 | RETURNS      | DESCRIPTION                        |
 | ------------ | ---------------------------------- |
@@ -26424,12 +26436,12 @@ ContourChart(
     show_legend: bool | None = None,
     legend: LegendSettingAttrs | None = None,
     show_grid: SHOW_GRID | str | bool | None = None,
-    filled: bool | None = None,
+    fill: bool | None = None,
     levels: (
         CONTOUR_LEVELS | str | int | list[float] | None
     ) = None,
     show_labels: bool | None = None,
-    show_colorbars: bool | None = None,
+    show_colorbar: bool | None = None,
     aspect_ratio: ASPECT_RATIO | str | None = None,
     scalex: AXIS_SCALE | str | None = None,
     scaley: AXIS_SCALE | str | None = None,
@@ -26542,7 +26554,9 @@ ContourChart(
     ) = None,
     valfmt: (
         VALUE_FORMAT | str | list[str | None] | None
-    ) = None
+    ) = None,
+    filled: bool | None = None,
+    show_colorbars: bool | None = None
 ) -> plt.Figure
 ```
 
@@ -26577,7 +26591,7 @@ Examples:
 | `xlabel`         | The x-axis label. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                                     |
 | `ylabel`         | The y-axis label. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                                                     |
 | `subtitle`       | The subtitle(s) for individual charts. Used as legend labels. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                         |
-| `emphasis`       | The emphasis role(s) for individual line contours, aligned like style: "background" mutes a chart (theme muted color, lowered alpha, behind the others, no legend entry), "highlight" bolds it and brings it to the front, None leaves it unchanged. Not supported for filled contours: passing a value with filled=True raises ValueError. **TYPE:** \`EMPHASIS                                                                      |
+| `emphasis`       | The emphasis role(s) for individual line contours, aligned like style: "background" mutes a chart (theme muted color, lowered alpha, behind the others, no legend entry), "highlight" bolds it and brings it to the front, None leaves it unchanged. Not supported for filled contours: passing a value with fill=True raises ValueError. **TYPE:** \`EMPHASIS                                                                        |
 | `emphasis_rule`  | A rule that highlights the line contours matching it and mutes the rest: {"above": v} or {"below": v} (strict), {"between": (lo, hi)} (inclusive), {"top": n} or {"bottom": n}, read against a summary of each contour's own z values, chosen by by: "mean" (default), "median", "min", "max", or "sum". An explicit emphasis role wins, and a count ranks across every contour. See EmphasisRuleAttrs. **TYPE:** \`EmphasisRuleAttrs |
 | `figsize`        | The size of the figure. **TYPE:** \`FIG_SIZE                                                                                                                                                                                                                                                                                                                                                                                          |
 | `xmin`           | The minimum x-axis value. **TYPE:** \`int                                                                                                                                                                                                                                                                                                                                                                                             |
@@ -26587,10 +26601,10 @@ Examples:
 | `show_legend`    | Whether to show the legend. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                          |
 | `legend`         | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** \`LegendSettingAttrs                                                                                                                                                                                                                                                                |
 | `show_grid`      | Which grid lines to show (e.g., "both", "x", "y"); False draws none. Off by default for filled contours. **TYPE:** \`SHOW_GRID                                                                                                                                                                                                                                                                                                        |
-| `filled`         | Whether to fill the bands between the levels (colored by the colormap) instead of drawing iso-lines (in the chart's color). **TYPE:** \`bool                                                                                                                                                                                                                                                                                          |
+| `fill`           | Whether to fill the bands between the levels (colored by the colormap) instead of drawing iso-lines (in the chart's color). **TYPE:** \`bool                                                                                                                                                                                                                                                                                          |
 | `levels`         | Which levels cut the surface: a rule of CONTOUR_LEVELS ("auto", the default, leaves the choice to matplotlib), a target level count, or an explicit list of level values. Filled values beyond a list's ends take the end colors, and the colorbar marks the overflow. **TYPE:** \`CONTOUR_LEVELS                                                                                                                                     |
 | `show_labels`    | Whether to write the level values along the iso-lines. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                               |
-| `show_colorbars` | Whether to show the colorbar(s) of filled contours. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                  |
+| `show_colorbar`  | Whether to show the colorbar(s) of filled contours. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                  |
 | `aspect_ratio`   | The aspect ratio of the axes ("auto" or "equal"). See ASPECT_RATIO. **TYPE:** \`ASPECT_RATIO                                                                                                                                                                                                                                                                                                                                          |
 | `scalex`         | The x-axis scale (e.g., "log", "linear"). **TYPE:** \`AXIS_SCALE                                                                                                                                                                                                                                                                                                                                                                      |
 | `scaley`         | The y-axis scale (e.g., "log", "linear"). **TYPE:** \`AXIS_SCALE                                                                                                                                                                                                                                                                                                                                                                      |
@@ -26621,6 +26635,8 @@ Examples:
 | `colorbar`       | The colorbar setting(s): label, location, tick format, and tick positions. See ColorbarSettingAttrs. **TYPE:** \`ColorbarSettingAttrs                                                                                                                                                                                                                                                                                                 |
 | `texts`          | Text annotation(s) to draw. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                                                                                                                                                                                                              |
 | `valfmt`         | Deprecated; use value_format. Removed in the next release. **TYPE:** \`VALUE_FORMAT                                                                                                                                                                                                                                                                                                                                                   |
+| `filled`         | Deprecated; use fill. Removed in the next release. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                   |
+| `show_colorbars` | Deprecated; use show_colorbar. Removed in the next release. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                          |
 
 | RETURNS      | DESCRIPTION                              |
 | ------------ | ---------------------------------------- |
@@ -26718,7 +26734,7 @@ HexbinChart(
     show_legend: bool | None = None,
     legend: LegendSettingAttrs | None = None,
     show_grid: SHOW_GRID | str | bool | None = None,
-    show_colorbars: bool | None = None,
+    show_colorbar: bool | None = None,
     aspect_ratio: ASPECT_RATIO | str | None = None,
     scalex: AXIS_SCALE | str | None = None,
     scaley: AXIS_SCALE | str | None = None,
@@ -26731,11 +26747,11 @@ HexbinChart(
         | list[HexbinStyleAttrs | None]
         | None
     ) = None,
-    gridsize: int | list[int | None] | None = None,
+    grid_size: int | list[int | None] | None = None,
     reduce: (
         HEXBIN_REDUCE | str | list[str | None] | None
     ) = None,
-    mincnt: int | list[int | None] | None = None,
+    min_count: int | list[int | None] | None = None,
     norm: COLOR_NORM | str | list[str | None] | None = None,
     vmin: float | list[float | None] | None = None,
     vmax: float | list[float | None] | None = None,
@@ -26836,7 +26852,10 @@ HexbinChart(
     ) = None,
     valfmt: (
         VALUE_FORMAT | str | list[str | None] | None
-    ) = None
+    ) = None,
+    show_colorbars: bool | None = None,
+    gridsize: int | list[int | None] | None = None,
+    mincnt: int | list[int | None] | None = None
 ) -> plt.Figure
 ```
 
@@ -26876,7 +26895,7 @@ Examples:
 | `show_legend`    | Whether to show the legend; it lists the labelled reference lines and bands. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                   |
 | `legend`         | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** \`LegendSettingAttrs                                                                                                                                                                                                                                                                          |
 | `show_grid`      | Which grid lines to show (e.g., "both", "x", "y"); False draws none. Off by default: the hexagons cover it. **TYPE:** \`SHOW_GRID                                                                                                                                                                                                                                                                                                               |
-| `show_colorbars` | Whether to show the colorbar(s). **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                               |
+| `show_colorbar`  | Whether to show the colorbar(s). **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                               |
 | `aspect_ratio`   | The aspect ratio of the axes ("auto" or "equal"). See ASPECT_RATIO. **TYPE:** \`ASPECT_RATIO                                                                                                                                                                                                                                                                                                                                                    |
 | `scalex`         | The x-axis scale (e.g., "log", "linear"). **TYPE:** \`AXIS_SCALE                                                                                                                                                                                                                                                                                                                                                                                |
 | `scaley`         | The y-axis scale (e.g., "log", "linear"). **TYPE:** \`AXIS_SCALE                                                                                                                                                                                                                                                                                                                                                                                |
@@ -26885,9 +26904,9 @@ Examples:
 | `sharex`         | Whether to share the x-axis in subplots. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                       |
 | `sharey`         | Whether to share the y-axis in subplots. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                       |
 | `style`          | Style configuration(s) for the hexbin chart(s). **TYPE:** \`HexbinStyleAttrs                                                                                                                                                                                                                                                                                                                                                                    |
-| `gridsize`       | The number of hexagons across the x-axis; the plot_hexbin_gridsize config value by default. **TYPE:** \`int                                                                                                                                                                                                                                                                                                                                     |
+| `grid_size`      | The number of hexagons across the x-axis; the plot_hexbin_gridsize config value by default. **TYPE:** \`int                                                                                                                                                                                                                                                                                                                                     |
 | `reduce`         | How the c values in a hexagon collapse into its color, one of HEXBIN_REDUCE (the mean by default). Ignored without c, where every hexagon shows its point count. **TYPE:** \`HEXBIN_REDUCE                                                                                                                                                                                                                                                      |
-| `mincnt`         | The point count below which a hexagon stays blank; every hexagon is drawn by default. **TYPE:** \`int                                                                                                                                                                                                                                                                                                                                           |
+| `min_count`      | The point count below which a hexagon stays blank; every hexagon is drawn by default. **TYPE:** \`int                                                                                                                                                                                                                                                                                                                                           |
 | `norm`           | Value normalization method(s) of the colormap; "log" spreads heavy-tailed counts. "centered" and "twoslope" hold vcenter in the middle of the theme's diverging colormap; see COLOR_NORM. **TYPE:** \`COLOR_NORM                                                                                                                                                                                                                                |
 | `vmin`           | Minimum value(s) for normalization. **TYPE:** \`float                                                                                                                                                                                                                                                                                                                                                                                           |
 | `vmax`           | Maximum value(s) for normalization. **TYPE:** \`float                                                                                                                                                                                                                                                                                                                                                                                           |
@@ -26910,6 +26929,9 @@ Examples:
 | `colorbar`       | The colorbar setting(s): label, location, tick format, and tick positions. See ColorbarSettingAttrs. **TYPE:** \`ColorbarSettingAttrs                                                                                                                                                                                                                                                                                                           |
 | `texts`          | Text annotation(s) to draw. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                                                                                                                                                                                                                        |
 | `valfmt`         | Deprecated; use value_format. Removed in the next release. **TYPE:** \`VALUE_FORMAT                                                                                                                                                                                                                                                                                                                                                             |
+| `show_colorbars` | Deprecated; use show_colorbar. Removed in the next release. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                    |
+| `gridsize`       | Deprecated; use grid_size. Removed in the next release. **TYPE:** \`int                                                                                                                                                                                                                                                                                                                                                                         |
+| `mincnt`         | Deprecated; use min_count. Removed in the next release. **TYPE:** \`int                                                                                                                                                                                                                                                                                                                                                                         |
 
 | RETURNS      | DESCRIPTION                             |
 | ------------ | --------------------------------------- |
@@ -26947,7 +26969,7 @@ The typing for the hexbin chart style.
 | `plot_hexbin_alpha`      | The alpha value of the hexagons. **TYPE:** \`float                                                                                           |
 | `plot_hexbin_edge_width` | The width of the hexagon edges; 0 draws none. **TYPE:** \`int                                                                                |
 | `plot_hexbin_edge_color` | The color of the hexagon edges. **TYPE:** \`str                                                                                              |
-| `plot_hexbin_gridsize`   | The number of hexagons across the x-axis when the chart sets no gridsize. **TYPE:** \`int                                                    |
+| `plot_hexbin_gridsize`   | The number of hexagons across the x-axis when the chart sets no grid_size. **TYPE:** \`int                                                   |
 
 ## Constants
 
@@ -29155,21 +29177,22 @@ kde1d(
     values: list[int | float],
     *,
     bandwidth: BANDWIDTH | str | float | None = None,
-    gridsize: int = 100,
+    grid_size: int | None = None,
     cut: float = 3,
-    xlim: tuple[float, float] | None = None
+    xlim: tuple[float, float] | None = None,
+    gridsize: int | None = None
 ) -> list[dict[str, float]]
 ```
 
 Estimates the density of the values as a curve.
 
-A Gaussian kernel density estimate evaluated on `gridsize` evenly spaced points over the range of the values, extended by `cut` bandwidths on each side so the curve tails off instead of being clipped at the extremes, or over an explicit `xlim` so several curves share one grid. The result is a list of `{x, y}` points ready for `LineChart`; the curve integrates to 1, so it overlays a density `Histogram` of the same values.
+A Gaussian kernel density estimate evaluated on `grid_size` evenly spaced points over the range of the values, extended by `cut` bandwidths on each side so the curve tails off instead of being clipped at the extremes, or over an explicit `xlim` so several curves share one grid. The result is a list of `{x, y}` points ready for `LineChart`; the curve integrates to 1, so it overlays a density `Histogram` of the same values.
 
 Examples:
 
 ```
 >>> from datachart.utils.stats import kde1d
->>> curve = kde1d([1, 2, 2, 3, 3, 3, 4, 4, 5], gridsize=5, cut=0)
+>>> curve = kde1d([1, 2, 2, 3, 3, 3, 4, 4, 5], grid_size=5, cut=0)
 >>> [round(point["x"], 2) for point in curve]
 [1.0, 2.0, 3.0, 4.0, 5.0]
 >>> round(sum(point["y"] for point in curve), 2)
@@ -29180,9 +29203,10 @@ Examples:
 | ----------- | --------------------------------------------------------------------------------------------------------------------------- |
 | `values`    | The values to estimate the density of. **TYPE:** \`list\[int                                                                |
 | `bandwidth` | The kernel bandwidth: None or "scott" (Scott's rule), "silverman", or a scalar factor. See BANDWIDTH. **TYPE:** \`BANDWIDTH |
-| `gridsize`  | The number of points the curve is evaluated on. **TYPE:** `int` **DEFAULT:** `100`                                          |
+| `grid_size` | The number of points the curve is evaluated on; 100 by default. **TYPE:** \`int                                             |
 | `cut`       | How many bandwidths to extend the grid past the extremes. **TYPE:** `float` **DEFAULT:** `3`                                |
 | `xlim`      | The (min, max) range of the grid; overrides the padded range. **TYPE:** \`tuple[float, float]                               |
+| `gridsize`  | Deprecated; use grid_size. Removed in the next release. **TYPE:** \`int                                                     |
 
 | RETURNS                  | DESCRIPTION                             |
 | ------------------------ | --------------------------------------- |
@@ -29200,22 +29224,23 @@ kde2d(
     y: list[int | float],
     *,
     bandwidth: BANDWIDTH | str | float | None = None,
-    gridsize: int | tuple[int, int] = 100,
+    grid_size: int | tuple[int, int] | None = None,
     cut: float = 3,
     xlim: tuple[Any, Any] | None = None,
-    ylim: tuple[float, float] | None = None
+    ylim: tuple[float, float] | None = None,
+    gridsize: int | tuple[int, int] | None = None
 ) -> dict[str, list]
 ```
 
 Estimates the density of the (x, y) points as a gridded surface.
 
-A Gaussian kernel density estimate evaluated on a `gridsize` × `gridsize` grid over the range of the points, extended by `cut` bandwidths on each side so the outer contours close instead of being clipped, or over explicit `xlim`/`ylim` so several surfaces share one grid. The result is an `{x, y, z}` chart dict ready for `ContourChart` — the density chart of a scattered dataset is `ContourChart(kde2d(x, y))`. A temporal `x` (dates, datetimes, or `datetime64`) gives a grid of datetime `x` values, in the input's zone, and `xlim` may then be a pair of datetimes.
+A Gaussian kernel density estimate evaluated on a `grid_size` × `grid_size` grid over the range of the points, extended by `cut` bandwidths on each side so the outer contours close instead of being clipped, or over explicit `xlim`/`ylim` so several surfaces share one grid. The result is an `{x, y, z}` chart dict ready for `ContourChart` — the density chart of a scattered dataset is `ContourChart(kde2d(x, y))`. A temporal `x` (dates, datetimes, or `datetime64`) gives a grid of datetime `x` values, in the input's zone, and `xlim` may then be a pair of datetimes.
 
 Examples:
 
 ```
 >>> from datachart.utils.stats import kde2d
->>> surface = kde2d([1, 2, 3, 4], [1, 3, 2, 4], gridsize=(3, 2), cut=0)
+>>> surface = kde2d([1, 2, 3, 4], [1, 3, 2, 4], grid_size=(3, 2), cut=0)
 >>> surface["x"], surface["y"]
 ([1.0, 2.5, 4.0], [1.0, 4.0])
 >>> [[round(z, 3) for z in row] for row in surface["z"]]
@@ -29227,10 +29252,11 @@ Examples:
 | `x`         | The x values of the points, numeric or temporal. **TYPE:** \`list\[int                                                      |
 | `y`         | The y values of the points, one per x value. **TYPE:** \`list\[int                                                          |
 | `bandwidth` | The kernel bandwidth: None or "scott" (Scott's rule), "silverman", or a scalar factor. See BANDWIDTH. **TYPE:** \`BANDWIDTH |
-| `gridsize`  | The number of grid columns and rows, as one number or an (x, y) pair. **TYPE:** \`int                                       |
+| `grid_size` | The number of grid columns and rows, as one number or an (x, y) pair; 100 by default. **TYPE:** \`int                       |
 | `cut`       | How many bandwidths to extend the grid past the extremes. **TYPE:** `float` **DEFAULT:** `3`                                |
 | `xlim`      | The (min, max) x range of the grid; overrides the padded range. **TYPE:** \`tuple[Any, Any]                                 |
 | `ylim`      | The (min, max) y range of the grid; overrides the padded range. **TYPE:** \`tuple[float, float]                             |
+| `gridsize`  | Deprecated; use grid_size. Removed in the next release. **TYPE:** \`int                                                     |
 
 | RETURNS           | DESCRIPTION                                      |
 | ----------------- | ------------------------------------------------ |
@@ -30548,7 +30574,7 @@ Each class and what reads it: a chart parameter, a style attribute, or the confi
 | `ORIENTATION`       | orientation; the orientation of the colorbar setting.    |
 | `VIOLIN_INNER`      | inner of ViolinPlot and RidgelinePlot.                   |
 | `BANDWIDTH`         | bandwidth of the density charts.                         |
-| `SWARM_MODE`        | mode of SwarmPlot and RaincloudPlot.                     |
+| `SWARM_MODE`        | swarm_mode of SwarmPlot and RaincloudPlot.               |
 | `VALUE_FORMAT`      | value_format, xticks_format, and yticks_format.          |
 | `DATE_FORMAT`       | xticks_format and yticks_format on a date axis.          |
 | `SHOW_GRID`         | show_grid.                                               |
@@ -31317,7 +31343,7 @@ Bases: `Domain`
 
 The supported swarm plot modes.
 
-Passed as the `mode` setting of swarm plots: how the points of one group spread across the category width.
+Passed as the `swarm_mode` setting of swarm plots: how the points of one group spread across the category width.
 
 Examples:
 

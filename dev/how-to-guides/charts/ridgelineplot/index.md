@@ -597,7 +597,7 @@ Panel(
         SwarmPlot(
             data=scores,
             orientation=ORIENTATION.HORIZONTAL,
-            mode=SWARM_MODE.STRIP,
+            swarm_mode=SWARM_MODE.STRIP,
             jitter=0.5,
             style={"plot_swarm_color": "#2C3E50", "plot_swarm_size": 6, "plot_swarm_alpha": 0.6},
         ),

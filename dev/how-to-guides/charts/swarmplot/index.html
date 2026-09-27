@@ -5678,7 +5678,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </tr>
 <tr>
 <td style="text-align:left">jitter the points instead of packing them</td>
-<td style="text-align:left"><code>mode</code>, <code>jitter</code></td>
+<td style="text-align:left"><code>swarm_mode</code>, <code>jitter</code></td>
 <td style="text-align:left"><a href="#swarm-and-strip-modes">Swarm and strip modes</a></td>
 </tr>
 <tr>
@@ -5793,7 +5793,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <td style="text-align:left"><a href="../../../references/constants/#datachart.constants.SHOW_GRID"><code>SHOW_GRID</code></a></td>
 </tr>
 <tr>
-<td style="text-align:left"><code>mode</code></td>
+<td style="text-align:left"><code>swarm_mode</code></td>
 <td style="text-align:left"><a href="../../../references/constants/#datachart.constants.SWARM_MODE"><code>SWARM_MODE</code></a></td>
 </tr>
 <tr>
@@ -6067,7 +6067,7 @@ SwarmPlot(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="swarm-and-strip-modes">Swarm and strip modes<a class="anchor-link" href="#swarm-and-strip-modes">¶</a></h3><p>A swarm computes a place for every point so none overlap, which is what makes single points readable. With thousands of points that placement adds nothing: the swarm fills its whole width anyway, and grows wider than the category. <code>mode</code> picks the placement from <a href="../../../references/constants/#datachart.constants.SWARM_MODE">SWARM_MODE</a>: <code>SWARM_MODE.SWARM</code> packs the points from the marker size at the moment the chart is drawn (the default; axis limits changed on the figure afterwards can shift the spacing), and <code>SWARM_MODE.STRIP</code> scatters them at random across the category, a <em>strip plot</em>. <code>jitter</code> sets the width of the strip as a fraction of the category width (0.4 by default), and the jitter is seeded, so the same data draws the same chart. On the presidents the strip lets points overlap, so the swarm is the better choice for a sample this small; the strip earns its place in <a href="#example-1-which-services-breach-the-sla-strip-mode-log-scale-and-an-sla-line">Example 1</a>, with 1,200 points.</p>
+<h3 id="swarm-and-strip-modes">Swarm and strip modes<a class="anchor-link" href="#swarm-and-strip-modes">¶</a></h3><p>A swarm computes a place for every point so none overlap, which is what makes single points readable. With thousands of points that placement adds nothing: the swarm fills its whole width anyway, and grows wider than the category. <code>swarm_mode</code> picks the placement from <a href="../../../references/constants/#datachart.constants.SWARM_MODE">SWARM_MODE</a>: <code>SWARM_MODE.SWARM</code> packs the points from the marker size at the moment the chart is drawn (the default; axis limits changed on the figure afterwards can shift the spacing), and <code>SWARM_MODE.STRIP</code> scatters them at random across the category, a <em>strip plot</em>. <code>jitter</code> sets the width of the strip as a fraction of the category width (0.4 by default), and the jitter is seeded, so the same data draws the same chart. On the presidents the strip lets points overlap, so the swarm is the better choice for a sample this small; the strip earns its place in <a href="#example-1-which-services-breach-the-sla-strip-mode-log-scale-and-an-sla-line">Example 1</a>, with 1,200 points.</p>
 </div>
 </div>
 </div>
@@ -6095,7 +6095,7 @@ SwarmPlot(
 <span class="n">SwarmPlot</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">inauguration_ages</span><span class="p">,</span>
     <span class="c1"># scatter the points at random instead of packing them</span>
-    <span class="n">mode</span><span class="o">=</span><span class="n">SWARM_MODE</span><span class="o">.</span><span class="n">STRIP</span><span class="p">,</span>
+    <span class="n">swarm_mode</span><span class="o">=</span><span class="n">SWARM_MODE</span><span class="o">.</span><span class="n">STRIP</span><span class="p">,</span>
     <span class="c1"># a strip a quarter of the category wide</span>
     <span class="n">jitter</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Age of US presidents at inauguration, strip mode"</span><span class="p">,</span>
@@ -6112,7 +6112,7 @@ SwarmPlot(
 SwarmPlot(
     data=inauguration_ages,
     # scatter the points at random instead of packing them
-    mode=SWARM_MODE.STRIP,
+    swarm_mode=SWARM_MODE.STRIP,
     # a strip a quarter of the category wide
     jitter=0.25,
     title="Age of US presidents at inauguration, strip mode",
@@ -7668,7 +7668,7 @@ president_records[:2]</div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">SwarmPlot</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">response_times</span><span class="p">,</span>
     <span class="c1"># scatter the many points across the category width</span>
-    <span class="n">mode</span><span class="o">=</span><span class="n">SWARM_MODE</span><span class="o">.</span><span class="n">STRIP</span><span class="p">,</span>
+    <span class="n">swarm_mode</span><span class="o">=</span><span class="n">SWARM_MODE</span><span class="o">.</span><span class="n">STRIP</span><span class="p">,</span>
     <span class="c1"># small, translucent points</span>
     <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">"plot_swarm_size"</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="s2">"plot_swarm_alpha"</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span> <span class="s2">"plot_swarm_edge_width"</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
     <span class="c1"># the long tail reads at the same resolution as the bulk</span>
@@ -7695,7 +7695,7 @@ president_records[:2]</div>
 <div class="clipboard-copy-txt" id="cell-26">SwarmPlot(
     data=response_times,
     # scatter the many points across the category width
-    mode=SWARM_MODE.STRIP,
+    swarm_mode=SWARM_MODE.STRIP,
     # small, translucent points
     style={"plot_swarm_size": 6, "plot_swarm_alpha": 0.4, "plot_swarm_edge_width": 0},
     # the long tail reads at the same resolution as the bulk

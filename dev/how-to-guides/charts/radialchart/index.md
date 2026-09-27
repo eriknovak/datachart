@@ -38,9 +38,9 @@ Every customization is either a keyword argument of `RadialChart` or an attribut
 | fix the radial range                      | `ymin`, `ymax`                                          | [Title, axis labels and radial range](#title-axis-labels-and-radial-range)                              |
 | resize the figure                         | `figsize`                                               | [Figure size and grid](#figure-size-and-grid)                                                           |
 | show the rings and spokes                 | `show_grid`                                             | [Figure size and grid](#figure-size-and-grid)                                                           |
-| rotate where the circle starts            | `startangle`                                            | [Start angle and direction](#start-angle-and-direction)                                                 |
+| rotate where the circle starts            | `start_angle`                                           | [Start angle and direction](#start-angle-and-direction)                                                 |
 | flip the angular direction                | `direction`                                             | [Start angle and direction](#start-angle-and-direction)                                                 |
-| cut a donut hole in the middle            | `innerradius`                                           | [Inner radius](#inner-radius)                                                                           |
+| cut a donut hole in the middle            | `inner_radius`                                          | [Inner radius](#inner-radius)                                                                           |
 | change the color, width, marker, or hatch | `style={"plot_line_color": ..., "plot_bar_hatch": ...}` | [Mark style](#mark-style)                                                                               |
 | highlight some bars, mute the rest        | `emphasis_rule`, the `"emphasis"` key of a data point   | [Sorting and emphasis](#sorting-and-emphasis)                                                           |
 | order the sectors by value                | `sort`, `sort_by`                                       | [Sorting and emphasis](#sorting-and-emphasis)                                                           |
@@ -150,7 +150,7 @@ RadialChart(
 
 ### Start angle and direction
 
-Where the circle starts and which way it runs is a convention the reader brings along, and the chart should meet it. The default puts the first label at the top and runs clockwise, which is how a compass and a clock work, so directions and months read without instructions. `startangle` moves the first label: a compass point (`"N"`, `"NE"`, `"E"`, `"SE"`, `"S"`, `"SW"`, `"W"`, `"NW"`) or a bearing in degrees clockwise from the top. `direction` flips the way the angles increase, with a [RADIAL_DIRECTION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.RADIAL_DIRECTION) member. Readers of scientific polar plots expect the mathematical convention instead, zero at the right and angles increasing counterclockwise; the example follows it, so January sits at the right and the year runs the other way round.
+Where the circle starts and which way it runs is a convention the reader brings along, and the chart should meet it. The default puts the first label at the top and runs clockwise, which is how a compass and a clock work, so directions and months read without instructions. `start_angle` moves the first label: a compass point (`"N"`, `"NE"`, `"E"`, `"SE"`, `"S"`, `"SW"`, `"W"`, `"NW"`) or a bearing in degrees clockwise from the top. `direction` flips the way the angles increase, with a [RADIAL_DIRECTION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.RADIAL_DIRECTION) member. Readers of scientific polar plots expect the mathematical convention instead, zero at the right and angles increasing counterclockwise; the example follows it, so January sits at the right and the year runs the other way round.
 
 ```
 from datachart.constants import RADIAL_DIRECTION
@@ -160,14 +160,14 @@ RadialChart(
     mark=RADIAL_TYPE.BAR,
     title="Monthly sunshine hours",
     # the mathematical convention: start at the right, run counterclockwise
-    startangle="E",
+    start_angle="E",
     direction=RADIAL_DIRECTION.COUNTERCLOCKWISE,
 ).show()
 ```
 
 ### Inner radius
 
-Sectors that meet at the center shrink to slivers there, so the small values, and the bottom segments of stacked bars, are hard to read. `innerradius` cuts a donut hole, given as a fraction (between 0 and 1) of the radial extent: every bar starts at the hole instead of the center and keeps a readable width along its whole length. The short winter sectors, thin wedges near the center above, get a readable width with a quarter of the radius reserved for the hole.
+Sectors that meet at the center shrink to slivers there, so the small values, and the bottom segments of stacked bars, are hard to read. `inner_radius` cuts a donut hole, given as a fraction (between 0 and 1) of the radial extent: every bar starts at the hole instead of the center and keeps a readable width along its whole length. The short winter sectors, thin wedges near the center above, get a readable width with a quarter of the radius reserved for the hole.
 
 ```
 RadialChart(
@@ -175,7 +175,7 @@ RadialChart(
     mark=RADIAL_TYPE.BAR,
     title="Monthly sunshine hours",
     # reserve the middle quarter of the radius for the hole
-    innerradius=0.25,
+    inner_radius=0.25,
 ).show()
 ```
 
@@ -245,7 +245,7 @@ RadialChart(
     mark=RADIAL_TYPE.BAR,
     title="Monthly sunshine hours",
     # a wider hole spreads the short winter labels apart
-    innerradius=0.4,
+    inner_radius=0.4,
     # print each month's hours at the tip of its bar
     show_values=True,
     value_format=VALUE_FORMAT.INTEGER,
@@ -259,7 +259,7 @@ RadialChart(
     data=sunshine_by_month,
     mark=RADIAL_TYPE.BAR,
     title="Monthly sunshine hours",
-    innerradius=0.3,
+    inner_radius=0.3,
     # the month names ride the bar tips, and the border circle goes
     show_tip_labels=True,
     show_border=False,
@@ -365,7 +365,7 @@ RadialChart(
     title="Monthly sunshine hours",
     show_legend=True,
     legend={"location": LEGEND_LOCATION.OUTSIDE_RIGHT},
-    innerradius=0.25,
+    inner_radius=0.25,
 ).show()
 ```
 
@@ -380,7 +380,7 @@ RadialChart(
     title="Months ranked by afternoon sunshine",
     show_legend=True,
     legend={"location": LEGEND_LOCATION.OUTSIDE_RIGHT},
-    innerradius=0.25,
+    inner_radius=0.25,
     # one order for both series, keyed by one of them
     sort=SORT.DESCENDING,
     sort_by="Afternoon",
@@ -563,7 +563,7 @@ this_year = RadialChart(
     subtitle=["Weekdays", "Weekends"],
     # stacked, so the outer edge is the month's total
     bar_mode=BAR_MODE.STACK,
-    innerradius=0.3,
+    inner_radius=0.3,
 )
 last_year = RadialChart(
     data=visits_last_year,

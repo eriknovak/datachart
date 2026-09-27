@@ -5734,17 +5734,17 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </tr>
 <tr>
 <td style="text-align:left">caption, move, or hide the colorbar</td>
-<td style="text-align:left"><code>colorbar</code>, <code>value_format</code>, <code>show_colorbars</code></td>
+<td style="text-align:left"><code>colorbar</code>, <code>value_format</code>, <code>show_colorbar</code></td>
 <td style="text-align:left"><a href="#colorbar">Colorbar</a></td>
 </tr>
 <tr>
 <td style="text-align:left">make the hexagons larger or smaller</td>
-<td style="text-align:left"><code>gridsize</code></td>
+<td style="text-align:left"><code>grid_size</code></td>
 <td style="text-align:left"><a href="#grid-size">Grid size</a></td>
 </tr>
 <tr>
 <td style="text-align:left">leave the sparse hexagons blank</td>
-<td style="text-align:left"><code>mincnt</code></td>
+<td style="text-align:left"><code>min_count</code></td>
 <td style="text-align:left"><a href="#minimum-count">Minimum count</a></td>
 </tr>
 <tr>
@@ -6045,7 +6045,7 @@ HexbinChart(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="colorbar">Colorbar<a class="anchor-link" href="#colorbar">¶</a></h3><p>The colorbar is the legend of a hexbin chart: without a caption, the reader does not know that the colors count listings. <code>colorbar</code> takes a <a href="../../../references/typings/#datachart.typings.ColorbarSettingAttrs">ColorbarSettingAttrs</a> dictionary: <code>label</code> captions the bar, <code>location</code> moves it to any edge with a <a href="../../../references/constants/#datachart.constants.COLORBAR_LOCATION">COLORBAR_LOCATION</a> member, <code>ticks</code> places its ticks, and <code>format</code> formats their labels (the <code>value_format</code> parameter does the same when <code>format</code> is not set). A bar above a wide chart takes less width from the hexagons than one beside it. <code>show_colorbars=False</code> hides the bar, which suits a chart whose colors are explained elsewhere, as in the <a href="#composing-with-panel">Composing with Panel</a> section.</p>
+<h3 id="colorbar">Colorbar<a class="anchor-link" href="#colorbar">¶</a></h3><p>The colorbar is the legend of a hexbin chart: without a caption, the reader does not know that the colors count listings. <code>colorbar</code> takes a <a href="../../../references/typings/#datachart.typings.ColorbarSettingAttrs">ColorbarSettingAttrs</a> dictionary: <code>label</code> captions the bar, <code>location</code> moves it to any edge with a <a href="../../../references/constants/#datachart.constants.COLORBAR_LOCATION">COLORBAR_LOCATION</a> member, <code>ticks</code> places its ticks, and <code>format</code> formats their labels (the <code>value_format</code> parameter does the same when <code>format</code> is not set). A bar above a wide chart takes less width from the hexagons than one beside it. <code>show_colorbar=False</code> hides the bar, which suits a chart whose colors are explained elsewhere, as in the <a href="#composing-with-panel">Composing with Panel</a> section.</p>
 </div>
 </div>
 </div>
@@ -6125,7 +6125,7 @@ HexbinChart(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="grid-size">Grid size<a class="anchor-link" href="#grid-size">¶</a></h3><p>The hexagon size decides what the chart can show. Large hexagons hold many points each, so the colors are smooth but the shape is coarse; small hexagons resolve finer structure until each holds too few points to color reliably. <code>gridsize</code> sets the number of hexagons across the x-axis (30 by default, from the <code>plot_hexbin_gridsize</code> style attribute). With 12 hexagons the listings reduce to a rough diagonal; with 60 the core shows its finer shape, at the price of a noisier color.</p>
+<h3 id="grid-size">Grid size<a class="anchor-link" href="#grid-size">¶</a></h3><p>The hexagon size decides what the chart can show. Large hexagons hold many points each, so the colors are smooth but the shape is coarse; small hexagons resolve finer structure until each holds too few points to color reliably. <code>grid_size</code> sets the number of hexagons across the x-axis (30 by default, from the <code>plot_hexbin_gridsize</code> style attribute). With 12 hexagons the listings reduce to a rough diagonal; with 60 the core shows its finer shape, at the price of a noisier color.</p>
 </div>
 </div>
 </div>
@@ -6148,23 +6148,23 @@ HexbinChart(
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">for</span> <span class="n">gridsize</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">12</span><span class="p">,</span> <span class="mi">60</span><span class="p">]:</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="k">for</span> <span class="n">grid_size</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">12</span><span class="p">,</span> <span class="mi">60</span><span class="p">]:</span>
     <span class="n">HexbinChart</span><span class="p">(</span>
         <span class="n">data</span><span class="o">=</span><span class="n">points</span><span class="p">,</span>
         <span class="c1"># the number of hexagons across the x-axis</span>
-        <span class="n">gridsize</span><span class="o">=</span><span class="n">gridsize</span><span class="p">,</span>
-        <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Apartment listings, </span><span class="si">{</span><span class="n">gridsize</span><span class="si">}</span><span class="s2"> hexagons across"</span><span class="p">,</span>
+        <span class="n">grid_size</span><span class="o">=</span><span class="n">grid_size</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Apartment listings, </span><span class="si">{</span><span class="n">grid_size</span><span class="si">}</span><span class="s2"> hexagons across"</span><span class="p">,</span>
         <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Floor area (m²)"</span><span class="p">,</span>
         <span class="n">ylabel</span><span class="o">=</span><span class="s2">"Rent (€/month)"</span><span class="p">,</span>
         <span class="n">figsize</span><span class="o">=</span><span class="n">FIG_SIZE</span><span class="o">.</span><span class="n">FULL_SHORT</span><span class="p">,</span>
     <span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-8">for gridsize in [12, 60]:
+<div class="clipboard-copy-txt" id="cell-8">for grid_size in [12, 60]:
     HexbinChart(
         data=points,
         # the number of hexagons across the x-axis
-        gridsize=gridsize,
-        title=f"Apartment listings, {gridsize} hexagons across",
+        grid_size=grid_size,
+        title=f"Apartment listings, {grid_size} hexagons across",
         xlabel="Floor area (m²)",
         ylabel="Rent (€/month)",
         figsize=FIG_SIZE.FULL_SHORT,
@@ -6199,7 +6199,7 @@ HexbinChart(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="minimum-count">Minimum count<a class="anchor-link" href="#minimum-count">¶</a></h3><p>Every hexagon of the tiling is drawn by default, so the tiling fills the whole bounding box of the points and empty plane looks like a region with few listings. <code>mincnt</code> leaves a hexagon blank unless at least that many points fall in it. <code>mincnt=1</code> draws only the hexagons that hold a listing, which shows the real outline of the data; a higher value also hides the hexagons with too few listings to trust.</p>
+<h3 id="minimum-count">Minimum count<a class="anchor-link" href="#minimum-count">¶</a></h3><p>Every hexagon of the tiling is drawn by default, so the tiling fills the whole bounding box of the points and empty plane looks like a region with few listings. <code>min_count</code> leaves a hexagon blank unless at least that many points fall in it. <code>min_count=1</code> draws only the hexagons that hold a listing, which shows the real outline of the data; a higher value also hides the hexagons with too few listings to trust.</p>
 </div>
 </div>
 </div>
@@ -6225,7 +6225,7 @@ HexbinChart(
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">HexbinChart</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">points</span><span class="p">,</span>
     <span class="c1"># blank the hexagons with fewer than five listings</span>
-    <span class="n">mincnt</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">min_count</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Apartment listings"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Floor area (m²)"</span><span class="p">,</span>
     <span class="n">ylabel</span><span class="o">=</span><span class="s2">"Rent (€/month)"</span><span class="p">,</span>
@@ -6235,7 +6235,7 @@ HexbinChart(
 <div class="clipboard-copy-txt" id="cell-9">HexbinChart(
     data=points,
     # blank the hexagons with fewer than five listings
-    mincnt=5,
+    min_count=5,
     title="Apartment listings",
     xlabel="Floor area (m²)",
     ylabel="Rent (€/month)",
@@ -6265,7 +6265,7 @@ HexbinChart(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="normalization">Normalization<a class="anchor-link" href="#normalization">¶</a></h3><p>Counts are heavy-tailed: a few hexagons in the core hold hundreds of listings while most hold a handful, so on a linear color scale nearly every hexagon draws in the palest shade. <code>norm</code> changes how the values map to colors with a <a href="../../../references/constants/#datachart.constants.COLOR_NORM">COLOR_NORM</a> member; <code>COLOR_NORM.LOG</code> spreads the counts, so the tail of the distribution becomes visible. A log scale needs positive values, so pair it with <code>mincnt=1</code>. <code>vmin</code> and <code>vmax</code> pin the color range instead of taking it from the data, which keeps the colors of several charts comparable.</p>
+<h3 id="normalization">Normalization<a class="anchor-link" href="#normalization">¶</a></h3><p>Counts are heavy-tailed: a few hexagons in the core hold hundreds of listings while most hold a handful, so on a linear color scale nearly every hexagon draws in the palest shade. <code>norm</code> changes how the values map to colors with a <a href="../../../references/constants/#datachart.constants.COLOR_NORM">COLOR_NORM</a> member; <code>COLOR_NORM.LOG</code> spreads the counts, so the tail of the distribution becomes visible. A log scale needs positive values, so pair it with <code>min_count=1</code>. <code>vmin</code> and <code>vmax</code> pin the color range instead of taking it from the data, which keeps the colors of several charts comparable.</p>
 </div>
 </div>
 </div>
@@ -6294,7 +6294,7 @@ HexbinChart(
     <span class="n">data</span><span class="o">=</span><span class="n">points</span><span class="p">,</span>
     <span class="c1"># log-scaled counts, so the sparse tail stays visible</span>
     <span class="n">norm</span><span class="o">=</span><span class="n">COLOR_NORM</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
-    <span class="n">mincnt</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">min_count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="c1"># the color range, from one listing to 300</span>
     <span class="n">vmin</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">vmax</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
@@ -6311,7 +6311,7 @@ HexbinChart(
     data=points,
     # log-scaled counts, so the sparse tail stays visible
     norm=COLOR_NORM.LOG,
-    mincnt=1,
+    min_count=1,
     # the color range, from one listing to 300
     vmin=1,
     vmax=300,
@@ -6345,7 +6345,7 @@ HexbinChart(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="aggregating-a-value">Aggregating a value<a class="anchor-link" href="#aggregating-a-value">¶</a></h3><p>Density is one question; the other is how a third value varies across the plane. With a <code>c</code> column in the data, each hexagon shows an aggregate of the <code>c</code> values of its points instead of the count. <code>reduce</code> picks the aggregate with a <a href="../../../references/constants/#datachart.constants.HEXBIN_REDUCE">HEXBIN_REDUCE</a> member: the mean by default, or the sum, median, minimum, or maximum. Only the hexagons holding a point are drawn, since an empty hexagon has nothing to aggregate, and an aggregate of one or two points is noisy, so <code>mincnt</code> hides those. Here <code>c</code> is the number of days a listing stayed on the market: the mean rises with the floor area and, at every area, with the rent.</p>
+<h3 id="aggregating-a-value">Aggregating a value<a class="anchor-link" href="#aggregating-a-value">¶</a></h3><p>Density is one question; the other is how a third value varies across the plane. With a <code>c</code> column in the data, each hexagon shows an aggregate of the <code>c</code> values of its points instead of the count. <code>reduce</code> picks the aggregate with a <a href="../../../references/constants/#datachart.constants.HEXBIN_REDUCE">HEXBIN_REDUCE</a> member: the mean by default, or the sum, median, minimum, or maximum. Only the hexagons holding a point are drawn, since an empty hexagon has nothing to aggregate, and an aggregate of one or two points is noisy, so <code>min_count</code> hides those. Here <code>c</code> is the number of days a listing stayed on the market: the mean rises with the floor area and, at every area, with the rent.</p>
 </div>
 </div>
 </div>
@@ -6376,7 +6376,7 @@ HexbinChart(
     <span class="c1"># the mean of the c values in every hexagon</span>
     <span class="n">reduce</span><span class="o">=</span><span class="n">HEXBIN_REDUCE</span><span class="o">.</span><span class="n">MEAN</span><span class="p">,</span>
     <span class="c1"># blank the hexagons with fewer than three listings</span>
-    <span class="n">mincnt</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">min_count</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
     <span class="n">colorbar</span><span class="o">=</span><span class="p">{</span><span class="s2">"label"</span><span class="p">:</span> <span class="s2">"Mean days on the market"</span><span class="p">},</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"How long apartments take to rent"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Floor area (m²)"</span><span class="p">,</span>
@@ -6392,7 +6392,7 @@ HexbinChart(
     # the mean of the c values in every hexagon
     reduce=HEXBIN_REDUCE.MEAN,
     # blank the hexagons with fewer than three listings
-    mincnt=3,
+    min_count=3,
     colorbar={"label": "Mean days on the market"},
     title="How long apartments take to rent",
     xlabel="Floor area (m²)",
@@ -6450,7 +6450,7 @@ HexbinChart(
     <span class="n">data</span><span class="o">=</span><span class="n">listings</span><span class="p">,</span>
     <span class="c1"># the longest-listed apartment in every hexagon</span>
     <span class="n">reduce</span><span class="o">=</span><span class="n">HEXBIN_REDUCE</span><span class="o">.</span><span class="n">MAX</span><span class="p">,</span>
-    <span class="n">mincnt</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">min_count</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
     <span class="n">colorbar</span><span class="o">=</span><span class="p">{</span><span class="s2">"label"</span><span class="p">:</span> <span class="s2">"Longest time on the market (days)"</span><span class="p">},</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"The slowest listings"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Floor area (m²)"</span><span class="p">,</span>
@@ -6462,7 +6462,7 @@ HexbinChart(
     data=listings,
     # the longest-listed apartment in every hexagon
     reduce=HEXBIN_REDUCE.MAX,
-    mincnt=3,
+    min_count=3,
     colorbar={"label": "Longest time on the market (days)"},
     title="The slowest listings",
     xlabel="Floor area (m²)",
@@ -6521,14 +6521,14 @@ HexbinChart(
 <span class="n">HexbinChart</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">listings</span><span class="p">,</span>
     <span class="n">reduce</span><span class="o">=</span><span class="n">HEXBIN_REDUCE</span><span class="o">.</span><span class="n">MEAN</span><span class="p">,</span>
-    <span class="n">mincnt</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">min_count</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
     <span class="c1"># a warm colormap and white edges between the hexagons</span>
     <span class="n">style</span><span class="o">=</span><span class="p">{</span>
         <span class="s2">"plot_hexbin_cmap"</span><span class="p">:</span> <span class="n">COLORS</span><span class="o">.</span><span class="n">YlOrRd</span><span class="p">,</span>
         <span class="s2">"plot_hexbin_edge_width"</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span>
         <span class="s2">"plot_hexbin_edge_color"</span><span class="p">:</span> <span class="s2">"#FFFFFF"</span><span class="p">,</span>
     <span class="p">},</span>
-    <span class="n">gridsize</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+    <span class="n">grid_size</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
     <span class="n">colorbar</span><span class="o">=</span><span class="p">{</span><span class="s2">"label"</span><span class="p">:</span> <span class="s2">"Mean days on the market"</span><span class="p">},</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"How long apartments take to rent"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Floor area (m²)"</span><span class="p">,</span>
@@ -6541,14 +6541,14 @@ HexbinChart(
 HexbinChart(
     data=listings,
     reduce=HEXBIN_REDUCE.MEAN,
-    mincnt=3,
+    min_count=3,
     # a warm colormap and white edges between the hexagons
     style={
         "plot_hexbin_cmap": COLORS.YlOrRd,
         "plot_hexbin_edge_width": 0.6,
         "plot_hexbin_edge_color": "#FFFFFF",
     },
-    gridsize=20,
+    grid_size=20,
     colorbar={"label": "Mean days on the market"},
     title="How long apartments take to rent",
     xlabel="Floor area (m²)",
@@ -6604,7 +6604,7 @@ HexbinChart(
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">HexbinChart</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">listings</span><span class="p">,</span>
-    <span class="n">mincnt</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">min_count</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
     <span class="c1"># outline the hexagons with a mean wait above 40 days, fade the rest</span>
     <span class="n">emphasis_rule</span><span class="o">=</span><span class="p">{</span><span class="s2">"above"</span><span class="p">:</span> <span class="mi">40</span><span class="p">},</span>
     <span class="n">colorbar</span><span class="o">=</span><span class="p">{</span><span class="s2">"label"</span><span class="p">:</span> <span class="s2">"Mean days on the market"</span><span class="p">},</span>
@@ -6616,7 +6616,7 @@ HexbinChart(
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-14">HexbinChart(
     data=listings,
-    mincnt=3,
+    min_count=3,
     # outline the hexagons with a mean wait above 40 days, fade the rest
     emphasis_rule={"above": 40},
     colorbar={"label": "Mean days on the market"},
@@ -6691,7 +6691,7 @@ HexbinChart(
     <span class="p">},</span>
     <span class="c1"># a rent budget of 800 to 1,200 €</span>
     <span class="n">hspans</span><span class="o">=</span><span class="p">{</span><span class="s2">"ymin"</span><span class="p">:</span> <span class="mi">800</span><span class="p">,</span> <span class="s2">"ymax"</span><span class="p">:</span> <span class="mi">1200</span><span class="p">,</span> <span class="s2">"style"</span><span class="p">:</span> <span class="n">BUDGET_STYLE</span><span class="p">},</span>
-    <span class="n">mincnt</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">min_count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Apartment listings against a rent budget"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Floor area (m²)"</span><span class="p">,</span>
     <span class="n">ylabel</span><span class="o">=</span><span class="s2">"Rent (€/month)"</span><span class="p">,</span>
@@ -6716,7 +6716,7 @@ HexbinChart(
     },
     # a rent budget of 800 to 1,200 €
     hspans={"ymin": 800, "ymax": 1200, "style": BUDGET_STYLE},
-    mincnt=1,
+    min_count=1,
     title="Apartment listings against a rent budget",
     xlabel="Floor area (m²)",
     ylabel="Rent (€/month)",
@@ -6769,7 +6769,7 @@ HexbinChart(
         <span class="s2">"label"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"median rate, </span><span class="si">{</span><span class="n">rate</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2"> €/m²"</span><span class="p">,</span>
         <span class="s2">"style"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"plot_dline_color"</span><span class="p">:</span> <span class="s2">"#1d3557"</span><span class="p">,</span> <span class="s2">"plot_dline_style"</span><span class="p">:</span> <span class="n">LINE_STYLE</span><span class="o">.</span><span class="n">DASHED</span><span class="p">},</span>
     <span class="p">},</span>
-    <span class="n">mincnt</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">min_count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Apartment listings against the median rent per square metre"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Floor area (m²)"</span><span class="p">,</span>
     <span class="n">ylabel</span><span class="o">=</span><span class="s2">"Rent (€/month)"</span><span class="p">,</span>
@@ -6788,7 +6788,7 @@ HexbinChart(
         "label": f"median rate, {rate:.0f} €/m²",
         "style": {"plot_dline_color": "#1d3557", "plot_dline_style": LINE_STYLE.DASHED},
     },
-    mincnt=1,
+    min_count=1,
     title="Apartment listings against the median rent per square metre",
     xlabel="Floor area (m²)",
     ylabel="Rent (€/month)",
@@ -6855,7 +6855,7 @@ HexbinChart(
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">HexbinChart</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">points</span><span class="p">,</span>
-    <span class="n">mincnt</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">min_count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">norm</span><span class="o">=</span><span class="n">COLOR_NORM</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
     <span class="c1"># a note in the empty corner, pointing at the tail</span>
     <span class="n">texts</span><span class="o">=</span><span class="p">{</span>
@@ -6873,7 +6873,7 @@ HexbinChart(
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-17">HexbinChart(
     data=points,
-    mincnt=1,
+    min_count=1,
     norm=COLOR_NORM.LOG,
     # a note in the empty corner, pointing at the tail
     texts={
@@ -6912,7 +6912,7 @@ HexbinChart(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h2 id="multiple-hexbin-charts">Multiple Hexbin Charts<a class="anchor-link" href="#multiple-hexbin-charts">¶</a></h2><p>To compare several groups of points, pass a list of datasets to <code>data</code> and set <code>subplots=True</code>. Hexagons are opaque, so several datasets on one axes would cover each other; subplots keep each group visible. <code>subtitle</code> titles the subplots, while <code>title</code>, <code>xlabel</code> and <code>ylabel</code> stay global; <code>max_cols</code> limits the subplots per row, and <code>sharex</code> and <code>sharey</code> put the subplots on one axis range. The per-chart parameters (<code>subtitle</code>, <code>style</code>, <code>gridsize</code>, <code>reduce</code>, <code>mincnt</code>, <code>norm</code>, <code>vmin</code>, <code>vmax</code>, <code>value_format</code>, <code>colorbar</code>) take either one value for every chart or a list with one value per chart. Each subplot scales its colors to its own data, so the same <code>vmin</code> and <code>vmax</code> on every subplot are what makes the shades comparable. <code>points_by_district</code>, defined in a hidden cell, splits the listings by district: the center has fewer listings, and they sit higher on the rent axis.</p>
+<h2 id="multiple-hexbin-charts">Multiple Hexbin Charts<a class="anchor-link" href="#multiple-hexbin-charts">¶</a></h2><p>To compare several groups of points, pass a list of datasets to <code>data</code> and set <code>subplots=True</code>. Hexagons are opaque, so several datasets on one axes would cover each other; subplots keep each group visible. <code>subtitle</code> titles the subplots, while <code>title</code>, <code>xlabel</code> and <code>ylabel</code> stay global; <code>max_cols</code> limits the subplots per row, and <code>sharex</code> and <code>sharey</code> put the subplots on one axis range. The per-chart parameters (<code>subtitle</code>, <code>style</code>, <code>grid_size</code>, <code>reduce</code>, <code>min_count</code>, <code>norm</code>, <code>vmin</code>, <code>vmax</code>, <code>value_format</code>, <code>colorbar</code>) take either one value for every chart or a list with one value per chart. Each subplot scales its colors to its own data, so the same <code>vmin</code> and <code>vmax</code> on every subplot are what makes the shades comparable. <code>points_by_district</code>, defined in a hidden cell, splits the listings by district: the center has fewer listings, and they sit higher on the rent axis.</p>
 </div>
 </div>
 </div>
@@ -6952,8 +6952,8 @@ HexbinChart(
     <span class="c1"># the same color range for every district</span>
     <span class="n">vmin</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">vmax</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
-    <span class="n">mincnt</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">gridsize</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
+    <span class="n">min_count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">grid_size</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Apartment listings by district"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Floor area (m²)"</span><span class="p">,</span>
     <span class="n">ylabel</span><span class="o">=</span><span class="s2">"Rent (€/month)"</span><span class="p">,</span>
@@ -6976,8 +6976,8 @@ HexbinChart(
     # the same color range for every district
     vmin=1,
     vmax=60,
-    mincnt=1,
-    gridsize=40,
+    min_count=1,
+    grid_size=40,
     title="Apartment listings by district",
     xlabel="Floor area (m²)",
     ylabel="Rent (€/month)",
@@ -7048,12 +7048,12 @@ HexbinChart(
         <span class="p">{</span>
             <span class="s2">"figure"</span><span class="p">:</span> <span class="n">HexbinChart</span><span class="p">(</span>
                 <span class="n">data</span><span class="o">=</span><span class="n">points</span><span class="p">,</span>
-                <span class="n">mincnt</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">min_count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
                 <span class="n">norm</span><span class="o">=</span><span class="n">COLOR_NORM</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
                 <span class="c1"># the budget band, labeled in the panel legend</span>
                 <span class="n">hspans</span><span class="o">=</span><span class="p">{</span><span class="s2">"ymin"</span><span class="p">:</span> <span class="mi">800</span><span class="p">,</span> <span class="s2">"ymax"</span><span class="p">:</span> <span class="mi">1200</span><span class="p">,</span> <span class="s2">"label"</span><span class="p">:</span> <span class="s2">"Budget"</span><span class="p">,</span> <span class="s2">"style"</span><span class="p">:</span> <span class="n">BUDGET_STYLE</span><span class="p">},</span>
                 <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">"plot_hexbin_cmap"</span><span class="p">:</span> <span class="n">COLORS</span><span class="o">.</span><span class="n">Greys</span><span class="p">},</span>
-                <span class="n">show_colorbars</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">show_colorbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="p">),</span>
             <span class="s2">"y_axis"</span><span class="p">:</span> <span class="s2">"left"</span><span class="p">,</span>
         <span class="p">},</span>
@@ -7095,12 +7095,12 @@ Panel(
         {
             "figure": HexbinChart(
                 data=points,
-                mincnt=1,
+                min_count=1,
                 norm=COLOR_NORM.LOG,
                 # the budget band, labeled in the panel legend
                 hspans={"ymin": 800, "ymax": 1200, "label": "Budget", "style": BUDGET_STYLE},
                 style={"plot_hexbin_cmap": COLORS.Greys},
-                show_colorbars=False,
+                show_colorbar=False,
             ),
             "y_axis": "left",
         },
@@ -7180,7 +7180,7 @@ Panel(
         <span class="p">[</span>
             <span class="n">HexbinChart</span><span class="p">(</span>
                 <span class="n">data</span><span class="o">=</span><span class="n">points</span><span class="p">,</span>
-                <span class="n">mincnt</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">min_count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
                 <span class="n">norm</span><span class="o">=</span><span class="n">COLOR_NORM</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
                 <span class="n">title</span><span class="o">=</span><span class="s2">"Listings"</span><span class="p">,</span>
                 <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Floor area (m²)"</span><span class="p">,</span>
@@ -7190,7 +7190,7 @@ Panel(
         <span class="p">[</span>
             <span class="n">HexbinChart</span><span class="p">(</span>
                 <span class="n">data</span><span class="o">=</span><span class="n">listings</span><span class="p">,</span>
-                <span class="n">mincnt</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                <span class="n">min_count</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
                 <span class="n">colorbar</span><span class="o">=</span><span class="p">{</span><span class="s2">"location"</span><span class="p">:</span> <span class="n">COLORBAR_LOCATION</span><span class="o">.</span><span class="n">BOTTOM</span><span class="p">},</span>
                 <span class="n">title</span><span class="o">=</span><span class="s2">"Mean days on the market"</span><span class="p">,</span>
                 <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Floor area (m²)"</span><span class="p">,</span>
@@ -7215,7 +7215,7 @@ Grid(
         [
             HexbinChart(
                 data=points,
-                mincnt=1,
+                min_count=1,
                 norm=COLOR_NORM.LOG,
                 title="Listings",
                 xlabel="Floor area (m²)",
@@ -7225,7 +7225,7 @@ Grid(
         [
             HexbinChart(
                 data=listings,
-                mincnt=3,
+                min_count=3,
                 colorbar={"location": COLORBAR_LOCATION.BOTTOM},
                 title="Mean days on the market",
                 xlabel="Floor area (m²)",
@@ -7308,7 +7308,7 @@ Grid(
     <span class="n">data</span><span class="o">=</span><span class="n">locations</span><span class="p">,</span>
     <span class="c1"># one kilometer is as long on both axes</span>
     <span class="n">aspect_ratio</span><span class="o">=</span><span class="n">ASPECT_RATIO</span><span class="o">.</span><span class="n">EQUAL</span><span class="p">,</span>
-    <span class="n">mincnt</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">min_count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">xmin</span><span class="o">=-</span><span class="mi">10</span><span class="p">,</span>
     <span class="n">xmax</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
     <span class="n">ymin</span><span class="o">=-</span><span class="mi">8</span><span class="p">,</span>
@@ -7325,7 +7325,7 @@ HexbinChart(
     data=locations,
     # one kilometer is as long on both axes
     aspect_ratio=ASPECT_RATIO.EQUAL,
-    mincnt=1,
+    min_count=1,
     xmin=-10,
     xmax=10,
     ymin=-8,
@@ -7387,8 +7387,8 @@ HexbinChart(
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">HexbinChart</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">rents_by_date</span><span class="p">,</span>
-    <span class="n">mincnt</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">gridsize</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span>
+    <span class="n">min_count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">grid_size</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span>
     <span class="c1"># one tick per quarter, labeled with the month name</span>
     <span class="n">xticks</span><span class="o">=</span><span class="p">[</span><span class="n">date</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">month</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">10</span><span class="p">)]</span> <span class="o">+</span> <span class="p">[</span><span class="n">date</span><span class="p">(</span><span class="mi">2025</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)],</span>
     <span class="n">xticks_format</span><span class="o">=</span><span class="s2">"%b"</span><span class="p">,</span>
@@ -7403,8 +7403,8 @@ HexbinChart(
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-22">HexbinChart(
     data=rents_by_date,
-    mincnt=1,
-    gridsize=24,
+    min_count=1,
+    grid_size=24,
     # one tick per quarter, labeled with the month name
     xticks=[date(2024, month, 1) for month in (1, 4, 7, 10)] + [date(2025, 1, 1)],
     xticks_format="%b",
@@ -7470,7 +7470,7 @@ HexbinChart(
 
 <span class="n">figure</span> <span class="o">=</span> <span class="n">HexbinChart</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">points</span><span class="p">,</span>
-    <span class="n">mincnt</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">min_count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">norm</span><span class="o">=</span><span class="n">COLOR_NORM</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Apartment listings"</span><span class="p">,</span>
     <span class="n">xlabel</span><span class="o">=</span><span class="s2">"Floor area (m²)"</span><span class="p">,</span>
@@ -7488,7 +7488,7 @@ config.set_theme(THEME.INK)
 
 figure = HexbinChart(
     data=points,
-    mincnt=1,
+    min_count=1,
     norm=COLOR_NORM.LOG,
     title="Apartment listings",
     xlabel="Floor area (m²)",
@@ -7566,8 +7566,8 @@ figure.show()</div>
         <span class="n">HexbinChart</span><span class="p">(</span>
             <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">"x"</span><span class="p">:</span> <span class="n">listings</span><span class="p">[</span><span class="s2">"x"</span><span class="p">],</span> <span class="s2">"y"</span><span class="p">:</span> <span class="n">listings</span><span class="p">[</span><span class="s2">"y"</span><span class="p">],</span> <span class="s2">"c"</span><span class="p">:</span> <span class="n">per_m2</span><span class="p">},</span>
             <span class="n">reduce</span><span class="o">=</span><span class="n">HEXBIN_REDUCE</span><span class="o">.</span><span class="n">MEAN</span><span class="p">,</span>
-            <span class="n">mincnt</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-            <span class="n">gridsize</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
+            <span class="n">min_count</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+            <span class="n">grid_size</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
             <span class="c1"># a diverging colormap centered on the city-wide mean;</span>
             <span class="c1"># the "_r" suffix reverses it, so the cheap side is blue</span>
             <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">"plot_hexbin_cmap"</span><span class="p">:</span> <span class="s2">"RdBu_r"</span><span class="p">},</span>
@@ -7600,8 +7600,8 @@ Panel(
         HexbinChart(
             data={"x": listings["x"], "y": listings["y"], "c": per_m2},
             reduce=HEXBIN_REDUCE.MEAN,
-            mincnt=3,
-            gridsize=40,
+            min_count=3,
+            grid_size=40,
             # a diverging colormap centered on the city-wide mean;
             # the "_r" suffix reverses it, so the cheap side is blue
             style={"plot_hexbin_cmap": "RdBu_r"},
@@ -7678,8 +7678,8 @@ Panel(
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">HexbinChart</span><span class="p">(</span>
     <span class="n">data</span><span class="o">=</span><span class="n">locations</span><span class="p">,</span>
-    <span class="n">mincnt</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">gridsize</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
+    <span class="n">min_count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">grid_size</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
     <span class="n">norm</span><span class="o">=</span><span class="n">COLOR_NORM</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
     <span class="n">aspect_ratio</span><span class="o">=</span><span class="n">ASPECT_RATIO</span><span class="o">.</span><span class="n">EQUAL</span><span class="p">,</span>
     <span class="c1"># outline the 25 fullest hexagons</span>
@@ -7702,8 +7702,8 @@ Panel(
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-25">HexbinChart(
     data=locations,
-    mincnt=1,
-    gridsize=40,
+    min_count=1,
+    grid_size=40,
     norm=COLOR_NORM.LOG,
     aspect_ratio=ASPECT_RATIO.EQUAL,
     # outline the 25 fullest hexagons
@@ -7772,11 +7772,11 @@ Panel(
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">district_row</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
     <span class="c1"># the listings and the median wait of one district, on the same axes</span>
-    <span class="n">frame</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">gridsize</span><span class="o">=</span><span class="mi">18</span><span class="p">,</span> <span class="n">xmin</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">xmax</span><span class="o">=</span><span class="mi">160</span><span class="p">,</span> <span class="n">ymin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ymax</span><span class="o">=</span><span class="mi">3500</span><span class="p">)</span>
+    <span class="n">frame</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">grid_size</span><span class="o">=</span><span class="mi">18</span><span class="p">,</span> <span class="n">xmin</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">xmax</span><span class="o">=</span><span class="mi">160</span><span class="p">,</span> <span class="n">ymin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ymax</span><span class="o">=</span><span class="mi">3500</span><span class="p">)</span>
     <span class="n">count</span> <span class="o">=</span> <span class="n">HexbinChart</span><span class="p">(</span>
         <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">"x"</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s2">"x"</span><span class="p">],</span> <span class="s2">"y"</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s2">"y"</span><span class="p">]},</span>
         <span class="n">norm</span><span class="o">=</span><span class="n">COLOR_NORM</span><span class="o">.</span><span class="n">LOG</span><span class="p">,</span>
-        <span class="n">mincnt</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">min_count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">vmin</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="n">vmax</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
         <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">: listings"</span><span class="p">,</span>
@@ -7785,7 +7785,7 @@ Panel(
     <span class="n">wait</span> <span class="o">=</span> <span class="n">HexbinChart</span><span class="p">(</span>
         <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
         <span class="n">reduce</span><span class="o">=</span><span class="n">HEXBIN_REDUCE</span><span class="o">.</span><span class="n">MEDIAN</span><span class="p">,</span>
-        <span class="n">mincnt</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">min_count</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
         <span class="c1"># the same range in every district, so the shades compare</span>
         <span class="n">vmin</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
         <span class="n">vmax</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span>
@@ -7808,11 +7808,11 @@ Panel(
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-26">def district_row(name, data):
     # the listings and the median wait of one district, on the same axes
-    frame = dict(gridsize=18, xmin=15, xmax=160, ymin=0, ymax=3500)
+    frame = dict(grid_size=18, xmin=15, xmax=160, ymin=0, ymax=3500)
     count = HexbinChart(
         data={"x": data["x"], "y": data["y"]},
         norm=COLOR_NORM.LOG,
-        mincnt=1,
+        min_count=1,
         vmin=1,
         vmax=300,
         title=f"{name}: listings",
@@ -7821,7 +7821,7 @@ Panel(
     wait = HexbinChart(
         data=data,
         reduce=HEXBIN_REDUCE.MEDIAN,
-        mincnt=3,
+        min_count=3,
         # the same range in every district, so the shades compare
         vmin=5,
         vmax=45,
