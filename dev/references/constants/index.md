@@ -781,7 +781,7 @@ Bases: `Domain`
 
 The supported violin inner marks.
 
-Passed as the `inner` setting of violin plots; `None` draws the body only.
+Passed as the `inner` setting of violin and ridgeline plots. On a violin plot `None` takes the theme's default; on a ridgeline plot it draws no marks.
 
 Examples:
 
@@ -793,10 +793,11 @@ Examples:
 
 | ATTRIBUTE   | DESCRIPTION                                                                                                                 |
 | ----------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `DEFAULT`   | The violin plot's default inner marks. Same as VIOLIN_INNER.BOX. **TYPE:** `str`                                            |
+| `DEFAULT`   | The violin plot's inner marks when the theme sets none. Same as VIOLIN_INNER.BOX. **TYPE:** `str`                           |
 | `BOX`       | A thin quartile bar, a 1.5·IQR whisker line, and a median dot. Equals to "box". **TYPE:** `str`                             |
 | `QUARTILES` | A dashed median line and dotted first and third quartile lines, clipped to the body. Equals to "quartiles". **TYPE:** `str` |
 | `MEDIAN`    | A single solid median line clipped to the body. Equals to "median". **TYPE:** `str`                                         |
+| `NO_INNER`  | No inner marks, the body alone. Equals to "none". **TYPE:** `str`                                                           |
 
 ### datachart.constants.BANDWIDTH
 

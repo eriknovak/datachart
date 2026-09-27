@@ -7311,7 +7311,7 @@ Panel(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>A violin body behind the box adds the shape of the distribution: draw the violin with <code>inner=None</code>, since the box supplies the summaries, and give the box a white fill so it reads over the body. The Gentoo violin stays wide across its whole box instead of peaking at the median, a hint of two groups of different size inside the species: the two sexes, which the <a href="#multiple-box-plots">Multiple Box Plots</a> section splits apart.</p>
+<p>A violin body behind the box adds the shape of the distribution: draw the violin with <code>inner="none"</code>, since the box supplies the summaries, and give the box a white fill so it reads over the body. The Gentoo violin stays wide across its whole box instead of peaking at the median, a hint of two groups of different size inside the species: the two sexes, which the <a href="#multiple-box-plots">Multiple Box Plots</a> section splits apart.</p>
 </div>
 </div>
 </div>
@@ -7337,7 +7337,7 @@ Panel(
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">Panel</span><span class="p">(</span>
     <span class="p">[</span>
         <span class="c1"># the body only; the box supplies the summaries</span>
-        <span class="n">ViolinPlot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">body_mass</span><span class="p">,</span> <span class="n">inner</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">"plot_violin_alpha"</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">}),</span>
+        <span class="n">ViolinPlot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">body_mass</span><span class="p">,</span> <span class="n">inner</span><span class="o">=</span><span class="s2">"none"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">"plot_violin_alpha"</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">}),</span>
         <span class="n">BoxPlot</span><span class="p">(</span>
             <span class="n">data</span><span class="o">=</span><span class="n">body_mass</span><span class="p">,</span>
             <span class="n">show_outliers</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -7354,7 +7354,7 @@ Panel(
 <div class="clipboard-copy-txt" id="cell-21">Panel(
     [
         # the body only; the box supplies the summaries
-        ViolinPlot(data=body_mass, inner=None, style={"plot_violin_alpha": 0.3}),
+        ViolinPlot(data=body_mass, inner="none", style={"plot_violin_alpha": 0.3}),
         BoxPlot(
             data=body_mass,
             show_outliers=False,

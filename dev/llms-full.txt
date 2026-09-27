@@ -7460,13 +7460,13 @@ Panel(
 ).show()
 ```
 
-A violin body behind the box adds the shape of the distribution: draw the violin with `inner=None`, since the box supplies the summaries, and give the box a white fill so it reads over the body. The Gentoo violin stays wide across its whole box instead of peaking at the median, a hint of two groups of different size inside the species: the two sexes, which the [Multiple Box Plots](#multiple-box-plots) section splits apart.
+A violin body behind the box adds the shape of the distribution: draw the violin with `inner="none"`, since the box supplies the summaries, and give the box a white fill so it reads over the body. The Gentoo violin stays wide across its whole box instead of peaking at the median, a hint of two groups of different size inside the species: the two sexes, which the [Multiple Box Plots](#multiple-box-plots) section splits apart.
 
 ```
 Panel(
     [
         # the body only; the box supplies the summaries
-        ViolinPlot(data=body_mass, inner=None, style={"plot_violin_alpha": 0.3}),
+        ViolinPlot(data=body_mass, inner="none", style={"plot_violin_alpha": 0.3}),
         BoxPlot(
             data=body_mass,
             show_outliers=False,
@@ -7861,12 +7861,12 @@ ViolinPlot(
 
 ### Inner marks
 
-The body shows the shape, and the marks inside it give the numbers to read against: where the median is, and where the middle half of the birds sits. `inner` picks them from [VIOLIN_INNER](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VIOLIN_INNER): `VIOLIN_INNER.BOX` (the default) draws a thin quartile bar, a whisker line and a median dot, the summary of a box plot; `VIOLIN_INNER.QUARTILES` draws a dashed median and dotted quartile lines across the body, which keep the shape in view; `VIOLIN_INNER.MEDIAN` draws the median line alone; `None` draws the body only. The quartile lines show what the box hides: the Gentoo median falls near the waist of the body, between the two clusters, where fewer birds actually sit.
+The body shows the shape, and the marks inside it give the numbers to read against: where the median is, and where the middle half of the birds sits. `inner` picks them from [VIOLIN_INNER](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VIOLIN_INNER): `VIOLIN_INNER.BOX` (the default) draws a thin quartile bar, a whisker line and a median dot, the summary of a box plot; `VIOLIN_INNER.QUARTILES` draws a dashed median and dotted quartile lines across the body, which keep the shape in view; `VIOLIN_INNER.MEDIAN` draws the median line alone; `VIOLIN_INNER.NO_INNER` draws the body only. The quartile lines show what the box hides: the Gentoo median falls near the waist of the body, between the two clusters, where fewer birds actually sit.
 
 ```
 from datachart.constants import VIOLIN_INNER
 
-for inner in [VIOLIN_INNER.QUARTILES, None]:
+for inner in [VIOLIN_INNER.QUARTILES, VIOLIN_INNER.NO_INNER]:
     ViolinPlot(
         data=penguins,
         # the marks drawn inside each body
@@ -8225,7 +8225,7 @@ ViolinPlot(
 
 ### Violins with boxes and swarms
 
-The violin shows the shape, a box plot the standard summary, and a swarm plot every single observation; one chart rarely needs all three, but a figure that must convince a skeptical reader sometimes does. A violin plot draws its groups at the same positions as a [BoxPlot](https://eriknovak.github.io/datachart/dev/references/charts/boxplot/#datachart.charts.BoxPlot) or a [SwarmPlot](https://eriknovak.github.io/datachart/dev/references/charts/swarmplot/#datachart.charts.SwarmPlot) with the same labels, so [Panel](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) overlays them: the violin with `inner=None` supplies the body, the box plot drawn over it supplies the whiskers and outliers. A panel takes one violin plot, and all its figures must group the same labels in the same order. The [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) guide covers the rest.
+The violin shows the shape, a box plot the standard summary, and a swarm plot every single observation; one chart rarely needs all three, but a figure that must convince a skeptical reader sometimes does. A violin plot draws its groups at the same positions as a [BoxPlot](https://eriknovak.github.io/datachart/dev/references/charts/boxplot/#datachart.charts.BoxPlot) or a [SwarmPlot](https://eriknovak.github.io/datachart/dev/references/charts/swarmplot/#datachart.charts.SwarmPlot) with the same labels, so [Panel](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) overlays them: the violin with `inner="none"` supplies the body, the box plot drawn over it supplies the whiskers and outliers. A panel takes one violin plot, and all its figures must group the same labels in the same order. The [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) guide covers the rest.
 
 ```
 from datachart.charts import BoxPlot, SwarmPlot
@@ -8234,7 +8234,7 @@ from datachart.utils import Panel
 Panel(
     [
         # the body only; the box plot supplies the summary
-        ViolinPlot(data=penguins, inner=None, style={"plot_violin_alpha": 0.4}),
+        ViolinPlot(data=penguins, inner="none", style={"plot_violin_alpha": 0.4}),
         BoxPlot(
             data=penguins,
             style={"plot_box_color": "#ffffff", "plot_box_alpha": 0.9, "plot_box_width": 0.15},
@@ -8254,7 +8254,7 @@ A swarm plot draws every bird as a point, so the reader can check that the smoot
 Panel(
     [
         # the body only, faded behind the points
-        ViolinPlot(data=penguins, inner=None, style={"plot_violin_alpha": 0.25}),
+        ViolinPlot(data=penguins, inner="none", style={"plot_violin_alpha": 0.25}),
         SwarmPlot(data=penguins, style={"plot_swarm_size": 6}),
     ],
     title="Body mass of Palmer penguins, every bird",
@@ -8399,7 +8399,7 @@ violins = ViolinPlot(
 )
 boxes = Panel(
     [
-        ViolinPlot(data=response_times, inner=None, style={"plot_violin_alpha": 0.25}),
+        ViolinPlot(data=response_times, inner="none", style={"plot_violin_alpha": 0.25}),
         BoxPlot(data=response_times, show_outliers=False),
     ],
     title="Box over the body",
@@ -8455,7 +8455,7 @@ def measurement_panel(data, title, unit, note):
         [
             ViolinPlot(
                 data=data,
-                inner=None,
+                inner="none",
                 style={"plot_violin_alpha": 0.25},
                 texts={"text": note, "x": 0.02, "y": 0.92, "coords": "axes"},
             ),
@@ -8926,13 +8926,13 @@ Panel(
 ).show()
 ```
 
-A [ViolinPlot](https://eriknovak.github.io/datachart/dev/references/charts/violinplot/#datachart.charts.ViolinPlot) outlines the shape of each distribution instead. `inner=None` draws the body only, since the swarm already shows where the values sit, and a low alpha keeps the points legible. With five points in the last era the outline is a guess, which is exactly what the points on top reveal.
+A [ViolinPlot](https://eriknovak.github.io/datachart/dev/references/charts/violinplot/#datachart.charts.ViolinPlot) outlines the shape of each distribution instead. `inner="none"` draws the body only, since the swarm already shows where the values sit, and a low alpha keeps the points legible. With five points in the last era the outline is a guess, which is exactly what the points on top reveal.
 
 ```
 Panel(
     [
         # the body only, faded behind the points
-        ViolinPlot(data=inauguration_ages, inner=None, style={"plot_violin_alpha": 0.3}),
+        ViolinPlot(data=inauguration_ages, inner="none", style={"plot_violin_alpha": 0.3}),
         SwarmPlot(data=inauguration_ages),
     ],
     title="Age of US presidents at inauguration",
@@ -18324,7 +18324,7 @@ config.reset_config()
 config.theme
 ```
 
-Beyond style, a theme carries defaults for chart settings ([ThemeDefaultAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ThemeDefaultAttrs)): `chart_default_show_grid` supplies the grid when a chart call leaves `show_grid` unset (every predefined theme but [`SKETCH`](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/#sketch) and [`QUILL`](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/#quill) ships a muted `"y"` grid), `chart_default_show_values` does the same for value labels (no predefined theme turns them on), a setting one chart owns takes that chart's name (`chart_default_calendar_heatmap_week_start`, `chart_default_ridgeline_overlap`, `chart_default_network_label_position`), and the `plot_hatch_cycle`, `plot_linestyle_cycle`, and `plot_marker_cycle` attributes tell series apart by pattern where a theme ships them ([`HATCH`](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/#hatch) and [`QUILL`](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/#quill)). A setting given in the chart call always wins over the theme default.
+Beyond style, a theme carries defaults for chart settings ([ThemeDefaultAttrs](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.ThemeDefaultAttrs)): `chart_default_show_grid` supplies the grid when a chart call leaves `show_grid` unset (every predefined theme but [`SKETCH`](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/#sketch) and [`QUILL`](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/#quill) ships a muted `"y"` grid), `chart_default_show_values` does the same for value labels (no predefined theme turns them on), `chart_default_jitter` sets the strip width of swarm and raincloud points, a setting one chart owns takes that chart's name (`chart_default_calendar_heatmap_week_start`, `chart_default_violin_inner`, `chart_default_ridgeline_overlap`, `chart_default_ridgeline_fill`, `chart_default_ridgeline_show_outline`, `chart_default_network_label_position`), and the `plot_hatch_cycle`, `plot_linestyle_cycle`, and `plot_marker_cycle` attributes tell series apart by pattern where a theme ships them ([`HATCH`](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/#hatch) and [`QUILL`](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/theme-gallery/#quill)). A setting given in the chart call always wins over the theme default.
 
 ## What a Theme Controls
 
@@ -24853,7 +24853,7 @@ ViolinPlot(
     ) = None,
     label: str | list[str | None] | None = None,
     value: str | list[str | None] | None = None,
-    inner: VIOLIN_INNER | str | None = VIOLIN_INNER.BOX,
+    inner: VIOLIN_INNER | str | None = None,
     bandwidth: BANDWIDTH | str | float | None = None,
     split: str | None = None
 ) -> plt.Figure
@@ -24927,7 +24927,7 @@ Examples:
 | `texts`         | Text annotation(s) to draw. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                                                                                                                                                                                                            |
 | `label`         | The key name in data for label/category values (default: "label"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                  |
 | `value`         | The key name in data for numeric values (default: "value"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                         |
-| `inner`         | The marks drawn inside each body: "box" (quartile bar, 1.5·IQR whisker, median dot), "quartiles" (dashed median, dotted Q1/Q3), "median" (one line), or None (body only). See VIOLIN_INNER. **TYPE:** \`VIOLIN_INNER                                                                                                                                                                                                                |
+| `inner`         | The marks drawn inside each body: "box" (quartile bar, 1.5·IQR whisker, median dot), "quartiles" (dashed median, dotted Q1/Q3), "median" (one line), or "none" (body only). None takes the theme's chart_default_violin_inner. See VIOLIN_INNER. **TYPE:** \`VIOLIN_INNER                                                                                                                                                           |
 | `bandwidth`     | The KDE bandwidth: None or "scott" (Scott's rule), "silverman", or a scalar factor. See BANDWIDTH. **TYPE:** \`BANDWIDTH                                                                                                                                                                                                                                                                                                            |
 | `split`         | The key name in data whose exactly two distinct values become the left and right halves of each violin, colored from the multiple palette and listed in the legend. **TYPE:** \`str                                                                                                                                                                                                                                                 |
 
@@ -25034,7 +25034,7 @@ SwarmPlot(
     legend: LegendSettingAttrs | None = None,
     show_grid: SHOW_GRID | str | bool | None = None,
     mode: SWARM_MODE | str | None = None,
-    jitter: float = 0.4,
+    jitter: float | None = None,
     show_values: bool | None = None,
     value_format: VALUE_FORMAT | str | None = None,
     aspect_ratio: ASPECT_RATIO | str | None = None,
@@ -25179,7 +25179,7 @@ Examples:
 | `legend`        | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** \`LegendSettingAttrs                                                                                                                                                                                                                                                              |
 | `show_grid`     | Which grid lines to show (e.g., "both", "x", "y"); False draws none. **TYPE:** \`SHOW_GRID                                                                                                                                                                                                                                                                                                                                          |
 | `mode`          | How the points spread across the category width. See SWARM_MODE: "swarm" packs the points so none overlap, from the marker size at draw time (axis limits changed afterwards can shift the spacing); "strip" jitters them uniformly. **TYPE:** \`SWARM_MODE                                                                                                                                                                         |
-| `jitter`        | The strip jitter width, as a fraction of the category width. Only used with mode="strip". **TYPE:** `float` **DEFAULT:** `0.4`                                                                                                                                                                                                                                                                                                      |
+| `jitter`        | The strip jitter width, as a fraction of the category width. Only used with mode="strip". None takes the theme's chart_default_jitter. **TYPE:** \`float                                                                                                                                                                                                                                                                            |
 | `show_values`   | Whether to print each group's minimum, median, and maximum beside the points nearest them. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                         |
 | `value_format`  | Format string for the value labels: a VALUE_FORMAT constant or any "{x:.1f}", "{:.1f}%", or "%g" style string. **TYPE:** \`VALUE_FORMAT                                                                                                                                                                                                                                                                                             |
 | `aspect_ratio`  | The aspect ratio of the axes ("auto" or "equal"). See ASPECT_RATIO. **TYPE:** \`ASPECT_RATIO                                                                                                                                                                                                                                                                                                                                        |
@@ -25310,7 +25310,7 @@ RaincloudPlot(
     show_values: bool | None = None,
     value_format: VALUE_FORMAT | str | None = None,
     mode: SWARM_MODE | str | None = None,
-    jitter: float = 0.4,
+    jitter: float | None = None,
     bandwidth: BANDWIDTH | str | float | None = None,
     aspect_ratio: ASPECT_RATIO | str | None = None,
     orientation: ORIENTATION | str | None = None,
@@ -25457,7 +25457,7 @@ Examples:
 | `show_values`   | Whether to print each group's median beside its box, and its minimum and maximum beside the rain points holding them. **TYPE:** \`bool                                                                                                                                                                                                                                                                                              |
 | `value_format`  | Format string for the value labels: a VALUE_FORMAT constant or any "{x:.1f}", "{:.1f}%", or "%g" style string. **TYPE:** \`VALUE_FORMAT                                                                                                                                                                                                                                                                                             |
 | `mode`          | How the rain spreads across its width. See SWARM_MODE: "swarm" packs the points so none overlap; "strip" jitters them uniformly. **TYPE:** \`SWARM_MODE                                                                                                                                                                                                                                                                             |
-| `jitter`        | The strip jitter width, as a fraction of the category width like SwarmPlot, scaled down to the rain's narrower cell. Only used with mode="strip". **TYPE:** `float` **DEFAULT:** `0.4`                                                                                                                                                                                                                                              |
+| `jitter`        | The strip jitter width, as a fraction of the category width like SwarmPlot, scaled down to the rain's narrower cell. Only used with mode="strip". None takes the theme's chart_default_jitter. **TYPE:** \`float                                                                                                                                                                                                                    |
 | `bandwidth`     | The cloud's KDE bandwidth: None or "scott" (Scott's rule), "silverman" (Silverman's rule), or a scalar factor. See BANDWIDTH. **TYPE:** \`BANDWIDTH                                                                                                                                                                                                                                                                                 |
 | `aspect_ratio`  | The aspect ratio of the axes ("auto" or "equal"). See ASPECT_RATIO. **TYPE:** \`ASPECT_RATIO                                                                                                                                                                                                                                                                                                                                        |
 | `orientation`   | The orientation of the rainclouds (vertical or horizontal). **TYPE:** \`ORIENTATION                                                                                                                                                                                                                                                                                                                                                 |
@@ -25677,8 +25677,8 @@ RidgelinePlot(
     overlap: float | None = None,
     ridge_scale: RIDGELINE_SCALE | str | None = None,
     inner: VIOLIN_INNER | str | None = None,
-    fill: bool = True,
-    show_outline: bool = True,
+    fill: bool | None = None,
+    show_outline: bool | None = None,
     sort: SORT | str | None = SORT.NONE,
     normalize: RIDGELINE_SCALE | str | None = None
 ) -> plt.Figure
@@ -25752,9 +25752,9 @@ Examples:
 | `bandwidth`     | The KDE bandwidth: None or "scott" (Scott's rule), "silverman", or a scalar factor. See BANDWIDTH. **TYPE:** \`BANDWIDTH                                                                                                                                                                                                                                                                                                            |
 | `overlap`       | How far a ridge's peak rises into the row above, in \[0, 1\]: a ridge rises from its tick and its peak stands 1 + overlap rows above it, so 0 makes rows touch. None takes the theme's chart_default_ridgeline_overlap. **TYPE:** \`float                                                                                                                                                                                           |
 | `ridge_scale`   | "per_row" (default) scales every ridge to the same peak so shapes compare; "common" keeps one density scale so heights compare. See RIDGELINE_SCALE. **TYPE:** \`RIDGELINE_SCALE                                                                                                                                                                                                                                                    |
-| `inner`         | The marks drawn inside each ridge, up to its height: "median" (one line), "quartiles" (dashed median, dotted Q1/Q3), or None. See VIOLIN_INNER; "box" is not supported. **TYPE:** \`VIOLIN_INNER                                                                                                                                                                                                                                    |
-| `fill`          | Whether to fill each ridge. **TYPE:** `bool` **DEFAULT:** `True`                                                                                                                                                                                                                                                                                                                                                                    |
-| `show_outline`  | Whether to stroke each ridge's density curve. **TYPE:** `bool` **DEFAULT:** `True`                                                                                                                                                                                                                                                                                                                                                  |
+| `inner`         | The marks drawn inside each ridge, up to its height: "median" (one line), "quartiles" (dashed median, dotted Q1/Q3), or None or "none" (no marks). See VIOLIN_INNER; "box" is not supported. **TYPE:** \`VIOLIN_INNER                                                                                                                                                                                                               |
+| `fill`          | Whether to fill each ridge. None takes the theme's chart_default_ridgeline_fill. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                   |
+| `show_outline`  | Whether to stroke each ridge's density curve. None takes the theme's chart_default_ridgeline_show_outline. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                         |
 | `sort`          | The row order: None keeps input order, "ascending" or "descending" orders the rows by their median; ties keep input order. See SORT. **TYPE:** \`SORT                                                                                                                                                                                                                                                                               |
 | `normalize`     | Deprecated; use ridge_scale. Removed in the next release. **TYPE:** \`RIDGELINE_SCALE                                                                                                                                                                                                                                                                                                                                               |
 
@@ -31271,7 +31271,7 @@ Bases: `Domain`
 
 The supported violin inner marks.
 
-Passed as the `inner` setting of violin plots; `None` draws the body only.
+Passed as the `inner` setting of violin and ridgeline plots. On a violin plot `None` takes the theme's default; on a ridgeline plot it draws no marks.
 
 Examples:
 
@@ -31283,10 +31283,11 @@ Examples:
 
 | ATTRIBUTE   | DESCRIPTION                                                                                                                 |
 | ----------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `DEFAULT`   | The violin plot's default inner marks. Same as VIOLIN_INNER.BOX. **TYPE:** `str`                                            |
+| `DEFAULT`   | The violin plot's inner marks when the theme sets none. Same as VIOLIN_INNER.BOX. **TYPE:** `str`                           |
 | `BOX`       | A thin quartile bar, a 1.5·IQR whisker line, and a median dot. Equals to "box". **TYPE:** `str`                             |
 | `QUARTILES` | A dashed median line and dotted first and third quartile lines, clipped to the body. Equals to "quartiles". **TYPE:** `str` |
 | `MEDIAN`    | A single solid median line clipped to the body. Equals to "median". **TYPE:** `str`                                         |
+| `NO_INNER`  | No inner marks, the body alone. Equals to "none". **TYPE:** `str`                                                           |
 
 ### datachart.constants.BANDWIDTH
 
@@ -32521,6 +32522,10 @@ A theme default for a front parameter is `chart_default_<parameter>` when severa
 | `chart_default_show_values`                 | The theme default for show_values, applied to every chart that takes it when the chart call leaves it unset. None means the theme has no opinion. **TYPE:** \`bool                                                                                                                    |
 | `chart_default_calendar_heatmap_week_start` | The theme default for the calendar heatmap's week_start, the weekday in the top row of every week. **TYPE:** \`CALENDAR_WEEKDAY                                                                                                                                                       |
 | `chart_default_ridgeline_overlap`           | The theme default for the ridgeline plot's overlap, how far a peak rises into the row above, in [0, 1]. **TYPE:** \`float                                                                                                                                                             |
+| `chart_default_ridgeline_fill`              | The theme default for the ridgeline plot's fill, whether each ridge is filled. **TYPE:** \`bool                                                                                                                                                                                       |
+| `chart_default_ridgeline_show_outline`      | The theme default for the ridgeline plot's show_outline, whether each ridge's density curve is stroked. **TYPE:** \`bool                                                                                                                                                              |
+| `chart_default_violin_inner`                | The theme default for the violin plot's inner, the marks drawn inside each body. **TYPE:** \`VIOLIN_INNER                                                                                                                                                                             |
+| `chart_default_jitter`                      | The theme default for jitter, the strip width of swarm and raincloud points, as a fraction of the category width. **TYPE:** \`float                                                                                                                                                   |
 | `chart_default_network_label_position`      | The theme default for the network chart's label_position, applied when the chart call leaves it unset. None means the theme has no opinion. **TYPE:** \`NETWORK_LABEL_POSITION                                                                                                        |
 | `plot_hatch_cycle`                          | The hatch patterns assigned per bar/histogram series, parallel to the color cycle; with plot_etch on, line area fills and stacked areas take them too. An explicit per-chart hatch style wins. None disables the cycle. **TYPE:** \`list[str]                                         |
 | `plot_linestyle_cycle`                      | The line styles assigned per line, bump and radial line series, parallel to the color cycle: a line style, or a dash pattern \[offset, [on, off, ...]\]. An explicit per-chart line style wins. None disables the cycle. **TYPE:** \`list\[LINE_STYLE                                 |

@@ -491,13 +491,13 @@ Panel(
 ).show()
 ```
 
-A violin body behind the box adds the shape of the distribution: draw the violin with `inner=None`, since the box supplies the summaries, and give the box a white fill so it reads over the body. The Gentoo violin stays wide across its whole box instead of peaking at the median, a hint of two groups of different size inside the species: the two sexes, which the [Multiple Box Plots](#multiple-box-plots) section splits apart.
+A violin body behind the box adds the shape of the distribution: draw the violin with `inner="none"`, since the box supplies the summaries, and give the box a white fill so it reads over the body. The Gentoo violin stays wide across its whole box instead of peaking at the median, a hint of two groups of different size inside the species: the two sexes, which the [Multiple Box Plots](#multiple-box-plots) section splits apart.
 
 ```
 Panel(
     [
         # the body only; the box supplies the summaries
-        ViolinPlot(data=body_mass, inner=None, style={"plot_violin_alpha": 0.3}),
+        ViolinPlot(data=body_mass, inner="none", style={"plot_violin_alpha": 0.3}),
         BoxPlot(
             data=body_mass,
             show_outliers=False,

@@ -7087,7 +7087,7 @@ Panel(
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>A <a href="../../../references/charts/violinplot/#datachart.charts.ViolinPlot">ViolinPlot</a> outlines the shape of each distribution instead. <code>inner=None</code> draws the body only, since the swarm already shows where the values sit, and a low alpha keeps the points legible. With five points in the last era the outline is a guess, which is exactly what the points on top reveal.</p>
+<p>A <a href="../../../references/charts/violinplot/#datachart.charts.ViolinPlot">ViolinPlot</a> outlines the shape of each distribution instead. <code>inner="none"</code> draws the body only, since the swarm already shows where the values sit, and a low alpha keeps the points legible. With five points in the last era the outline is a guess, which is exactly what the points on top reveal.</p>
 </div>
 </div>
 </div>
@@ -7113,7 +7113,7 @@ Panel(
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">Panel</span><span class="p">(</span>
     <span class="p">[</span>
         <span class="c1"># the body only, faded behind the points</span>
-        <span class="n">ViolinPlot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">inauguration_ages</span><span class="p">,</span> <span class="n">inner</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">"plot_violin_alpha"</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">}),</span>
+        <span class="n">ViolinPlot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">inauguration_ages</span><span class="p">,</span> <span class="n">inner</span><span class="o">=</span><span class="s2">"none"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">"plot_violin_alpha"</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">}),</span>
         <span class="n">SwarmPlot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">inauguration_ages</span><span class="p">),</span>
     <span class="p">],</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">"Age of US presidents at inauguration"</span><span class="p">,</span>
@@ -7126,7 +7126,7 @@ Panel(
 <div class="clipboard-copy-txt" id="cell-19">Panel(
     [
         # the body only, faded behind the points
-        ViolinPlot(data=inauguration_ages, inner=None, style={"plot_violin_alpha": 0.3}),
+        ViolinPlot(data=inauguration_ages, inner="none", style={"plot_violin_alpha": 0.3}),
         SwarmPlot(data=inauguration_ages),
     ],
     title="Age of US presidents at inauguration",

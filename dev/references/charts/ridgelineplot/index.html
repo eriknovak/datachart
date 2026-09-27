@@ -4515,8 +4515,8 @@
 <a id="__codelineno-0-122" name="__codelineno-0-122" href="#__codelineno-0-122"></a>    <span class="n">overlap</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-123" name="__codelineno-0-123" href="#__codelineno-0-123"></a>    <span class="n">ridge_scale</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.RIDGELINE_SCALE&lt;/span&gt;" href="../../constants/#datachart.constants.RIDGELINE_SCALE">RIDGELINE_SCALE</a></span> <span class="o">|</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-124" name="__codelineno-0-124" href="#__codelineno-0-124"></a>    <span class="n">inner</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.VIOLIN_INNER&lt;/span&gt;" href="../../constants/#datachart.constants.VIOLIN_INNER">VIOLIN_INNER</a></span> <span class="o">|</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-125" name="__codelineno-0-125" href="#__codelineno-0-125"></a>    <span class="n">fill</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<a id="__codelineno-0-126" name="__codelineno-0-126" href="#__codelineno-0-126"></a>    <span class="n">show_outline</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-0-125" name="__codelineno-0-125" href="#__codelineno-0-125"></a>    <span class="n">fill</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-126" name="__codelineno-0-126" href="#__codelineno-0-126"></a>    <span class="n">show_outline</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-127" name="__codelineno-0-127" href="#__codelineno-0-127"></a>    <span class="n">sort</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.SORT&lt;/span&gt;" href="../../constants/#datachart.constants.SORT">SORT</a></span> <span class="o">|</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.SORT&lt;/span&gt;" href="../../constants/#datachart.constants.SORT">SORT</a></span><span class="o">.</span><span class="n"><span title="datachart.constants.SORT.NONE">NONE</span></span><span class="p">,</span>
 <a id="__codelineno-0-128" name="__codelineno-0-128" href="#__codelineno-0-128"></a>    <span class="n">normalize</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.RIDGELINE_SCALE&lt;/span&gt;" href="../../constants/#datachart.constants.RIDGELINE_SCALE">RIDGELINE_SCALE</a></span> <span class="o">|</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 <a id="__codelineno-0-129" name="__codelineno-0-129" href="#__codelineno-0-129"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="matplotlib.pyplot">plt</span></span><span class="o">.</span><span class="n"><span title="matplotlib.pyplot.Figure">Figure</span></span>
@@ -5454,7 +5454,7 @@ shapes compare; "common" keeps one density scale so heights compare. See
             <td class="doc-param-details">
               <div class="doc-md-description">
                 <p>The marks drawn inside each ridge, up to its height: "median" (one line),
-"quartiles" (dashed median, dotted Q1/Q3), or None. See
+"quartiles" (dashed median, dotted Q1/Q3), or None or "none" (no marks). See
 <a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.VIOLIN_INNER&lt;/span&gt;" href="../../constants/#datachart.constants.VIOLIN_INNER"><code>VIOLIN_INNER</code></a>; "box" is not supported.</p>
               </div>
               <p>
@@ -5475,16 +5475,17 @@ shapes compare; "common" keeps one density scale so heights compare. See
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>Whether to fill each ridge.</p>
+                <p>Whether to fill each ridge. None takes the theme's
+<code>chart_default_ridgeline_fill</code>.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
                     <b>TYPE:</b>
-                      <code><span title="bool">bool</span></code>
+                      <code><span title="bool">bool</span> | None</code>
                   </span>
                   <span class="doc-param-default">
                     <b>DEFAULT:</b>
-                      <code>True</code>
+                      <code>None</code>
                   </span>
               </p>
             </td>
@@ -5495,16 +5496,17 @@ shapes compare; "common" keeps one density scale so heights compare. See
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>Whether to stroke each ridge's density curve.</p>
+                <p>Whether to stroke each ridge's density curve. None takes
+the theme's <code>chart_default_ridgeline_show_outline</code>.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
                     <b>TYPE:</b>
-                      <code><span title="bool">bool</span></code>
+                      <code><span title="bool">bool</span> | None</code>
                   </span>
                   <span class="doc-param-default">
                     <b>DEFAULT:</b>
-                      <code>True</code>
+                      <code>None</code>
                   </span>
               </p>
             </td>

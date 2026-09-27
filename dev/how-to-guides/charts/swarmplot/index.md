@@ -447,13 +447,13 @@ Panel(
 ).show()
 ```
 
-A [ViolinPlot](https://eriknovak.github.io/datachart/dev/references/charts/violinplot/#datachart.charts.ViolinPlot) outlines the shape of each distribution instead. `inner=None` draws the body only, since the swarm already shows where the values sit, and a low alpha keeps the points legible. With five points in the last era the outline is a guess, which is exactly what the points on top reveal.
+A [ViolinPlot](https://eriknovak.github.io/datachart/dev/references/charts/violinplot/#datachart.charts.ViolinPlot) outlines the shape of each distribution instead. `inner="none"` draws the body only, since the swarm already shows where the values sit, and a low alpha keeps the points legible. With five points in the last era the outline is a guess, which is exactly what the points on top reveal.
 
 ```
 Panel(
     [
         # the body only, faded behind the points
-        ViolinPlot(data=inauguration_ages, inner=None, style={"plot_violin_alpha": 0.3}),
+        ViolinPlot(data=inauguration_ages, inner="none", style={"plot_violin_alpha": 0.3}),
         SwarmPlot(data=inauguration_ages),
     ],
     title="Age of US presidents at inauguration",

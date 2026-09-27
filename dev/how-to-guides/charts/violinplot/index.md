@@ -123,12 +123,12 @@ ViolinPlot(
 
 ### Inner marks
 
-The body shows the shape, and the marks inside it give the numbers to read against: where the median is, and where the middle half of the birds sits. `inner` picks them from [VIOLIN_INNER](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VIOLIN_INNER): `VIOLIN_INNER.BOX` (the default) draws a thin quartile bar, a whisker line and a median dot, the summary of a box plot; `VIOLIN_INNER.QUARTILES` draws a dashed median and dotted quartile lines across the body, which keep the shape in view; `VIOLIN_INNER.MEDIAN` draws the median line alone; `None` draws the body only. The quartile lines show what the box hides: the Gentoo median falls near the waist of the body, between the two clusters, where fewer birds actually sit.
+The body shows the shape, and the marks inside it give the numbers to read against: where the median is, and where the middle half of the birds sits. `inner` picks them from [VIOLIN_INNER](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VIOLIN_INNER): `VIOLIN_INNER.BOX` (the default) draws a thin quartile bar, a whisker line and a median dot, the summary of a box plot; `VIOLIN_INNER.QUARTILES` draws a dashed median and dotted quartile lines across the body, which keep the shape in view; `VIOLIN_INNER.MEDIAN` draws the median line alone; `VIOLIN_INNER.NO_INNER` draws the body only. The quartile lines show what the box hides: the Gentoo median falls near the waist of the body, between the two clusters, where fewer birds actually sit.
 
 ```
 from datachart.constants import VIOLIN_INNER
 
-for inner in [VIOLIN_INNER.QUARTILES, None]:
+for inner in [VIOLIN_INNER.QUARTILES, VIOLIN_INNER.NO_INNER]:
     ViolinPlot(
         data=penguins,
         # the marks drawn inside each body
@@ -487,7 +487,7 @@ ViolinPlot(
 
 ### Violins with boxes and swarms
 
-The violin shows the shape, a box plot the standard summary, and a swarm plot every single observation; one chart rarely needs all three, but a figure that must convince a skeptical reader sometimes does. A violin plot draws its groups at the same positions as a [BoxPlot](https://eriknovak.github.io/datachart/dev/references/charts/boxplot/#datachart.charts.BoxPlot) or a [SwarmPlot](https://eriknovak.github.io/datachart/dev/references/charts/swarmplot/#datachart.charts.SwarmPlot) with the same labels, so [Panel](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) overlays them: the violin with `inner=None` supplies the body, the box plot drawn over it supplies the whiskers and outliers. A panel takes one violin plot, and all its figures must group the same labels in the same order. The [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) guide covers the rest.
+The violin shows the shape, a box plot the standard summary, and a swarm plot every single observation; one chart rarely needs all three, but a figure that must convince a skeptical reader sometimes does. A violin plot draws its groups at the same positions as a [BoxPlot](https://eriknovak.github.io/datachart/dev/references/charts/boxplot/#datachart.charts.BoxPlot) or a [SwarmPlot](https://eriknovak.github.io/datachart/dev/references/charts/swarmplot/#datachart.charts.SwarmPlot) with the same labels, so [Panel](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Panel) overlays them: the violin with `inner="none"` supplies the body, the box plot drawn over it supplies the whiskers and outliers. A panel takes one violin plot, and all its figures must group the same labels in the same order. The [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md) guide covers the rest.
 
 ```
 from datachart.charts import BoxPlot, SwarmPlot
@@ -496,7 +496,7 @@ from datachart.utils import Panel
 Panel(
     [
         # the body only; the box plot supplies the summary
-        ViolinPlot(data=penguins, inner=None, style={"plot_violin_alpha": 0.4}),
+        ViolinPlot(data=penguins, inner="none", style={"plot_violin_alpha": 0.4}),
         BoxPlot(
             data=penguins,
             style={"plot_box_color": "#ffffff", "plot_box_alpha": 0.9, "plot_box_width": 0.15},
@@ -516,7 +516,7 @@ A swarm plot draws every bird as a point, so the reader can check that the smoot
 Panel(
     [
         # the body only, faded behind the points
-        ViolinPlot(data=penguins, inner=None, style={"plot_violin_alpha": 0.25}),
+        ViolinPlot(data=penguins, inner="none", style={"plot_violin_alpha": 0.25}),
         SwarmPlot(data=penguins, style={"plot_swarm_size": 6}),
     ],
     title="Body mass of Palmer penguins, every bird",
@@ -661,7 +661,7 @@ violins = ViolinPlot(
 )
 boxes = Panel(
     [
-        ViolinPlot(data=response_times, inner=None, style={"plot_violin_alpha": 0.25}),
+        ViolinPlot(data=response_times, inner="none", style={"plot_violin_alpha": 0.25}),
         BoxPlot(data=response_times, show_outliers=False),
     ],
     title="Box over the body",
@@ -717,7 +717,7 @@ def measurement_panel(data, title, unit, note):
         [
             ViolinPlot(
                 data=data,
-                inner=None,
+                inner="none",
                 style={"plot_violin_alpha": 0.25},
                 texts={"text": note, "x": 0.02, "y": 0.92, "coords": "axes"},
             ),

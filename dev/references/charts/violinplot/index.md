@@ -130,7 +130,7 @@ ViolinPlot(
     ) = None,
     label: str | list[str | None] | None = None,
     value: str | list[str | None] | None = None,
-    inner: VIOLIN_INNER | str | None = VIOLIN_INNER.BOX,
+    inner: VIOLIN_INNER | str | None = None,
     bandwidth: BANDWIDTH | str | float | None = None,
     split: str | None = None
 ) -> plt.Figure
@@ -204,7 +204,7 @@ Examples:
 | `texts`         | Text annotation(s) to draw. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                                                                                                                                                                                                            |
 | `label`         | The key name in data for label/category values (default: "label"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                  |
 | `value`         | The key name in data for numeric values (default: "value"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                         |
-| `inner`         | The marks drawn inside each body: "box" (quartile bar, 1.5·IQR whisker, median dot), "quartiles" (dashed median, dotted Q1/Q3), "median" (one line), or None (body only). See VIOLIN_INNER. **TYPE:** \`VIOLIN_INNER                                                                                                                                                                                                                |
+| `inner`         | The marks drawn inside each body: "box" (quartile bar, 1.5·IQR whisker, median dot), "quartiles" (dashed median, dotted Q1/Q3), "median" (one line), or "none" (body only). None takes the theme's chart_default_violin_inner. See VIOLIN_INNER. **TYPE:** \`VIOLIN_INNER                                                                                                                                                           |
 | `bandwidth`     | The KDE bandwidth: None or "scott" (Scott's rule), "silverman", or a scalar factor. See BANDWIDTH. **TYPE:** \`BANDWIDTH                                                                                                                                                                                                                                                                                                            |
 | `split`         | The key name in data whose exactly two distinct values become the left and right halves of each violin, colored from the multiple palette and listed in the legend. **TYPE:** \`str                                                                                                                                                                                                                                                 |
 

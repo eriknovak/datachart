@@ -10870,7 +10870,9 @@ plots, and violin plots.</p>
 
 
         <p>The supported violin inner marks.</p>
-<p>Passed as the <code>inner</code> setting of violin plots; <code>None</code> draws the body only.</p>
+<p>Passed as the <code>inner</code> setting of violin and ridgeline plots. On a violin
+plot <code>None</code> takes the theme's default; on a ridgeline plot it draws no
+marks.</p>
 <p><img alt="VIOLIN_INNER at a glance" src="../../assets/imgs/const-violin-inner.svg" width="100%" /></p>
 
 
@@ -10893,7 +10895,8 @@ plots, and violin plots.</p>
             <td><code><span title="datachart.constants.VIOLIN_INNER.DEFAULT">DEFAULT</span></code></td>
             <td class="doc-attribute-details">
               <div class="doc-md-description">
-                <p>The violin plot's default inner marks. Same as <code>VIOLIN_INNER.BOX</code>.</p>
+                <p>The violin plot's inner marks when the theme sets none.
+Same as <code>VIOLIN_INNER.BOX</code>.</p>
               </div>
               <p>
                   <span class="doc-attribute-annotation">
@@ -10939,6 +10942,20 @@ quartile lines, clipped to the body. Equals to <code>"quartiles"</code>.</p>
               <div class="doc-md-description">
                 <p>A single solid median line clipped to the body. Equals
 to <code>"median"</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.constants.VIOLIN_INNER.NO_INNER">NO_INNER</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>No inner marks, the body alone. Equals to <code>"none"</code>.</p>
               </div>
               <p>
                   <span class="doc-attribute-annotation">
