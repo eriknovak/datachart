@@ -32,7 +32,8 @@ adds no tag; one that reverses, narrows, widens or replaces a commitment does.
 
 ## Drawing seam and figure lifecycle
 
-- [0001](0001-layer-panel-drawing-seam.md) — One Layer/Panel drawing seam; style resolved at construction
+- [0001](0001-layer-panel-drawing-seam.md) — One Layer/Panel drawing seam; style resolved at construction (amended by [0086](0086-layers-package-and-two-check-mechanisms.md))
+- [0086](0086-layers-package-and-two-check-mechanisms.md) — The drawing seam is a package; a capability is a mixin, a group policy is a row field
 - [0003](0003-explicit-settings-seam.md) — Chart fronts pass explicit settings; the attrs dict is retired (amended by [0066](0066-front-body-one-call.md))
 - [0008](0008-unmanaged-figures.md) — Figures are unmanaged; showing is explicit via `Figure.show()` (amended by [0031](0031-interactive-show-hover-seam.md))
 - [0031](0031-interactive-show-hover-seam.md) — `show(interactive=True)` is the single interactive opt-in, fed by a per-layer hover seam
