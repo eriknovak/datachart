@@ -1168,10 +1168,11 @@ class ThemeDefaultAttrs(TypedDict):
             per bar/histogram series, parallel to the color cycle; with
             `plot_etch` on, line area fills and stacked areas take them too. An
             explicit per-chart hatch style wins. `None` disables the cycle.
-        plot_linestyle_cycle (Union[List[Union[LINE_STYLE, str]], None]): The
-            line styles assigned per line, bump and radial line series, parallel
-            to the color cycle. An explicit per-chart line style wins. `None`
-            disables the cycle.
+        plot_linestyle_cycle (Union[List[Union[LINE_STYLE, str, List[Union[float, List[float]]]]], None]):
+            The line styles assigned per line, bump and radial line series,
+            parallel to the color cycle: a line style, or a dash pattern
+            `[offset, [on, off, ...]]`. An explicit per-chart line style wins.
+            `None` disables the cycle.
         plot_marker_cycle (Union[List[Union[LINE_MARKER, str, Dict[str, Union[str, bool]]]], None]):
             The markers assigned per scatter and radial scatter series,
             parallel to the color cycle, and per network node group: a marker,
@@ -1186,7 +1187,10 @@ class ThemeDefaultAttrs(TypedDict):
     chart_default_ridgeline_overlap: Union[float, None]
     chart_default_network_label_position: Union[NETWORK_LABEL_POSITION, str, None]
     plot_hatch_cycle: Union[List[str], None]
-    plot_linestyle_cycle: Union[List[Union[LINE_STYLE, str]], None]
+    # a dash pattern is a list, not a tuple, so it survives a JSON round trip
+    plot_linestyle_cycle: Union[
+        List[Union[LINE_STYLE, str, List[Union[float, List[float]]]]], None
+    ]
     plot_marker_cycle: Union[
         List[Union[LINE_MARKER, str, Dict[str, Union[str, bool]]]], None
     ]
@@ -1654,11 +1658,24 @@ class _LineSingleChartAttrs(TypedDict):
 # ================================================
 
 
+class StackedAreaRecordAttrs(TypedDict):
+    """One record of the stacked area chart.
+
+    Attributes:
+        x (Union[int, float]): The x-axis value.
+        y (Union[int, float]): The y-axis value.
+
+    """
+
+    x: Union[int, float]
+    y: Union[int, float]
+
+
 class _StackedAreaSingleChartAttrs(TypedDict):
     """The single chart attributes for the stacked area chart.
 
     Attributes:
-        data (List[LineRecordAttrs]): The list of data points defining one series; every series shares the same `x` values.
+        data (List[StackedAreaRecordAttrs]): The list of data points defining one series; every series shares the same `x` values.
         subtitle (Union[str, None]): The subtitle of the series. Also used as the label in the legend.
         xlabel (Union[str, None]): The xlabel of the chart.
         ylabel (Union[str, None]): The ylabel of the chart.
@@ -1681,7 +1698,7 @@ class _StackedAreaSingleChartAttrs(TypedDict):
 
     """
 
-    data: List[LineRecordAttrs]
+    data: List[StackedAreaRecordAttrs]
     subtitle: Union[str, None]
     xlabel: Union[str, None]
     ylabel: Union[str, None]
@@ -1711,11 +1728,24 @@ class _StackedAreaSingleChartAttrs(TypedDict):
 # ================================================
 
 
+class BumpRecordAttrs(TypedDict):
+    """One record of the bump chart.
+
+    Attributes:
+        x (Union[int, float]): The x-axis value.
+        y (Union[int, float]): The y-axis value.
+
+    """
+
+    x: Union[int, float]
+    y: Union[int, float]
+
+
 class _BumpSingleChartAttrs(TypedDict):
     """The single chart attributes for the bump chart.
 
     Attributes:
-        data (List[LineRecordAttrs]): The list of data points defining one series; `y` is a value ranked per period, or the rank itself.
+        data (List[BumpRecordAttrs]): The list of data points defining one series; `y` is a value ranked per period, or the rank itself.
         subtitle (Union[str, None]): The subtitle of the series. Also used as its end label and legend label.
         xlabel (Union[str, None]): The xlabel of the chart.
         ylabel (Union[str, None]): The ylabel of the chart.
@@ -1735,7 +1765,7 @@ class _BumpSingleChartAttrs(TypedDict):
 
     """
 
-    data: List[LineRecordAttrs]
+    data: List[BumpRecordAttrs]
     subtitle: Union[str, None]
     xlabel: Union[str, None]
     ylabel: Union[str, None]
