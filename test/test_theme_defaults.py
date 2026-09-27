@@ -506,7 +506,7 @@ class TestDarkTheme(unittest.TestCase):
     def test_the_colorbar_labels_follow_the_theme(self):
         """A colorbar's ticks and outline are furniture too (ADR 0058)."""
         config.set_theme(THEME.DARK)
-        figure = Heatmap(HEAT, show_colorbars=True)
+        figure = Heatmap(HEAT, show_colorbar=True)
         bar_axes = [ax for ax in figure.axes if ax is not figure.axes[0]]
         self.assertTrue(bar_axes)
         labels = bar_axes[0].get_yticklabels() or bar_axes[0].get_xticklabels()
@@ -550,7 +550,7 @@ class TestFurnitureFollowsEveryTheme(unittest.TestCase):
             with self.subTest(theme=theme):
                 config.set_theme(theme)
                 expected = config["font_general_color"]
-                figure = Heatmap(HEAT, show_colorbars=True)
+                figure = Heatmap(HEAT, show_colorbar=True)
                 bars = [ax for ax in figure.axes if ax is not figure.axes[0]]
                 if not bars:
                     # a value-etch theme draws a stepped legend, not a bar

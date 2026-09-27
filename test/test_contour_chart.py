@@ -97,7 +97,7 @@ class TestContourValidation(unittest.TestCase):
 
     def test_emphasis_rejected_when_filled(self):
         with self.assertRaises(ValueError):
-            ContourChart(data=surface(), filled=True, emphasis="highlight")
+            ContourChart(data=surface(), fill=True, emphasis="highlight")
 
     def test_invalid_levels_rule(self):
         with self.assertRaises(ValueError):
@@ -129,7 +129,7 @@ class TestContourDraw(unittest.TestCase):
         self.assertTrue(ax.yaxis.get_gridlines()[0].get_visible())
 
     def test_filled_uses_cmap_no_grid_and_colorbar(self):
-        figure = ContourChart(data=surface(), filled=True, show_colorbars=True)
+        figure = ContourChart(data=surface(), fill=True, show_colorbar=True)
         ax = figure.axes[0]
         sets = _contour_sets(ax)
         self.assertTrue(sets[0].filled)
@@ -139,7 +139,7 @@ class TestContourDraw(unittest.TestCase):
         self.assertEqual(len(figure.axes), 2)
 
     def test_lines_without_colorbar(self):
-        figure = ContourChart(data=surface(), show_colorbars=True)
+        figure = ContourChart(data=surface(), show_colorbar=True)
         self.assertEqual(len(figure.axes), 1)
 
     def test_line_cmap_truncated_when_pinned(self):
@@ -194,7 +194,7 @@ class TestContourDraw(unittest.TestCase):
     def test_explicit_levels_below_the_peak_fill_the_top(self):
         x = np.arange(10)
         z = (np.add.outer(x, x) ** 2 / 4).tolist()  # 0 .. 81
-        figure = ContourChart(data={"z": z}, filled=True, levels=[0, 10, 20])
+        figure = ContourChart(data={"z": z}, fill=True, levels=[0, 10, 20])
         (bands,) = _contour_sets(figure.axes[0])
         self.assertEqual(bands.extend, "max")
         # one band per level pair, plus the overflow band above 20
@@ -211,7 +211,7 @@ class TestContourDraw(unittest.TestCase):
         }
         for extend, levels in cases.items():
             with self.subTest(extend=extend):
-                figure = ContourChart(data={"z": z}, filled=True, levels=levels)
+                figure = ContourChart(data={"z": z}, fill=True, levels=levels)
                 self.assertEqual(_contour_sets(figure.axes[0])[0].extend, extend)
 
     def test_filled_contour_needs_two_levels(self):
@@ -219,19 +219,19 @@ class TestContourDraw(unittest.TestCase):
         for levels in ([7], [7, 7.0]):
             with self.subTest(levels=levels):
                 with self.assertRaisesRegex(ValueError, "at least two distinct levels"):
-                    ContourChart(data={"z": z}, filled=True, levels=levels)
+                    ContourChart(data={"z": z}, fill=True, levels=levels)
         lines = ContourChart(data={"z": z}, levels=[7])
         self.assertEqual(len(_contour_sets(lines.axes[0])), 1)
 
     def test_auto_and_count_levels_do_not_extend(self):
         for levels in (None, 4, CONTOUR_LEVELS.RICE):
             with self.subTest(levels=levels):
-                figure = ContourChart(data=surface(), filled=True, levels=levels)
+                figure = ContourChart(data=surface(), fill=True, levels=levels)
                 self.assertEqual(_contour_sets(figure.axes[0])[0].extend, "neither")
 
     def test_extended_band_hover_spans_to_the_surface_end(self):
         z = [[0.0, 5.0], [10.0, 15.0]]
-        figure = ContourChart(data={"z": z}, filled=True, levels=[5, 10])
+        figure = ContourChart(data={"z": z}, fill=True, levels=[5, 10])
         ax = figure.axes[0]
         (bands,) = _contour_sets(ax)
         (resolve,) = [r for artist, r in figure._hover_targets if artist is bands]
@@ -256,7 +256,7 @@ class TestContourDraw(unittest.TestCase):
 
     def test_all_none_emphasis_allowed_when_filled(self):
         figure = ContourChart(
-            data=[bump(-2, -1), bump(2, 1)], filled=True, emphasis=[None, None]
+            data=[bump(-2, -1), bump(2, 1)], fill=True, emphasis=[None, None]
         )
         self.assertEqual(len(_contour_sets(figure.axes[0])), 2)
 
@@ -278,7 +278,7 @@ class TestContourDraw(unittest.TestCase):
 
     def test_filled_legend_swatch(self):
         figure = ContourChart(
-            data=bump(0, 0), subtitle="density", filled=True, show_legend=True
+            data=bump(0, 0), subtitle="density", fill=True, show_legend=True
         )
         legend = figure.axes[0].get_legend()
         self.assertEqual([t.get_text() for t in legend.get_texts()], ["density"])
@@ -309,7 +309,7 @@ class TestContourDraw(unittest.TestCase):
         self.assertEqual([t.get_text() for t in legend.get_texts()], ["B"])
 
     def test_norm_and_vmin_vmax(self):
-        figure = ContourChart(data=surface(), filled=True, vmin=0, vmax=500)
+        figure = ContourChart(data=surface(), fill=True, vmin=0, vmax=500)
         cs = _contour_sets(figure.axes[0])[0]
         self.assertEqual((cs.norm.vmin, cs.norm.vmax), (0, 500))
 
@@ -350,7 +350,7 @@ class TestContourCompose(unittest.TestCase):
         points = [{"x": float(x), "y": float(y)} for x, y in rng.normal(0, 1, (30, 2))]
         panel = Panel(
             [
-                ContourChart(data=bump(0, 0), filled=True),
+                ContourChart(data=bump(0, 0), fill=True),
                 ScatterChart(data=points),
             ],
         )
@@ -374,7 +374,7 @@ class TestContourCompose(unittest.TestCase):
 
     def test_reference_line_draws_over_filled_contour(self):
         figure = ContourChart(
-            data=bump(0, 0), filled=True, hlines={"y": 0, "label": "ref"}
+            data=bump(0, 0), fill=True, hlines={"y": 0, "label": "ref"}
         )
         ax = figure.axes[0]
         (line,) = [c for c in ax.collections if c.get_label() == "ref"]
@@ -383,7 +383,7 @@ class TestContourCompose(unittest.TestCase):
     def test_grid_nesting(self):
         fig = Grid(
             [
-                [ContourChart(data=surface(), filled=True, title="fill")],
+                [ContourChart(data=surface(), fill=True, title="fill")],
                 [
                     LineChart(data=[{"x": i, "y": i} for i in range(5)]),
                     ContourChart(data=surface(), show_labels=True, title="lines"),
@@ -473,15 +473,15 @@ class TestContourCentredNorm(unittest.TestCase):
     """A centred norm holds `vcenter` mid-colormap, as on the heatmap."""
 
     def test_vcenter_moves_the_centre_of_filled_bands(self):
-        ax = ContourChart(surface(), filled=True, norm="centered", vcenter=2).axes[0]
+        ax = ContourChart(surface(), fill=True, norm="centered", vcenter=2).axes[0]
         bands = _contour_sets(ax)[0]
         self.assertIsInstance(bands.norm, matplotlib.colors.CenteredNorm)
         self.assertEqual(bands.norm.vcenter, 2)
         self.assertEqual(bands.cmap.name, config["plot_heatmap_cmap_diverging"])
 
     def test_twoslope_keeps_its_bounds(self):
-        ax = ContourChart(
-            surface(), filled=True, norm="twoslope", vmin=-1, vmax=4
-        ).axes[0]
+        ax = ContourChart(surface(), fill=True, norm="twoslope", vmin=-1, vmax=4).axes[
+            0
+        ]
         norm = _contour_sets(ax)[0].norm
         self.assertEqual((norm.vmin, norm.vcenter, norm.vmax), (-1, 0, 4))

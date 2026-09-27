@@ -596,14 +596,14 @@ class TestComposedWithGeographicCharts(unittest.TestCase):
 
     def hexbin(self, **kwargs):
         return HexbinChart(
-            {"x": self.lon.tolist(), "y": self.lat.tolist()}, gridsize=25, **kwargs
+            {"x": self.lon.tolist(), "y": self.lat.tolist()}, grid_size=25, **kwargs
         )
 
     def test_hexbin_with_mincnt_and_alpha_shows_the_land_between_cells(self):
         figure = Panel(
             [
                 BasemapChart(),
-                self.hexbin(mincnt=1, style={"plot_hexbin_alpha": 0.75}),
+                self.hexbin(min_count=1, style={"plot_hexbin_alpha": 0.75}),
             ],
             xmin=19,
             xmax=45,
@@ -618,8 +618,8 @@ class TestComposedWithGeographicCharts(unittest.TestCase):
         self.assertGreater(np.abs(pixel(figure, 31, 39.5) - self.land).max(), 0.03)
 
     def test_hexbin_keeps_its_colorbar_and_limits(self):
-        alone = self.hexbin(mincnt=1)
-        composed = Panel([BasemapChart(), self.hexbin(mincnt=1)])
+        alone = self.hexbin(min_count=1)
+        composed = Panel([BasemapChart(), self.hexbin(min_count=1)])
         self.assertEqual(len(composed.axes), len(alone.axes))
         self.assertEqual(composed.axes[0].get_xlim(), alone.axes[0].get_xlim())
 
@@ -628,9 +628,9 @@ class TestComposedWithGeographicCharts(unittest.TestCase):
         ys = np.linspace(34, 42, 15)
         z = np.exp(-((xs[None, :] - 30) ** 2 / 20 + (ys[:, None] - 38) ** 2 / 4))
         data = {"x": xs.tolist(), "y": ys.tolist(), "z": z.tolist()}
-        for filled in (False, True):
-            with self.subTest(filled=filled):
-                figure = Panel([BasemapChart(), ContourChart(data, filled=filled)])
+        for fill in (False, True):
+            with self.subTest(fill=fill):
+                figure = Panel([BasemapChart(), ContourChart(data, fill=fill)])
                 ax = figure.axes[0]
                 (land,) = [p for p in ax.patches if isinstance(p, PathPatch)]
                 marks = [c for c in ax.collections if not isinstance(c, LineCollection)]
@@ -659,7 +659,7 @@ class TestComposedWithGeographicCharts(unittest.TestCase):
                 [
                     Panel([BasemapChart(), ScatterChart(points())]),
                     Panel(
-                        [BasemapChart(), self.hexbin(mincnt=1)],
+                        [BasemapChart(), self.hexbin(min_count=1)],
                         aspect_ratio=ASPECT_RATIO.GEOGRAPHIC,
                     ),
                 ]

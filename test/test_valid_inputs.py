@@ -145,9 +145,9 @@ class TestOneElementLists(ValidInputCase):
             "value_format": lambda: Heatmap(
                 Z, show_values=True, value_format=["{x:.1f}"]
             ),
-            "gridsize": lambda: HexbinChart(
+            "grid_size": lambda: HexbinChart(
                 {"x": list(range(20)), "y": [i % 3 for i in range(20)]},
-                gridsize=[5],
+                grid_size=[5],
             ),
             "x": lambda: LineChart(RECORDS, x=["a"], y="b"),
             "hue": lambda: ScatterChart(RECORDS, x="a", y="b", hue=["c"]),

@@ -331,7 +331,7 @@ class TestCalendarFront(unittest.TestCase):
         figure = calendar(
             date(2024, 1, 1),
             5,
-            show_colorbars=True,
+            show_colorbar=True,
             colorbar={"label": "Steps", "location": COLORBAR_LOCATION.BOTTOM},
         )
         bars = [ax for ax in _all_axes(figure) if ax.get_xlabel() == "Steps"]

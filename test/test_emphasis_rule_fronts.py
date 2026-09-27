@@ -132,7 +132,7 @@ class TestSeriesFronts:
     def test_filled_contours_reject_the_rule(self):
         grid = {"x": [0, 1], "y": [0, 1], "z": [[0, 1], [1, 2]]}
         with pytest.raises(ValueError, match="filled"):
-            ContourChart(grid, filled=True, emphasis_rule={"top": 1})
+            ContourChart(grid, fill=True, emphasis_rule={"top": 1})
 
     def test_unknown_by_raises_at_the_front(self):
         with pytest.raises(ValueError, match="`by`"):
@@ -382,7 +382,7 @@ class TestCellFronts:
 
     def test_hexbin_rule_mutes_bins(self):
         figure = HexbinChart(
-            self.POINTS, gridsize=5, mincnt=1, emphasis_rule={"top": 1}
+            self.POINTS, grid_size=5, min_count=1, emphasis_rule={"top": 1}
         )
         tiles, outline = figure.axes[0].collections[:2]
         assert len(tiles.get_offsets()) == 3
@@ -393,13 +393,13 @@ class TestCellFronts:
 
     def test_hexbin_hover_keeps_bin_values(self):
         figure = HexbinChart(
-            self.POINTS, gridsize=5, mincnt=1, emphasis_rule={"top": 1}
+            self.POINTS, grid_size=5, min_count=1, emphasis_rule={"top": 1}
         )
         ((_, resolve),) = figure._hover_targets
         assert sorted(resolve([i])["count"] for i in range(3)) == [1.0, 2.0, 3.0]
 
     def test_hexbin_bottom_skips_empty_bins(self):
-        figure = HexbinChart(self.POINTS, gridsize=5, emphasis_rule={"bottom": 1})
+        figure = HexbinChart(self.POINTS, grid_size=5, emphasis_rule={"bottom": 1})
         tiles, outline = figure.axes[0].collections[:2]
         ((_, resolve),) = figure._hover_targets
         offsets = [tuple(o) for o in tiles.get_offsets()]

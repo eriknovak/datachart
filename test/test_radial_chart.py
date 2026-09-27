@@ -52,12 +52,12 @@ class TestFrontValidation:
             RadialChart(data=WIND, direction="widdershins")
 
     def test_innerradius_out_of_range_raises(self):
-        with pytest.raises(ValueError, match="innerradius"):
-            RadialChart(data=WIND, innerradius=1.0)
+        with pytest.raises(ValueError, match="inner_radius"):
+            RadialChart(data=WIND, inner_radius=1.0)
 
     def test_bad_startangle_string_raises(self):
-        with pytest.raises(ValueError, match="startangle"):
-            RadialChart(data=WIND, startangle="north")
+        with pytest.raises(ValueError, match="start_angle"):
+            RadialChart(data=WIND, start_angle="north")
 
 
 class TestPolarAxes:
@@ -76,12 +76,12 @@ class TestPolarAxes:
         assert ax.get_theta_direction() == -1
 
     def test_startangle_compass_string(self):
-        ax = RadialChart(data=WIND, startangle="E").axes[0]
+        ax = RadialChart(data=WIND, start_angle="E").axes[0]
         assert ax.get_theta_offset() == pytest.approx(0.0)
 
     def test_startangle_numeric_bearing(self):
-        # a numeric startangle is a compass bearing: degrees clockwise from north
-        ax = RadialChart(data=WIND, startangle=90).axes[0]
+        # a numeric start_angle is a compass bearing: degrees clockwise from north
+        ax = RadialChart(data=WIND, start_angle=90).axes[0]
         assert ax.get_theta_offset() == pytest.approx(0.0)
 
     def test_counterclockwise_direction(self):
@@ -89,7 +89,7 @@ class TestPolarAxes:
         assert ax.get_theta_direction() == 1
 
     def test_innerradius_moves_rorigin(self):
-        ax = RadialChart(data=WIND, innerradius=0.3).axes[0]
+        ax = RadialChart(data=WIND, inner_radius=0.3).axes[0]
         rmin, rmax = ax.get_ylim()
         expected = rmin - 0.3 / 0.7 * (rmax - rmin)
         assert ax.get_rorigin() == pytest.approx(expected)
@@ -187,7 +187,7 @@ class TestRadialTickLabels:
     def test_the_angle_is_data_theta_under_a_custom_startangle(self):
         six = [{"label": str(i), "y": i + 1} for i in range(6)]
         ax = RadialChart(
-            data=six, startangle="E", direction=RADIAL_DIRECTION.COUNTERCLOCKWISE
+            data=six, start_angle="E", direction=RADIAL_DIRECTION.COUNTERCLOCKWISE
         ).axes[0]
         assert ax.get_rlabel_position() == pytest.approx(30.0)
         spokes = sorted(ax.get_xticks())

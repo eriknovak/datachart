@@ -187,7 +187,7 @@ def _always(settings: dict) -> bool:
 
 
 def _filled(settings: dict) -> bool:
-    return bool(settings.get("filled"))
+    return bool(settings.get("fill"))
 
 
 def _bump_legend(charts: List[dict], settings: dict) -> Optional[bool]:
@@ -371,6 +371,42 @@ def _radial_mark(charts: List[dict], settings: dict) -> List[dict]:
             f"bar visual only; the {visual!r} visual has no bars to order."
         )
     return charts
+
+
+_COMPASS = ("N", "NE", "E", "SE", "S", "SW", "W", "NW")
+
+
+def _check_radial(charts: List[dict], settings: dict) -> None:
+    inner_radius = settings.get("inner_radius")
+    if inner_radius is not None and not 0 <= inner_radius < 1:
+        raise ValueError(
+            f"Invalid `inner_radius` value {inner_radius!r}. "
+            "Must be a fraction 0 <= f < 1 of the radial extent."
+        )
+    start_angle = settings.get("start_angle")
+    if isinstance(start_angle, str) and start_angle not in _COMPASS:
+        raise ValueError(
+            f"Invalid `start_angle` value {start_angle!r}. Must be a compass "
+            f"location {_COMPASS} or a numeric bearing in degrees."
+        )
+
+
+def _check_contour(charts: List[dict], settings: dict) -> None:
+    # filled bands take the colormap, never a series color
+    if not settings.get("fill"):
+        return
+    if settings.get("emphasis_rule") is not None:
+        raise ValueError(
+            "ContourChart does not support `emphasis_rule` when `fill=True`: "
+            "filled bands take the colormap, not a series color to mute or "
+            "highlight. Use line contours instead."
+        )
+    if any(chart.get("emphasis") is not None for chart in charts):
+        raise ValueError(
+            "ContourChart does not support `emphasis` when `fill=True`: "
+            "filled bands take the colormap, not a series color to mute or "
+            "highlight. Use line contours instead."
+        )
 
 
 def _radial_required(settings: dict) -> Tuple[str, ...]:
@@ -638,7 +674,12 @@ _KINDS = (
                 for name in ("vlines", "hlines", "dlines", "brackets")
             },
         },
-        renamed={"type": "mark"},
+        renamed={
+            "type": "mark",
+            "startangle": "start_angle",
+            "innerradius": "inner_radius",
+        },
+        check_records=_check_radial,
         prepare=_radial_mark,
         # the front takes a rule and a sort on the bar visual only
         emphasis_units=bar_units,
@@ -663,6 +704,7 @@ _KINDS = (
             "a calendar is a single raster layer with no series to mute or "
             "highlight.",
         ),
+        renamed={"show_colorbars": "show_colorbar"},
         overlayable=False,
         gridless=_always,
     ),
@@ -756,7 +798,8 @@ _KINDS = (
         check_records=_finite_groups("swarm plot"),
         record_keys=("label", "value"),
         required_keys=("label", "value"),
-        defaults={"orientation": ORIENTATION.VERTICAL, "mode": SWARM_MODE.SWARM},
+        defaults={"orientation": ORIENTATION.VERTICAL, "swarm_mode": SWARM_MODE.SWARM},
+        renamed={"mode": "swarm_mode"},
         group=True,
         emphasis_units=group_units,
         emphasis_by="median",
@@ -770,11 +813,12 @@ _KINDS = (
         required_keys=("label", "value"),
         defaults={
             "orientation": ORIENTATION.VERTICAL,
-            "mode": SWARM_MODE.SWARM,
+            "swarm_mode": SWARM_MODE.SWARM,
             "show_outliers": True,
         },
         build=_raincloud_layers,
         datasets=DatasetPolicy.SUBPLOT,
+        renamed={"mode": "swarm_mode"},
         group=True,
         emphasis_units=group_units,
         emphasis_by="median",
@@ -827,7 +871,11 @@ _KINDS = (
             "a heatmap has no series to mute or highlight. Set the `emphasis` "
             "grid on `data` for per-cell roles instead.",
         ),
-        renamed={"show_heatmap_values": "show_values", "valfmt": "value_format"},
+        renamed={
+            "show_heatmap_values": "show_values",
+            "valfmt": "value_format",
+            "show_colorbars": "show_colorbar",
+        },
         overlayable=False,
         # a raster covers the grid
         gridless=_always,
@@ -844,7 +892,12 @@ _KINDS = (
         ),
         dict_data=True,
         data_keys=(),
-        renamed={"valfmt": "value_format"},
+        renamed={
+            "valfmt": "value_format",
+            "filled": "fill",
+            "show_colorbars": "show_colorbar",
+        },
+        check_records=_check_contour,
         # filled contour bands cover the grid
         gridless=_filled,
         emphasis_units=series_units("z"),
@@ -858,8 +911,8 @@ _KINDS = (
         chart_keys=frozenset(
             {
                 "colorbar",
-                "gridsize",
-                "mincnt",
+                "grid_size",
+                "min_count",
                 "norm",
                 "reduce",
                 "value_format",
@@ -868,7 +921,7 @@ _KINDS = (
                 "vmin",
             }
         ),
-        defaults={"show_colorbars": True},
+        defaults={"show_colorbar": True},
         dict_data=True,
         data_keys=(),
         rejects=_no_emphasis(
@@ -876,7 +929,12 @@ _KINDS = (
             "a hexbin chart is a single colormapped layer with no series to "
             "mute or highlight.",
         ),
-        renamed={"valfmt": "value_format"},
+        renamed={
+            "valfmt": "value_format",
+            "gridsize": "grid_size",
+            "mincnt": "min_count",
+            "show_colorbars": "show_colorbar",
+        },
         # hexagons cover the grid
         gridless=_always,
     ),
@@ -1062,12 +1120,13 @@ _SHARED = (
     SharedParameter("show_area", bool),
     SharedParameter("show_labels", bool),
     SharedParameter("show_outliers", bool),
-    SharedParameter("show_colorbars", bool),
+    SharedParameter("show_colorbar", bool),
     SharedParameter("show_regression", bool),
     SharedParameter("show_correlation", bool),
+    SharedParameter("fill", bool),
     SharedParameter("num_bins", int),
     SharedParameter("bandwidth", Union[BANDWIDTH, str, float]),
-    SharedParameter("mode", Union[SWARM_MODE, str]),
+    SharedParameter("swarm_mode", Union[SWARM_MODE, str]),
     SharedParameter("jitter", float, theme_default="chart_default_jitter"),
     SharedParameter("position", Union[DRAW_POSITION, str]),
     SharedParameter(
@@ -1278,9 +1337,9 @@ def build_chart_panel_settings(
         "tighten_xlim": kind.tighten_xlim,
         "baseline": settings.get("baseline") or STACKED_AREA_BASELINE.DEFAULT,
         # radial furniture; only polar panels read these
-        "startangle": settings.get("startangle"),
+        "start_angle": settings.get("start_angle"),
         "direction": settings.get("direction"),
-        "innerradius": settings.get("innerradius"),
+        "inner_radius": settings.get("inner_radius"),
         "show_border": settings.get("show_border"),
         "show_values": resolve_show_values(settings),
         "show_tip_labels": settings.get("show_tip_labels"),

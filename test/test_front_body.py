@@ -2,6 +2,8 @@ import ast
 import inspect
 import textwrap
 import unittest
+import warnings
+from datetime import date
 from typing import Optional
 from unittest import mock
 
@@ -9,14 +11,17 @@ import datachart.charts
 from datachart.charts import (
     BasemapChart,
     BoxPlot,
+    CalendarHeatmap,
     ContourChart,
     Heatmap,
     HexbinChart,
     LineChart,
     NetworkChart,
     RadialChart,
+    RaincloudPlot,
     RidgelinePlot,
     ScatterChart,
+    SwarmPlot,
 )
 from datachart.utils import Grid, Panel
 from datachart.utils._internal import plot_engine
@@ -127,6 +132,12 @@ class TestSharedParameters(unittest.TestCase):
         furniture = {"show_legend", "legend", "show_grid", "aspect_ratio"}
         limits = {"xmin", "xmax", "ymin", "ymax"}
         self.assertLessEqual(furniture | limits, set(params))
+
+    def test_settled_names_are_rows(self):
+        self.assertLessEqual(
+            {"fill", "swarm_mode", "show_colorbar"}, SHARED_PARAMETERS.keys()
+        )
+        self.assertFalse({"mode", "show_colorbars"} & SHARED_PARAMETERS.keys())
 
     def test_every_row_is_shared(self):
         # a remap parameter is shared by its row, however many fronts take it
@@ -291,7 +302,7 @@ class TestRenderSplit(unittest.TestCase):
             colorbar={"location": "right"},
             xticklabels=["a", "b"],
             title="T",
-            show_colorbars=True,
+            show_colorbar=True,
         )
         self.assertEqual(chart_type, "heatmap")
         self.assertEqual(
@@ -313,7 +324,7 @@ class TestRenderSplit(unittest.TestCase):
             {
                 **UNSET,
                 "title": "T",
-                "show_colorbars": True,
+                "show_colorbar": True,
                 "show_values": None,
                 "show_legend": None,
                 "subplots": None,
@@ -327,6 +338,7 @@ POINTS = {"x": [0, 1, 2], "y": [0, 1, 2]}
 GROUPS = [{"label": "a", "value": v} for v in (1, 2, 3, 5)]
 WIND = [{"label": "N", "y": 1}, {"label": "E", "y": 2}, {"label": "S", "y": 3}]
 NAMED = [{"x": 0, "y": 1, "name": "a"}, {"x": 1, "y": 2, "name": "b"}]
+DAYS = {"date": [date(2024, 1, 1), date(2024, 1, 2)], "value": [1, 2]}
 
 # front, its data, the deprecated name, the new name, and a value for both
 RENAMES = [
@@ -337,6 +349,17 @@ RENAMES = [
     (RidgelinePlot, GROUPS, "normalize", "ridge_scale", "common"),
     (RadialChart, WIND, "type", "mark", "bar"),
     (ScatterChart, NAMED, "label", "annotation", "name"),
+    (RadialChart, WIND, "startangle", "start_angle", "E"),
+    (RadialChart, WIND, "innerradius", "inner_radius", 0.3),
+    (ContourChart, GRID, "filled", "fill", True),
+    (SwarmPlot, GROUPS, "mode", "swarm_mode", "strip"),
+    (RaincloudPlot, GROUPS, "mode", "swarm_mode", "strip"),
+    (HexbinChart, POINTS, "mincnt", "min_count", 2),
+    (HexbinChart, POINTS, "gridsize", "grid_size", 5),
+    (Heatmap, GRID, "show_colorbars", "show_colorbar", False),
+    (CalendarHeatmap, DAYS, "show_colorbars", "show_colorbar", True),
+    (ContourChart, GRID, "show_colorbars", "show_colorbar", False),
+    (HexbinChart, POINTS, "show_colorbars", "show_colorbar", False),
 ]
 
 
@@ -350,6 +373,23 @@ class TestDeprecatedNames(unittest.TestCase):
                 self.assertEqual(caught.filename, __file__)
                 self.assertEqual(got, expected)
 
+    def test_old_name_warns_once(self):
+        for front, data, old, _, value in RENAMES:
+            with self.subTest(front=front.__name__, name=old):
+                with warnings.catch_warnings(record=True) as caught:
+                    warnings.simplefilter("always")
+                    captured(front, data, **{old: value})
+                deprecations = [
+                    w for w in caught if issubclass(w.category, DeprecationWarning)
+                ]
+                self.assertEqual(len(deprecations), 1)
+                self.assertIn(f"`{old}`", str(deprecations[0].message))
+
+    def test_old_name_is_listed_in_its_row(self):
+        for front, _, old, new, _ in RENAMES:
+            with self.subTest(front=front.__name__, name=old):
+                self.assertEqual(CHART_KINDS[front.__name__.lower()].renamed[old], new)
+
     def test_basemap_features_is_data(self):
         expected = captured(BasemapChart, "land")
         with self.assertWarnsRegex(DeprecationWarning, "`data`"):
@@ -360,6 +400,30 @@ class TestDeprecatedNames(unittest.TestCase):
         with self.assertWarns(DeprecationWarning):
             with self.assertRaisesRegex(ValueError, "`show_values` only"):
                 Heatmap(GRID, show_values=True, show_heatmap_values=True)
+
+    def test_old_name_warns_before_its_value_is_checked(self):
+        bad = [
+            (RadialChart, WIND, {"innerradius": 1.0}, "`inner_radius`"),
+            (RadialChart, WIND, {"startangle": "north"}, "`start_angle`"),
+            (
+                ContourChart,
+                GRID,
+                {"filled": True, "emphasis_rule": {"top": 1}},
+                "`fill",
+            ),
+        ]
+        for front, data, kwargs, message in bad:
+            with self.subTest(front=front.__name__, kwargs=kwargs):
+                with self.assertWarns(DeprecationWarning):
+                    with self.assertRaisesRegex(ValueError, message):
+                        front(data, **kwargs)
+
+    def test_both_names_raise_for_every_rename(self):
+        for front, data, old, new, value in RENAMES:
+            with self.subTest(front=front.__name__, name=old):
+                with self.assertWarns(DeprecationWarning):
+                    with self.assertRaisesRegex(ValueError, f"`{new}` only"):
+                        front(data, **{old: value, new: value})
 
 
 class TestDictShape(unittest.TestCase):

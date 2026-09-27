@@ -52,10 +52,10 @@ def ContourChart(
     show_legend: Optional[bool] = None,
     legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
-    filled: Optional[bool] = None,
+    fill: Optional[bool] = None,
     levels: Optional[Union[CONTOUR_LEVELS, str, int, List[float]]] = None,
     show_labels: Optional[bool] = None,
-    show_colorbars: Optional[bool] = None,
+    show_colorbar: Optional[bool] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     scalex: Optional[Union[AXIS_SCALE, str]] = None,
     scaley: Optional[Union[AXIS_SCALE, str]] = None,
@@ -137,6 +137,8 @@ def ContourChart(
         ]
     ] = None,
     valfmt: Optional[Union[VALUE_FORMAT, str, List[Optional[str]]]] = None,
+    filled: Optional[bool] = None,
+    show_colorbars: Optional[bool] = None,
 ) -> plt.Figure:
     """Creates the contour chart.
 
@@ -180,7 +182,7 @@ def ContourChart(
             lowered alpha, behind the others, no legend entry), "highlight"
             bolds it and brings it to the front, None leaves it unchanged.
             Not supported for filled contours: passing a value with
-            `filled=True` raises `ValueError`.
+            `fill=True` raises `ValueError`.
         emphasis_rule: A rule that highlights the line contours matching it and mutes
             the rest: `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}`
             (inclusive), `{"top": n}` or `{"bottom": n}`, read against a summary of each
@@ -199,7 +201,7 @@ def ContourChart(
             [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
         show_grid: Which grid lines to show (e.g., "both", "x", "y"); `False`
             draws none. Off by default for filled contours.
-        filled: Whether to fill the bands between the levels (colored by the
+        fill: Whether to fill the bands between the levels (colored by the
             colormap) instead of drawing iso-lines (in the chart's color).
         levels: Which levels cut the surface: a rule of
             [`CONTOUR_LEVELS`][datachart.constants.CONTOUR_LEVELS] (`"auto"`, the
@@ -207,7 +209,7 @@ def ContourChart(
             explicit list of level values. Filled values beyond a list's ends
             take the end colors, and the colorbar marks the overflow.
         show_labels: Whether to write the level values along the iso-lines.
-        show_colorbars: Whether to show the colorbar(s) of filled contours.
+        show_colorbar: Whether to show the colorbar(s) of filled contours.
         aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
             [`ASPECT_RATIO`][datachart.constants.ASPECT_RATIO].
         scalex: The x-axis scale (e.g., "log", "linear").
@@ -250,25 +252,13 @@ def ContourChart(
             [`ColorbarSettingAttrs`][datachart.typings.ColorbarSettingAttrs].
         texts: Text annotation(s) to draw.
         valfmt: Deprecated; use `value_format`. Removed in the next release.
+        filled: Deprecated; use `fill`. Removed in the next release.
+        show_colorbars: Deprecated; use `show_colorbar`. Removed in the next release.
 
     Returns:
         The figure containing the contour chart.
 
     """
     params = dict(locals())
-
-    if filled and emphasis_rule is not None:
-        raise ValueError(
-            "ContourChart does not support `emphasis_rule` when `filled=True`: "
-            "filled bands take the colormap, not a series color to mute or "
-            "highlight. Use line contours instead."
-        )
-    roles = emphasis if isinstance(emphasis, list) else [emphasis]
-    if filled and any(role is not None for role in roles):
-        raise ValueError(
-            "ContourChart does not support `emphasis` when `filled=True`: "
-            "filled bands take the colormap, not a series color to mute or "
-            "highlight. Use line contours instead."
-        )
 
     return render("contourchart", params)

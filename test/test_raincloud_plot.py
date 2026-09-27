@@ -100,7 +100,7 @@ class TestRaincloudLayers(unittest.TestCase):
             self.assertAlmostEqual((ys.max() + ys.min()) / 2, pos)
 
     def test_strip_rain_stays_inside_spread(self):
-        figure = RaincloudPlot(group_data(), mode="strip")
+        figure = RaincloudPlot(group_data(), swarm_mode="strip")
         xy = np.concatenate(
             [c.get_offsets() for c in _swarm_collections(figure.axes[0])]
         )

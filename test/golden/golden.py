@@ -773,7 +773,7 @@ def scatter_multi_subplots():
 @case
 def heatmap_basic():
     data = {"z": [[(i * j) % 7 for j in range(5)] for i in range(4)]}
-    return Heatmap(data=data, show_values=True, show_colorbars=True)
+    return Heatmap(data=data, show_values=True, show_colorbar=True)
 
 
 @case
@@ -796,7 +796,7 @@ def heatmap_labels():
 @case
 def heatmap_blank_cells():
     data = {"z": [[1, None, 3], [None, 5, 6]]}
-    return Heatmap(data=data, show_values=True, show_colorbars=True)
+    return Heatmap(data=data, show_values=True, show_colorbar=True)
 
 
 def signed_matrix():
@@ -812,7 +812,7 @@ def heatmap_centered():
         data=data,
         norm=COLOR_NORM.CENTERED,
         show_values=True,
-        show_colorbars=True,
+        show_colorbar=True,
         title="Centred on zero",
     )
 
@@ -826,7 +826,7 @@ def heatmap_twoslope():
         vmin=-3,
         vmax=5,
         show_values=True,
-        show_colorbars=True,
+        show_colorbar=True,
         title="Two slopes about zero",
     )
 
@@ -967,7 +967,7 @@ def swarm_vertical():
 
 @case
 def strip_horizontal():
-    return SwarmPlot(data=swarm_data(), mode="strip", orientation="horizontal")
+    return SwarmPlot(data=swarm_data(), swarm_mode="strip", orientation="horizontal")
 
 
 @case
@@ -987,7 +987,10 @@ def raincloud_vertical():
 @case
 def raincloud_horizontal():
     return RaincloudPlot(
-        data=swarm_data(seed=6), orientation="horizontal", mode="strip", show_grid="x"
+        data=swarm_data(seed=6),
+        orientation="horizontal",
+        swarm_mode="strip",
+        show_grid="x",
     )
 
 
@@ -1225,7 +1228,7 @@ def theme_quill_heatmap_steps():
     return Heatmap(
         data=data,
         show_values=True,
-        show_colorbars=True,
+        show_colorbar=True,
         colorbar={"label": "value"},
     )
 
@@ -1249,8 +1252,8 @@ def theme_quill_contour_relief():
     ]
     return ContourChart(
         data={"x": list(grid), "y": list(grid), "z": z},
-        filled=True,
-        show_colorbars=True,
+        fill=True,
+        show_colorbar=True,
     )
 
 
@@ -1317,7 +1320,7 @@ def theme_dark_heatmap():
     return Heatmap(
         data=data,
         show_values=True,
-        show_colorbars=True,
+        show_colorbar=True,
         colorbar={"label": "value"},
     )
 
@@ -1564,7 +1567,7 @@ def values_swarm_vertical():
 def values_swarm_horizontal_strip():
     return SwarmPlot(
         data=swarm_data(seed=6),
-        mode="strip",
+        swarm_mode="strip",
         orientation="horizontal",
         show_values=True,
         value_format=VALUE_FORMAT.DECIMAL,
@@ -1859,7 +1862,7 @@ def radial_line():
 
 @case
 def radial_line_area_donut():
-    return RadialChart(data=RAD1, show_area=True, innerradius=0.25, startangle="E")
+    return RadialChart(data=RAD1, show_area=True, inner_radius=0.25, start_angle="E")
 
 
 @case
@@ -1900,7 +1903,7 @@ def radial_bar_tip_labels():
         bar_mode="stack",
         show_tip_labels=True,
         show_border=False,
-        innerradius=0.3,
+        inner_radius=0.3,
         figsize=(7, 7),
     )
 
@@ -2046,8 +2049,8 @@ def contour_lines():
 def contour_filled_colorbar():
     return ContourChart(
         data=contour_grid_data(peaks, -3, 3),
-        filled=True,
-        show_colorbars=True,
+        fill=True,
+        show_colorbar=True,
         levels=CONTOUR_LEVELS.FD,
     )
 
@@ -2087,7 +2090,7 @@ def contour_subplots():
             contour_grid_data(peaks, -3, 3),
         ],
         subtitle=["Himmelblau", "Rosenbrock (log z)", "Peaks"],
-        filled=True,
+        fill=True,
         subplots=True,
         max_cols=3,
         figsize=(12, 4),
@@ -2113,8 +2116,8 @@ def contour_panel_scatter():
 def contour_grid():
     top = ContourChart(
         data=contour_grid_data(peaks, -3, 3),
-        filled=True,
-        show_colorbars=True,
+        fill=True,
+        show_colorbar=True,
         title="filled",
     )
     line = LineChart(data=LINE1, title="line")
@@ -2140,9 +2143,9 @@ def contour_kde2d():
         [rng.normal((-1, -1), 0.6, (150, 2)), rng.normal((1.5, 1), 0.8, (100, 2))]
     )
     return ContourChart(
-        data=kde2d(pts[:, 0].tolist(), pts[:, 1].tolist(), gridsize=60),
-        filled=True,
-        show_colorbars=True,
+        data=kde2d(pts[:, 0].tolist(), pts[:, 1].tolist(), grid_size=60),
+        fill=True,
+        show_colorbar=True,
         levels=8,
     )
 
@@ -2167,7 +2170,7 @@ def hexbin_counts():
 
 @case
 def hexbin_log():
-    return HexbinChart(data=hexbin_points(), norm=COLOR_NORM.LOG, mincnt=1)
+    return HexbinChart(data=hexbin_points(), norm=COLOR_NORM.LOG, min_count=1)
 
 
 @case
@@ -2178,7 +2181,7 @@ def hexbin_c_mean():
         data=data,
         reduce=HEXBIN_REDUCE.MEAN,
         style={"plot_hexbin_cmap": COLORS.RdBu},
-        gridsize=20,
+        grid_size=20,
     )
 
 
@@ -2187,8 +2190,8 @@ def hexbin_edges():
     return HexbinChart(
         data=hexbin_points(),
         style={"plot_hexbin_edge_width": 0.8, "plot_hexbin_edge_color": "#FFFFFF"},
-        gridsize=15,
-        show_colorbars=False,
+        grid_size=15,
+        show_colorbar=False,
     )
 
 
@@ -2217,7 +2220,7 @@ def hexbin_panel_scatter():
     tiles = HexbinChart(
         data=data,
         style={"plot_hexbin_edge_width": 0.5, "plot_hexbin_edge_color": "#FFFFFF"},
-        show_colorbars=False,
+        show_colorbar=False,
     )
     return Panel([tiles, scatter], title="Panel", show_legend=True)
 
@@ -2247,7 +2250,7 @@ def hexbin_log_scales():
     rng = np.random.RandomState(4)
     xy = np.exp(rng.normal(0, 1, (3000, 2)))
     data = {"x": xy[:, 0].tolist(), "y": xy[:, 1].tolist()}
-    return HexbinChart(data=data, scalex="log", scaley="log", gridsize=20)
+    return HexbinChart(data=data, scalex="log", scaley="log", grid_size=20)
 
 
 def contour_bowl(n=40):
@@ -2258,12 +2261,12 @@ def contour_bowl(n=40):
 
 @case
 def contour_levels_overflow():
-    return ContourChart(data=contour_bowl(), filled=True, levels=[2, 4, 6, 8])
+    return ContourChart(data=contour_bowl(), fill=True, levels=[2, 4, 6, 8])
 
 
 @case
 def contour_filled_panel_line_ref():
-    bowl = ContourChart(data=contour_bowl(), filled=True, hlines={"y": 1})
+    bowl = ContourChart(data=contour_bowl(), fill=True, hlines={"y": 1})
     line = LineChart(data=[{"x": x, "y": x / 2} for x in np.linspace(-3, 3, 13)])
     return Panel([bowl, line], title="surface under the line")
 
@@ -2920,7 +2923,7 @@ def calendar_single_year():
     return CalendarHeatmap(
         {"date": days, "value": values},
         title="Commits, 2024",
-        show_colorbars=True,
+        show_colorbar=True,
         colorbar={"label": "commits", "location": COLORBAR_LOCATION.BOTTOM},
         figsize=(9, 2.6),
     )
@@ -2963,7 +2966,7 @@ def calendar_centered():
     return CalendarHeatmap(
         {"date": [d for d, _ in quarter], "value": [v for _, v in quarter]},
         norm=COLOR_NORM.CENTERED,
-        show_colorbars=True,
+        show_colorbar=True,
         title="Q1 2024, daily anomaly",
         figsize=(9, 2.6),
     )
@@ -2983,7 +2986,7 @@ def calendar_narrow_colorbar():
     return CalendarHeatmap(
         {"date": days[:60], "value": values[:60]},
         title="Two months",
-        show_colorbars=True,
+        show_colorbar=True,
         colorbar={"label": "commits"},
     )
 
@@ -3194,7 +3197,7 @@ def colorbar_left_label():
     data = {"z": [[(i * j) % 7 for j in range(6)] for i in range(5)]}
     return Heatmap(
         data=data,
-        show_colorbars=True,
+        show_colorbar=True,
         colorbar={"label": "Residual", "location": COLORBAR_LOCATION.LEFT},
     )
 
@@ -3203,8 +3206,8 @@ def colorbar_left_label():
 def colorbar_bottom_format():
     return ContourChart(
         data=contour_grid_data(peaks, -3, 3),
-        filled=True,
-        show_colorbars=True,
+        fill=True,
+        show_colorbar=True,
         colorbar={
             "label": "Height",
             "location": COLORBAR_LOCATION.BOTTOM,
@@ -3227,7 +3230,7 @@ def colorbar_right_ticks():
     data = {"z": [[(i * j) % 7 for j in range(6)] for i in range(5)]}
     return Heatmap(
         data=data,
-        show_colorbars=True,
+        show_colorbar=True,
         aspect_ratio=ASPECT_RATIO.EQUAL,
         colorbar={"label": "Residual", "ticks": [0, 3, 6], "format": "{x:.0f}"},
     )
@@ -3238,7 +3241,7 @@ def colorbar_grid_label():
     data = {"z": [[(i * j) % 7 for j in range(6)] for i in range(5)]}
     heatmap = Heatmap(
         data=data,
-        show_colorbars=True,
+        show_colorbar=True,
         title="labelled",
         colorbar={"label": "Residual", "location": COLORBAR_LOCATION.BOTTOM},
     )
@@ -3355,7 +3358,7 @@ def band_radial_annulus():
         mark="bar",
         hspans={"ymin": 3, "ymax": 5, "style": {"plot_hspan_color": "#E76F51"}},
         vspans={"xmin": 300, "xmax": 30},
-        innerradius=0.2,
+        inner_radius=0.2,
         title="Annulus and a wrapped wedge",
     )
 
@@ -3566,7 +3569,7 @@ def heatmap_rule_above():
         data=data,
         emphasis_rule={"above": 4},
         show_values=True,
-        show_colorbars=True,
+        show_colorbar=True,
     )
 
 
@@ -3815,7 +3818,9 @@ def basemap_under_hexbin_in_grid():
     lat = np.concatenate([rng.normal(38, 1.0, 300), rng.normal(37.5, 0.6, 300)])
     under = Panel(
         [
-            HexbinChart({"x": lon.tolist(), "y": lat.tolist()}, gridsize=20, mincnt=1),
+            HexbinChart(
+                {"x": lon.tolist(), "y": lat.tolist()}, grid_size=20, min_count=1
+            ),
             BasemapChart(),
         ],
         title="Hexbin over the coast",

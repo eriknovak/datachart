@@ -418,11 +418,23 @@ class TestStats(unittest.TestCase):
         self.assertGreater(x[-1], max(values))
 
     def test_kde1d_cut_zero_spans_the_values(self):
-        curve = kde1d([1, 2, 3, 4], gridsize=4, cut=0)
+        curve = kde1d([1, 2, 3, 4], grid_size=4, cut=0)
         self.assertEqual([point["x"] for point in curve], [1.0, 2.0, 3.0, 4.0])
 
+    def test_kde_gridsize_is_deprecated(self):
+        for kde, args in ((kde1d, ([1, 2, 3],)), (kde2d, ([1, 2, 3], [1, 3, 2]))):
+            with self.subTest(kde=kde.__name__):
+                expected = kde(*args, grid_size=3)
+                with self.assertWarnsRegex(DeprecationWarning, "`grid_size`") as caught:
+                    got = kde(*args, gridsize=3)
+                self.assertEqual(caught.filename, __file__)
+                self.assertEqual(got, expected)
+                with self.assertWarns(DeprecationWarning):
+                    with self.assertRaisesRegex(ValueError, "`grid_size` only"):
+                        kde(*args, gridsize=3, grid_size=3)
+
     def test_kde2d_shape_and_symmetry(self):
-        surface = kde2d([1, 2, 3, 4], [1, 3, 2, 4], gridsize=(3, 2), cut=0)
+        surface = kde2d([1, 2, 3, 4], [1, 3, 2, 4], grid_size=(3, 2), cut=0)
         self.assertEqual(surface["x"], [1.0, 2.5, 4.0])
         self.assertEqual(surface["y"], [1.0, 4.0])
         z = np.asarray(surface["z"])
@@ -430,17 +442,17 @@ class TestStats(unittest.TestCase):
         np.testing.assert_allclose(z[0], z[1][::-1])
 
     def test_kde_limits_override_the_padded_range(self):
-        curve = kde1d([1, 2, 3], gridsize=3, xlim=(0, 10))
+        curve = kde1d([1, 2, 3], grid_size=3, xlim=(0, 10))
         self.assertEqual([point["x"] for point in curve], [0.0, 5.0, 10.0])
-        surface = kde2d([1, 2, 3], [1, 3, 2], gridsize=2, xlim=(0, 4), ylim=(-1, 5))
+        surface = kde2d([1, 2, 3], [1, 3, 2], grid_size=2, xlim=(0, 4), ylim=(-1, 5))
         self.assertEqual(surface["x"], [0.0, 4.0])
         self.assertEqual(surface["y"], [-1.0, 5.0])
 
     def test_kde2d_bandwidth_smooths(self):
         x = [1, 2, 3, 4, 5]
         y = [5, 3, 1, 3, 5]
-        narrow = np.asarray(kde2d(x, y, bandwidth=0.2, gridsize=20)["z"])
-        wide = np.asarray(kde2d(x, y, bandwidth=2.0, gridsize=20)["z"])
+        narrow = np.asarray(kde2d(x, y, bandwidth=0.2, grid_size=20)["z"])
+        wide = np.asarray(kde2d(x, y, bandwidth=2.0, grid_size=20)["z"])
         self.assertGreater(narrow.max(), wide.max())
 
     def test_kde_invalid_inputs(self):
@@ -487,7 +499,7 @@ class TestStatsTemporalX(unittest.TestCase):
                 spearman(x, self.y)
                 linear_fit(x, self.y)
                 loess(x, self.y)
-                kde2d(x, self.y, gridsize=5)
+                kde2d(x, self.y, grid_size=5)
 
     def test_correlations_match_date_numbers(self):
         numbers = list(mdates.date2num(self.days))
@@ -522,7 +534,7 @@ class TestStatsTemporalX(unittest.TestCase):
         self.assertEqual(curve[0]["x"], days[0])
 
     def test_kde2d_returns_datetime_grid(self):
-        surface = kde2d(self.days, self.y, gridsize=5, cut=0)
+        surface = kde2d(self.days, self.y, grid_size=5, cut=0)
         self.assertTrue(all(isinstance(value, datetime) for value in surface["x"]))
         self.assertEqual(surface["x"][0].date(), self.days[0].date())
         self.assertEqual(surface["x"][-1].date(), self.days[-1].date())
@@ -530,12 +542,12 @@ class TestStatsTemporalX(unittest.TestCase):
 
     def test_kde2d_accepts_datetime_xlim(self):
         xlim = (datetime(2023, 12, 25), datetime(2024, 1, 20))
-        surface = kde2d(self.days, self.y, gridsize=3, xlim=xlim)
+        surface = kde2d(self.days, self.y, grid_size=3, xlim=xlim)
         self.assertEqual(surface["x"][0].replace(tzinfo=None), xlim[0])
         self.assertEqual(surface["x"][-1].replace(tzinfo=None), xlim[1])
 
     def test_contour_chart_renders_kde2d(self):
-        figure = ContourChart(kde2d(self.days, self.y, gridsize=10))
+        figure = ContourChart(kde2d(self.days, self.y, grid_size=10))
         self.assertIsNotNone(figure)
         plt.close(figure)
 
@@ -563,7 +575,7 @@ class TestStatsTemporalX(unittest.TestCase):
         self.assertAlmostEqual(spearman(x, self.y), spearman(numbers, self.y))
         self.assertAlmostEqual(linear_fit(x, self.y)[0], linear_fit(numbers, self.y)[0])
         self.assertIsInstance(loess(x, self.y)[0]["x"], datetime)
-        self.assertIsInstance(kde2d(x, self.y, gridsize=5)["x"][0], datetime)
+        self.assertIsInstance(kde2d(x, self.y, grid_size=5)["x"][0], datetime)
 
 
 class TestKdeWithoutSpread(unittest.TestCase):

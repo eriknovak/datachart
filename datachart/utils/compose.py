@@ -516,9 +516,9 @@ def Panel(
     if projection == "polar":
         # the merged panel keeps the first source figure's radial furniture
         for key in (
-            "startangle",
+            "start_angle",
             "direction",
-            "innerradius",
+            "inner_radius",
             "show_border",
             "show_values",
             "show_tip_labels",

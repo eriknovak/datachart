@@ -1,5 +1,6 @@
 ---
 status: accepted
+amended-by: [0082]
 ---
 
 # The axis kind is a panel snapshot, and date strings are never parsed
