@@ -992,7 +992,9 @@ def is_missing(value) -> bool:
 
 
 def validate_finite_groups(chart: dict, name: str) -> None:
-    """Raise when a group of a group chart holds NaN values and nothing else.
+    """Raise when a group of a group chart holds missing values and nothing else.
+
+    A chart whose every value is missing draws nothing and passes.
 
     Args:
         chart: One chart, its `data` a list of `{label, value}` records.
@@ -1012,7 +1014,7 @@ def validate_finite_groups(chart: dict, name: str) -> None:
         else:
             finite_labels.add(label)
     for label in nan_labels:
-        if label not in finite_labels:
+        if finite_labels and label not in finite_labels:
             subtitle = chart.get("subtitle")
             named = f"{name} `{subtitle}`" if subtitle else name
             raise ValueError(f"The {named} group `{label}` has no finite values.")

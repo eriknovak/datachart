@@ -8,7 +8,6 @@ record whose position is missing is dropped (ADR 0082).
 
 import warnings
 from collections.abc import Iterable, Iterator
-from numbers import Real
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
@@ -548,6 +547,13 @@ def build_charts_structure(
             if isinstance(chart["data"], dict):
                 chart["data"] = _drawn_columns(kind, chart["data"])
             emptied.append(not _has_values(kind, chart))
+    else:
+        # records of free-form keys: an infinity is missing like NaN
+        for chart in charts:
+            chart["data"] = [
+                {k: _missing_as_nan(v) if v is not None else v for k, v in r.items()}
+                for r in chart["data"]
+            ]
     if charts and all(emptied) and len(emptied) == len(charts):
         raise ValueError(
             f"{_front(kind)} has nothing to draw: every value in `data` is "
@@ -615,32 +621,23 @@ def _holds_a_value(cell: Any) -> bool:
 
 
 def _missing_as_nan(value: Any) -> Any:
-    """A value with its missing numbers as NaN; anything else as given.
+    """A value, list, or grid with each missing number as NaN.
 
-    A grid or list of numbers holding a missing one reads as a float array;
-    finite numbers, dates, and strings keep their type.
+    Finite numbers keep their type, so an integer grid still prints its
+    values as integers; dates and strings are left as given.
     """
 
+    if isinstance(value, np.ndarray):
+        if value.dtype.kind == "f" and not np.isfinite(value).all():
+            return np.where(np.isfinite(value), value, np.nan)
+        if value.dtype.kind == "O":
+            return np.array([_missing_as_nan(v) for v in value], dtype=object)
+        return value
+    if isinstance(value, (list, tuple)):
+        return type(value)(_missing_as_nan(v) for v in value)
     if is_missing(value) and not isinstance(value, np.datetime64):
         return np.nan
-    if not isinstance(value, (list, tuple, np.ndarray)):
-        return value
-    try:
-        cells = np.asarray(value, dtype=object).ravel()
-    except ValueError:
-        # a ragged grid is the layer's to reject
-        return value
-    numbers = all(
-        cell is None or (isinstance(cell, Real) and not isinstance(cell, bool))
-        for cell in cells
-    )
-    if not numbers or not any(is_missing(cell) for cell in cells):
-        return value
-    array = np.asarray(value, dtype=object)
-    array[array == None] = np.nan  # noqa: E711 - elementwise comparison
-    array = array.astype(float)
-    array[~np.isfinite(array)] = np.nan
-    return array
+    return value
 
 
 def canonical_records(

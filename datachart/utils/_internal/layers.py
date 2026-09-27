@@ -534,14 +534,13 @@ def get_chart_data(attr: str, chart: dict) -> Optional[np.ndarray]:
     return np.array(values)
 
 
-def get_chart_observations(attr: str, chart: dict, name: str) -> Optional[np.ndarray]:
+def get_chart_observations(attr: str, chart: dict) -> Optional[np.ndarray]:
     """A data column as one flat pool of observations, NaN dropped.
 
     A point carries a single observation or a list of them, and the charts
     that bin or estimate over a sample read the lot as one series. Records
     are concatenated, so lists of unequal length never have to square into
-    a grid (issue #233). A column of NaN alone raises, naming the chart
-    `name` and its subtitle.
+    a grid (issue #233). A column of NaN alone is None: it draws nothing.
     """
 
     values = _chart_column(attr, chart)
@@ -557,11 +556,7 @@ def get_chart_observations(attr: str, chart: dict, name: str) -> Optional[np.nda
     if observations.dtype.kind != "f":
         return observations
     finite = observations[~np.isnan(observations)]
-    if len(observations) and not len(finite):
-        subtitle = chart.get("subtitle")
-        named = f"{name} `{subtitle}`" if subtitle else name
-        raise ValueError(f"The {named} has no finite `{attr}` values.")
-    return finite
+    return finite if len(finite) else None
 
 
 def get_chart_grid(chart: dict, kind: str, dtype=float) -> tuple:
@@ -637,13 +632,20 @@ def axis_kind(values) -> Optional[str]:
         return None
     if isinstance(values, np.ndarray) and values.dtype.kind == "M":
         return AXIS_TEMPORAL
-    for value in values:
-        if value is None:
-            continue
-        if is_temporal(value):
-            return AXIS_TEMPORAL
-        return AXIS_CATEGORICAL if isinstance(value, str) else AXIS_NUMERIC
-    return None
+    if isinstance(values, np.ndarray) and values.dtype.kind in "fiu":
+        return AXIS_NUMERIC
+    # the first value decides; a temporal/numeric mix raises (ADR 0082)
+    kinds = [
+        (
+            AXIS_TEMPORAL
+            if is_temporal(value)
+            else AXIS_CATEGORICAL if isinstance(value, str) else AXIS_NUMERIC
+        )
+        for value in values
+        if not is_missing(value)
+    ]
+    validate_axis_kinds(kinds)
+    return kinds[0] if kinds else None
 
 
 def _as_datetime(value):
@@ -1034,6 +1036,34 @@ def _shared_data_interval(ax, axis_name: str) -> tuple:
     return min(min(i) for i in intervals), max(max(i) for i in intervals)
 
 
+def _single_value_limits(value: float, temporal: bool) -> Tuple[float, float]:
+    """The view around an axis's one data value, which has no range to show.
+
+    A temporal axis pads a day each side, its value a date or a date
+    number; a number pads 5 % of itself, or half a unit at zero (ADR 0082).
+    """
+
+    if isinstance(value, np.datetime64):
+        pad = np.timedelta64(1, "D")
+    elif isinstance(value, date):
+        pad = timedelta(days=1)
+    else:
+        pad = 1.0 if temporal else 0.05 * abs(value) or 0.5
+    return value - pad, value + pad
+
+
+def _pad_single_value(ax, axis_name: str, temporal: bool) -> None:
+    """Pad an axis whose data is one value, so its view is never zero-wide."""
+
+    lo, hi = _shared_data_interval(ax, axis_name)
+    if not (np.isfinite([lo, hi]).all() and lo == hi):
+        return
+    lo, hi = _single_value_limits(lo, temporal)
+    axis = getattr(ax, f"{axis_name}axis")
+    bounds = (hi, lo) if axis.get_inverted() else (lo, hi)
+    (ax.set_xlim if axis_name == "x" else ax.set_ylim)(*bounds)
+
+
 def _snap_limits_to_ticks(
     ax, axis_name: str, fixed=(False, False), data_ends: bool = True
 ) -> bool:
@@ -1124,9 +1154,10 @@ def _snap_limits_to_ticks(
         new_lo, new_hi = lo_next, hi_next
     # the snap never crosses zero when the data does not: a margin dipping
     # below all-positive values rounds to zero, not a whole step under it
-    if not fixed[0] and new_lo < 0 <= data_lo:
+    # a single value keeps the padding on both sides of it
+    if not fixed[0] and new_lo < 0 <= data_lo and data_hi > data_lo:
         new_lo = 0.0
-    if not fixed[1] and new_hi > 0 >= data_hi:
+    if not fixed[1] and new_hi > 0 >= data_hi and data_hi > data_lo:
         new_hi = 0.0
     on_data = data_ends and (
         (not fixed[0] and math.isclose(new_lo, data_lo, abs_tol=tol))
@@ -2885,9 +2916,20 @@ def _column_range(chart: dict, attr: str) -> Optional[tuple]:
     """The (min, max) of a chart's data column; None when the column is absent."""
 
     values = get_chart_data(attr, chart)
-    if values is None or len(values) == 0 or axis_kind(values) == AXIS_CATEGORICAL:
+    if values is None or axis_kind(values) == AXIS_CATEGORICAL:
         return None
-    return (minimum(values), maximum(values))
+    return _present_range(values)
+
+
+def _present_range(values) -> Optional[tuple]:
+    """The (min, max) of the values present; None when every one is missing."""
+
+    if values is None or len(values) == 0:
+        return None
+    lo = minimum(values)
+    if isinstance(lo, float) and np.isnan(lo):
+        return None
+    return (lo, maximum(values))
 
 
 def _plot_text_font() -> dict:
@@ -3657,10 +3699,7 @@ class BarLayer(Layer):
         return self.y_values()
 
     def y_range(self):
-        y = self.y_values()
-        if y is None or len(y) == 0:
-            return None
-        return (float(np.min(y)), float(np.max(y)))
+        return _present_range(self.y_values())
 
     @property
     def bar_width(self) -> float:
@@ -4344,7 +4383,7 @@ class HistogramLayer(Layer):
         self._resolve_value_labels()
 
     def x_values(self) -> Optional[np.ndarray]:
-        return get_chart_observations("x", self.chart, "histogram")
+        return get_chart_observations("x", self.chart)
 
     def y_range(self):
         x = self.x_values()
@@ -4500,7 +4539,7 @@ class KdeLayer(Layer):
         self.xlim = self.settings.get("kde_xlim")
 
     def x_values(self) -> Optional[np.ndarray]:
-        return get_chart_observations("x", self.chart, "density")
+        return get_chart_observations("x", self.chart)
 
     def curve(self) -> Optional[tuple]:
         """The (x, density) samples; None when the values have no spread."""
@@ -4637,10 +4676,7 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
             self.hue_colors = [cycle[i]["color"] for i in range(len(unique_hues))]
 
     def y_range(self):
-        y = get_chart_data("y", self.chart)
-        if y is None or len(y) == 0:
-            return None
-        return (float(np.min(y)), float(np.max(y)))
+        return _present_range(get_chart_data("y", self.chart))
 
     def x_values(self):
         return get_chart_data("x", self.chart)
@@ -5130,10 +5166,7 @@ class GroupLayer(Layer):
         return [v for vals in self.grouped_values().values() for v in vals]
 
     def y_range(self):
-        values = self.value_data()
-        if not values:
-            return None
-        return (float(np.min(values)), float(np.max(values)))
+        return _present_range(self.value_data())
 
     def summary_datum(self, label, position, values) -> dict:
         """A group's hover datum: its category position on the drawn axis, then the five-number summary."""
@@ -5237,7 +5270,9 @@ class BoxLayer(GroupLayer):
         values = [grouped[lbl] for lbl in labels]
 
         if len(values) == 0:
-            warnings.warn("No data points found for box plot.")
+            # records whose values are all missing draw nothing, silently
+            if not self.chart.get("data"):
+                warnings.warn("No data points found for box plot.")
             return
 
         positions = [ctx.category_index[lbl] + self.offset for lbl in labels]
@@ -5449,7 +5484,9 @@ class SwarmLayer(UnclippedMarksMixin, PointLabelMixin, GroupLayer):
         grouped = self.grouped_values()
         labels = list(grouped.keys())
         if not labels:
-            warnings.warn("No data points found for swarm plot.")
+            # records whose values are all missing draw nothing, silently
+            if not self.chart.get("data"):
+                warnings.warn("No data points found for swarm plot.")
             return
 
         index = ctx.category_index
@@ -6124,7 +6161,9 @@ class ViolinLayer(GroupLayer):
     def draw(self, ax, ctx):
         labels, grouped = self._group()
         if len(labels) == 0:
-            warnings.warn("No data points found for violin plot.")
+            # records whose values are all missing draw nothing, silently
+            if not self.chart.get("data"):
+                warnings.warn("No data points found for violin plot.")
             return
 
         body_style = dict(self.violin_style)
@@ -6388,7 +6427,9 @@ class RidgelineLayer(GroupLayer):
     def draw(self, ax, ctx):
         grouped = self.grouped_values()
         if not grouped:
-            warnings.warn("No data points found for ridgeline plot.")
+            # records whose values are all missing draw nothing, silently
+            if not self.chart.get("data"):
+                warnings.warn("No data points found for ridgeline plot.")
             return
         for label, values in grouped.items():
             if len(values) < 2:
@@ -7277,6 +7318,11 @@ class ContourLayer(Layer):
         # clabel takes no font family; the level labels are restyled after
         self.label_family = resolve_font_family()
         self.x, self.y, self.z = self._grid()
+        # a grid of missing values alone draws nothing
+        self.empty = not np.isfinite(self.z).any()
+        if self.empty:
+            self.levels, self.extend, self.band_edges = None, "neither", None
+            return
         self.levels = contour_levels(self.z, self.settings.get("levels"))
         if self.filled:
             validate_filled_levels(self.levels)
@@ -7306,8 +7352,6 @@ class ContourLayer(Layer):
         """The validated (x, y, z) arrays; x and y default to the indices."""
 
         x, y, z = get_chart_grid(self.chart, "contour")
-        if not np.isfinite(z).any():
-            raise ValueError("The contour chart `z` grid has no finite values.")
         n_rows, n_cols = z.shape
         self._x_kind = axis_kind(x)
         if x is None:
@@ -7333,6 +7377,8 @@ class ContourLayer(Layer):
         return (float(self.y.min()), float(self.y.max()))
 
     def draw(self, ax, ctx):
+        if self.empty:
+            return
         style = dict(self.contour_style)
         if ctx.z_order is not None:
             style["zorder"] = ctx.z_order
@@ -8341,10 +8387,7 @@ class RadialLayer(Layer):
         return get_chart_data("y", self.chart)
 
     def y_range(self):
-        y = get_chart_data("y", self.chart)
-        if y is None or len(y) == 0:
-            return None
-        return (float(np.min(y)), float(np.max(y)))
+        return _present_range(get_chart_data("y", self.chart))
 
     def apply_scales(self, ax, scalex, scaley):
         # a polar axes rejects set_xscale; only the radial (value) axis scales
@@ -8547,7 +8590,7 @@ class RadialHistogramLayer(RadialLayer):
         self.num_bins = self.settings.get("num_bins") or DEFAULT_NUM_BINS
 
     def x_values(self) -> Optional[np.ndarray]:
-        return get_chart_observations("x", self.chart, "radial histogram")
+        return get_chart_observations("x", self.chart)
 
     def value_data(self):
         return None
@@ -11735,7 +11778,9 @@ class Panel:
                             show_yerr=idx == len(stack) - 1,
                         )
                         if stacks and y is not None:
-                            np.add.at(bottoms, positions, np.asarray(y, dtype=float))
+                            # a missing bar adds nothing to the stack
+                            heights = np.nan_to_num(np.asarray(y, dtype=float))
+                            np.add.at(bottoms, positions, heights)
             else:  # overlay
                 for layer in bar_layers:
                     bar_slots[id(layer)] = BarSlot(offset=0.0, width=layer.bar_width)
@@ -12261,6 +12306,9 @@ class Panel:
                 if len(siblings) > 1:
                     shared = _shared_data_interval(ax, axis_name)
                     lo, hi = min(lo, shared[0]), max(hi, shared[1])
+                if lo == hi:
+                    temporal = self.temporal_axis == axis_name
+                    lo, hi = _single_value_limits(lo, temporal)
                 (ax.set_ylim if horizontal else ax.set_xlim)(lo, hi)
                 pinned.add(axis_name)
 
@@ -12436,6 +12484,17 @@ class Panel:
         # the display axes whose ends sit on the data, per axes; a pinned
         # axis counts only while the user sets no limit on it
         ends_on_data = {ax: set()}
+        if not bare and not polar:
+            for axis_name in ("x", "y"):
+                if axis_name in pinned or (rank_axis and axis_name == "y"):
+                    continue
+                if all(s.get(f"{axis_name}{end}") is None for end in ("min", "max")):
+                    temporal = self.temporal_axis == axis_name
+                    _pad_single_value(ax, axis_name, temporal)
+            if ax_right is not None and all(
+                s.get(f"y{end}_right") is None for end in ("min", "max")
+            ):
+                _pad_single_value(ax_right, "x" if horizontal else "y", False)
         for axis_name in pinned:
             if all(s.get(f"{axis_name}{end}") is None for end in ("min", "max")):
                 ends_on_data[ax].add(axis_name)

@@ -414,7 +414,9 @@ def _ridgeline_layers(charts: List[dict], settings: dict) -> List[Layer]:
 
 
 def _check_dumbbells(charts: List[dict], settings: dict) -> None:
-    for chart in charts:
+    # a dataset left empty by missing values draws nothing beside the others
+    drawn = [chart for chart in charts if chart["data"]] or charts
+    for chart in drawn:
         validate_dumbbell_records(chart["data"])
 
 

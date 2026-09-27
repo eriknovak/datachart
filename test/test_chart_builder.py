@@ -424,15 +424,19 @@ class TestMissingValues(unittest.TestCase):
         build_charts_structure("linechart", data)
         self.assertEqual(data, before)
 
-    def test_a_grid_with_a_missing_cell_is_a_float_array(self):
+    def test_a_grid_reads_a_missing_cell_as_nan(self):
         for name in ("heatmap", "contourchart"):
             for missing in MISSING:
                 with self.subTest(kind=name, missing=missing):
-                    (chart,) = build_charts_structure(name, {"z": [[1, missing]]})
+                    grid = {"z": [[1, missing], [3, 4]]}
+                    (chart,) = build_charts_structure(name, grid)
                     z = chart["data"]["z"]
-                    self.assertEqual(z.dtype, float)
-                    self.assertEqual(z[0, 0], 1)
-                    self.assertTrue(np.isnan(z[0, 1]))
+                    self.assertIsInstance(z[0][0], int)
+                    self.assertTrue(np.isnan(z[0][1]))
+        array = np.array([[1.0, np.inf], [3.0, 4.0]])
+        (chart,) = build_charts_structure("heatmap", {"z": array})
+        self.assertTrue(np.isnan(chart["data"]["z"][0, 1]))
+        self.assertTrue(np.isinf(array[0, 1]))
 
     def test_a_finite_grid_is_left_as_given(self):
         for name, grid in GRIDS.items():
