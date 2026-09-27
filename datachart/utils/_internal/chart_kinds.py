@@ -243,6 +243,9 @@ class ChartKind:
         record_keys: The canonical keys of one record, in order; each is a
             remap parameter the builder reads the caller's key name from.
         required_keys: The record keys every record must carry.
+        required_by: The record keys every record must carry, given the
+            settings, for a front whose marks read different keys; it
+            overrides `required_keys`.
         check_records: Raises for records the key check cannot judge, given
             the built charts and settings.
         expand: Rewrites the built charts and settings, for a front whose
@@ -298,6 +301,7 @@ class ChartKind:
     projection: Optional[str] = None
     record_keys: Tuple[str, ...] = ()
     required_keys: Tuple[str, ...] = ()
+    required_by: Optional[Callable[[dict], Tuple[str, ...]]] = None
     check_records: Optional[Callable[[List[dict], dict], None]] = None
     expand: Optional[Expand] = None
     dict_data: bool = False
@@ -331,6 +335,13 @@ class ChartKind:
 
         return (CHART_KEYS | self.chart_keys | set(self.record_keys)) - self.figure_keys
 
+    def required(self, settings: dict) -> Tuple[str, ...]:
+        """The record keys every record must carry, given the settings."""
+
+        if self.required_by is not None:
+            return self.required_by(settings)
+        return self.required_keys
+
     def build_layers(self, charts: List[dict], settings: dict) -> List[Layer]:
         """The front's layers for already prepared charts."""
 
@@ -360,6 +371,12 @@ def _radial_mark(charts: List[dict], settings: dict) -> List[dict]:
             f"bar visual only; the {visual!r} visual has no bars to order."
         )
     return charts
+
+
+def _radial_required(settings: dict) -> Tuple[str, ...]:
+    # the histogram visual bins `x`; the others plot `y`, as a bar chart
+    visual = settings.get("mark") or RADIAL_TYPE.DEFAULT
+    return () if visual == RADIAL_TYPE.HISTOGRAM else ("y",)
 
 
 def _radial_layers(charts: List[dict], settings: dict) -> List[Layer]:
@@ -609,6 +626,7 @@ _KINDS = (
         domains={"mark": RADIAL_TYPE, "direction": RADIAL_DIRECTION},
         # the histogram visual reads `x`, the others `label` and `y`
         record_keys=("label", "x", "y", "yerr"),
+        required_by=_radial_required,
         build=_radial_layers,
         projection="polar",
         rejects={

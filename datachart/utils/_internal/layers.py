@@ -13216,6 +13216,24 @@ class Panel:
                     path_effects=self._text_halo(),
                 )
 
+    def legend_entries(self, ax) -> tuple:
+        """The legend handles and labels this panel drew on `ax` and its twins.
+
+        A combined panel tags each label with its value axis, as its own
+        legend does; otherwise the entries of every twin come in order.
+        """
+
+        # the marks may sit on a hidden twin of the axes
+        twins = [twin for twin in ax._twinned_axes.get_siblings(ax) if twin is not ax]
+        if self.settings.get("legend_mode") == "combined":
+            ax_right = twins[0] if twins else None
+            return self._combined_legend_entries(ax, ax_right, self.horizontal)
+        handles, labels = ax.get_legend_handles_labels()
+        for twin in twins:
+            entries = twin.get_legend_handles_labels()
+            handles, labels = handles + entries[0], labels + entries[1]
+        return handles, labels
+
     @staticmethod
     def _combined_legend_entries(ax_left, ax_right, horizontal=False) -> tuple:
         """The legend handles and labels of both axes, labels tagged by side."""

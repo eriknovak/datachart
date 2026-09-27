@@ -9,11 +9,12 @@ import os
 import warnings
 from collections import defaultdict
 from datetime import date, datetime
-from numbers import Real
+from numbers import Integral, Real
 
 from typing import List, Optional
 
 import matplotlib.dates as mdates
+from matplotlib.figure import Figure
 import numpy as np
 from PIL import Image
 
@@ -26,6 +27,7 @@ from ...constants import (
     DUMBBELL_SORT_KEY,
     DUMBBELL_VALUE,
     EMPHASIS,
+    LEGEND_LOCATION,
     GANTT_ARROW_ENTRY,
     GANTT_SORT_KEY,
     GANTT_VALUE,
@@ -69,16 +71,127 @@ def is_number(value) -> bool:
 
 
 def validate_bandwidth(bandwidth) -> None:
-    """Raise unless `bandwidth` is None, a rule name, or a number.
+    """Raise unless `bandwidth` is None, a rule name, or a finite number > 0.
 
     A rule name is checked against `BANDWIDTH` where the value is read.
     """
 
-    if not (bandwidth is None or isinstance(bandwidth, str) or is_number(bandwidth)):
+    if not (
+        bandwidth is None
+        or isinstance(bandwidth, str)
+        or (is_number(bandwidth) and math.isfinite(bandwidth) and bandwidth > 0)
+    ):
         raise ValueError(
             f"Invalid `bandwidth` value {bandwidth!r}. "
-            f"Must be None, one of {BANDWIDTH.members()}, or a number."
+            f"Must be None, one of {BANDWIDTH.members()}, or a finite number "
+            "greater than 0."
         )
+
+
+# the per-figure options a composition front reads from a chart dict
+PANEL_CHART_KEYS = ("figure", "y_axis", "z_order", "legend_label", "emphasis")
+GRID_CHART_KEYS = ("figure", "layout_spec")
+PANEL_Y_AXES = ("left", "right", "auto")
+# a grid cell's position and size, in grid rows and columns
+LAYOUT_SPEC_KEYS = ("row", "col", "rowspan", "colspan")
+
+
+def is_integer(value) -> bool:
+    """Whether `value` is an integer; bools are not, numpy integers are."""
+
+    return isinstance(value, Integral) and not isinstance(value, bool)
+
+
+def validate_chart_dict(chart: dict, index: int, allowed: tuple) -> None:
+    """Raise unless a composition chart dict holds a figure and known keys."""
+
+    if "figure" not in chart:
+        raise ValueError(f"Chart at index {index} is missing 'figure' key")
+    unknown = [key for key in chart if key not in allowed]
+    if unknown:
+        raise ValueError(
+            f"Invalid key {unknown[0]!r} in `charts[{index}]`. "
+            f"Must be one of {allowed}."
+        )
+    if not isinstance(chart["figure"], Figure):
+        raise ValueError(
+            f"Invalid `charts[{index}]['figure']` value {chart['figure']!r}. "
+            "Must be a figure created by a datachart chart function."
+        )
+
+
+def validate_panel_options(chart: dict, index: int) -> None:
+    """Raise for a Panel chart dict's unknown key, `y_axis`, or `z_order`."""
+
+    validate_chart_dict(chart, index, PANEL_CHART_KEYS)
+    y_axis = chart.get("y_axis")
+    if y_axis is not None and y_axis not in PANEL_Y_AXES:
+        raise ValueError(
+            f"Invalid `charts[{index}]['y_axis']` value {y_axis!r}. "
+            f"Must be one of {PANEL_Y_AXES} or None."
+        )
+    z_order = chart.get("z_order")
+    if z_order is not None and not is_integer(z_order):
+        raise ValueError(
+            f"Invalid `charts[{index}]['z_order']` value {z_order!r}. "
+            "Must be an integer or None."
+        )
+
+
+def validate_layout_specs(specs: list) -> None:
+    """Raise for a Grid layout spec out of range, or two cells that overlap."""
+
+    for index, spec in enumerate(specs):
+        where = f"charts[{index}]['layout_spec']"
+        if not isinstance(spec, dict):
+            raise ValueError(
+                f"Invalid `{where}` value {spec!r}. Must be a dict with the "
+                f"keys {LAYOUT_SPEC_KEYS}."
+            )
+        unknown = [key for key in spec if key not in LAYOUT_SPEC_KEYS]
+        if unknown:
+            raise ValueError(
+                f"Invalid key {unknown[0]!r} in `{where}`. "
+                f"Must be one of {LAYOUT_SPEC_KEYS}."
+            )
+        missing = [key for key in LAYOUT_SPEC_KEYS if key not in spec]
+        if missing:
+            raise ValueError(f"{where} missing required keys: {missing}")
+        for key in LAYOUT_SPEC_KEYS:
+            # a position may be 0, a span must cover at least one cell
+            least = 1 if key.endswith("span") else 0
+            if not is_integer(spec[key]) or spec[key] < least:
+                raise ValueError(
+                    f"Invalid `{where}['{key}']` value {spec[key]!r}. "
+                    f"Must be an integer >= {least}."
+                )
+    cells = {}
+    for index, spec in enumerate(specs):
+        for row in range(spec["row"], spec["row"] + spec["rowspan"]):
+            for col in range(spec["col"], spec["col"] + spec["colspan"]):
+                other = cells.setdefault((row, col), index)
+                if other != index:
+                    raise ValueError(
+                        f"`charts[{other}]` and `charts[{index}]` overlap in "
+                        f"the grid at row {row}, column {col}; each grid cell "
+                        "holds one chart."
+                    )
+
+
+def validate_max_cols(max_cols) -> None:
+    """Raise unless `max_cols` is None or a positive integer."""
+
+    if max_cols is not None and (not is_integer(max_cols) or max_cols < 1):
+        raise ValueError(
+            f"Invalid `max_cols` value {max_cols!r}. "
+            "Must be None or an integer >= 1."
+        )
+
+
+def validate_legend_location(legend) -> None:
+    """Raise unless a legend setting's `location` is a `LEGEND_LOCATION`."""
+
+    LEGEND_LOCATION.check((legend or {}).get("location"), "legend['location']")
 
 
 def validate_single_dataset(n_datasets: int, name: str) -> None:

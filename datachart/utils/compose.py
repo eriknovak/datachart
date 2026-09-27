@@ -52,7 +52,14 @@ from ._internal.layers import (
     value_axis_grid,
     _rule_summary,
 )
-from ._internal.validate import validate_emphasis_rule
+from ._internal.validate import (
+    GRID_CHART_KEYS,
+    validate_chart_dict,
+    validate_emphasis_rule,
+    validate_legend_location,
+    validate_max_cols,
+    validate_panel_options,
+)
 
 
 def _extract_groups(figure: plt.Figure, index: int) -> Tuple[_PanelSeam, list]:
@@ -361,18 +368,20 @@ def Panel(
         A matplotlib Figure containing the overlaid charts.
 
     Raises:
-        ValueError: If charts is empty, an item is not a figure or a valid dict,
-            a figure cannot be overlaid (missing metadata, Grid figure), or the
-            figures mix horizontal and vertical orientations.
+        ValueError: If charts is empty, an item is not a figure or a valid dict
+            (an unknown key, a `y_axis` other than "left", "right" or "auto",
+            a non-integer `z_order`), the legend location is unknown, a figure
+            cannot be overlaid (missing metadata, Grid figure), or the figures
+            mix horizontal and vertical orientations.
     """
     check_domains(locals(), {"scaley_right": AXIS_SCALE})
+    validate_legend_location(legend)
     items = []
     for i, item in enumerate(charts):
         if isinstance(item, plt.Figure):
             items.append({"figure": item})
         elif isinstance(item, dict):
-            if "figure" not in item:
-                raise ValueError(f"Chart at index {i} is missing 'figure' key")
+            validate_panel_options(item, i)
             check_domains(item, {})
             items.append(item)
         else:
@@ -872,9 +881,13 @@ def Grid(
 
     Raises:
         ValueError: If charts is empty, rows are mixed with flat items, a cell
-            is invalid, or a figure cannot be composed (missing metadata).
+            is invalid, two `layout_spec` cells overlap, `max_cols` is not a
+            positive integer, the legend location is unknown, or a figure
+            cannot be composed (missing metadata).
     """
     check_domains(locals(), {})
+    validate_max_cols(max_cols)
+    validate_legend_location(legend)
     if not charts:
         raise ValueError("At least one chart is required")
     furniture = {
@@ -910,6 +923,7 @@ def Grid(
         if isinstance(item, plt.Figure):
             items.append({"figure": item})
         elif isinstance(item, dict):
+            validate_chart_dict(item, i, GRID_CHART_KEYS)
             items.append(item)
         else:
             raise ValueError(f"Item at index {i} is not a matplotlib Figure or a dict")

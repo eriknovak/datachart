@@ -6,7 +6,7 @@ there are, and every record comes out under the row's canonical keys
 """
 
 import warnings
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional, Tuple
 
 from .chart_kinds import ChartKind, chart_kind
 
@@ -347,6 +347,7 @@ def build_charts_structure(
     vspans: Any = None,
     hspans: Any = None,
     texts: Any = None,
+    required_keys: Optional[Tuple[str, ...]] = None,
     **extra_attrs: Any,
 ) -> List[Dict[str, Any]]:
     """Build the canonical chart dicts: the one record-reading seam (ADR 0069).
@@ -373,6 +374,8 @@ def build_charts_structure(
         vspans: The vertical reference bands.
         hspans: The horizontal reference bands.
         texts: The text annotations.
+        required_keys: The record keys every record must carry; None takes
+            the row's `required_keys`.
         **extra_attrs: Extra chart-specific attributes.
 
     Returns:
@@ -432,11 +435,16 @@ def build_charts_structure(
     if kind.record_keys:
         for index, chart in enumerate(charts):
             where = f"data[{index}]" if is_multi_chart else "data"
-            chart["data"] = canonical_records(kind, chart, where)
+            chart["data"] = canonical_records(kind, chart, where, required_keys)
     return charts
 
 
-def canonical_records(kind: ChartKind, chart: dict, where: str) -> Any:
+def canonical_records(
+    kind: ChartKind,
+    chart: dict,
+    where: str,
+    required_keys: Optional[Tuple[str, ...]] = None,
+) -> Any:
     """The chart's records copied under the row's canonical keys (ADR 0069).
 
     Pops the chart's remap parameters: each names the caller's key for one
@@ -452,6 +460,8 @@ def canonical_records(kind: ChartKind, chart: dict, where: str) -> Any:
         kind: The front's row, declaring the record keys.
         chart: One chart dict, its `data` a list of records or of columns.
         where: How the error names the chart's records, e.g. `"data[1]"`.
+        required_keys: The record keys every record must carry; None takes
+            the row's `required_keys`.
 
     Returns:
         The chart's data under canonical keys.
@@ -482,10 +492,11 @@ def canonical_records(kind: ChartKind, chart: dict, where: str) -> Any:
         return _canonical(data, sources)
     if not isinstance(data, list):
         return data
+    required = kind.required_keys if required_keys is None else required_keys
     records = []
     for index, record in enumerate(data):
         if isinstance(record, dict):
-            for key in kind.required_keys:
+            for key in required:
                 if sources[key] is not None and sources[key] not in record:
                     raise ValueError(
                         f"{kind.label[0].upper()}{kind.label[1:]} record "

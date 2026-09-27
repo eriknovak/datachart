@@ -148,7 +148,9 @@ def render(chart_type: str, params: dict) -> plt.Figure:
         if settings.get(key) is None:
             settings[key] = value
 
-    charts = build_charts_structure(chart_type, params["data"], **per_chart)
+    charts = build_charts_structure(
+        chart_type, params["data"], required_keys=kind.required(settings), **per_chart
+    )
     if kind.check_records is not None:
         kind.check_records(charts, settings)
     if kind.expand is not None:
