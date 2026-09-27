@@ -6359,7 +6359,7 @@ class RidgelineLayer(GroupLayer):
             if np.ptp(fit) == 0:
                 ends.append((fit[0], fit[0]))
                 continue
-            curve = kde1d(fit, bandwidth=self.bandwidth, gridsize=2)
+            curve = kde1d(fit, bandwidth=self.bandwidth, grid_size=2)
             ends.append((curve[0]["x"], curve[-1]["x"]))
         if not ends:
             return None
@@ -6511,7 +6511,7 @@ class RidgelineLayer(GroupLayer):
         if np.ptp(values) == 0:
             return np.zeros(RIDGE_GRIDSIZE)
         curve = kde1d(
-            values, bandwidth=self.bandwidth, gridsize=RIDGE_GRIDSIZE, xlim=(lo, hi)
+            values, bandwidth=self.bandwidth, grid_size=RIDGE_GRIDSIZE, xlim=(lo, hi)
         )
         return np.array([point["y"] for point in curve])
 

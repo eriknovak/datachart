@@ -83,7 +83,9 @@ deprecated keyword in the front's signature, and the legacy kind-as-
 `show_values` branch in `_validate_value_kind`. Remove any
 `_DEPRECATED_ALIASES` entry in `datachart/constants.py` and any `_RENAMED`
 entry on a constant class that already shipped, and any `STYLE_ALIASES`
-entry in `datachart/themes/_base.py` that already shipped. Publishing the
+entry in `datachart/themes/_base.py` that already shipped, and the
+deprecated `gridsize` keyword of `kde1d`/`kde2d` with its `_grid_size`
+helper in `datachart/utils/stats.py` once it has shipped. Publishing the
 GitHub release then triggers PyPI and the versioned docs.
 
 ## Architecture

@@ -2143,7 +2143,7 @@ def contour_kde2d():
         [rng.normal((-1, -1), 0.6, (150, 2)), rng.normal((1.5, 1), 0.8, (100, 2))]
     )
     return ContourChart(
-        data=kde2d(pts[:, 0].tolist(), pts[:, 1].tolist(), gridsize=60),
+        data=kde2d(pts[:, 0].tolist(), pts[:, 1].tolist(), grid_size=60),
         fill=True,
         show_colorbar=True,
         levels=8,
