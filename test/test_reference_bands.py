@@ -92,7 +92,7 @@ class TestTypingsAndThemes(unittest.TestCase):
                     self.assertIn(f"plot_{side}_{key}", theme, theme_name)
 
     def test_base_defaults(self):
-        config.reset_config()
+        config.reset()
         self.assertIsNone(config["plot_vspan_color"])
         self.assertEqual(config["plot_vspan_alpha"], 0.25)
         self.assertEqual(config["plot_vspan_zorder"], 1.75)
@@ -101,7 +101,7 @@ class TestTypingsAndThemes(unittest.TestCase):
 
 class TestStyleResolvers(unittest.TestCase):
     def tearDown(self):
-        config.reset_config()
+        config.reset()
 
     def test_defaults(self):
         style = get_vspan_style({})
@@ -168,7 +168,7 @@ class TestBounds(unittest.TestCase):
 
 class TestStacking(unittest.TestCase):
     def tearDown(self):
-        config.reset_config()
+        config.reset()
         plt.close("all")
 
     def test_default_zorder_between_grid_and_marks(self):
@@ -201,7 +201,7 @@ class TestStacking(unittest.TestCase):
         self.assertGreater(line.get_zorder(), max(p.get_zorder() for p in points))
 
     def test_theme_zorder_moves_band(self):
-        config.update_config({"plot_hspan_zorder": 10})
+        config.update({"plot_hspan_zorder": 10})
         figure = LineChart(
             data=LINE, hspans={"ymin": 1, "ymax": 3}, hlines={"y": 2, "label": "ref"}
         )

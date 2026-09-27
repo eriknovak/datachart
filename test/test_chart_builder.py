@@ -172,6 +172,24 @@ class TestMalformedData(unittest.TestCase):
             [{"data": [{"x": 1, "y": 3}, {"x": 2, "y": 4}]}],
         )
 
+    def test_a_list_of_column_dicts_is_one_chart_each(self):
+        charts = build_charts_structure(
+            "linechart", [{"x": [1, 2], "y": [3, 4]}, {"x": [5], "y": [6]}]
+        )
+        self.assertEqual(
+            charts,
+            [
+                {"data": [{"x": 1, "y": 3}, {"x": 2, "y": 4}]},
+                {"data": [{"x": 5, "y": 6}]},
+            ],
+        )
+
+    def test_a_record_with_a_list_value_stays_a_record(self):
+        records = [{"x": 1, "y": 2, "yerr": [0.5, 1.0]}]
+        self.assertEqual(
+            build_charts_structure("linechart", records), [{"data": records}]
+        )
+
     def test_columns_of_unequal_length_are_named(self):
         self.assertRejects(
             "linechart", {"x": [1, 2], "y": [3]}, r"equal lengths.*'x': 2, 'y': 1"

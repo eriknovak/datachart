@@ -1,4 +1,5 @@
 import unittest
+import warnings
 from datetime import datetime, timedelta, timezone
 
 import matplotlib
@@ -25,6 +26,7 @@ from datachart.utils.stats import (
     variance,
     iqr,
     correlation,
+    pearson,
     mean,
     median,
     spearman,
@@ -133,44 +135,54 @@ class TestStats(unittest.TestCase):
         self.assertEqual(result, 3.0)
 
     # =====================================
-    # Test correlation
+    # Test pearson
     # =====================================
 
-    def test_correlation_perfect_positive(self):
+    def test_pearson_perfect_positive(self):
         # check perfect positive correlation
         x = [1, 2, 3, 4, 5]
         y = [1, 2, 3, 4, 5]
-        result = correlation(x, y)
+        result = pearson(x, y)
         self.assertAlmostEqual(result, 1.0, places=10)
 
-    def test_correlation_perfect_negative(self):
+    def test_pearson_perfect_negative(self):
         # check perfect negative correlation
         x = [1, 2, 3, 4, 5]
         y = [5, 4, 3, 2, 1]
-        result = correlation(x, y)
+        result = pearson(x, y)
         self.assertAlmostEqual(result, -1.0, places=10)
 
-    def test_correlation_no_correlation(self):
+    def test_pearson_constant_is_nan(self):
         # check no correlation (constant y)
         x = [1, 2, 3, 4, 5]
         y = [3, 3, 3, 3, 3]
-        result = correlation(x, y)
+        result = pearson(x, y)
         # When one variable is constant, correlation is NaN
         self.assertTrue(result != result)  # NaN check
 
-    def test_correlation_length_mismatch(self):
+    def test_pearson_length_mismatch(self):
         # check that mismatched lengths raise ValueError
         x = [1, 2, 3]
         y = [1, 2]
         with self.assertRaises(ValueError):
-            correlation(x, y)
+            pearson(x, y)
 
-    def test_correlation_type_error(self):
+    def test_correlation_is_the_deprecated_pearson(self):
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            self.assertEqual(correlation([1, 2, 3], [3, 2, 1]), -1.0)
+        deprecations = [w for w in caught if w.category is DeprecationWarning]
+        self.assertEqual(len(deprecations), 1)
+        self.assertIn("`correlation`", str(deprecations[0].message))
+        self.assertIn("`pearson`", str(deprecations[0].message))
+        self.assertEqual(deprecations[0].filename, __file__)
+
+    def test_pearson_type_error(self):
         # check that invalid types raise TypeError
         with self.assertRaises(TypeError):
-            correlation("not a list", [1, 2, 3])
+            pearson("not a list", [1, 2, 3])
         with self.assertRaises(TypeError):
-            correlation([1, 2, 3], "not a list")
+            pearson([1, 2, 3], "not a list")
 
     # Test spearman
 
@@ -412,9 +424,11 @@ class TestStats(unittest.TestCase):
     def test_kde1d_curve_integrates_to_one(self):
         values = np.random.RandomState(0).normal(size=300).tolist()
         curve = kde1d(values)
-        self.assertEqual(len(curve), 100)
-        x = [point["x"] for point in curve]
-        y = [point["y"] for point in curve]
+        self.assertEqual(set(curve), {"x", "y"})
+        x, y = curve["x"], curve["y"]
+        self.assertIsInstance(x, list)
+        self.assertEqual(len(x), 100)
+        self.assertEqual(len(y), 100)
         self.assertAlmostEqual(float(np.trapezoid(y, x)), 1.0, places=2)
         # the grid extends past the values by `cut` bandwidths
         self.assertLess(x[0], min(values))
@@ -422,7 +436,7 @@ class TestStats(unittest.TestCase):
 
     def test_kde1d_cut_zero_spans_the_values(self):
         curve = kde1d([1, 2, 3, 4], grid_size=4, cut=0)
-        self.assertEqual([point["x"] for point in curve], [1.0, 2.0, 3.0, 4.0])
+        self.assertEqual(curve["x"], [1.0, 2.0, 3.0, 4.0])
 
     def test_kde_gridsize_is_deprecated(self):
         for kde, args in ((kde1d, ([1, 2, 3],)), (kde2d, ([1, 2, 3], [1, 3, 2]))):
@@ -446,7 +460,7 @@ class TestStats(unittest.TestCase):
 
     def test_kde_limits_override_the_padded_range(self):
         curve = kde1d([1, 2, 3], grid_size=3, xlim=(0, 10))
-        self.assertEqual([point["x"] for point in curve], [0.0, 5.0, 10.0])
+        self.assertEqual(curve["x"], [0.0, 5.0, 10.0])
         surface = kde2d([1, 2, 3], [1, 3, 2], grid_size=2, xlim=(0, 4), ylim=(-1, 5))
         self.assertEqual(surface["x"], [0.0, 4.0])
         self.assertEqual(surface["y"], [-1.0, 5.0])
@@ -530,11 +544,11 @@ class TestStatsMissingValues(unittest.TestCase):
         self.assertEqual(histogram(HOLED, bins=3), histogram(FINITE, bins=3))
 
     def test_densities_ignore_missing_values(self):
-        self.assertEqual(kde1d(HOLED, gridsize=5), kde1d(FINITE, gridsize=5))
+        self.assertEqual(kde1d(HOLED, grid_size=5), kde1d(FINITE, grid_size=5))
         y = [2.0, 1.0, 5.0, 3.0, 4.0]
         holed_y = [2.0, 9.0, 1.0, 9.0, 5.0, 9.0, 3.0, 9.0, 4.0]
         self.assertEqual(
-            kde2d(HOLED, holed_y, gridsize=4), kde2d(FINITE, y, gridsize=4)
+            kde2d(HOLED, holed_y, grid_size=4), kde2d(FINITE, y, grid_size=4)
         )
 
     def test_smoothers_keep_one_value_per_input(self):
@@ -574,7 +588,7 @@ class TestStatsTemporalX(unittest.TestCase):
     def test_helpers_accept_every_temporal_form(self):
         for name, x in self.forms().items():
             with self.subTest(form=name):
-                correlation(x, self.y)
+                pearson(x, self.y)
                 spearman(x, self.y)
                 linear_fit(x, self.y)
                 loess(x, self.y)
@@ -584,9 +598,7 @@ class TestStatsTemporalX(unittest.TestCase):
         numbers = list(mdates.date2num(self.days))
         for name, x in self.forms().items():
             with self.subTest(form=name):
-                self.assertAlmostEqual(
-                    correlation(x, self.y), correlation(numbers, self.y)
-                )
+                self.assertAlmostEqual(pearson(x, self.y), pearson(numbers, self.y))
                 self.assertAlmostEqual(spearman(x, self.y), spearman(numbers, self.y))
 
     def test_linear_fit_slope_is_per_day(self):
@@ -633,7 +645,7 @@ class TestStatsTemporalX(unittest.TestCase):
     def test_mixed_temporal_and_numeric_raises(self):
         mixed = [self.days[0], 1.0, self.days[2]]
         y = [1.0, 2.0, 3.0]
-        for helper in (correlation, spearman, linear_fit, loess, kde2d):
+        for helper in (pearson, spearman, linear_fit, loess, kde2d):
             with self.subTest(helper=helper.__name__):
                 with self.assertRaises(TypeError):
                     helper(mixed, y)
@@ -650,7 +662,7 @@ class TestStatsTemporalX(unittest.TestCase):
     def test_helpers_accept_a_datetime_index(self):
         x = pd.DatetimeIndex(self.days)
         numbers = list(mdates.date2num(self.days))
-        self.assertAlmostEqual(correlation(x, self.y), correlation(numbers, self.y))
+        self.assertAlmostEqual(pearson(x, self.y), pearson(numbers, self.y))
         self.assertAlmostEqual(spearman(x, self.y), spearman(numbers, self.y))
         self.assertAlmostEqual(linear_fit(x, self.y)[0], linear_fit(numbers, self.y)[0])
         self.assertIsInstance(loess(x, self.y)[0]["x"], datetime)

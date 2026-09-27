@@ -60,10 +60,10 @@ def texts(ax):
 
 class ValueLabelCase(unittest.TestCase):
     def setUp(self):
-        config.reset_config()
+        config.reset()
 
     def tearDown(self):
-        config.reset_config()
+        config.reset()
         plt.close("all")
 
 
@@ -74,7 +74,7 @@ class TestStyleFamily(ValueLabelCase):
         self.assertNotIn("plot_bar_value_fontsize", DEFAULT_THEME)
 
     def test_bar_value_keys_alias_the_family_in_config(self):
-        config.update_config({"plot_bar_value_fontsize": 13})
+        config.update({"plot_bar_value_fontsize": 13})
         self.assertEqual(config["plot_value_fontsize"], 13)
         self.assertEqual(config["plot_bar_value_fontsize"], 13)
         self.assertEqual(config.get("plot_bar_value_fontsize"), 13)
@@ -324,7 +324,7 @@ class TestThemeDefault(ValueLabelCase):
     )
 
     def test_labelling_theme_labels_every_front(self):
-        config.update_config({"chart_default_show_values": True})
+        config.update({"chart_default_show_values": True})
         for front in self.FRONTS:
             self.assertTrue(labels(front().axes[0]))
             self.assertFalse(labels(front(show_values=False).axes[0]))
@@ -334,11 +334,11 @@ class TestThemeDefault(ValueLabelCase):
             self.assertFalse(labels(front().axes[0]))
 
     def test_labelling_theme_labels_a_raincloud_range(self):
-        config.update_config({"chart_default_show_values": True})
+        config.update({"chart_default_show_values": True})
         self.assertEqual(len(texts(RaincloudPlot(GROUPS).axes[0])), 6)
 
     def test_point_labels_win_over_the_theme_default(self):
-        config.update_config({"chart_default_show_values": True})
+        config.update({"chart_default_show_values": True})
         figure = ScatterChart(NAMED, label="name")
         self.assertEqual(texts(figure.axes[0]), ["p0", "p1", "p2"])
 
@@ -373,9 +373,7 @@ class TestLogBars(ValueLabelCase):
     """A bar on a log axis draws and labels its true value."""
 
     def test_vertical_log_bar_keeps_its_value(self):
-        figure = BarChart(
-            [{"label": "A", "y": 10}], scaley="log", show_values=True
-        )
+        figure = BarChart([{"label": "A", "y": 10}], scaley="log", show_values=True)
         ax = figure.axes[0]
         self.assertEqual(ax.patches[0].get_height(), 10)
         self.assertEqual(texts(ax), ["10"])

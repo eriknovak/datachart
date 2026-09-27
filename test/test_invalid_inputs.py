@@ -52,7 +52,7 @@ class TestBandwidth(InvalidInputCase):
                     ViolinPlot(data, bandwidth=bandwidth)
 
     def test_a_positive_number_passes(self):
-        self.assertEqual(len(kde1d(VALUES, bandwidth=0.5, grid_size=10)), 10)
+        self.assertEqual(len(kde1d(VALUES, bandwidth=0.5, grid_size=10)["y"]), 10)
 
 
 class TestPanelDicts(InvalidInputCase):

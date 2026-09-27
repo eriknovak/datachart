@@ -129,7 +129,7 @@ class TestTypingsAndThemes(unittest.TestCase):
 
 class TestStyleResolver(unittest.TestCase):
     def tearDown(self):
-        config.reset_config()
+        config.reset()
 
     def test_defaults(self):
         style = get_bracket_style({})
@@ -176,7 +176,7 @@ class TestValidation(unittest.TestCase):
 
 class TestGeometry(unittest.TestCase):
     def tearDown(self):
-        config.reset_config()
+        config.reset()
         plt.close("all")
 
     def test_the_path_is_a_tick_the_span_and_a_tick(self):

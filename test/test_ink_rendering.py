@@ -93,14 +93,14 @@ class TestInkStroke(unittest.TestCase):
         self.assertFalse(data_lines(LineChart(LINE))[0].get_path_effects())
 
     def test_series_line_takes_the_stroke(self):
-        config.update_config({"plot_ink_stroke": STROKE})
+        config.update({"plot_ink_stroke": STROKE})
         figure = LineChart(LINE)
         (effect,) = ink_effects(data_lines(figure)[0])
         self.assertAlmostEqual(effect.width_scale, 1.6)
         png(figure)
 
     def test_regression_line_takes_the_stroke(self):
-        config.update_config({"plot_ink_stroke": STROKE})
+        config.update({"plot_ink_stroke": STROKE})
         figure = ScatterChart(
             [{"x": float(i), "y": float(i % 3)} for i in range(6)],
             show_regression=True,
@@ -108,18 +108,18 @@ class TestInkStroke(unittest.TestCase):
         self.assertTrue(any(ink_effects(line) for line in data_lines(figure)))
 
     def test_contour_lines_take_the_stroke(self):
-        config.update_config({"plot_ink_stroke": STROKE})
+        config.update({"plot_ink_stroke": STROKE})
         figure = ContourChart(GRID)
         self.assertTrue(any(ink_effects(c) for c in figure.axes[0].collections))
 
     def test_chart_style_turns_the_stroke_off(self):
-        config.update_config({"plot_ink_stroke": STROKE})
+        config.update({"plot_ink_stroke": STROKE})
         figure = LineChart(LINE, style={"plot_ink_stroke": None})
         self.assertFalse(ink_effects(data_lines(figure)[0]))
 
     def test_stroke_changes_the_pixels_and_repeats(self):
         plain = png(LineChart(LINE))
-        config.update_config({"plot_ink_stroke": STROKE})
+        config.update({"plot_ink_stroke": STROKE})
         first, second = png(LineChart(LINE)), png(LineChart(LINE))
         self.assertNotEqual(plain, first)
         self.assertEqual(first, second)
@@ -135,7 +135,7 @@ class TestInkStroke(unittest.TestCase):
         self.assertGreater(renderer.fills, 3)
 
     def test_grid_keeps_the_stroke(self):
-        config.update_config({"plot_ink_stroke": STROKE})
+        config.update({"plot_ink_stroke": STROKE})
         source = LineChart(LINE)
         config.set_theme(THEME.DEFAULT)
         grid = Grid([source, LineChart(LINE)])
@@ -144,7 +144,7 @@ class TestInkStroke(unittest.TestCase):
 
     def test_no_rc_leakage(self):
         before = copy.deepcopy(matplotlib.rcParams["path.effects"])
-        config.update_config({"plot_ink_stroke": STROKE})
+        config.update({"plot_ink_stroke": STROKE})
         png(LineChart(LINE))
         self.assertEqual(matplotlib.rcParams["path.effects"], before)
 
@@ -174,7 +174,7 @@ class TestEtch(unittest.TestCase):
         self.assertGreater(hatched_draws(bars), 0)
 
     def test_hatched_bars_are_etched_not_tiled(self):
-        config.update_config({"plot_etch": ETCH})
+        config.update({"plot_etch": ETCH})
         bars = BarChart(BAR, style={"plot_bar_hatch": "/"})
         patch = bars.axes[0].patches[0]
         (effect,) = etch_effects(patch)
@@ -183,11 +183,11 @@ class TestEtch(unittest.TestCase):
 
     def test_unhatched_bars_draw_as_they_are(self):
         plain = png(BarChart(BAR))
-        config.update_config({"plot_etch": ETCH})
+        config.update({"plot_etch": ETCH})
         self.assertEqual(png(BarChart(BAR)), plain)
 
     def test_histogram_and_radial_bars_are_etched(self):
-        config.update_config({"plot_etch": ETCH, "plot_hatch_cycle": ["/", "x"]})
+        config.update({"plot_etch": ETCH, "plot_hatch_cycle": ["/", "x"]})
         hist = Histogram({"x": [1.0, 2.0, 2.0, 3.0, 3.0, 3.0]})
         self.assertTrue(etch_effects(hist.axes[0].patches[0]))
         radial = RadialChart(BAR, mark="bar")
@@ -195,7 +195,7 @@ class TestEtch(unittest.TestCase):
         self.assertEqual(hatched_draws(hist) + hatched_draws(radial), 0)
 
     def test_area_fills_etch_without_wash(self):
-        config.update_config({"plot_etch": ETCH, "plot_area_hatch": "/"})
+        config.update({"plot_etch": ETCH, "plot_area_hatch": "/"})
         line = LineChart(LINE, show_area=True)
         (effect,) = etch_effects(line.axes[0].collections[0])
         self.assertIsNone(effect.wash)
@@ -204,7 +204,7 @@ class TestEtch(unittest.TestCase):
         self.assertEqual(hatched_draws(line), 0)
 
     def test_etching_repeats(self):
-        config.update_config({"plot_etch": ETCH})
+        config.update({"plot_etch": ETCH})
         first = png(BarChart(BAR, style={"plot_bar_hatch": "x."}))
         second = png(BarChart(BAR, style={"plot_bar_hatch": "x."}))
         self.assertEqual(first, second)
@@ -232,7 +232,7 @@ class TestGroundColors(unittest.TestCase):
             self.assertIsNone(config[key], key)
 
     def test_panel_applies_ground_and_furniture(self):
-        config.update_config(GROUND)
+        config.update(GROUND)
         figure = LineChart(LINE, subtitle="Run", show_legend=True)
         ax = figure.axes[0]
         self.assertEqual(to_hex(figure.get_facecolor()), PARCHMENT.lower())
@@ -245,12 +245,12 @@ class TestGroundColors(unittest.TestCase):
         self.assertEqual(to_hex(frame.get_facecolor()), PARCHMENT.lower())
 
     def test_bare_panel_takes_the_ground(self):
-        config.update_config(GROUND)
+        config.update(GROUND)
         figure = SankeyChart({"links": [{"source": "a", "target": "b", "value": 1.0}]})
         self.assertEqual(to_hex(figure.get_facecolor()), PARCHMENT.lower())
 
     def test_halo_follows_the_ground(self):
-        config.update_config({**GROUND, "plot_sketch_halo_width": 2})
+        config.update({**GROUND, "plot_sketch_halo_width": 2})
         figure = BarChart(BAR, show_values=True)
         (effect,) = figure.axes[0].texts[0].get_path_effects()
         self.assertEqual(to_hex(effect._gc["foreground"]), PARCHMENT.lower())
@@ -264,14 +264,14 @@ class TestAreaAndBodyEtching(unittest.TestCase):
         plt.close("all")
 
     def test_hatch_cycle_skips_areas_without_etch(self):
-        config.update_config({"plot_hatch_cycle": ["/", "x"]})
+        config.update({"plot_hatch_cycle": ["/", "x"]})
         figure = StackedAreaChart([LINE, LINE_2])
         self.assertEqual(
             [c.get_hatch() for c in figure.axes[0].collections], [None, None]
         )
 
     def test_each_area_takes_its_own_pattern(self):
-        config.update_config({"plot_etch": ETCH, "plot_hatch_cycle": ["/", "x"]})
+        config.update({"plot_etch": ETCH, "plot_hatch_cycle": ["/", "x"]})
         stacked = StackedAreaChart([LINE, LINE_2])
         self.assertEqual(
             [c.get_hatch() for c in stacked.axes[0].collections], ["/", "x"]
@@ -280,18 +280,18 @@ class TestAreaAndBodyEtching(unittest.TestCase):
         self.assertEqual([c.get_hatch() for c in lines.axes[0].collections], ["/", "x"])
 
     def test_chart_area_hatch_beats_the_cycle(self):
-        config.update_config({"plot_etch": ETCH, "plot_hatch_cycle": ["/", "x"]})
+        config.update({"plot_etch": ETCH, "plot_hatch_cycle": ["/", "x"]})
         figure = LineChart(LINE, show_area=True, style={"plot_area_hatch": "."})
         self.assertEqual(figure.axes[0].collections[0].get_hatch(), ".")
 
     def test_area_legend_swatch_carries_the_etch(self):
-        config.update_config({"plot_etch": ETCH, "plot_hatch_cycle": ["/", "x"]})
+        config.update({"plot_etch": ETCH, "plot_hatch_cycle": ["/", "x"]})
         figure = StackedAreaChart([LINE, LINE_2], subtitle=["a", "b"], show_legend=True)
         swatch = figure.axes[0].get_legend().get_patches()[0]
         self.assertTrue(etch_effects(swatch))
 
     def test_bodies_take_their_hatch_and_etch(self):
-        config.update_config(
+        config.update(
             {
                 "plot_etch": ETCH,
                 "plot_box_hatch": "/",
@@ -321,20 +321,18 @@ class TestStyleCycles(unittest.TestCase):
         self.assertIsNone(config["plot_marker_cycle"])
 
     def test_line_styles_cycle_per_series(self):
-        config.update_config({"plot_linestyle_cycle": ["-", "--", ":"]})
+        config.update({"plot_linestyle_cycle": ["-", "--", ":"]})
         figure = LineChart([LINE, LINE_2])
         styles = [line.get_linestyle() for line in data_lines(figure)]
         self.assertEqual(styles, ["-", "--"])
 
     def test_chart_line_style_wins(self):
-        config.update_config({"plot_linestyle_cycle": ["--"]})
+        config.update({"plot_linestyle_cycle": ["--"]})
         figure = LineChart(LINE, style={"plot_line_style": ":"})
         self.assertEqual(data_lines(figure)[0].get_linestyle(), ":")
 
     def test_markers_cycle_filled_and_hollow(self):
-        config.update_config(
-            {"plot_marker_cycle": ["o", {"marker": "s", "hollow": True}]}
-        )
+        config.update({"plot_marker_cycle": ["o", {"marker": "s", "hollow": True}]})
         points = [{"x": float(i), "y": float(i)} for i in range(4)]
         shifted = [{"x": float(i), "y": float(i) + 1} for i in range(4)]
         figure = ScatterChart([points, shifted])
@@ -349,7 +347,7 @@ class TestStyleCycles(unittest.TestCase):
         )
 
     def test_chart_marker_wins(self):
-        config.update_config({"plot_marker_cycle": [{"marker": "s", "hollow": True}]})
+        config.update({"plot_marker_cycle": [{"marker": "s", "hollow": True}]})
         points = [{"x": float(i), "y": float(i)} for i in range(4)]
         figure = ScatterChart(points, style={"plot_scatter_marker": "^"})
         self.assertEqual(len(figure.axes[0].collections[0].get_facecolor()), 1)
@@ -481,7 +479,7 @@ class TestDownloadedFaces(unittest.TestCase):
         self.assertEqual(os.listdir(os.path.join(self.folder.name, "fonts")), [])
 
     def test_unreachable_face_warns_once_and_drops_out(self):
-        config.update_config({"font_general_serif": [self.FACE, "DejaVu Serif"]})
+        config.update({"font_general_serif": [self.FACE, "DejaVu Serif"]})
         with self.urlopen(side_effect=OSError("offline")) as urlopen:
             with self.assertWarnsRegex(UserWarning, "offline") as caught:
                 stack = resolve_font_family("serif")
@@ -501,7 +499,7 @@ class TestDownloadedFaces(unittest.TestCase):
         self.assertEqual(family, resolve_font_family())
 
     def test_unreachable_theme_family_falls_back_to_sans_serif(self):
-        config.update_config({"font_general_family": self.FACE})
+        config.update({"font_general_family": self.FACE})
         with self.urlopen(side_effect=OSError("offline")):
             with self.assertWarns(UserWarning):
                 family = resolve_font_family()
@@ -510,7 +508,7 @@ class TestDownloadedFaces(unittest.TestCase):
 
 class TestValueEtch(unittest.TestCase):
     def setUp(self):
-        config.update_config({"plot_etch": ETCH, "plot_value_etch": VALUE_ETCH})
+        config.update({"plot_etch": ETCH, "plot_value_etch": VALUE_ETCH})
 
     def tearDown(self):
         config.set_theme(THEME.DEFAULT)
@@ -524,7 +522,7 @@ class TestValueEtch(unittest.TestCase):
         self.assertEqual(len(figure.axes), 2)
 
     def test_needs_the_etch(self):
-        config.update_config({"plot_etch": None})
+        config.update({"plot_etch": None})
         figure = Heatmap(GRID, show_colorbar=True)
         self.assertFalse(step_collections(figure.axes[0]))
 
@@ -570,7 +568,7 @@ class TestValueEtch(unittest.TestCase):
         self.assertFalse([a for a in figure.axes[0].artists if isinstance(a, Legend)])
 
     def test_values_read_through_a_ground_halo(self):
-        config.update_config(GROUND)
+        config.update(GROUND)
         text = Heatmap(GRID, show_values=True).axes[0].texts[-1]
         self.assertIsNone(text.get_bbox_patch())
         (halo,) = text.get_path_effects()
@@ -585,7 +583,7 @@ class TestValueEtch(unittest.TestCase):
         boxed = ParallelCoords(rows, dimensions=["a", "b"]).axes[0].texts[0]
         self.assertIsNotNone(boxed.get_bbox_patch())
         self.assertFalse(boxed.get_path_effects())
-        config.update_config({"plot_parallel_tick_label_bg_color": None})
+        config.update({"plot_parallel_tick_label_bg_color": None})
         halo = ParallelCoords(rows, dimensions=["a", "b"]).axes[0].texts[0]
         self.assertIsNone(halo.get_bbox_patch())
         self.assertTrue(halo.get_path_effects())
@@ -665,12 +663,12 @@ class TestChartInkLooks(unittest.TestCase):
         links = {"links": [{"source": "a", "target": "b", "value": 1.0}]}
         filled = SankeyChart(links).axes[0].patches[0]
         self.assertEqual(filled.get_facecolor()[3], 1.0)
-        config.update_config({"plot_sankey_node_fill": False})
+        config.update({"plot_sankey_node_fill": False})
         outline = SankeyChart(links).axes[0].patches[0]
         self.assertEqual(outline.get_facecolor()[3], 0.0)
 
     def test_treemap_etching_thins_with_depth(self):
-        config.update_config(
+        config.update(
             {
                 "plot_etch": ETCH,
                 "plot_hatch_cycle": ["/", "."],
@@ -693,12 +691,12 @@ class TestChartInkLooks(unittest.TestCase):
         png(figure)
 
     def test_treemap_unchanged_without_density(self):
-        config.update_config({"plot_etch": ETCH, "plot_hatch_cycle": ["/", "."]})
+        config.update({"plot_etch": ETCH, "plot_hatch_cycle": ["/", "."]})
         patches = Treemap(TREE).axes[0].patches
         self.assertTrue(all(p.get_hatch() is None for p in patches))
 
     def test_network_ink_roads_shapes_and_rings(self):
-        config.update_config(
+        config.update(
             {
                 "plot_network_edge_ink_stroke": {
                     "width_scale": 1.4,
@@ -736,7 +734,7 @@ class TestChartInkLooks(unittest.TestCase):
         self.assertEqual(centred.get_va(), "center")
         above = NetworkChart(NETWORK, label_position="above").axes[0].texts[0]
         self.assertEqual(above.get_va(), "bottom")
-        config.update_config({"chart_default_network_label_position": "above"})
+        config.update({"chart_default_network_label_position": "above"})
         self.assertEqual(NetworkChart(NETWORK).axes[0].texts[0].get_va(), "bottom")
         explicit = NetworkChart(NETWORK, label_position="center").axes[0].texts[0]
         self.assertEqual(explicit.get_va(), "center")

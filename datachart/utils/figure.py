@@ -3,7 +3,7 @@
 The `figure` module provides a set of utilities for manipulating the images.
 
 Methods:
-    save_figure(figure, path, dpi, format, transparent):
+    save_figure(figure, path, dpi, fmt, transparent):
         Saves the figure into one file per provided format.
 
 """
@@ -26,7 +26,7 @@ from ._internal.config_helpers import (
 )
 from ._internal.figures import new_figure
 from ._internal.plot_engine import SUBPLOT_FURNITURE_KEYS
-from ._internal.validate import validate_layout_specs
+from ._internal.validate import validate_layout_specs, warn_renamed
 
 # =====================================
 # Helper functions
@@ -539,7 +539,16 @@ GRID_LEGEND_EDGES = {
     "lower center": "bottom",
 }
 # the grid furniture laid over every cell's own panel settings
-CELL_OVERRIDE_KEYS = ("show_grid", "xmin", "xmax", "ymin", "ymax", "aspect_ratio")
+CELL_OVERRIDE_KEYS = (
+    "show_grid",
+    "xmin",
+    "xmax",
+    "ymin",
+    "ymax",
+    "aspect_ratio",
+    "scalex",
+    "scaley",
+)
 
 
 def _figure_grid_layout_impl(
@@ -561,6 +570,8 @@ def _figure_grid_layout_impl(
     ymin: Optional[float] = None,
     ymax: Optional[float] = None,
     aspect_ratio: Optional[str] = None,
+    scalex: Optional[str] = None,
+    scaley: Optional[str] = None,
 ) -> plt.Figure:
     """Internal implementation for figure grid layout.
 
@@ -580,8 +591,8 @@ def _figure_grid_layout_impl(
         sharey: Whether to share the y-axis across all subplots.
         show_legend: Whether to draw one legend for the whole grid.
         legend: The legend setting; its location picks the grid edge.
-        show_grid, xmin, xmax, ymin, ymax, aspect_ratio: Laid over every
-            cell's own setting when given.
+        show_grid, xmin, xmax, ymin, ymax, aspect_ratio, scalex, scaley: Laid
+            over every cell's own setting when given.
 
     Returns:
         A new matplotlib Figure containing all charts in a grid layout.
@@ -635,12 +646,18 @@ def _figure_grid_layout_impl(
         location = (legend or {}).get("location")
         grid_legend = node_legend(legend, GRID_LEGEND_EDGES.get(location, "right"))
     given = dict(
-        zip(CELL_OVERRIDE_KEYS, (show_grid, xmin, xmax, ymin, ymax, aspect_ratio))
+        zip(
+            CELL_OVERRIDE_KEYS,
+            (show_grid, xmin, xmax, ymin, ymax, aspect_ratio, scalex, scaley),
+        )
     )
     overrides = {key: value for key, value in given.items() if value is not None}
     if "show_grid" in overrides:
         # an explicit value, as a front's: a polar cell draws only what it names
         overrides["show_grid_explicit"] = True
+    if "scalex" in overrides or "scaley" in overrides:
+        # the grid's scales name literal axes, so a log error names them so
+        overrides["literal_scale_keys"] = True
 
     # the recursive cell tree lets this grid nest inside another Grid (ADR 0006)
     node = {
@@ -677,14 +694,15 @@ def _figure_grid_layout_impl(
 
 def save_figure(
     figure: plt.Figure,
-    path: str,
+    path: Union[str, os.PathLike],
     dpi: int = 300,
-    format: Optional[Union[FIG_FORMAT, List[FIG_FORMAT]]] = None,
+    fmt: Optional[Union[FIG_FORMAT, List[FIG_FORMAT]]] = None,
     transparent: bool = False,
+    format: Optional[Union[FIG_FORMAT, List[FIG_FORMAT]]] = None,
 ) -> List[str]:
     """Save the figure to one or more files.
 
-    Writes the rendered figure to disk in the format given by `format` or,
+    Writes the rendered figure to disk in the format given by `fmt` or,
     when omitted, by the file extension. Use a vector format (PDF, SVG) for
     print and papers, PNG with `dpi` >= 300 for raster deliverables, and
     `transparent=True` to drop the figure background for slides and web
@@ -705,34 +723,42 @@ def save_figure(
         >>> from datachart.utils.figure import save_figure
         >>> from datachart.constants import FIG_FORMAT
         >>> path = "/path/to/save/chart.png"
-        >>> save_figure(figure, path, dpi=300, format=FIG_FORMAT.PNG, transparent=True)
+        >>> save_figure(figure, path, dpi=300, fmt=FIG_FORMAT.PNG, transparent=True)
 
         >>> # 3. save the same figure as a PDF and a PNG
-        >>> save_figure(figure, "/path/to/save/chart", format=[FIG_FORMAT.PDF, FIG_FORMAT.PNG])
+        >>> save_figure(figure, "/path/to/save/chart", fmt=[FIG_FORMAT.PDF, FIG_FORMAT.PNG])
         ['/path/to/save/chart.pdf', '/path/to/save/chart.png']
 
     Args:
         figure: The figure to save.
-        path: The path where the figure is saved. A stem when `format` is a list.
+        path: The path where the figure is saved. A stem when `fmt` is a list.
         dpi: The DPI of the figure.
-        format: The format of the figure, or a list of formats to write. If `None`, the format will be determined from the file extension.
+        fmt: The format of the figure, or a list of formats to write. If `None`, the format will be determined from the file extension.
         transparent: Whether to make the background transparent.
+        format: Deprecated; use `fmt`.
 
     Returns:
         The paths written, in the order the formats were given.
 
     Raises:
-        ValueError: If `format` is an empty list.
+        ValueError: If `fmt` is an empty list, or both `fmt` and `format`
+            are passed.
     """
 
-    if isinstance(format, list):
-        if not format:
-            raise ValueError("The `format` list is empty: name at least one format")
-        formats = format
-        stem = _figure_stem(path)
-        paths = [f"{stem}.{fmt}" for fmt in formats]
+    if format is not None:
+        warn_renamed("format", "fmt")
+        if fmt is not None:
+            raise ValueError("Pass `fmt` only; `format` is its deprecated name.")
+        fmt = format
+
+    if isinstance(fmt, list):
+        if not fmt:
+            raise ValueError("The `fmt` list is empty: name at least one format")
+        formats = fmt
+        stem = _figure_stem(os.fspath(path))
+        paths = [f"{stem}.{extension}" for extension in formats]
     else:
-        formats, paths = [format], [path]
+        formats, paths = [fmt], [os.fspath(path)]
 
     # save the figure to one file per format
     for out_path, out_format in zip(paths, formats):

@@ -30,10 +30,10 @@ def outline_vertices(figure):
 
 class TestHistogramBarMode(unittest.TestCase):
     def setUp(self):
-        config.reset_config()
+        config.reset()
 
     def tearDown(self):
-        config.reset_config()
+        config.reset()
         plt.close("all")
 
     def test_panel_settings_default_stack_for_histograms(self):
@@ -102,10 +102,10 @@ class TestHistogramBarMode(unittest.TestCase):
 
 class TestStepEdgeDefaults(unittest.TestCase):
     def setUp(self):
-        config.reset_config()
+        config.reset()
 
     def tearDown(self):
-        config.reset_config()
+        config.reset()
         plt.close("all")
 
     def test_step_edge_follows_series_color(self):
@@ -169,10 +169,10 @@ class TestCumulativeStepEnd(unittest.TestCase):
     """A cumulative step outline ends at its total, with no drop back to zero."""
 
     def setUp(self):
-        config.reset_config()
+        config.reset()
 
     def tearDown(self):
-        config.reset_config()
+        config.reset()
         plt.close("all")
 
     def test_cumulative_step_ends_at_its_total(self):
@@ -237,10 +237,10 @@ class TestLogStepGaps(unittest.TestCase):
     """A log value axis has no zero: the step outline breaks over the drops to it."""
 
     def setUp(self):
-        config.reset_config()
+        config.reset()
 
     def tearDown(self):
-        config.reset_config()
+        config.reset()
         plt.close("all")
 
     def step(self, data=HIST_GAP, **kwargs):

@@ -1082,7 +1082,7 @@ def show_grid():
     data = [{"x": x, "y": y} for x, y in zip(range(6), [1, 3, 2, 5, 4, 6])]
     # mute the theme's grid opinion so NONE means no grid, and darken the
     # grid lines so the panels differ at thumbnail size
-    config.update_config(
+    config.update(
         {
             "chart_default_show_grid": None,
             "plot_grid_color": "#9A9A9A",
@@ -1096,7 +1096,7 @@ def show_grid():
             for label, value in members
         ]
     finally:
-        config.reset_config()
+        config.reset()
     chart_grid(
         figs,
         "const-show-grid.svg",

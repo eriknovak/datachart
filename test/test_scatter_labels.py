@@ -24,7 +24,7 @@ POINTS = [
 def _close_figures():
     yield
     plt.close("all")
-    config.reset_config()
+    config.reset()
 
 
 def _labels(ax):

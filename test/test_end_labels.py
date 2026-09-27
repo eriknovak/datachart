@@ -31,7 +31,7 @@ def _labels(ax):
 
 class TestLineEndLabels(unittest.TestCase):
     def setUp(self):
-        config.reset_config()
+        config.reset()
 
     def tearDown(self):
         plt.close("all")

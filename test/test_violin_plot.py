@@ -59,22 +59,22 @@ class TestViolinPlot(unittest.TestCase):
         )
 
     def test_theme_sets_the_inner_and_a_call_overrides_it(self):
-        config.update_config({"chart_default_violin_inner": VIOLIN_INNER.MEDIAN})
+        config.update({"chart_default_violin_inner": VIOLIN_INNER.MEDIAN})
         self.assertEqual(len(ViolinPlot(violin_data()).axes[0].lines), 3)
         self.assertEqual(len(ViolinPlot(violin_data(), inner="box").axes[0].lines), 9)
 
     def test_a_theme_without_an_inner_draws_the_box(self):
-        config.update_config({"chart_default_violin_inner": None})
+        config.update({"chart_default_violin_inner": None})
         self.assertEqual(len(ViolinPlot(violin_data()).axes[0].lines), 9)
 
     def test_an_invalid_theme_inner_raises(self):
-        config.update_config({"chart_default_violin_inner": "mean"})
+        config.update({"chart_default_violin_inner": "mean"})
         with self.assertRaisesRegex(ValueError, "chart_default_violin_inner"):
             ViolinPlot(violin_data())
 
     def test_raincloud_cloud_ignores_the_violin_inner_default(self):
         before = len(RaincloudPlot(violin_data()).axes[0].lines)
-        config.update_config({"chart_default_violin_inner": VIOLIN_INNER.QUARTILES})
+        config.update({"chart_default_violin_inner": VIOLIN_INNER.QUARTILES})
         self.assertEqual(len(RaincloudPlot(violin_data()).axes[0].lines), before)
 
     def test_invalid_inner_raises(self):

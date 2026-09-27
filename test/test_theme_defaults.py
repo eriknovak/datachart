@@ -78,7 +78,7 @@ class TestThemeDefaults(unittest.TestCase):
 
     def test_none_theme_default_leaves_grid_off(self):
         """A `None` theme default preserves the no-grid behavior."""
-        config.update_config({"chart_default_show_grid": None})
+        config.update({"chart_default_show_grid": None})
         figure = BarChart(BAR)
         self.assertFalse(grid_visible(figure.axes[0], "y"))
         self.assertFalse(grid_visible(figure.axes[0], "x"))
@@ -106,14 +106,14 @@ class TestThemeDefaults(unittest.TestCase):
 
     def test_theme_show_values_default_applies(self):
         """A theme shipping `chart_default_show_values` labels bars by default."""
-        config.update_config({"chart_default_show_values": True})
+        config.update({"chart_default_show_values": True})
         figure = BarChart(BAR)
         labels = [text.get_text() for text in figure.axes[0].texts]
         self.assertEqual(labels, ["3", "5", "4"])
 
     def test_explicit_show_values_wins(self):
         """`show_values=False` beats the theme's on-by-default."""
-        config.update_config({"chart_default_show_values": True})
+        config.update({"chart_default_show_values": True})
         figure = BarChart(BAR, show_values=False)
         self.assertEqual(list(figure.axes[0].texts), [])
 
@@ -218,19 +218,17 @@ class TestTickLabelRotation(unittest.TestCase):
         self.assertEqual(self.rotations(LineChart(data=LINE)), ({0.0}, {0.0}))
 
     def test_set_rotation_turns_the_labels(self):
-        config.update_config(
-            {"axes_xticks_label_rotate": 45, "axes_yticks_label_rotate": 30}
-        )
+        config.update({"axes_xticks_label_rotate": 45, "axes_yticks_label_rotate": 30})
         self.assertEqual(self.rotations(LineChart(data=LINE)), ({45.0}, {30.0}))
 
     def test_chart_rotation_wins_over_the_theme(self):
-        config.update_config({"axes_xticks_label_rotate": 45})
+        config.update({"axes_xticks_label_rotate": 45})
         figure = BarChart(data=BAR, xtickrotate=10)
         self.assertEqual(self.rotations(figure)[0], {10.0})
 
     def test_old_key_warns_and_applies(self):
         with self.assertWarns(DeprecationWarning):
-            config.update_config({"plot_xticks_label_rotate": 60})
+            config.update({"plot_xticks_label_rotate": 60})
         self.assertEqual(self.rotations(BarChart(data=BAR))[0], {60.0})
 
 
@@ -616,10 +614,10 @@ class TestThemeDefaultAliases(unittest.TestCase):
     }
 
     def tearDown(self):
-        config.reset_config()
+        config.reset()
 
-    def test_reset_config_carries_the_new_keys_only(self):
-        config.reset_config()
+    def test_reset_carries_the_new_keys_only(self):
+        config.reset()
         self.assertEqual(
             config.get("chart_default_calendar_heatmap_week_start"), "monday"
         )
@@ -630,7 +628,7 @@ class TestThemeDefaultAliases(unittest.TestCase):
 
     def test_write_warns_and_the_value_round_trips(self):
         with self.assertWarns(DeprecationWarning) as caught:
-            config.update_config({"plot_ridgeline_overlap": 0.3})
+            config.update({"plot_ridgeline_overlap": 0.3})
         self.assertIn("chart_default_ridgeline_overlap", str(caught.warning))
         self.assertEqual(config.get("chart_default_ridgeline_overlap"), 0.3)
         with warnings.catch_warnings():
@@ -699,7 +697,7 @@ class TestThemeDefaultAliases(unittest.TestCase):
         for alias, key in self.RENAMED.items():
             with self.subTest(alias=alias):
                 with self.assertWarnsRegex(DeprecationWarning, key):
-                    config.update_config({alias: config.get(key)})
+                    config.update({alias: config.get(key)})
 
 
 if __name__ == "__main__":

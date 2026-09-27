@@ -101,7 +101,7 @@ any page as markdown by appending index.md to its URL).
   ScatterChart, Histogram, ...) that takes a list of series, each a list of
   dicts. Look up the dict keys and parameters of a chart in its guide before
   using it: https://eriknovak.github.io/datachart/latest/how-to-guides/charts/
-- Style is global: `config.set_theme(THEME.X)` and `config.update_config(...)`
+- Style is global: `config.set_theme(THEME.X)` and `config.update(...)`
   from `datachart.config` and `datachart.constants`. Per-chart overrides go in
   the chart's `style` argument. Do not restyle through matplotlib directly.
 - Combine finished figures with `Panel` (overlay on shared axes) and `Grid`

@@ -7,7 +7,7 @@
   "excludeFiles": ["changelog.md", "development.md"],
   "rules": [
     "Every chart function returns a matplotlib Figure; save it with datachart.utils.save_figure",
-    "Set global style with config.set_theme or config.update_config; per-chart overrides go in the chart's style parameter",
+    "Set global style with config.set_theme or config.update; per-chart overrides go in the chart's style parameter",
     "Combine rendered figures with Panel (overlay on shared axes, optional dual y-axes) and Grid (grid layout, grids nest)"
   ]
 }

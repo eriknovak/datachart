@@ -16,9 +16,9 @@ One `config` instance holds the style every chart is drawn with. Its methods cha
 | I want to…                                        | Call                                                      | See |
 | :------------------------------------------------ | :-------------------------------------------------------- | :-- |
 | switch the look of every chart                    | `config.set_theme(THEME.INK)`                             | [set_theme](#datachart.config.Config.set_theme) |
-| change a few attributes on top of the theme       | `config.update_config({"font_general_size": 12})`         | [update_config](#datachart.config.Config.update_config) |
+| change a few attributes on top of the theme       | `config.update({"font_general_size": 12})`                | [update](#datachart.config.Config.update) |
 | change the look for one block of code             | `with config.override(...)`, `with config.using_theme(...)` | [override](#datachart.config.Config.override), [using_theme](#datachart.config.Config.using_theme) |
-| go back to the default theme                      | `config.reset_config()`                                   | [reset_config](#datachart.config.Config.reset_config) |
+| go back to the default theme                      | `config.reset()`                                          | [reset](#datachart.config.Config.reset) |
 | add a theme of my own                             | `config.register_theme(name, theme)`, then `set_theme(name)` | [register_theme](#datachart.config.Config.register_theme) |
 | see which names `set_theme` accepts               | `config.list_themes()`                                    | [list_themes](#datachart.config.Config.list_themes) |
 | share a theme as a file                           | `config.save_theme(path)`, `config.load_theme(path)`      | [save_theme](#datachart.config.Config.save_theme), [load_theme](#datachart.config.Config.load_theme) |
