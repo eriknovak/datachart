@@ -372,10 +372,10 @@ def _record_datasets(kind: ChartKind, data: Any) -> Any:
 
 
 def _is_column_dict(chart: Any) -> bool:
-    # every value a column; a record holds at least one scalar, its data keys
+    # two or more columns: a lone list is a point pooling its observations
     return (
         isinstance(chart, dict)
-        and bool(chart)
+        and len(chart) > 1
         and all(
             isinstance(v, Iterable) and not isinstance(v, (dict, str, bytes))
             for v in chart.values()
