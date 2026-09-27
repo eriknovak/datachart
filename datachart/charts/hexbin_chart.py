@@ -51,7 +51,7 @@ def HexbinChart(
     show_legend: Optional[bool] = None,
     legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
-    show_colorbars: Optional[bool] = None,
+    show_colorbar: Optional[bool] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     scalex: Optional[Union[AXIS_SCALE, str]] = None,
     scaley: Optional[Union[AXIS_SCALE, str]] = None,
@@ -60,9 +60,9 @@ def HexbinChart(
     sharex: Optional[bool] = None,
     sharey: Optional[bool] = None,
     style: Optional[Union[HexbinStyleAttrs, List[Optional[HexbinStyleAttrs]]]] = None,
-    gridsize: Optional[Union[int, List[Optional[int]]]] = None,
+    grid_size: Optional[Union[int, List[Optional[int]]]] = None,
     reduce: Optional[Union[HEXBIN_REDUCE, str, List[Optional[str]]]] = None,
-    mincnt: Optional[Union[int, List[Optional[int]]]] = None,
+    min_count: Optional[Union[int, List[Optional[int]]]] = None,
     norm: Optional[Union[COLOR_NORM, str, List[Optional[str]]]] = None,
     vmin: Optional[Union[float, List[Optional[float]]]] = None,
     vmax: Optional[Union[float, List[Optional[float]]]] = None,
@@ -136,6 +136,9 @@ def HexbinChart(
         ]
     ] = None,
     valfmt: Optional[Union[VALUE_FORMAT, str, List[Optional[str]]]] = None,
+    show_colorbars: Optional[bool] = None,
+    gridsize: Optional[Union[int, List[Optional[int]]]] = None,
+    mincnt: Optional[Union[int, List[Optional[int]]]] = None,
 ) -> plt.Figure:
     """Creates the hexbin chart.
 
@@ -191,7 +194,7 @@ def HexbinChart(
             [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
         show_grid: Which grid lines to show (e.g., "both", "x", "y"); `False`
             draws none. Off by default: the hexagons cover it.
-        show_colorbars: Whether to show the colorbar(s).
+        show_colorbar: Whether to show the colorbar(s).
         aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
             [`ASPECT_RATIO`][datachart.constants.ASPECT_RATIO].
         scalex: The x-axis scale (e.g., "log", "linear").
@@ -201,12 +204,12 @@ def HexbinChart(
         sharex: Whether to share the x-axis in subplots.
         sharey: Whether to share the y-axis in subplots.
         style: Style configuration(s) for the hexbin chart(s).
-        gridsize: The number of hexagons across the x-axis; the
+        grid_size: The number of hexagons across the x-axis; the
             `plot_hexbin_gridsize` config value by default.
         reduce: How the `c` values in a hexagon collapse into its color, one of
             [`HEXBIN_REDUCE`][datachart.constants.HEXBIN_REDUCE] (the mean by default).
             Ignored without `c`, where every hexagon shows its point count.
-        mincnt: The point count below which a hexagon stays blank; every
+        min_count: The point count below which a hexagon stays blank; every
             hexagon is drawn by default.
         norm: Value normalization method(s) of the colormap; `"log"` spreads
             heavy-tailed counts. `"centered"` and `"twoslope"`
@@ -243,6 +246,9 @@ def HexbinChart(
             [`ColorbarSettingAttrs`][datachart.typings.ColorbarSettingAttrs].
         texts: Text annotation(s) to draw.
         valfmt: Deprecated; use `value_format`. Removed in the next release.
+        show_colorbars: Deprecated; use `show_colorbar`. Removed in the next release.
+        gridsize: Deprecated; use `grid_size`. Removed in the next release.
+        mincnt: Deprecated; use `min_count`. Removed in the next release.
 
     Returns:
         The figure containing the hexbin chart.

@@ -50,7 +50,7 @@ def SwarmPlot(
     show_legend: Optional[bool] = None,
     legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
-    mode: Optional[Union[SWARM_MODE, str]] = None,
+    swarm_mode: Optional[Union[SWARM_MODE, str]] = None,
     jitter: Optional[float] = None,
     show_values: Optional[bool] = None,
     value_format: Optional[Union[VALUE_FORMAT, str]] = None,
@@ -125,6 +125,7 @@ def SwarmPlot(
     ] = None,
     label: Optional[Union[str, List[Optional[str]]]] = None,
     value: Optional[Union[str, List[Optional[str]]]] = None,
+    mode: Optional[Union[SWARM_MODE, str]] = None,
 ) -> plt.Figure:
     """Creates the swarm plot.
 
@@ -183,12 +184,12 @@ def SwarmPlot(
             [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
         show_grid: Which grid lines to show (e.g., "both", "x", "y");
             `False` draws none.
-        mode: How the points spread across the category width. See
+        swarm_mode: How the points spread across the category width. See
             [`SWARM_MODE`][datachart.constants.SWARM_MODE]: "swarm" packs the points so
             none overlap, from the marker size at draw time (axis limits changed
             afterwards can shift the spacing); "strip" jitters them uniformly.
         jitter: The strip jitter width, as a fraction of the category width.
-            Only used with `mode="strip"`. None takes the theme's
+            Only used with `swarm_mode="strip"`. None takes the theme's
             `chart_default_jitter`.
         show_values: Whether to print each group's minimum, median, and
             maximum beside the points nearest them.
@@ -226,6 +227,7 @@ def SwarmPlot(
         texts: Text annotation(s) to draw.
         label: The key name in data for label/category values (default: "label").
         value: The key name in data for numeric values (default: "value").
+        mode: Deprecated; use `swarm_mode`. Removed in the next release.
 
     Returns:
         The figure containing the swarm plot.

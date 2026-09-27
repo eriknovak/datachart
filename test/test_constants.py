@@ -168,7 +168,7 @@ CASES = [
     ("aspect_ratio", LineChart, LINE),
     ("value_format", BarChart, BARS),
     ("bar_mode", BarChart, BARS),
-    ("mode", SwarmPlot, GROUPS),
+    ("swarm_mode", SwarmPlot, GROUPS),
     ("emphasis", LineChart, LINE),
     ("sort", BarChart, BARS),
     ("show_grid", LineChart, LINE),

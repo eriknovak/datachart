@@ -42,7 +42,7 @@ def Heatmap(
     show_legend: Optional[bool] = None,
     legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
-    show_colorbars: Optional[bool] = None,
+    show_colorbar: Optional[bool] = None,
     show_values: Optional[bool] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     subplots: Optional[bool] = None,
@@ -79,6 +79,7 @@ def Heatmap(
     ] = None,
     show_heatmap_values: Optional[bool] = None,
     valfmt: Optional[Union[VALUE_FORMAT, str, List[Optional[str]]]] = None,
+    show_colorbars: Optional[bool] = None,
 ) -> plt.Figure:
     """Creates the heatmap.
 
@@ -139,7 +140,7 @@ def Heatmap(
             [`LegendSettingAttrs`][datachart.typings.LegendSettingAttrs].
         show_grid: Which grid lines to show (e.g., "both", "x", "y");
             `False` draws none.
-        show_colorbars: Whether to show the colorbar(s).
+        show_colorbar: Whether to show the colorbar(s).
         show_values: Whether to write each cell's value in the cell.
         aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
             [`ASPECT_RATIO`][datachart.constants.ASPECT_RATIO].
@@ -175,6 +176,7 @@ def Heatmap(
         texts: Text annotation(s) to draw.
         show_heatmap_values: Deprecated; use `show_values`. Removed in the next release.
         valfmt: Deprecated; use `value_format`. Removed in the next release.
+        show_colorbars: Deprecated; use `show_colorbar`. Removed in the next release.
 
     Returns:
         The figure containing the heatmap.

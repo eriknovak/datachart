@@ -519,17 +519,17 @@ class TestValueEtch(unittest.TestCase):
     def test_off_by_default(self):
         config.set_theme(THEME.DEFAULT)
         self.assertIsNone(config["plot_value_etch"])
-        figure = Heatmap(GRID, show_colorbars=True)
+        figure = Heatmap(GRID, show_colorbar=True)
         self.assertFalse(step_collections(figure.axes[0]))
         self.assertEqual(len(figure.axes), 2)
 
     def test_needs_the_etch(self):
         config.update_config({"plot_etch": None})
-        figure = Heatmap(GRID, show_colorbars=True)
+        figure = Heatmap(GRID, show_colorbar=True)
         self.assertFalse(step_collections(figure.axes[0]))
 
     def test_heatmap_cells_draw_as_steps_with_a_step_legend(self):
-        figure = Heatmap(GRID, show_colorbars=True, colorbar={"label": "Score"})
+        figure = Heatmap(GRID, show_colorbar=True, colorbar={"label": "Score"})
         ax = figure.axes[0]
         self.assertEqual(len(figure.axes), 1)
         steps = step_collections(ax)
@@ -557,7 +557,7 @@ class TestValueEtch(unittest.TestCase):
         self.assertEqual(alphas.max(), 1.0)
 
     def test_empty_hexbin_bins_draw_nothing(self):
-        figure = HexbinChart({"x": [0.0, 0.1, 5.0], "y": [0.0, 0.1, 5.0]}, gridsize=5)
+        figure = HexbinChart({"x": [0.0, 0.1, 5.0], "y": [0.0, 0.1, 5.0]}, grid_size=5)
         tiles = figure.axes[0].collections[0]
         values = [c for c in figure.axes[0].collections if c.get_gid() != "value-step"]
         drawn = sum(len(c.get_offsets()) for c in step_collections(figure.axes[0]))
@@ -565,7 +565,7 @@ class TestValueEtch(unittest.TestCase):
         self.assertLess(drawn, len(tiles.get_offsets()))
 
     def test_no_legend_without_colorbars(self):
-        figure = Heatmap(GRID, show_colorbars=False)
+        figure = Heatmap(GRID, show_colorbar=False)
         self.assertTrue(step_collections(figure.axes[0]))
         self.assertFalse([a for a in figure.axes[0].artists if isinstance(a, Legend)])
 
@@ -577,7 +577,7 @@ class TestValueEtch(unittest.TestCase):
         self.assertEqual(to_hex(halo._gc["foreground"]), PARCHMENT.lower())
         x = np.linspace(-2, 2, 20)
         z = [[float(np.exp(-(a * a + b * b))) for a in x] for b in x]
-        relief = ContourChart({"x": list(x), "y": list(x), "z": z}, filled=True)
+        relief = ContourChart({"x": list(x), "y": list(x), "z": z}, fill=True)
         self.assertTrue(all(t.get_path_effects() for t in relief.axes[0].texts))
 
     def test_boxless_parallel_labels_take_the_halo(self):
@@ -596,13 +596,13 @@ class TestValueEtch(unittest.TestCase):
         days = [date(2024, 1, 1) + timedelta(days=i) for i in range(40)]
         calendar = CalendarHeatmap(
             {"date": days, "value": list(range(40))},
-            show_colorbars=True,
+            show_colorbar=True,
         )
         self.assertTrue(step_collections(calendar.axes[0]))
         rng = np.random.default_rng(1)
         hexbin = HexbinChart(
             {"x": list(rng.normal(size=300)), "y": list(rng.normal(size=300))},
-            show_colorbars=True,
+            show_colorbar=True,
         )
         self.assertTrue(step_collections(hexbin.axes[0]))
         self.assertEqual(len(hexbin.axes), 1)
@@ -613,7 +613,7 @@ class TestValueEtch(unittest.TestCase):
         x = np.linspace(-2, 2, 30)
         z = [[float(np.exp(-(a * a + b * b))) for a in x] for b in x]
         figure = ContourChart(
-            {"x": list(x), "y": list(x), "z": z}, filled=True, show_colorbars=True
+            {"x": list(x), "y": list(x), "z": z}, fill=True, show_colorbar=True
         )
         ax = figure.axes[0]
         self.assertTrue(step_collections(ax))
@@ -624,7 +624,7 @@ class TestValueEtch(unittest.TestCase):
         png(figure)
 
     def test_relief_overflow_band_spans_to_the_surface_peak(self):
-        figure = ContourChart(GRID, filled=True, show_colorbars=True, levels=[0, 2, 4])
+        figure = ContourChart(GRID, fill=True, show_colorbar=True, levels=[0, 2, 4])
         ax = figure.axes[0]
         (legend,) = [a for a in ax.artists if isinstance(a, Legend)]
         self.assertEqual(legend.get_texts()[-1].get_text().split(" – ")[-1], "8")

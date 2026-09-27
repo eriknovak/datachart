@@ -39,11 +39,11 @@ def points(n=300, seed=0):
 
 
 FRONTS = {
-    "heatmap": lambda **kw: Heatmap(data={"z": Z}, show_colorbars=True, **kw),
+    "heatmap": lambda **kw: Heatmap(data={"z": Z}, show_colorbar=True, **kw),
     "contour": lambda **kw: ContourChart(
-        data=surface(), filled=True, show_colorbars=True, **kw
+        data=surface(), fill=True, show_colorbar=True, **kw
     ),
-    "hexbin": lambda **kw: HexbinChart(data=points(), gridsize=8, **kw),
+    "hexbin": lambda **kw: HexbinChart(data=points(), grid_size=8, **kw),
 }
 
 
@@ -215,13 +215,13 @@ class TestColorbarRendering(unittest.TestCase):
                 plt.close(figure)
 
     def test_hexbin_value_format_is_the_format_fallback(self):
-        figure = HexbinChart(data=points(), gridsize=8, value_format="{x:.2f}")
+        figure = HexbinChart(data=points(), grid_size=8, value_format="{x:.2f}")
         colorbar = colorbar_of(figure)
         self.assertEqual(colorbar.formatter(1.5), "1.50")
 
         figure = HexbinChart(
             data=points(),
-            gridsize=8,
+            grid_size=8,
             value_format="{x:.2f}",
             colorbar={"format": "{x:.1f}"},
         )
@@ -230,7 +230,7 @@ class TestColorbarRendering(unittest.TestCase):
     def test_heatmap_value_format_still_formats_cells(self):
         figure = Heatmap(
             data={"z": Z},
-            show_colorbars=True,
+            show_colorbar=True,
             show_values=True,
             value_format="{x:.1f}",
             colorbar={"format": "{x:.3f}"},
@@ -292,7 +292,7 @@ class TestColorbarRendering(unittest.TestCase):
                 with self.subTest(location=location, label=label):
                     figure = Heatmap(
                         data={"z": wide},
-                        show_colorbars=True,
+                        show_colorbar=True,
                         colorbar={"location": location, "label": label},
                         aspect_ratio="equal",
                         figsize=(3, 3),
@@ -310,7 +310,7 @@ class TestColorbarRendering(unittest.TestCase):
         figures = {
             "calendar": lambda location: CalendarHeatmap(
                 {"date": dates, "value": list(range(60))},
-                show_colorbars=True,
+                show_colorbar=True,
                 colorbar={"label": "Steps", "location": location},
             ),
             "heatmap": lambda location: FRONTS["heatmap"](
@@ -379,7 +379,7 @@ class TestColorbarRendering(unittest.TestCase):
         figure = HexbinChart(
             data=[points(seed=1), points(seed=2)],
             subplots=True,
-            gridsize=8,
+            grid_size=8,
             colorbar={"location": "bottom"},
             xlabel="X",
         )
@@ -389,7 +389,7 @@ class TestColorbarRendering(unittest.TestCase):
         source = FRONTS["heatmap"](
             colorbar={"label": "Count", "location": "bottom", "format": "{x:.2f}"}
         )
-        grid = Grid([[source, FRONTS["hexbin"](show_colorbars=False)]])
+        grid = Grid([[source, FRONTS["hexbin"](show_colorbar=False)]])
         grid.canvas.draw()
         bars = colorbars_of(grid)
         self.assertEqual(len(bars), 1)
@@ -424,7 +424,7 @@ class TestColorbarFormats(unittest.TestCase):
     def test_callable_value_format_and_colorbar_format(self):
         figure = Heatmap(Z_SMALL, show_values=True, value_format=one_decimal)
         self.assertIn("1.0", cell_texts(figure))
-        Heatmap(Z_SMALL, show_colorbars=True, colorbar={"format": one_decimal})
+        Heatmap(Z_SMALL, show_colorbar=True, colorbar={"format": one_decimal})
 
     def test_colorbar_formats_label_a_tick_at_one_and_a_half(self):
         formats = (
@@ -438,7 +438,7 @@ class TestColorbarFormats(unittest.TestCase):
             with self.subTest(fmt=fmt):
                 figure = Heatmap(
                     Z_SMALL,
-                    show_colorbars=True,
+                    show_colorbar=True,
                     colorbar={"format": fmt, "ticks": [1.5]},
                     vmin=1,
                     vmax=4,

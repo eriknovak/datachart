@@ -35,7 +35,7 @@ def CalendarHeatmap(
     figsize: Optional[Union[FIG_SIZE, Tuple[float, float]]] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     max_cols: Optional[int] = None,
-    show_colorbars: Optional[bool] = None,
+    show_colorbar: Optional[bool] = None,
     show_values: Optional[bool] = None,
     value_format: Optional[Union[VALUE_FORMAT, str]] = None,
     style: Optional[
@@ -55,6 +55,7 @@ def CalendarHeatmap(
             List[Union[TextSettingAttrs, List[TextSettingAttrs], None]],
         ]
     ] = None,
+    show_colorbars: Optional[bool] = None,
 ) -> plt.Figure:
     """Creates the calendar heatmap.
 
@@ -72,7 +73,7 @@ def CalendarHeatmap(
         >>> figure = CalendarHeatmap(
         ...     data={"date": days, "value": [i % 7 for i in range(366)]},
         ...     title="Daily values, 2024",
-        ...     show_colorbars=True,
+        ...     show_colorbar=True,
         ... )
 
     Args:
@@ -110,7 +111,7 @@ def CalendarHeatmap(
             [`ASPECT_RATIO`][datachart.constants.ASPECT_RATIO].
         max_cols: Maximum number of calendars per row when several are
             drawn. Defaults to `1`, one calendar per row.
-        show_colorbars: Whether to show the colorbar(s).
+        show_colorbar: Whether to show the colorbar(s).
         show_values: Whether to write each day's value into its cell.
         value_format: The format of the cell values: a
             [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT] constant (default
@@ -131,6 +132,7 @@ def CalendarHeatmap(
             dataset. The cells sit at integer positions: the week column
             along x, the weekday row along y, counted from zero at the
             top-left cell of the drawn range.
+        show_colorbars: Deprecated; use `show_colorbar`. Removed in the next release.
 
     Returns:
         The figure containing the calendar heatmap(s).

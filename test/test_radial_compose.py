@@ -41,8 +41,8 @@ class TestPanelProjection:
     def test_merged_panel_keeps_radial_furniture(self):
         fig = Panel(
             [
-                RadialChart(data=WIND, startangle="E"),
-                RadialChart(data=WIND2, startangle="E"),
+                RadialChart(data=WIND, start_angle="E"),
+                RadialChart(data=WIND2, start_angle="E"),
             ]
         )
         assert fig.axes[0].get_theta_offset() == pytest.approx(0.0)

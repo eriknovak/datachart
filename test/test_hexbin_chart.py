@@ -78,17 +78,19 @@ class TestHexbinLayer(unittest.TestCase):
     def tearDown(self):
         config.set_theme(THEME.DEFAULT)
 
-    def test_gridsize_defaults_to_config(self):
+    def test_grid_size_defaults_to_config(self):
         layer = build_layers("hexbinchart", [{"data": points()}], {})[0]
-        self.assertEqual(layer.gridsize, config["plot_hexbin_gridsize"])
-        layer = build_layers("hexbinchart", [{"data": points(), "gridsize": 12}], {})[0]
-        self.assertEqual(layer.gridsize, 12)
+        self.assertEqual(layer.grid_size, config["plot_hexbin_gridsize"])
+        layer = build_layers("hexbinchart", [{"data": points(), "grid_size": 12}], {})[
+            0
+        ]
+        self.assertEqual(layer.grid_size, 12)
         layer = build_layers(
             "hexbinchart",
             [{"data": points(), "style": {"plot_hexbin_gridsize": 8}}],
             {},
         )[0]
-        self.assertEqual(layer.gridsize, 8)
+        self.assertEqual(layer.grid_size, 8)
 
     def test_reduce_defaults_to_mean_with_c_only(self):
         layer = build_layers("hexbinchart", [{"data": points()}], {})[0]
@@ -157,7 +159,7 @@ class TestHexbinChart(unittest.TestCase):
     def test_colorbar_drawn_by_default(self):
         figure = HexbinChart(data=points())
         self.assertEqual(len(figure.axes), 2)
-        figure = HexbinChart(data=points(), show_colorbars=False)
+        figure = HexbinChart(data=points(), show_colorbar=False)
         self.assertEqual(len(figure.axes), 1)
 
     def test_grid_off_by_default(self):
@@ -188,15 +190,15 @@ class TestHexbinChart(unittest.TestCase):
         )[0].get_array()
         self.assertFalse(np.allclose(sums, means))
 
-    def test_mincnt_drops_sparse_cells(self):
+    def test_min_count_drops_sparse_cells(self):
         every = _hexbins(HexbinChart(data=points()).axes[0])[0]
-        dense = _hexbins(HexbinChart(data=points(), mincnt=5).axes[0])[0]
+        dense = _hexbins(HexbinChart(data=points(), min_count=5).axes[0])[0]
         self.assertLess(len(dense.get_offsets()), len(every.get_offsets()))
         self.assertTrue(dense.get_array().min() >= 5)
 
-    def test_gridsize_controls_cell_count(self):
-        coarse = _hexbins(HexbinChart(data=points(), gridsize=5).axes[0])[0]
-        fine = _hexbins(HexbinChart(data=points(), gridsize=30).axes[0])[0]
+    def test_grid_size_controls_cell_count(self):
+        coarse = _hexbins(HexbinChart(data=points(), grid_size=5).axes[0])[0]
+        fine = _hexbins(HexbinChart(data=points(), grid_size=30).axes[0])[0]
         self.assertLess(len(coarse.get_offsets()), len(fine.get_offsets()))
 
     def test_edge_style(self):
@@ -233,9 +235,9 @@ class TestHexbinChart(unittest.TestCase):
         figure = HexbinChart(
             data=[points(seed=1), points_with_c(seed=2)],
             subplots=True,
-            gridsize=[5, 20],
+            grid_size=[5, 20],
             reduce=[None, HEXBIN_REDUCE.MAX],
-            show_colorbars=False,
+            show_colorbar=False,
         )
         a, b = [_hexbins(ax)[0] for ax in figure.axes]
         self.assertLess(len(a.get_offsets()), len(b.get_offsets()))
@@ -243,7 +245,7 @@ class TestHexbinChart(unittest.TestCase):
     def test_overlay_draws_every_chart(self):
         figure = HexbinChart(
             data=[points(seed=1, center=(-3, 0)), points(seed=2, center=(3, 0))],
-            show_colorbars=False,
+            show_colorbar=False,
         )
         self.assertEqual(len(_hexbins(figure.axes[0])), 2)
 
@@ -264,7 +266,7 @@ class TestHexbinCompose(unittest.TestCase):
         scatter_points = [{"x": x, "y": y} for x, y in zip(data["x"], data["y"])]
         panel = Panel(
             [
-                HexbinChart(data=data, show_colorbars=False),
+                HexbinChart(data=data, show_colorbar=False),
                 ScatterChart(data=scatter_points, subtitle="points"),
             ],
             show_legend=True,
@@ -279,7 +281,7 @@ class TestHexbinCompose(unittest.TestCase):
                 [HexbinChart(data=points(), title="hex")],
                 [
                     LineChart(data=[{"x": i, "y": i} for i in range(5)]),
-                    HexbinChart(data=points_with_c(), show_colorbars=False),
+                    HexbinChart(data=points_with_c(), show_colorbar=False),
                 ],
             ]
         )
@@ -291,7 +293,7 @@ class TestHexbinCompose(unittest.TestCase):
             data=[points(seed=1), points(seed=2)],
             subtitle=["A", "B"],
             subplots=True,
-            show_colorbars=False,
+            show_colorbar=False,
         )
         fig = Grid([inner, LineChart(data=[{"x": i, "y": i} for i in range(5)])])
         self.assertEqual(len(fig.axes), 3)
@@ -374,6 +376,6 @@ class TestHexbinCentredNorm(unittest.TestCase):
         self.assertEqual(tiles.norm.vcenter, 0.5)
         self.assertEqual(tiles.cmap.name, config["plot_heatmap_cmap_diverging"])
 
-    def test_show_colorbars_defaults_on(self):
+    def test_show_colorbar_defaults_on(self):
         figure = HexbinChart(points())
         self.assertEqual(len(figure.axes), 2)
