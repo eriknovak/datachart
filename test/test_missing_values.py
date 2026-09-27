@@ -263,6 +263,21 @@ class TestRecordFronts(MissingCase):
         figure = self.quietly(lambda: pyramid(holed(bars(), "y", None)))
         self.assertEqual(drawn_bars(figure), 9)
 
+    def test_a_missing_scatter_size_or_error_is_not_drawn(self):
+        for key in ("size", "xerr", "yerr"):
+            for label, missing in MISSING.items():
+                with self.subTest(key=key, missing=label):
+                    records = [
+                        {**p, "size": 1.0, "xerr": 0.1, "yerr": 0.1} for p in points()
+                    ]
+                    self.quietly(lambda: ScatterChart(holed(records, key, missing)))
+
+    def test_a_missing_value_has_no_value_label(self):
+        figure = self.quietly(
+            lambda: LineChart(holed(series(), "y", None), show_values=True)
+        )
+        self.assertEqual(len(figure.axes[0].texts), 4)
+
     def test_an_absent_key_still_raises(self):
         with self.assertRaisesRegex(ValueError, "record `data\\[0\\]` has no `y` key"):
             LineChart([{"x": 1}])

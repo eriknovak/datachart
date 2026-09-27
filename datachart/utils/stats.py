@@ -707,8 +707,7 @@ def rolling_mean(values: List[Union[int, float]], window: int) -> List[float]:
         [nan, nan, 2.0, 3.0, 4.0]
 
     Args:
-        values: The list of values; missing ones (None, NaN, infinities)
-            are ignored.
+        values: The list of values; a window averages its finite values.
         window: The number of values averaged, at least 1.
 
     Returns:
@@ -729,7 +728,6 @@ def rolling_mean(values: List[Union[int, float]], window: int) -> List[float]:
     present = np.isfinite(series)
     result = np.full(len(series), np.nan)
     if len(series) >= window:
-        # each window averages its finite values; one with none is nan
         sums = np.convolve(np.where(present, series, 0), np.ones(window), "valid")
         counts = np.convolve(present, np.ones(window), "valid")
         with np.errstate(invalid="ignore", divide="ignore"):
@@ -751,8 +749,7 @@ def ewma(values: List[Union[int, float]], alpha: float) -> List[float]:
         [1.0, 1.5, 2.25]
 
     Args:
-        values: The list of values; missing ones (None, NaN, infinities)
-            are ignored.
+        values: The list of values; a missing one outputs `nan`.
         alpha: The weight of the current value, in `(0, 1]`.
 
     Returns:
@@ -769,7 +766,6 @@ def ewma(values: List[Union[int, float]], alpha: float) -> List[float]:
     result: List[float] = []
     previous = None
     for value in values:
-        # a missing value outputs nan and leaves the average where it was
         if is_missing(value):
             result.append(np.nan)
             continue

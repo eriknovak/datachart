@@ -535,18 +535,18 @@ def build_charts_structure(
     else:
         charts = [build_chart_dict_single(data, **common_args)]
     # a chart given data whose every value is missing has nothing to draw
-    emptied = []
+    nothing_to_draw = []
     if kind.record_keys:
         for index, chart in enumerate(charts):
             where = f"data[{index}]" if is_multi_chart else "data"
             records = canonical_records(kind, chart, where, required_keys)
             chart["data"] = _drawn_records(kind, records)
-            emptied.append(bool(records) and not _has_values(kind, chart))
+            nothing_to_draw.append(bool(records) and not _has_values(kind, chart))
     elif kind.dict_data:
         for chart in charts:
             if isinstance(chart["data"], dict):
                 chart["data"] = _drawn_columns(kind, chart["data"])
-            emptied.append(not _has_values(kind, chart))
+            nothing_to_draw.append(not _has_values(kind, chart))
     else:
         # records of free-form keys: an infinity is missing like NaN
         for chart in charts:
@@ -554,7 +554,8 @@ def build_charts_structure(
                 {k: _missing_as_nan(v) if v is not None else v for k, v in r.items()}
                 for r in chart["data"]
             ]
-    if charts and all(emptied) and len(emptied) == len(charts):
+            nothing_to_draw.append(False)
+    if charts and all(nothing_to_draw):
         raise ValueError(
             f"{_front(kind)} has nothing to draw: every value in `data` is "
             "missing (None, NaN, or inf)."
@@ -563,7 +564,6 @@ def build_charts_structure(
 
 
 def _drawn_records(kind: ChartKind, records: List[dict]) -> List[dict]:
-    # a missing position drops the record; a missing value stays as NaN
     drawn = []
     for record in records:
         if any(is_missing(record.get(key, 0)) for key in kind.position_keys):
@@ -599,7 +599,6 @@ def _drawn_columns(kind: ChartKind, data: dict) -> dict:
 
 def _has_values(kind: ChartKind, chart: dict) -> bool:
     # the value keys decide, or the position keys where a record has none
-
     data = chart.get("data")
     if isinstance(data, dict):
         columns = [data]

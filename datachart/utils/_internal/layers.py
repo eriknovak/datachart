@@ -5060,6 +5060,15 @@ class GroupLayer(Layer):
     legend_body = None
     legend_label = None
 
+    def warn_without_records(self, name: str) -> None:
+        """Warn that the layer was given no records.
+
+        Records whose values are all missing draw nothing, silently.
+        """
+
+        if not self.chart.get("data"):
+            warnings.warn(f"No data points found for {name}.")
+
     def _resolve_style(self):
         if self.sorts_by_median:
             self.sort = self.settings.get("sort")
@@ -5270,9 +5279,7 @@ class BoxLayer(GroupLayer):
         values = [grouped[lbl] for lbl in labels]
 
         if len(values) == 0:
-            # records whose values are all missing draw nothing, silently
-            if not self.chart.get("data"):
-                warnings.warn("No data points found for box plot.")
+            self.warn_without_records("box plot")
             return
 
         positions = [ctx.category_index[lbl] + self.offset for lbl in labels]
@@ -5484,9 +5491,7 @@ class SwarmLayer(UnclippedMarksMixin, PointLabelMixin, GroupLayer):
         grouped = self.grouped_values()
         labels = list(grouped.keys())
         if not labels:
-            # records whose values are all missing draw nothing, silently
-            if not self.chart.get("data"):
-                warnings.warn("No data points found for swarm plot.")
+            self.warn_without_records("swarm plot")
             return
 
         index = ctx.category_index
@@ -6161,9 +6166,7 @@ class ViolinLayer(GroupLayer):
     def draw(self, ax, ctx):
         labels, grouped = self._group()
         if len(labels) == 0:
-            # records whose values are all missing draw nothing, silently
-            if not self.chart.get("data"):
-                warnings.warn("No data points found for violin plot.")
+            self.warn_without_records("violin plot")
             return
 
         body_style = dict(self.violin_style)
@@ -6427,9 +6430,7 @@ class RidgelineLayer(GroupLayer):
     def draw(self, ax, ctx):
         grouped = self.grouped_values()
         if not grouped:
-            # records whose values are all missing draw nothing, silently
-            if not self.chart.get("data"):
-                warnings.warn("No data points found for ridgeline plot.")
+            self.warn_without_records("ridgeline plot")
             return
         for label, values in grouped.items():
             if len(values) < 2:
@@ -12764,6 +12765,9 @@ class Panel:
                     # scatter sizes are marker areas in points squared
                     radii = np.sqrt(np.broadcast_to(sizes, len(xs))) / 2
                     for i, ((cx, cy), r) in enumerate(zip(centers, radii)):
+                        # a missing value draws no point, so no label either
+                        if not np.isfinite([cx, cy]).all():
+                            continue
                         rpx = r * px_per_pt
                         obstacles.append((cx - rpx, cy - rpx, cx + rpx, cy + rpx))
                         if labels is not None and labels[i] is not None:

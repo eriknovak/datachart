@@ -82,7 +82,6 @@ from .validate import (
     validate_calendar_year,
     validate_dumbbell_records,
     validate_emphasis_rule,
-    validate_finite_groups,
     validate_gantt_groups,
     validate_gantt_sort_by,
     validate_gantt_tasks,
@@ -427,15 +426,6 @@ def _check_annotations(charts: List[dict], settings: dict) -> None:
         validate_annotation(label_key, settings.get("show_values"))
 
 
-def _finite_groups(name: str) -> Callable[[List[dict], dict], None]:
-    # NaN values are dropped as None is; a group of them alone has no values
-    def check(charts: List[dict], settings: dict) -> None:
-        for chart in charts:
-            validate_finite_groups(chart, name)
-
-    return check
-
-
 def _check_tasks(charts: List[dict], settings: dict) -> None:
     sort = settings.get("sort")
     sort_key = validate_gantt_sort_by(sort, settings.get("sort_by"))
@@ -757,7 +747,6 @@ _KINDS = (
         "boxplot",
         "box plot",
         BoxLayer,
-        check_records=_finite_groups("box plot"),
         record_keys=("label", "value"),
         required_keys=("label", "value"),
         position_keys=("label",),
@@ -774,7 +763,6 @@ _KINDS = (
         ViolinLayer,
         domains={"inner": VIOLIN_INNER},
         theme_defaults={"inner": "chart_default_violin_inner"},
-        check_records=_finite_groups("violin plot"),
         record_keys=("label", "value"),
         required_keys=("label", "value"),
         position_keys=("label",),
@@ -789,7 +777,6 @@ _KINDS = (
         "swarmplot",
         "swarm plot",
         SwarmLayer,
-        check_records=_finite_groups("swarm plot"),
         record_keys=("label", "value"),
         required_keys=("label", "value"),
         position_keys=("label",),
@@ -803,7 +790,6 @@ _KINDS = (
         "raincloudplot",
         "raincloud plot",
         ViolinLayer,
-        check_records=_finite_groups("raincloud plot"),
         record_keys=("label", "value"),
         required_keys=("label", "value"),
         position_keys=("label",),
@@ -829,7 +815,6 @@ _KINDS = (
             "fill": "chart_default_ridgeline_fill",
             "show_outline": "chart_default_ridgeline_show_outline",
         },
-        check_records=_finite_groups("ridgeline plot"),
         record_keys=("label", "value"),
         required_keys=("label", "value"),
         position_keys=("label",),
@@ -849,7 +834,7 @@ _KINDS = (
         record_keys=("x", "y", "size", "hue", "annotation", "xerr", "yerr"),
         required_keys=("x", "y"),
         position_keys=("x",),
-        value_keys=("y",),
+        value_keys=("y", "size", "xerr", "yerr"),
         # `label` is the category key on every other front (ADR 0069)
         renamed={"label": "annotation"},
         check_records=_check_annotations,

@@ -90,10 +90,15 @@ class TestErrorValidation(unittest.TestCase):
         self.assertIn("`yerr`", str(caught.exception))
 
     def test_a_non_number_raises(self):
-        for value in ("1", True, float("nan"), float("inf")):
+        for value in ("1", True):
             with self.subTest(value=value):
                 with self.assertRaises(ValueError):
                     validate_error_distances([value], "yerr")
+
+    def test_a_missing_distance_draws_no_bar(self):
+        for value in (None, float("nan"), float("inf")):
+            with self.subTest(value=value):
+                self.assertEqual(validate_error_distances([value], "yerr"), [None])
 
 
 class TestErrorStyle(unittest.TestCase):

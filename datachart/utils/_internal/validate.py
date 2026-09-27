@@ -293,7 +293,7 @@ def validate_error_distances(values: list, key: str) -> List[Optional[tuple]]:
 
     distances = []
     for index, value in enumerate(values):
-        if value is None:
+        if is_missing(value):
             distances.append(None)
             continue
         pair = tuple(value) if isinstance(value, (list, tuple)) else (value, value)
@@ -989,35 +989,6 @@ def is_missing(value) -> bool:
     if isinstance(value, (float, np.floating)):
         return not math.isfinite(value)
     return isinstance(value, np.datetime64) and np.isnat(value)
-
-
-def validate_finite_groups(chart: dict, name: str) -> None:
-    """Raise when a group of a group chart holds missing values and nothing else.
-
-    A chart whose every value is missing draws nothing and passes.
-
-    Args:
-        chart: One chart, its `data` a list of `{label, value}` records.
-        name: The front's name in the message, e.g. `"box plot"`.
-    """
-
-    data = chart.get("data")
-    if not isinstance(data, list):
-        return
-    nan_labels, finite_labels = [], set()
-    for record in data:
-        label, value = record.get("label"), record.get("value")
-        if label is None or value is None:
-            continue
-        if is_missing(value):
-            nan_labels.append(label)
-        else:
-            finite_labels.add(label)
-    for label in nan_labels:
-        if finite_labels and label not in finite_labels:
-            subtitle = chart.get("subtitle")
-            named = f"{name} `{subtitle}`" if subtitle else name
-            raise ValueError(f"The {named} group `{label}` has no finite values.")
 
 
 def validate_dumbbell_records(records) -> None:
