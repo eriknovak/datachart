@@ -6,11 +6,18 @@ from typing import Any, List, Optional, Sequence, Union
 import numpy as np
 import matplotlib.colors as mcolors
 
-from ._base import TRAITS, canonical_style, warn_aliases
-from .default import DEFAULT_THEME
+from pypalettes import load_palette
+
+from ._base import TRAITS, canonical_style, complete_theme, warn_aliases
 from ..constants import TRAIT
 from ..typings import StyleAttrs
-from ..utils._internal.colors import get_color_scale, get_colormap, oklab_lightness
+from ..utils._internal.colors import (
+    CUSTOM_PALETTES,
+    get_color_scale,
+    get_colormap,
+    is_plain_color,
+    oklab_lightness,
+)
 
 Lead = Union[str, List[str]]
 
@@ -46,13 +53,28 @@ def _is_dark_page(theme: StyleAttrs) -> bool:
 
 def _resolve_base(base: Union[str, StyleAttrs]) -> StyleAttrs:
     if isinstance(base, dict):
-        return {**copy.deepcopy(DEFAULT_THEME), **copy.deepcopy(base)}
+        # `_resolve_base`, `derive_theme`, then the caller
+        return complete_theme(base, stacklevel=3)
     # for a name only: the config module imports this package while loading
     from ..config.configuration import THEMES
 
     if base not in THEMES:
         raise ValueError(f"Unknown theme: {base!r}. Must be one of {list(THEMES)}")
     return copy.deepcopy(THEMES[base])
+
+
+def _check_palette(lead: str) -> None:
+    """Raise for a lead naming no palette; the color helpers fall back instead."""
+
+    if lead in CUSTOM_PALETTES or is_plain_color(lead):
+        return
+    try:
+        load_palette(lead)
+    except Exception:
+        raise ValueError(
+            f"Unknown lead palette: {lead!r}. Use a `COLORS` constant, a "
+            "pypalettes palette name, or a list of colors."
+        ) from None
 
 
 def derive_theme(
@@ -86,9 +108,11 @@ def derive_theme(
     Args:
         base: A `THEME` constant, a registered theme name, or a theme dictionary;
             a partial dictionary is completed from the default theme, as
-            `register_theme` completes it.
+            `register_theme` completes it: alias keys are renamed and an
+            unknown key raises.
         lead: A `COLORS` constant, a pypalettes palette name, or a list of colors.
-            A diverging map is not a lead; it is read as categorical.
+            A diverging map is not a lead; it is read as categorical. A name
+            that is no palette raises.
         traits: `TRAIT` members applied in order after the lead; an unknown
             name raises.
         **overrides: Style attributes set on the result; an unknown name raises.
@@ -99,6 +123,8 @@ def derive_theme(
     """
 
     theme = _resolve_base(base)
+    if isinstance(lead, str):
+        _check_palette(lead)
     swatches = get_color_scale(lead) if isinstance(lead, str) else list(lead)
     if len(swatches) < 2:
         raise ValueError("The lead must hold at least two colors.")
