@@ -135,7 +135,7 @@ cdf = LineChart(
     [{"x": x, "y": 100 * i / len(samples)} for i, x in enumerate(samples, 1)],
     subtitle="Cumulative %",
 )
-config.update_config({"plot_legend_location": LEGEND_LOCATION.UPPER_LEFT})
+config.update({"plot_legend_location": LEGEND_LOCATION.UPPER_LEFT})
 overlay = Panel(
     [hist, cdf], title="Histogram + line", ylabel_right="%",
     auto_secondary_axis=1, show_legend=True,
@@ -152,7 +152,7 @@ save_figure(figure, "grid.png")
 
 ## Themes
 
-Predefined themes, applied with `config.set_theme(THEME.<NAME>)`. Any attribute can then be tweaked globally via `config.update_config(...)` or per chart via the `style` argument — see the [themes][themes-guide], [config][config-guide], and [theme gallery][gallery-guide] guides.
+Predefined themes, applied with `config.set_theme(THEME.<NAME>)`. Any attribute can then be tweaked globally via `config.update(...)` or per chart via the `style` argument — see the [themes][themes-guide], [config][config-guide], and [theme gallery][gallery-guide] guides.
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/eriknovak/datachart/main/docs/assets/imgs/example-themes.png" alt="The same grouped bar chart across the predefined themes" width="720" />

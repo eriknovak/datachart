@@ -85,7 +85,10 @@ deprecated keyword in the front's signature, and the legacy kind-as-
 entry on a constant class that already shipped, and any `STYLE_ALIASES`
 entry in `datachart/themes/_base.py` that already shipped, and the
 deprecated `gridsize` keyword of `kde1d`/`kde2d` with its `_grid_size`
-helper in `datachart/utils/stats.py` once it has shipped. Publishing the
+helper in `datachart/utils/stats.py` once it has shipped. Remove the
+deprecated wrappers that already shipped: `stats.correlation`,
+`Config.update_config`, `Config.reset_config`, and `save_figure`'s `format`
+keyword. Publishing the
 GitHub release then triggers PyPI and the versioned docs.
 
 ## Architecture
@@ -121,7 +124,7 @@ The package uses a singleton configuration pattern:
 from datachart.config import config
 
 # The `config` instance is a global singleton that stores all style attributes
-# Users can modify it via config.set_theme(), config.update_config(), or config.reset_config()
+# Users can modify it via config.set_theme(), config.update(), or config.reset()
 ```
 
 **Key points:**

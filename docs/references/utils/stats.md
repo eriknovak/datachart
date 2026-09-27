@@ -18,7 +18,7 @@ Every function takes plain Python lists and returns a number, a pair, or lists r
 | a center, count, or total                      | [`mean`](#datachart.utils.stats.mean), [`median`](#datachart.utils.stats.median), [`mode`](#datachart.utils.stats.mode), [`count`](#datachart.utils.stats.count), [`sum_values`](#datachart.utils.stats.sum_values) |
 | how far the values spread                      | [`stdev`](#datachart.utils.stats.stdev), [`variance`](#datachart.utils.stats.variance), [`quantile`](#datachart.utils.stats.quantile), [`iqr`](#datachart.utils.stats.iqr), [`minimum`](#datachart.utils.stats.minimum), [`maximum`](#datachart.utils.stats.maximum) |
 | the shape of a distribution                    | [`skewness`](#datachart.utils.stats.skewness), [`kurtosis`](#datachart.utils.stats.kurtosis) |
-| how two variables move together                | [`correlation`](#datachart.utils.stats.correlation), [`spearman`](#datachart.utils.stats.spearman) |
+| how two variables move together                | [`pearson`](#datachart.utils.stats.pearson), [`spearman`](#datachart.utils.stats.spearman) |
 | a trend line                                   | [`linear_fit`](#datachart.utils.stats.linear_fit) |
 | an interval around a statistic                 | [`bootstrap_ci`](#datachart.utils.stats.bootstrap_ci) |
 | bins for a histogram                           | [`histogram`](#datachart.utils.stats.histogram) |
@@ -49,7 +49,7 @@ Every function takes plain Python lists and returns a number, a pair, or lists r
 
 ## Association
 
-::: datachart.utils.stats.correlation
+::: datachart.utils.stats.pearson
 ::: datachart.utils.stats.spearman
 
 ## Trend Line

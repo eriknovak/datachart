@@ -599,7 +599,7 @@ and networks.
 _Avoid_: focus, selected group
 
 **Density estimate**:
-A Gaussian kernel density (`stats.kde1d` → `{x, y}` points for `LineChart`,
+A Gaussian kernel density (`stats.kde1d` → an `{x, y}` dict for `LineChart`,
 `stats.kde2d` → an `{x, y, z}` dict for `ContourChart`) on a grid that extends
 `cut` bandwidths past the data so the estimate tails off instead of being
 clipped. `bandwidth` takes a `BANDWIDTH` rule or a scalar factor, as violins do.
@@ -608,8 +608,8 @@ _Avoid_: KDE plot, density chart (as a chart type)
 **Smoother**:
 A stats helper that turns a noisy series into a readable one — `rolling_mean`
 and `ewma` return a `List[float]` aligned to the input index (`nan` until the
-window fills), `loess` returns `{x, y}` points sorted by `x` for `LineChart`,
-as `kde1d` does. Shapes follow each function's arity, not the chart that draws
+window fills), `loess` returns `{x, y}` points sorted by `x` for `LineChart`.
+Shapes follow each function's arity, not the chart that draws
 them (ADR 0038).
 _Avoid_: trend line (that is the drawn mark), moving average (for the group)
 
@@ -774,7 +774,7 @@ _Avoid_: pinned colour, explicit colour, style colour
 
 **Active theme**:
 The name of the theme last applied, held on the configuration as `theme` and
-kept in step with the style dictionary — `set_theme`, `reset_config`, and a
+kept in step with the style dictionary — `set_theme`, `reset`, and a
 theme scope all move the two together.
 _Avoid_: current theme, selected theme
 
