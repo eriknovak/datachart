@@ -21,6 +21,7 @@ from .base import (
     EMPHASIS_BACKGROUND,
     EndLabelMixin,
     Layer,
+    LineStyleCycleMixin,
     MarkClipBox,
     POINT_LABEL_PAD,
     POINT_LABEL_SPOTS_VERTICAL,
@@ -28,6 +29,7 @@ from .base import (
     StackSlot,
     TEXT_ANNOTATION_ZORDER,
     TEXT_LINE_HEIGHT,
+    UnclippedMarksMixin,
     _apply_cycle_hatch,
     _oriented,
     _point_resolver,
@@ -67,7 +69,14 @@ def _mark_radius(line_style: dict) -> float:
     return (line_style.get("markersize") or plt.rcParams["lines.markersize"]) / 2
 
 
-class LineLayer(PointLabelMixin, EndLabelMixin, AreaFillMixin, Layer):
+class LineLayer(
+    PointLabelMixin,
+    EndLabelMixin,
+    AreaFillMixin,
+    LineStyleCycleMixin,
+    UnclippedMarksMixin,
+    Layer,
+):
     kind = "line"
     color_style = "line_style"
     label_spots = POINT_LABEL_SPOTS_VERTICAL
@@ -315,6 +324,10 @@ class BumpLayer(LineLayer):
     # value labels sit beside the marks inside the half-rank margin
     labels_past_mark = False
 
+    def takes_hatch(self) -> bool:
+        # a bump line fills no area
+        return False
+
     def _resolve_style(self):
         style = get_bump_style(self.style)
         self.label_padding = style.pop("label_padding", 0)
@@ -408,6 +421,10 @@ class StackedAreaLayer(EndLabelMixin, Layer):
         self.line_style = get_line_style(self.style)
         self._resolve_value_labels()
         self._resolve_end_labels(False, POINT_LABEL_PAD)
+
+    def takes_hatch(self) -> bool:
+        # a tiled hatch on a translucent area reads poorly: etched areas only
+        return self.etch is not None
 
     def x_values(self):
         return get_chart_data("x", self.chart)

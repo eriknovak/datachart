@@ -44,6 +44,7 @@ from ....constants import (
 )
 from ....config import config
 from .base import (
+    CategoryGroupMixin,
     DEFAULT_ORIENTATION,
     DrawContext,
     EMPHASIS_BACKGROUND,
@@ -55,6 +56,7 @@ from .base import (
     NO_LEGEND,
     POINT_LABEL_SPOTS,
     POINT_LABEL_SPOTS_VERTICAL,
+    PackedMarksMixin,
     PointLabelMixin,
     TEXT_ANNOTATION_ZORDER,
     UnclippedMarksMixin,
@@ -113,8 +115,10 @@ def grouped_values(chart: dict) -> dict:
     }
 
 
-class GroupLayer(Layer):
+class GroupLayer(CategoryGroupMixin, Layer):
     """A layer of labeled groups placed on the panel's category index."""
+
+    on_category_axis = True
 
     # box, violin and ridgeline fronts order their groups by median (ADR 0042)
     sorts_by_median = False
@@ -233,6 +237,9 @@ class GroupLayer(Layer):
 
     def labels(self) -> list:
         return list(self.grouped_values().keys())
+
+    def bracket_values(self) -> dict:
+        return self.grouped_values()
 
     def value_data(self):
         return [v for vals in self.grouped_values().values() for v in vals]
@@ -493,7 +500,7 @@ def strip_offsets(n: int, jitter: float) -> np.ndarray:
     return np.random.default_rng(0).uniform(-jitter / 2, jitter / 2, n)
 
 
-class SwarmLayer(UnclippedMarksMixin, PointLabelMixin, GroupLayer):
+class SwarmLayer(UnclippedMarksMixin, PointLabelMixin, PackedMarksMixin, GroupLayer):
     kind = "swarm"
 
     def _resolve_style(self):

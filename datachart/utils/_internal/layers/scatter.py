@@ -20,6 +20,7 @@ from .base import (
     EMPHASIS_HIGHLIGHT,
     Layer,
     MARKER_ROLE_ORDER,
+    MarkerCycleMixin,
     NO_LEGEND,
     POINT_LABEL_PAD,
     PointLabelMixin,
@@ -86,9 +87,12 @@ def _masked_errors(errors: dict, mask) -> dict:
     }
 
 
-class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
+class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, MarkerCycleMixin, Layer):
     kind = "scatter"
     record_roles_beat_layer = True
+
+    def size_values(self) -> Optional[np.ndarray]:
+        return get_chart_data("size", self.chart)
 
     def _resolve_style(self):
         self.scatter_style = get_scatter_style(self.style)

@@ -39,6 +39,8 @@ from ....constants import (
 )
 from ....config import config
 from .base import (
+    BarSlotMixin,
+    BinnedMarksMixin,
     COLORBAR_FRACTION,
     DEFAULT_NUM_BINS,
     DEFAULT_ORIENTATION,
@@ -73,10 +75,11 @@ def _axis_formatter(ax: plt.Axes, which: str) -> Callable:
     return getattr(ax, f"format_{which}data")
 
 
-class BarLayer(Layer):
+class BarLayer(BarSlotMixin, Layer):
     kind = "bar"
     color_style = "bar_style"
     labels_past_mark = True
+    on_category_axis = True
 
     def _resolve_style(self):
         orientation = self.settings.get("orientation") or DEFAULT_ORIENTATION
@@ -92,6 +95,13 @@ class BarLayer(Layer):
 
     def y_values(self) -> Optional[np.ndarray]:
         return get_chart_data("y", self.chart)
+
+    def bracket_values(self) -> Optional[dict]:
+        labels, values = self.labels(), self.y_values()
+        if labels is None or values is None:
+            return None
+        # a bar is one value at its label, where a group is many
+        return {label: [value] for label, value in zip(labels, values)}
 
     def value_data(self):
         return self.y_values()
@@ -319,6 +329,8 @@ class GanttLayer(BarLayer):
     color_style = None
 
     kind = "gantt"
+    # task rows place themselves by task, off the category axis
+    on_category_axis = False
 
     def _resolve_style(self):
         self.is_horizontal = True
@@ -779,7 +791,7 @@ class GanttLayer(BarLayer):
         return resolve
 
 
-class HistogramLayer(Layer):
+class HistogramLayer(BinnedMarksMixin, Layer):
     kind = "histogram"
     color_style = "hist_style"
     labels_past_mark = True

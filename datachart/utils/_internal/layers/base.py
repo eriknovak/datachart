@@ -677,6 +677,24 @@ class Layer:
     colorbar_edge: Optional[str] = None
     # the normalized position a value step must break on; None spaces them evenly
     step_centre: Optional[float] = None
+    # (theta, tip radius, value, category index) per radial mark, recorded
+    # at draw time so the panel can write tip texts with the final orientation
+    _tips = ()
+    # the layer's labels share the panel's one category axis (ADR 0079)
+    on_category_axis: bool = False
+
+    # group policies: the front's `ChartKind` row sets these at build; a layer
+    # built outside a row (a text carrier) takes none of them
+    tighten_xlim: bool = False
+    shared_bins: bool = False
+    stacks: bool = False
+    rank_axis: bool = False
+    rows_down: bool = False
+    rising_rows: bool = False
+    paired: bool = False
+    schedule_axis: bool = False
+    shared_dimensions: bool = False
+    map_underlay: bool = False
 
     def __init__(self, chart: dict, settings: dict):
         self.chart = chart
@@ -883,6 +901,32 @@ class Layer:
     def labels(self):
         """The layer's category labels; None for a layer without groups."""
         return None
+
+    def category_labels(self) -> Optional[list]:
+        """The labels the layer places on the panel's category axis; None off it."""
+
+        if not self.on_category_axis:
+            return None
+        labels = self.labels()
+        return None if labels is None else list(labels)
+
+    def bracket_values(self) -> Optional[dict]:
+        """The values drawn at each category label, for bracket placement.
+
+        None for a layer whose marks brackets do not stand on.
+        """
+
+        return None
+
+    def size_values(self) -> Optional[np.ndarray]:
+        """The data the layer's mark sizes scale from; None for fixed sizes."""
+
+        return None
+
+    def takes_hatch(self) -> bool:
+        """Whether the panel's hatch cycle reaches the layer's fills."""
+
+        return False
 
     def x_kind(self) -> Optional[str]:
         """The kind of axis the layer's x data asks for (ADR 0037); None without x.
@@ -1380,6 +1424,10 @@ def _apply_cycle_hatch(style: dict, ctx: DrawContext) -> None:
 class AreaFillMixin:
     """The fill under a series line: cycle color and hatch, muted or not."""
 
+    def takes_hatch(self) -> bool:
+        # a tiled hatch on a translucent area reads poorly: etched areas only
+        return self.etch is not None
+
     def _resolved_area_style(self, ctx):
         area_style = self._merge_color("color", ctx.color, self.area_style)
         if ctx.z_order is not None:
@@ -1388,6 +1436,36 @@ class AreaFillMixin:
         if ctx.emphasis == EMPHASIS_BACKGROUND:
             area_style["color"] = self.muted_color
         return area_style
+
+
+class BarSlotMixin:
+    """Bars the panel slots side by side and fades with its bar overlay alpha."""
+
+    def takes_hatch(self) -> bool:
+        return True
+
+
+class BinnedMarksMixin:
+    """Binned counts the panel fades with its histogram overlay alpha."""
+
+    def takes_hatch(self) -> bool:
+        return True
+
+
+class LineStyleCycleMixin:
+    """Series lines the panel's line-style cycle reaches."""
+
+
+class MarkerCycleMixin:
+    """Point marks the panel's marker cycle reaches."""
+
+
+class PackedMarksMixin:
+    """Marks the panel packs apart once its scales and limits are final."""
+
+
+class CategoryGroupMixin:
+    """Groups on the panel's shared category axis, which they label."""
 
 
 class MarkClipBox(TransformedBbox):

@@ -220,6 +220,21 @@ class DatasetPolicy(Enum):
     RAISE = "raise"
 
 
+# the row fields copied onto every layer a row builds; `Panel` reads them there
+LAYER_POLICIES = (
+    "tighten_xlim",
+    "shared_bins",
+    "stacks",
+    "rank_axis",
+    "rows_down",
+    "rising_rows",
+    "paired",
+    "schedule_axis",
+    "shared_dimensions",
+    "map_underlay",
+)
+
+
 @dataclass(frozen=True)
 class ChartKind:
     """Everything the engine, builder, and composition read about a front.
@@ -277,10 +292,28 @@ class ChartKind:
         gridless: Whether the grid is off unless asked, given the settings.
         grid_on_value_axis: A theme's one-axis grid follows the value axis
             when it runs horizontally.
-        tighten_xlim: The x limits hug the data instead of a margin.
+        tighten_xlim: The x limits hug the data instead of a margin: the
+            panel pins them to the union of these layers' x ranges.
         bar_mode: The default bar mode of the panel.
         mirrored: The panel mirrors the bars about zero (a pyramid).
-        shared_bins: Subplots share one set of histogram bins.
+        shared_bins: Subplots share one set of histogram bins, and a panel
+            bins and stacks these layers on shared edges.
+        stacks: The layers stack on one shared baseline, which floors the
+            value axis; a panel of them alone ends on the stack.
+        rank_axis: The layers draw ranks: a panel of them alone runs a rank
+            axis, rank 1 on top, with one tick per period.
+        rows_down: The first row reads at the top of a horizontal panel.
+        rising_rows: Rows rise from their baselines, so swarms drawn over
+            them pack on the rising side.
+        paired: Each record is a start-end pair; a lone paired layer names
+            its ends plainly, and the densest one splits the minor grid.
+        schedule_axis: The layers are tasks on a schedule: a panel of them
+            alone ticks its dates from first start to last end, and they
+            place their own row ticks.
+        shared_dimensions: The layers share dimension axes the panel
+            normalizes once; the panel draws a legend only for hue groups.
+        map_underlay: The layers are a map underlay: the panel checks what
+            draws over them, and alone they frame their own outlines.
         warns_subplot_legend: `show_legend` warns when the charts split into
             subplots.
         swaps_horizontal_labels: A horizontal subplot swaps its axis labels.
@@ -326,6 +359,14 @@ class ChartKind:
     bar_mode: str = "group"
     mirrored: bool = False
     shared_bins: bool = False
+    stacks: bool = False
+    rank_axis: bool = False
+    rows_down: bool = False
+    rising_rows: bool = False
+    paired: bool = False
+    schedule_axis: bool = False
+    shared_dimensions: bool = False
+    map_underlay: bool = False
     warns_subplot_legend: bool = True
     swaps_horizontal_labels: bool = False
     emphasis_units: Optional[Callable] = None
@@ -351,8 +392,14 @@ class ChartKind:
         """The front's layers for already prepared charts."""
 
         if self.build is not None:
-            return self.build(charts, settings)
-        return [self.layer(chart, settings) for chart in charts]
+            layers = self.build(charts, settings)
+        else:
+            layers = [self.layer(chart, settings) for chart in charts]
+        # the panel reads the row's group policies on the layers it holds
+        for layer in layers:
+            for name in LAYER_POLICIES:
+                setattr(layer, name, getattr(self, name))
+        return layers
 
 
 # ================================================
@@ -609,6 +656,7 @@ _KINDS = (
         tighten_xlim=True,
         emphasis_units=series_units("y"),
         emphasis_by="mean",
+        stacks=True,
     ),
     ChartKind(
         "bumpchart",
@@ -629,6 +677,7 @@ _KINDS = (
         emphasis_ranks=True,
         # the rule reads the ranks, so they come first
         prepare=rank_bump_charts,
+        rank_axis=True,
     ),
     ChartKind(
         "barchart",
@@ -740,6 +789,8 @@ _KINDS = (
         overlayable=False,
         emphasis_units=gantt_units,
         order=sort_gantt_charts,
+        rows_down=True,
+        schedule_axis=True,
     ),
     ChartKind(
         "dumbbellchart",
@@ -761,6 +812,8 @@ _KINDS = (
         grid_on_value_axis=True,
         emphasis_units=dumbbell_units,
         order=sort_dumbbell_charts,
+        rows_down=True,
+        paired=True,
     ),
     ChartKind(
         "histogram",
@@ -870,6 +923,8 @@ _KINDS = (
         group=True,
         emphasis_units=group_units,
         emphasis_by="median",
+        rows_down=True,
+        rising_rows=True,
     ),
     ChartKind(
         "scatterchart",
@@ -979,6 +1034,7 @@ _KINDS = (
         build=_parallel_layers,
         subplots=False,
         emphasis_units=parallel_units,
+        shared_dimensions=True,
     ),
     ChartKind(
         "networkchart",
@@ -1023,6 +1079,7 @@ _KINDS = (
         subplots=False,
         renamed={"features": "data"},
         expand=_basemap_chart,
+        map_underlay=True,
     ),
     ChartKind(
         "sankeychart",

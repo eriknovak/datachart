@@ -13,10 +13,14 @@ from ....constants import RADIAL_TYPE
 from ....config import config
 from .base import (
     AreaFillMixin,
+    BarSlotMixin,
+    BinnedMarksMixin,
     DEFAULT_NUM_BINS,
     EMPHASIS_BACKGROUND,
     EMPHASIS_HIGHLIGHT,
     Layer,
+    LineStyleCycleMixin,
+    MarkerCycleMixin,
     _apply_cycle_hatch,
     _category_positions,
     _hollow_marker,
@@ -80,12 +84,13 @@ class RadialLayer(Layer):
     projection = "polar"
     # categorical layers place their labels evenly around the circle
     is_categorical = True
-    # (theta, tip radius, value, category index) per mark, recorded at draw
-    # time so the panel can write tip texts with the final orientation
-    _tips = ()
+    on_category_axis = True
 
     def labels(self) -> Optional[np.ndarray]:
         return get_chart_data("label", self.chart)
+
+    def category_labels(self) -> Optional[list]:
+        return super().category_labels() if self.is_categorical else None
 
     def value_data(self):
         return get_chart_data("y", self.chart)
@@ -99,7 +104,7 @@ class RadialLayer(Layer):
             ax.set_yscale(scaley)
 
 
-class RadialLineLayer(AreaFillMixin, RadialLayer):
+class RadialLineLayer(AreaFillMixin, LineStyleCycleMixin, RadialLayer):
     kind = "radial-line"
     color_style = "line_style"
 
@@ -160,7 +165,7 @@ class RadialLineLayer(AreaFillMixin, RadialLayer):
             self._etch([area], wash=False)
 
 
-class RadialBarLayer(RadialLayer):
+class RadialBarLayer(BarSlotMixin, RadialLayer):
     kind = "radial-bar"
     color_style = "bar_style"
     show_values = False
@@ -237,7 +242,7 @@ class RadialBarLayer(RadialLayer):
         self.register_hover(bars, _radial_resolver(self.label(ctx), labels, y))
 
 
-class RadialScatterLayer(RadialLayer):
+class RadialScatterLayer(MarkerCycleMixin, RadialLayer):
     kind = "radial-scatter"
 
     def _resolve_style(self):
@@ -280,7 +285,7 @@ class RadialScatterLayer(RadialLayer):
         self.register_hover(points, _radial_resolver(self.label(ctx), labels, y))
 
 
-class RadialHistogramLayer(RadialLayer):
+class RadialHistogramLayer(BinnedMarksMixin, RadialLayer):
     kind = "radial-histogram"
     color_style = "hist_style"
     is_categorical = False

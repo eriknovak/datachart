@@ -59,12 +59,18 @@ from ....constants import (
 from ....config import config
 from .base import (
     BarSlot,
+    BarSlotMixin,
+    BinnedMarksMixin,
+    CategoryGroupMixin,
     DEFAULT_NUM_BINS,
     DEFAULT_VALUE_LABEL_FORMAT,
     DrawContext,
     EndLabelMixin,
     Layer,
+    LineStyleCycleMixin,
+    MarkerCycleMixin,
     NO_LEGEND,
+    PackedMarksMixin,
     PointLabelMixin,
     REF_CYCLE_COLOR,
     SPAN_SIDES,
@@ -90,20 +96,12 @@ from .ticks import (
     date_labels,
     to_date_numbers,
 )
-from .line import BumpLayer, LineLayer, StackedAreaLayer, _stack_slots
-from .bar import BarLayer, GanttLayer, HistogramLayer, _hist_stack_slots
-from .scatter import CORRELATION_BOX_CORNER, ScatterLayer, _axis_numbers
-from .group import DumbbellLayer, GroupLayer, RidgelineLayer, SwarmLayer, pack_swarms
-from .position import BasemapLayer
-from .parallel import ParallelCoordsLayer, compute_parallel_stats
-from .radial import (
-    RadialBarLayer,
-    RadialHistogramLayer,
-    RadialLayer,
-    RadialLineLayer,
-    RadialScatterLayer,
-    _radial_theta,
-)
+from .line import _stack_slots
+from .bar import _hist_stack_slots
+from .scatter import CORRELATION_BOX_CORNER, _axis_numbers
+from .group import pack_swarms
+from .parallel import compute_parallel_stats
+from .radial import _radial_theta
 from .relational import _marker_entry, _overlap_area
 
 # an overlap below this many square pixels counts as a clear spot
@@ -375,9 +373,7 @@ def _size_extents(layers_on_axes) -> dict:
 
     extents = {}
     for layer, owner_ax in layers_on_axes:
-        if not isinstance(layer, ScatterLayer):
-            continue
-        sizes = get_chart_data("size", layer.chart)
+        sizes = layer.size_values()
         if sizes is None or len(sizes) == 0:
             continue
         lo, hi = float(np.min(sizes)), float(np.max(sizes))
@@ -736,22 +732,6 @@ def _draw_ref_lines(
         ax.set_ylim(*ylim)
 
 
-def _layer_category_labels(layer: "Layer") -> Optional[list]:
-    """The labels a layer places on the panel's category axis (ADR 0079).
-
-    None for a layer off that axis; Gantt rows place themselves by task.
-    """
-
-    if isinstance(layer, GanttLayer):
-        return None
-    if isinstance(layer, (GroupLayer, BarLayer)) or (
-        isinstance(layer, RadialLayer) and layer.is_categorical
-    ):
-        labels = layer.labels()
-        return None if labels is None else list(labels)
-    return None
-
-
 def _check_unique_labels(layer: "Layer", labels: list, number: int) -> None:
     """Raise when one series names a category twice: its slot is ambiguous."""
 
@@ -792,15 +772,8 @@ def _bracket_categories(layers: List["Layer"], category_index: dict) -> tuple:
     positions = dict(category_index)
     tops = {}
     for layer in layers:
-        if isinstance(layer, GroupLayer):
-            grouped = layer.grouped_values()
-        elif isinstance(layer, BarLayer):
-            labels, values = layer.labels(), layer.y_values()
-            if labels is None or values is None:
-                continue
-            # a bar is one value at its label, where a group is many
-            grouped = {label: [value] for label, value in zip(labels, values)}
-        else:
+        grouped = layer.bracket_values()
+        if grouped is None:
             continue
         for position, (label, values) in enumerate(grouped.items()):
             positions.setdefault(label, position)
@@ -1319,11 +1292,7 @@ class LayerGroup:
     def hist_bins(self) -> Optional[np.ndarray]:
         """Shared bin edges across the group's histogram layers."""
 
-        xall = [
-            layer.x_values()
-            for layer in self.layers
-            if isinstance(layer, HistogramLayer)
-        ]
+        xall = [layer.x_values() for layer in self.layers if layer.shared_bins]
         xall = [x for x in xall if x is not None]
         if not xall:
             return None
@@ -1488,25 +1457,6 @@ def _style_assignments(entries: Optional[list]) -> Optional[defaultdict]:
         return None
     entry_iter = iter_cycle(entries)
     return defaultdict(lambda: next(entry_iter))
-
-
-def _takes_hatch(layer: Layer) -> bool:
-    """Whether the panel's hatch cycle reaches the layer's fills.
-
-    Areas take it only when etched: a tiled hatch on a translucent area
-    reads poorly (ADR 0048).
-    """
-
-    if isinstance(
-        layer, (BarLayer, HistogramLayer, RadialBarLayer, RadialHistogramLayer)
-    ):
-        return True
-    areas = (LineLayer, StackedAreaLayer, RadialLineLayer)
-    return (
-        isinstance(layer, areas)
-        and not isinstance(layer, BumpLayer)
-        and layer.etch is not None
-    )
 
 
 class Panel:
@@ -1742,7 +1692,7 @@ class Panel:
             ("ridge", "ridgeline plot"),
         ):
             validate_single_dataset(sum(l.kind == kind for l in self.layers), name)
-        if any(isinstance(l, BasemapLayer) for l in self.layers):
+        if any(l.map_underlay for l in self.layers):
             validate_basemap_company(
                 [
                     l.kind
@@ -1815,9 +1765,7 @@ class Panel:
 
         # bar slotting across every layer in the panel; radial bars share the
         # machinery — their slots are sector fractions, scaled at draw time
-        bar_layers = [
-            l for l in self.layers if isinstance(l, (BarLayer, RadialBarLayer))
-        ]
+        bar_layers = [l for l in self.layers if isinstance(l, BarSlotMixin)]
         bar_mode = s.get("bar_mode") or BAR_MODE.DEFAULT
         # every category layer shares one category axis (ADR 0020, ADR 0079)
         category_index = self.category_index(self.layers)
@@ -1850,7 +1798,7 @@ class Panel:
                 for stack in by_axis(bar_layers):
                     bottoms = np.zeros(len(category_index or ()))
                     for idx, layer in enumerate(stack):
-                        labels, y = _layer_category_labels(layer), layer.y_values()
+                        labels, y = layer.category_labels(), layer.y_values()
                         stacks = category_index is not None and labels is not None
                         positions = _category_positions(labels or (), category_index)
                         bar_slots[id(layer)] = BarSlot(
@@ -1878,7 +1826,7 @@ class Panel:
             (group, l)
             for group in self.groups
             for l in group.layers
-            if isinstance(l, HistogramLayer) and l.x_values() is not None
+            if l.shared_bins and l.x_values() is not None
         ]
         hist_alpha = None
         if bar_mode != "stack" and len(hist_pairs) > 1:
@@ -1902,7 +1850,7 @@ class Panel:
                 hist_slots.update(_hist_stack_slots(stack, stack_bins))
 
         # stacked areas always stack; the baseline is a panel setting (ADR 0025)
-        stack_layers = [l for l in self.layers if isinstance(l, StackedAreaLayer)]
+        stack_layers = [l for l in self.layers if l.stacks]
         stack_slots = {}
         # both value axes share the one category axis, so every stack shares x
         if stack_layers:
@@ -1914,8 +1862,8 @@ class Panel:
 
         zorder_defaults = s.get("zorder_defaults", {})
 
-        group_layers = [l for l in self.layers if isinstance(l, GroupLayer)]
-        dumbbell_count = sum(isinstance(l, DumbbellLayer) for l in group_layers)
+        group_layers = [l for l in self.layers if isinstance(l, CategoryGroupMixin)]
+        dumbbell_count = sum(l.paired for l in group_layers)
 
         # hatch, line-style and marker cycles: per series, parallel to the
         # color cycle (ADR 0004, ADR 0048)
@@ -1960,7 +1908,7 @@ class Panel:
                 )
 
         # panel-owned parallel normalization (ADR 0009); furniture draws once
-        parallel_layers = [l for l in self.layers if isinstance(l, ParallelCoordsLayer)]
+        parallel_layers = [l for l in self.layers if l.shared_dimensions]
         parallel_stats = compute_parallel_stats(parallel_layers)
         parallel_axes_owner = parallel_layers[-1] if parallel_layers else None
 
@@ -2016,11 +1964,9 @@ class Panel:
                     legend_label=NO_LEGEND if muted else group.legend_label,
                     alpha=(
                         bar_alpha
-                        if isinstance(layer, (BarLayer, RadialBarLayer))
+                        if isinstance(layer, BarSlotMixin)
                         else (
-                            hist_alpha
-                            if isinstance(layer, (HistogramLayer, RadialHistogramLayer))
-                            else None
+                            hist_alpha if isinstance(layer, BinnedMarksMixin) else None
                         )
                     ),
                     bar_slot=bar_slots.get(id(layer)),
@@ -2029,19 +1975,19 @@ class Panel:
                     bins=bins,
                     hatch=(
                         hatch_assignments[layer.chart_hash]
-                        if hatch_assignments is not None and _takes_hatch(layer)
+                        if hatch_assignments is not None and layer.takes_hatch()
                         else None
                     ),
                     linestyle=(
                         linestyle_assignments[layer.chart_hash]
                         if linestyle_assignments is not None
-                        and isinstance(layer, (LineLayer, RadialLineLayer))
+                        and isinstance(layer, LineStyleCycleMixin)
                         else None
                     ),
                     marker=(
                         marker_assignments[layer.chart_hash]
                         if marker_assignments is not None
-                        and isinstance(layer, (ScatterLayer, RadialScatterLayer))
+                        and isinstance(layer, MarkerCycleMixin)
                         else None
                     ),
                     emphasis=role,
@@ -2079,7 +2025,7 @@ class Panel:
         category_layers = [
             (layer, labels)
             for layer in layers
-            if (labels := _layer_category_labels(layer)) is not None
+            if (labels := layer.category_labels()) is not None
         ]
         for number, (layer, labels) in enumerate(category_layers, 1):
             _check_unique_labels(layer, labels, number)
@@ -2289,7 +2235,7 @@ class Panel:
         """
 
         splits = max(
-            (l.grid_minor for l in self.layers if isinstance(l, DumbbellLayer)),
+            (l.grid_minor for l in self.layers if l.paired),
             default=0,
         )
         name = "x" if horizontal else "y"
@@ -2374,11 +2320,7 @@ class Panel:
         pinned = set()
         # line charts pin the category-axis limits to the union of their data ranges
         if s.get("tighten_xlim"):
-            ranges = [
-                layer.x_range()
-                for layer in layers
-                if isinstance(layer, (LineLayer, StackedAreaLayer))
-            ]
+            ranges = [layer.x_range() for layer in layers if layer.tighten_xlim]
             ranges = [r for r in ranges if r is not None]
             if ranges:
                 lo, hi = min(r[0] for r in ranges), max(r[1] for r in ranges)
@@ -2399,7 +2341,7 @@ class Panel:
         data_layers = [l for l in layers if l.kind != "text"]
 
         # a lone basemap frames its outlines; beside data it frames nothing
-        if data_layers and all(isinstance(l, BasemapLayer) for l in data_layers):
+        if data_layers and all(l.map_underlay for l in data_layers):
             bounds = np.array([l.bounds() for l in data_layers])
             x0, x1 = bounds[:, 0].min(), bounds[:, 1].max()
             y0, y1 = bounds[:, 2].min(), bounds[:, 3].max()
@@ -2410,9 +2352,7 @@ class Panel:
                 if hi > lo:
                     getattr(ax, f"set_{axis_name}lim")(lo, hi)
                     pinned.add(axis_name)
-        rank_axis = bool(data_layers) and all(
-            isinstance(l, BumpLayer) for l in data_layers
-        )
+        rank_axis = bool(data_layers) and all(l.rank_axis for l in data_layers)
         rank_ranges = [r for r in (l.y_range() for l in data_layers) if r is not None]
         rank_axis = rank_axis and bool(rank_ranges) and not bare and not polar
         if rank_axis:
@@ -2501,17 +2441,11 @@ class Panel:
         ):
             for owner_ax, owned in value_axes.items():
                 scale = scale_right if owner_ax is ax_right else value_scale
-                if scale != "log" and any(
-                    isinstance(l, StackedAreaLayer) for l in owned
-                ):
+                if scale != "log" and any(l.stacks for l in owned):
                     (owner_ax.set_xlim if horizontal else owner_ax.set_ylim)(0, None)
         # a stack alone fills its frame: the value axis ends exactly where the
         # stack does (a percent stack at 100), with no margin above it
-        if (
-            layers
-            and all(isinstance(l, StackedAreaLayer) for l in layers)
-            and value_scale != "log"
-        ):
+        if layers and all(l.stacks for l in layers) and value_scale != "log":
             lo, hi = ax.dataLim.intervalx if horizontal else ax.dataLim.intervaly
             if np.isfinite([lo, hi]).all() and hi > lo:
                 (ax.set_xlim if horizontal else ax.set_ylim)(lo, hi)
@@ -2526,9 +2460,9 @@ class Panel:
         if rank_axis and not ax.yaxis_inverted():
             ax.invert_yaxis()
         # the first ridge row reads at the top; overlaid groups follow (ADR 0047)
-        ridges = any(isinstance(l, RidgelineLayer) for l in layers)
+        ridges = any(l.rising_rows for l in layers)
         # the first task or dumbbell row reads at the top too (ADR 0049, 0050)
-        rows_down = any(isinstance(l, (GanttLayer, DumbbellLayer)) for l in layers)
+        rows_down = any(l.rows_down for l in layers)
         if (
             (ridges or rows_down)
             and horizontal
@@ -2548,7 +2482,7 @@ class Panel:
         # (dates keep theirs)
         if (
             layers
-            and all(isinstance(l, BumpLayer) for l in layers)
+            and all(l.rank_axis for l in layers)
             and self.temporal_axis is None
             and all(l.chart.get("xticks") is None for l in layers)
         ):
@@ -2615,7 +2549,7 @@ class Panel:
             if not dims:
                 continue
             for layer in layers:
-                if isinstance(layer, (LineLayer, UnclippedMarksMixin)):
+                if isinstance(layer, UnclippedMarksMixin):
                     layer.unclip_marks(axes, sorted(dims))
 
         # radial furniture reads the final r limits, so it follows them
@@ -2629,7 +2563,7 @@ class Panel:
         swarms = defaultdict(list)
         for group, owner_ax in zip(self.groups, group_axes):
             for layer in group.layers:
-                if isinstance(layer, SwarmLayer):
+                if isinstance(layer, PackedMarksMixin):
                     swarms[owner_ax].append(layer)
         for owner_ax, swarm_layers in swarms.items():
             pack_swarms(owner_ax, swarm_layers, swarm_side)
@@ -2773,7 +2707,7 @@ class Panel:
                 )
                 if handles:
                     _draw_legend(ax, ax_right, legend_style, handles, labels)
-            elif not any(isinstance(l, ParallelCoordsLayer) for l in layers):
+            elif not any(l.shared_dimensions for l in layers):
                 # parallel coords only carry a legend when hue groups exist;
                 # unlabeled panels get no empty legend frame
                 handles, labels = ax.get_legend_handles_labels()
@@ -2974,7 +2908,7 @@ class Panel:
     def _schedule_bounds(self):
         """A gantt panel's (first start, last end) as date numbers, else None."""
 
-        if not self.layers or any(not isinstance(l, GanttLayer) for l in self.layers):
+        if not self.layers or not all(l.schedule_axis for l in self.layers):
             return None
         ranges = [r for r in (l.y_range() for l in self.layers) if r is not None]
         if not ranges:
@@ -3001,7 +2935,7 @@ class Panel:
             starts = [
                 float(np.min(l.starts))
                 for l in self.layers
-                if isinstance(l, GanttLayer) and len(l.starts)
+                if l.schedule_axis and len(l.starts)
             ]
             start = min(starts) if starts else 0.0
         if not is_number(start):
@@ -3155,7 +3089,7 @@ class Panel:
             ax.xaxis.set_tick_params(labelrotation=rotation)
 
     def _apply_bar_ticks(self, ax, bar_ticks, bar_layers) -> None:
-        gantt = next((l for l in bar_layers if isinstance(l, GanttLayer)), None)
+        gantt = next((l for l in bar_layers if l.schedule_axis), None)
         if gantt is not None:
             # task rows skip the header and gap rows, so they place themselves
             gantt.apply_row_ticks(
@@ -3289,12 +3223,7 @@ class Panel:
         show_tip_labels = s.get("show_tip_labels")
         if not show_values and not show_tip_labels:
             return
-        tips = [
-            tip
-            for layer in self.layers
-            if isinstance(layer, RadialLayer)
-            for tip in layer._tips
-        ]
+        tips = [tip for layer in self.layers for tip in layer._tips]
         if not tips:
             return
 
