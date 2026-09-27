@@ -3,6 +3,8 @@
 import os
 import tempfile
 import unittest
+import warnings
+from pathlib import Path
 
 import matplotlib
 
@@ -29,29 +31,29 @@ class TestSaveFigure(unittest.TestCase):
 
     def test_several_formats_write_one_file_each(self):
         stem = self.path("fig1")
-        paths = save_figure(self.figure, stem, format=[FIG_FORMAT.PDF, FIG_FORMAT.PNG])
+        paths = save_figure(self.figure, stem, fmt=[FIG_FORMAT.PDF, FIG_FORMAT.PNG])
         self.assertEqual(paths, [f"{stem}.pdf", f"{stem}.png"])
         for path in paths:
             self.assertTrue(os.path.isfile(path))
 
     def test_known_extension_is_stripped_from_the_stem(self):
-        paths = save_figure(self.figure, self.path("fig1.png"), format=[FIG_FORMAT.PDF])
+        paths = save_figure(self.figure, self.path("fig1.png"), fmt=[FIG_FORMAT.PDF])
         self.assertEqual(paths, [self.path("fig1.pdf")])
         self.assertTrue(os.path.isfile(paths[0]))
 
     def test_dotted_name_keeps_every_part_of_itself(self):
-        paths = save_figure(self.figure, self.path("fig.v2"), format=[FIG_FORMAT.PDF])
+        paths = save_figure(self.figure, self.path("fig.v2"), fmt=[FIG_FORMAT.PDF])
         self.assertEqual(paths, [self.path("fig.v2.pdf")])
         self.assertTrue(os.path.isfile(paths[0]))
 
     def test_repeated_format_writes_once_per_entry(self):
         stem = self.path("fig1")
-        paths = save_figure(self.figure, stem, format=[FIG_FORMAT.PNG, FIG_FORMAT.PNG])
+        paths = save_figure(self.figure, stem, fmt=[FIG_FORMAT.PNG, FIG_FORMAT.PNG])
         self.assertEqual(paths, [f"{stem}.png", f"{stem}.png"])
 
     def test_single_format_uses_the_path_verbatim(self):
         path = self.path("fig1.png")
-        self.assertEqual(save_figure(self.figure, path, format=FIG_FORMAT.PNG), [path])
+        self.assertEqual(save_figure(self.figure, path, fmt=FIG_FORMAT.PNG), [path])
         self.assertTrue(os.path.isfile(path))
 
     def test_format_inferred_from_the_extension(self):
@@ -61,8 +63,43 @@ class TestSaveFigure(unittest.TestCase):
 
     def test_empty_format_list_raises(self):
         with self.assertRaises(ValueError) as ctx:
-            save_figure(self.figure, self.path("fig1"), format=[])
+            save_figure(self.figure, self.path("fig1"), fmt=[])
         self.assertIn("format", str(ctx.exception))
+
+    def test_path_object_writes_the_file(self):
+        path = Path(self.path("fig1.png"))
+        save_figure(self.figure, path)
+        self.assertTrue(path.is_file())
+
+    def test_path_object_stem_takes_several_formats(self):
+        stem = Path(self.path("fig1.png"))
+        paths = save_figure(self.figure, stem, fmt=[FIG_FORMAT.PDF, FIG_FORMAT.PNG])
+        self.assertEqual(paths, [self.path("fig1.pdf"), self.path("fig1.png")])
+
+    def test_deprecated_format_warns_once_and_forwards(self):
+        path = self.path("fig1.png")
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            self.assertEqual(
+                save_figure(self.figure, path, format=FIG_FORMAT.PNG), [path]
+            )
+        deprecations = [w for w in caught if w.category is DeprecationWarning]
+        self.assertEqual(len(deprecations), 1)
+        self.assertIn("`format`", str(deprecations[0].message))
+        self.assertIn("`fmt`", str(deprecations[0].message))
+        self.assertEqual(deprecations[0].filename, __file__)
+        self.assertTrue(os.path.isfile(path))
+
+    def test_format_and_fmt_together_raise(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            with self.assertRaises(ValueError):
+                save_figure(
+                    self.figure,
+                    self.path("fig1.png"),
+                    fmt=FIG_FORMAT.PNG,
+                    format=FIG_FORMAT.PNG,
+                )
 
 
 class TestSaveFigureKeepsTheThemeGround(unittest.TestCase):
@@ -93,7 +130,7 @@ class TestSaveFigureKeepsTheThemeGround(unittest.TestCase):
 
     def test_svg_keeps_the_dark_ground(self):
         path = self.path("dark.svg")
-        save_figure(self.figure, path, format=FIG_FORMAT.SVG)
+        save_figure(self.figure, path, fmt=FIG_FORMAT.SVG)
         with open(path) as handle:
             markup = handle.read()
         self.assertIn(config["figure_facecolor"].lower(), markup.lower())

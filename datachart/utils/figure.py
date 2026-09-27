@@ -3,7 +3,7 @@
 The `figure` module provides a set of utilities for manipulating the images.
 
 Methods:
-    save_figure(figure, path, dpi, format, transparent):
+    save_figure(figure, path, dpi, fmt, transparent):
         Saves the figure into one file per provided format.
 
 """
@@ -11,6 +11,7 @@ Methods:
 import copy
 import math
 import os
+import warnings
 from typing import FrozenSet, List, Mapping, Optional, Tuple, Union, Dict, Any
 
 import numpy as np
@@ -677,14 +678,15 @@ def _figure_grid_layout_impl(
 
 def save_figure(
     figure: plt.Figure,
-    path: str,
+    path: Union[str, os.PathLike],
     dpi: int = 300,
-    format: Optional[Union[FIG_FORMAT, List[FIG_FORMAT]]] = None,
+    fmt: Optional[Union[FIG_FORMAT, List[FIG_FORMAT]]] = None,
     transparent: bool = False,
+    format: Optional[Union[FIG_FORMAT, List[FIG_FORMAT]]] = None,
 ) -> List[str]:
     """Save the figure to one or more files.
 
-    Writes the rendered figure to disk in the format given by `format` or,
+    Writes the rendered figure to disk in the format given by `fmt` or,
     when omitted, by the file extension. Use a vector format (PDF, SVG) for
     print and papers, PNG with `dpi` >= 300 for raster deliverables, and
     `transparent=True` to drop the figure background for slides and web
@@ -705,34 +707,47 @@ def save_figure(
         >>> from datachart.utils.figure import save_figure
         >>> from datachart.constants import FIG_FORMAT
         >>> path = "/path/to/save/chart.png"
-        >>> save_figure(figure, path, dpi=300, format=FIG_FORMAT.PNG, transparent=True)
+        >>> save_figure(figure, path, dpi=300, fmt=FIG_FORMAT.PNG, transparent=True)
 
         >>> # 3. save the same figure as a PDF and a PNG
-        >>> save_figure(figure, "/path/to/save/chart", format=[FIG_FORMAT.PDF, FIG_FORMAT.PNG])
+        >>> save_figure(figure, "/path/to/save/chart", fmt=[FIG_FORMAT.PDF, FIG_FORMAT.PNG])
         ['/path/to/save/chart.pdf', '/path/to/save/chart.png']
 
     Args:
         figure: The figure to save.
-        path: The path where the figure is saved. A stem when `format` is a list.
+        path: The path where the figure is saved. A stem when `fmt` is a list.
         dpi: The DPI of the figure.
-        format: The format of the figure, or a list of formats to write. If `None`, the format will be determined from the file extension.
+        fmt: The format of the figure, or a list of formats to write. If `None`, the format will be determined from the file extension.
         transparent: Whether to make the background transparent.
+        format: Deprecated; use `fmt`.
 
     Returns:
         The paths written, in the order the formats were given.
 
     Raises:
-        ValueError: If `format` is an empty list.
+        ValueError: If `fmt` is an empty list, or both `fmt` and `format`
+            are passed.
     """
 
-    if isinstance(format, list):
-        if not format:
-            raise ValueError("The `format` list is empty: name at least one format")
-        formats = format
-        stem = _figure_stem(path)
-        paths = [f"{stem}.{fmt}" for fmt in formats]
+    if format is not None:
+        warnings.warn(
+            "`format` is deprecated and will be removed in the next release; "
+            "use `fmt` instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        if fmt is not None:
+            raise ValueError("Pass `fmt` only; `format` is its deprecated name.")
+        fmt = format
+
+    if isinstance(fmt, list):
+        if not fmt:
+            raise ValueError("The `fmt` list is empty: name at least one format")
+        formats = fmt
+        stem = _figure_stem(os.fspath(path))
+        paths = [f"{stem}.{extension}" for extension in formats]
     else:
-        formats, paths = [format], [path]
+        formats, paths = [fmt], [os.fspath(path)]
 
     # save the figure to one file per format
     for out_path, out_format in zip(paths, formats):
