@@ -24,7 +24,7 @@ from ._internal.config_helpers import (
     get_text_style,
     resolve_font_family,
 )
-from ._internal.figures import new_figure
+from ._internal.figures import new_figure, parent_cell, subgridspec
 from ._internal.plot_engine import SUBPLOT_FURNITURE_KEYS
 from ._internal.validate import validate_layout_specs, warn_renamed
 
@@ -163,7 +163,7 @@ def _render_subplot_panels(
     figure this way, while a `Grid` cell rebuilds it as a grid node.
     """
     nrows, ncols = shape
-    sub_gs = subplot_spec.subgridspec(nrows, ncols)
+    sub_gs = subgridspec(owner, subplot_spec, nrows, ncols)
     for idx, panel in enumerate(panels):
         ax = owner.add_subplot(
             sub_gs[idx // ncols, idx % ncols],
@@ -236,7 +236,7 @@ def _render_grid_node(
     sub_gs = (
         GridSpec(len(heights), len(widths), figure=owner, **ratios)
         if subplot_spec is None
-        else subplot_spec.subgridspec(len(heights), len(widths), **ratios)
+        else subgridspec(owner, subplot_spec, len(heights), len(widths), **ratios)
     )
     row_offset = (1 if title else 0) + (1 if edge == "top" else 0)
     col_offset = (1 if edge == "left" else 0) + (1 if ylabel else 0)
@@ -409,14 +409,16 @@ def node_legend(
     }
 
 
-def _column_window(subplot_spec: SubplotSpec) -> Tuple[float, float]:
+def _column_window(
+    figure: plt.Figure, subplot_spec: SubplotSpec
+) -> Tuple[float, float]:
     """The horizontal span of a gridspec cell as fractions of the figure width."""
     chain = []
     ss = subplot_spec
     while ss is not None:
         chain.append(ss)
-        # a subgridspec's parent cell; None once the outermost gridspec is reached
-        ss = getattr(ss.get_gridspec(), "_subplot_spec", None)
+        # None once the outermost gridspec is reached
+        ss = parent_cell(figure, ss.get_gridspec())
     x0, x1 = 0.0, 1.0
     for ss in reversed(chain):
         gs = ss.get_gridspec()
@@ -453,7 +455,7 @@ def _align_axes_columns(figure: plt.Figure) -> None:
         # their box at draw time, so their edges neither anchor nor follow a column
         if ss is None or ax.get_aspect() != "auto" or ax.get_box_aspect():
             continue
-        x0f, x1f = _column_window(ss)
+        x0f, x1f = _column_window(figure, ss)
         lefts.setdefault(round(x0f, 6), []).append(ax)
         rights.setdefault(round(x1f, 6), []).append(ax)
 

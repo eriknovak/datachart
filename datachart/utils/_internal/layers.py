@@ -1023,12 +1023,18 @@ def _apply_date_period(
         spine.set_visible(False)
 
 
+def _shared_siblings(ax, axis_name: str) -> list:
+    """Every axes sharing `ax`'s `x` or `y` axis, `ax` included."""
+
+    return getattr(ax, f"get_shared_{axis_name}_axes")().get_siblings(ax)
+
+
 def _shared_data_interval(ax, axis_name: str) -> tuple:
     """The data range of an axis, across every axes that shares it."""
 
     intervals = [
         getattr(a.dataLim, f"interval{axis_name}")
-        for a in ax._shared_axes[axis_name].get_siblings(ax)
+        for a in _shared_siblings(ax, axis_name)
     ]
     intervals = [i for i in intervals if np.isfinite(i).all()]
     if not intervals:
@@ -2031,6 +2037,24 @@ def _marks_reach(slot, dim, bboxes, lines, offsets):
     return max(reach) if reach else None
 
 
+# the compass anchor of each legend location code, 1 to 10
+_LEGEND_ANCHORS = (None, "NE", "NW", "SW", "SE", "E", "W", "E", "S", "N", "C")
+
+
+def _anchored_legend_origin(legend: Legend, code: int, size, parent, renderer):
+    """The lower-left corner of a legend box of `size` placed in `parent` at `code`.
+
+    The box sits against the location code's side or corner of the parent,
+    inset by the legend's border-axes padding, as matplotlib places a legend.
+    """
+
+    pad = legend.borderaxespad * renderer.points_to_pixels(
+        legend.prop.get_size_in_points()
+    )
+    container = parent.padded(-pad, -pad)
+    return size.anchored(_LEGEND_ANCHORS[code], container=container).p0
+
+
 def _fit_legend(
     legend: Legend, axes: list, dim: int, renderer, mirror: bool = False
 ) -> None:
@@ -2067,7 +2091,7 @@ def _fit_legend(
     best = None
     for name in names:
         code = Legend.codes[name]
-        l, b = legend._get_anchored_bbox(code, size, anchor, renderer)
+        l, b = _anchored_legend_origin(legend, code, size, anchor, renderer)
         slot = Bbox.from_bounds(l, b, box.width, box.height)
         reach = _marks_reach(slot, dim, bboxes, lines, offsets)
         reach = a0 if reach is None else min(reach, a1)
@@ -11641,7 +11665,7 @@ class Panel:
         # an axes drawn earlier fixed the limits this one shares; autoscale
         # again, over the data of every axes that shares them
         for axis_name in ("x", "y"):
-            if len(ax._shared_axes[axis_name].get_siblings(ax)) > 1:
+            if len(_shared_siblings(ax, axis_name)) > 1:
                 getattr(ax, f"set_autoscale{axis_name}_on")(True)
         # every artist created here copies the wobble from the rc context at
         # construction (ADR 0027); nothing global changes
@@ -12300,7 +12324,7 @@ class Panel:
                 lo, hi = min(r[0] for r in ranges), max(r[1] for r in ranges)
                 # subplots sharing this axis pin it to all of their data
                 axis_name = "y" if horizontal else "x"
-                siblings = ax._shared_axes[axis_name].get_siblings(ax)
+                siblings = _shared_siblings(ax, axis_name)
                 if len(siblings) > 1:
                     shared = _shared_data_interval(ax, axis_name)
                     lo, hi = min(lo, shared[0]), max(hi, shared[1])

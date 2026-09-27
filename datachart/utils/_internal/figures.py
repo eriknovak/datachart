@@ -8,19 +8,26 @@ annotations over the layers' registered hover targets (ADR 0031).
 """
 
 import importlib
+import inspect
 import io
 import itertools
 import numbers
+import threading
 import warnings
 
 import numpy as np
-import matplotlib._constrained_layout as _constrained_layout
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.collections import PathCollection, PolyCollection
 from matplotlib.figure import Figure
 from matplotlib.layout_engine import ConstrainedLayoutEngine
 from matplotlib.lines import Line2D
 from matplotlib.patches import FancyArrowPatch, PathPatch
+
+# the one private matplotlib touchpoint, guarded below (ADR 0085)
+try:
+    import matplotlib._constrained_layout as _constrained_layout
+except ImportError:
+    _constrained_layout = None
 
 
 def _in_notebook_kernel() -> bool:
@@ -319,7 +326,23 @@ class DatachartFigure(Figure):
         self._hover_canvas = self.canvas
 
 
-def _propagate_nested_margins(layoutgrids) -> None:
+def subgridspec(owner: Figure, subplot_spec, nrows: int, ncols: int, **kwargs):
+    """Split a cell into a nested gridspec, recording the cell as its parent.
+
+    The owner figure maps every nested gridspec it holds to its parent cell,
+    so layout code walks the nesting without asking matplotlib for it.
+    """
+    gs = subplot_spec.subgridspec(nrows, ncols, **kwargs)
+    owner.__dict__.setdefault("_parent_cells", {})[gs] = subplot_spec
+    return gs
+
+
+def parent_cell(figure: Figure, gridspec):
+    """The cell `gridspec` was split from, or None for an outermost gridspec."""
+    return getattr(figure, "_parent_cells", {}).get(gridspec)
+
+
+def _propagate_nested_margins(layoutgrids, fig) -> None:
     """Lift each nested gridspec's outer margins onto its parent cell.
 
     Constrained layout equalises the *inner* height of a gridspec's rows, and
@@ -327,19 +350,19 @@ def _propagate_nested_margins(layoutgrids) -> None:
     so it shrinks by its siblings' margins — a nested Grid alone in a host
     row collapses. Deepest nesting first, so margins reach the outermost grid.
     """
-    nested = [gs for gs in layoutgrids if hasattr(gs, "_subplot_spec")]
+    nested = [gs for gs in layoutgrids if parent_cell(fig, gs) is not None]
 
     def depth(gs):
         d = 0
-        while hasattr(gs, "_subplot_spec"):
-            gs = gs._subplot_spec.get_gridspec()
+        while (cell := parent_cell(fig, gs)) is not None:
+            gs = cell.get_gridspec()
             d += 1
         return d
 
     for gs in sorted(nested, key=depth, reverse=True):
         lg = layoutgrids[gs]
         vals = lg.margin_vals
-        subplot_spec = gs._subplot_spec
+        subplot_spec = parent_cell(fig, gs)
         parent = layoutgrids.get(subplot_spec.get_gridspec())
         if parent is None:
             continue
@@ -356,21 +379,66 @@ def _propagate_nested_margins(layoutgrids) -> None:
         parent.edit_outer_margin_mins(margin, subplot_spec)
 
 
+def _margin_hook_available() -> bool:
+    """Whether constrained layout's margin step has the signature the lift wraps."""
+    hook = getattr(_constrained_layout, "make_layout_margins", None)
+    if hook is None:
+        return False
+    try:
+        params = inspect.signature(hook).parameters.values()
+    except (TypeError, ValueError):
+        return False
+    positional = inspect.Parameter.POSITIONAL_OR_KEYWORD
+    keyword = inspect.Parameter.KEYWORD_ONLY
+    return [(p.name, p.kind) for p in params] == [
+        ("layoutgrids", positional),
+        ("fig", positional),
+        ("renderer", positional),
+        ("w_pad", keyword),
+        ("h_pad", keyword),
+        ("hspace", keyword),
+        ("wspace", keyword),
+    ]
+
+
+_MARGIN_HOOK = _margin_hook_available()
+# the swap replaces a module attribute, so layouts take turns
+_margin_hook_lock = threading.Lock()
+_fallback_warned = False
+
+
 class NestedGridLayoutEngine(ConstrainedLayoutEngine):
     """Constrained layout whose nested gridspecs size their parent cell."""
 
     def execute(self, fig):
-        original = _constrained_layout.make_layout_margins
+        with _margin_hook_lock:
+            original = _constrained_layout.make_layout_margins
 
-        def make_layout_margins(layoutgrids, *args, **kwargs):
-            original(layoutgrids, *args, **kwargs)
-            _propagate_nested_margins(layoutgrids)
+            def make_layout_margins(layoutgrids, figure, *args, **kwargs):
+                original(layoutgrids, figure, *args, **kwargs)
+                _propagate_nested_margins(layoutgrids, figure)
 
-        _constrained_layout.make_layout_margins = make_layout_margins
-        try:
-            return super().execute(fig)
-        finally:
-            _constrained_layout.make_layout_margins = original
+            _constrained_layout.make_layout_margins = make_layout_margins
+            try:
+                return super().execute(fig)
+            finally:
+                _constrained_layout.make_layout_margins = original
+
+
+def _layout_engine() -> ConstrainedLayoutEngine:
+    """The nested-grid engine, or plain constrained layout without its hook."""
+    global _fallback_warned
+    if _MARGIN_HOOK:
+        return NestedGridLayoutEngine()
+    if not _fallback_warned:
+        _fallback_warned = True
+        warnings.warn(
+            "this matplotlib version lacks the constrained-layout hook datachart "
+            "uses to size nested grids; a nested grid alone in a row may shrink",
+            UserWarning,
+            stacklevel=3,
+        )
+    return ConstrainedLayoutEngine()
 
 
 def new_figure(figsize=None) -> DatachartFigure:
@@ -386,6 +454,6 @@ def new_figure(figsize=None) -> DatachartFigure:
         The unmanaged figure.
 
     """
-    figure = DatachartFigure(figsize=figsize, layout=NestedGridLayoutEngine())
+    figure = DatachartFigure(figsize=figsize, layout=_layout_engine())
     FigureCanvasAgg(figure)
     return figure
