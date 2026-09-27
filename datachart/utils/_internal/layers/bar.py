@@ -445,7 +445,7 @@ class GanttLayer(BarLayer):
             position += 1
         self.tick_rows, self.tick_labels = ticks, labels
 
-    def apply_row_ticks(self, ax, rotation: float) -> None:
+    def apply_row_ticks(self, ax, rotation: float) -> bool:
         """Label the task rows; group header labels print bold."""
 
         ax.set_yticks(self.tick_rows, self.tick_labels)
@@ -455,6 +455,7 @@ class GanttLayer(BarLayer):
         for position, label in zip(self.tick_rows, ax.get_yticklabels()):
             if position in headers:
                 label.set_fontweight(FONT_WEIGHT.BOLD)
+        return True
 
     def labels(self) -> Optional[np.ndarray]:
         if not self.tasks:

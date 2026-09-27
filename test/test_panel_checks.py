@@ -10,11 +10,27 @@ def _named_classes(node) -> list:
     """The names an isinstance call's class argument lists."""
 
     items = node.elts if isinstance(node, ast.Tuple) else [node]
-    return [item.id for item in items if isinstance(item, ast.Name)]
+    return [
+        item.id if isinstance(item, ast.Name) else item.attr
+        for item in items
+        if isinstance(item, (ast.Name, ast.Attribute))
+    ]
+
+
+def _concrete_layer_names() -> set:
+    """The names of every class below `Layer`, however deep."""
+
+    names, pending = set(), [Layer]
+    while pending:
+        for sub in pending.pop().__subclasses__():
+            names.add(sub.__name__)
+            pending.append(sub)
+    return names
 
 
 class TestPanelChecks(unittest.TestCase):
     def test_panel_names_no_concrete_layer_class(self):
+        concrete = _concrete_layer_names()
         tree = ast.parse(inspect.getsource(panel))
         for call in ast.walk(tree):
             if not (
@@ -24,14 +40,8 @@ class TestPanelChecks(unittest.TestCase):
             ):
                 continue
             for name in _named_classes(call.args[1]):
-                value = getattr(panel, name, None)
                 with self.subTest(name=name, line=call.lineno):
-                    concrete = (
-                        inspect.isclass(value)
-                        and issubclass(value, Layer)
-                        and value is not Layer
-                    )
-                    self.assertFalse(concrete)
+                    self.assertNotIn(name, concrete)
 
     def test_every_policy_defaults_off_on_the_layer(self):
         for name in LAYER_POLICIES:

@@ -677,14 +677,12 @@ class Layer:
     colorbar_edge: Optional[str] = None
     # the normalized position a value step must break on; None spaces them evenly
     step_centre: Optional[float] = None
-    # (theta, tip radius, value, category index) per radial mark, recorded
-    # at draw time so the panel can write tip texts with the final orientation
+    # (theta, radius, value, index) per radial mark, for the panel's tip texts
     _tips = ()
     # the layer's labels share the panel's one category axis (ADR 0079)
     on_category_axis: bool = False
 
-    # group policies: the front's `ChartKind` row sets these at build; a layer
-    # built outside a row (a text carrier) takes none of them
+    # group policies, set from the front's `ChartKind` row at build
     tighten_xlim: bool = False
     shared_bins: bool = False
     stacks: bool = False
@@ -925,6 +923,11 @@ class Layer:
 
     def takes_hatch(self) -> bool:
         """Whether the panel's hatch cycle reaches the layer's fills."""
+
+        return False
+
+    def apply_row_ticks(self, ax, rotation: float) -> bool:
+        """Place the layer's own row ticks; False leaves them to the panel."""
 
         return False
 

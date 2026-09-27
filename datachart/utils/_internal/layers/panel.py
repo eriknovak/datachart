@@ -1863,7 +1863,7 @@ class Panel:
         zorder_defaults = s.get("zorder_defaults", {})
 
         group_layers = [l for l in self.layers if isinstance(l, CategoryGroupMixin)]
-        dumbbell_count = sum(l.paired for l in group_layers)
+        paired_count = sum(l.paired for l in group_layers)
 
         # hatch, line-style and marker cycles: per series, parallel to the
         # color cycle (ADR 0004, ADR 0048)
@@ -1996,7 +1996,7 @@ class Panel:
                     parallel_axes=layer is parallel_axes_owner,
                     transpose=horizontal and layer.is_horizontal is None,
                     category_index=category_index,
-                    sole_dumbbell=dumbbell_count == 1,
+                    sole_dumbbell=paired_count == 1,
                     aspect_locked=aspect_locked,
                     value_scale=value_scale,
                     category_scale=category_scale,
@@ -2460,11 +2460,11 @@ class Panel:
         if rank_axis and not ax.yaxis_inverted():
             ax.invert_yaxis()
         # the first ridge row reads at the top; overlaid groups follow (ADR 0047)
-        ridges = any(l.rising_rows for l in layers)
+        rising = any(l.rising_rows for l in layers)
         # the first task or dumbbell row reads at the top too (ADR 0049, 0050)
         rows_down = any(l.rows_down for l in layers)
         if (
-            (ridges or rows_down)
+            (rising or rows_down)
             and horizontal
             and not bare
             and not ax.yaxis_inverted()
@@ -2559,7 +2559,7 @@ class Panel:
         # beeswarm packing reads the display transform, so it runs once the
         # scales and limits are final (ADR 0020); over ridges the points pack
         # on the side the ridges rise to, inside them (ADR 0047)
-        swarm_side = (-1 if horizontal else 1) if ridges else 0
+        swarm_side = (-1 if horizontal else 1) if rising else 0
         swarms = defaultdict(list)
         for group, owner_ax in zip(self.groups, group_axes):
             for layer in group.layers:
@@ -3089,13 +3089,11 @@ class Panel:
             ax.xaxis.set_tick_params(labelrotation=rotation)
 
     def _apply_bar_ticks(self, ax, bar_ticks, bar_layers) -> None:
-        gantt = next((l for l in bar_layers if l.schedule_axis), None)
-        if gantt is not None:
-            # task rows skip the header and gap rows, so they place themselves
-            gantt.apply_row_ticks(
-                ax, self._tick_rotation("y", gantt.chart.get("ytickrotate"))
-            )
-            return
+        # task rows skip the header and gap rows, so they place themselves
+        for layer in bar_layers:
+            rotation = self._tick_rotation("y", layer.chart.get("ytickrotate"))
+            if layer.apply_row_ticks(ax, rotation):
+                return
         # the panel's category index supplies the labels (ADR 0079)
         index = self.category_index(self.layers)
         if not index:
