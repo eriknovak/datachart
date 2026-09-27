@@ -868,12 +868,7 @@ def _grid_size(grid_size, gridsize, default):
     if gridsize is None:
         return default if grid_size is None else grid_size
     # this function, the kde function, then the caller
-    warnings.warn(
-        "`gridsize` is deprecated and will be removed in the next release; "
-        "use `grid_size` instead.",
-        DeprecationWarning,
-        stacklevel=3,
-    )
+    warn_renamed("gridsize", "grid_size", stacklevel=3)
     if grid_size is not None:
         raise ValueError("Pass `grid_size` only; `gridsize` is its deprecated name.")
     return gridsize
