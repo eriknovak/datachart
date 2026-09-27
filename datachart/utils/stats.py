@@ -306,7 +306,7 @@ def maximum(values: List[Any]) -> Any:
     return _as_float(np.max(values))
 
 
-def correlation(x: List[Union[int, float]], y: List[Union[int, float]]) -> float:
+def pearson(x: List[Union[int, float]], y: List[Union[int, float]]) -> float:
     """Calculates the Pearson correlation coefficient between two lists.
 
     The Pearson correlation coefficient measures the linear relationship
@@ -316,10 +316,10 @@ def correlation(x: List[Union[int, float]], y: List[Union[int, float]]) -> float
     correlated as matplotlib date numbers.
 
     Examples:
-        >>> from datachart.utils.stats import correlation
-        >>> round(correlation([1, 2, 3, 4, 5], [1, 2, 3, 4, 5]), 6)
+        >>> from datachart.utils.stats import pearson
+        >>> round(pearson([1, 2, 3, 4, 5], [1, 2, 3, 4, 5]), 6)
         1.0
-        >>> round(correlation([1, 2, 3, 4, 5], [5, 4, 3, 2, 1]), 6)
+        >>> round(pearson([1, 2, 3, 4, 5], [5, 4, 3, 2, 1]), 6)
         -1.0
 
     Args:
@@ -339,6 +339,25 @@ def correlation(x: List[Union[int, float]], y: List[Union[int, float]]) -> float
     if len(xs) == 0:
         raise ValueError("x and y must have at least one value.")
     return float(np.corrcoef(xs, ys)[0, 1])
+
+
+def correlation(x: List[Union[int, float]], y: List[Union[int, float]]) -> float:
+    """Deprecated: use `pearson`, which it forwards to.
+
+    Args:
+        x: The first list of values, numeric or temporal.
+        y: The second list of values.
+
+    Returns:
+        The Pearson correlation coefficient.
+    """
+    warnings.warn(
+        "`correlation` is deprecated and will be removed in the next release; "
+        "use `pearson` instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    return pearson(x, y)
 
 
 def _is_temporal_column(values: Any, name: str) -> bool:
@@ -404,7 +423,7 @@ def spearman(x: List[Union[int, float]], y: List[Union[int, float]]) -> float:
 
     The Spearman coefficient is the Pearson correlation of the ranks, so it
     measures any monotone relationship, not only a linear one, and is robust
-    to outliers. It ranges from -1 to 1 like `correlation`, and likewise
+    to outliers. It ranges from -1 to 1 like `pearson`, and likewise
     accepts a temporal `x`.
 
     Examples:
@@ -784,8 +803,7 @@ def loess(
     At each `x` a straight line is fitted to the nearest `frac` share of the
     points, weighted by a tricube kernel so closer points count more, and the
     smoothed `y` is that line's value there (LOESS/LOWESS). The result is a
-    list of `{x, y}` points sorted by `x`, ready for `LineChart`, as `kde1d`
-    returns. A smaller `frac` follows the data more closely. A temporal `x`
+    list of `{x, y}` points sorted by `x`, ready for `LineChart`. A smaller `frac` follows the data more closely. A temporal `x`
     (dates, datetimes, or `datetime64`) is smoothed as date numbers and the
     curve's `x` values come back as datetimes, in the input's zone.
 
@@ -893,22 +911,23 @@ def kde1d(
     cut: float = 3,
     xlim: Optional[Tuple[float, float]] = None,
     gridsize: Optional[int] = None,
-) -> List[Dict[str, float]]:
+) -> Dict[str, List[float]]:
     """Estimates the density of the values as a curve.
 
     A Gaussian kernel density estimate evaluated on `grid_size` evenly spaced
     points over the range of the values, extended by `cut` bandwidths on each
     side so the curve tails off instead of being clipped at the extremes, or
     over an explicit `xlim` so several curves share one grid. The
-    result is a list of `{x, y}` points ready for `LineChart`; the curve
-    integrates to 1, so it overlays a density `Histogram` of the same values.
+    result is an `{x, y}` dict of columns ready for `LineChart`, the shape
+    `kde2d` returns; the curve integrates to 1, so it overlays a density
+    `Histogram` of the same values.
 
     Examples:
         >>> from datachart.utils.stats import kde1d
         >>> curve = kde1d([1, 2, 2, 3, 3, 3, 4, 4, 5], grid_size=5, cut=0)
-        >>> [round(point["x"], 2) for point in curve]
+        >>> [round(x, 2) for x in curve["x"]]
         [1.0, 2.0, 3.0, 4.0, 5.0]
-        >>> round(sum(point["y"] for point in curve), 2)
+        >>> round(sum(curve["y"]), 2)
         0.94
 
     Args:
@@ -923,7 +942,7 @@ def kde1d(
         gridsize: Deprecated; use `grid_size`. Removed in the next release.
 
     Returns:
-        The `{x, y}` points of the density curve.
+        The density curve as `{"x": [...], "y": [...]}`, one `y` per `x`.
 
     Raises:
         ValueError: If the bandwidth is invalid, there are fewer than two
@@ -935,7 +954,7 @@ def kde1d(
     lo, hi = xlim or (points.min() - padding, points.max() + padding)
     grid = np.linspace(lo, hi, grid_size)
     density = kde.evaluate(grid)
-    return [{"x": float(x), "y": float(y)} for x, y in zip(grid, density)]
+    return {"x": grid.tolist(), "y": density.tolist()}
 
 
 def kde2d(

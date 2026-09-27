@@ -12,7 +12,7 @@ from ..utils.figure import (
     _render_grid_node,
     node_legend,
 )
-from ..utils.stats import correlation
+from ..utils.stats import pearson
 from ..utils._internal.chart_builder import build_charts_structure
 from ..utils._internal.colors import create_color_cycle
 from ..utils._internal.config_helpers import get_scatter_matrix_style
@@ -218,7 +218,7 @@ def _correlation_panel(x, y, groups, colors, style, settings) -> Panel:
     texts = []
     for k, (label, mask) in enumerate(groups):
         keep = mask & np.isfinite(x) & np.isfinite(y)
-        r = correlation(x[keep], y[keep]) if keep.sum() > 1 else np.nan
+        r = pearson(x[keep], y[keep]) if keep.sum() > 1 else np.nan
         value = "n/a" if np.isnan(r) else f"{r:.2f}"
         text_style = dict(font)
         if label is not None:

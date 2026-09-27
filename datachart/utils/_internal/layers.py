@@ -4549,11 +4549,8 @@ class KdeLayer(Layer):
             x = self.x_values()
             self._curve = None
             if x is not None and len(x) > 1 and np.ptp(x) > 0:
-                points = kde1d(x, xlim=self.xlim)
-                self._curve = (
-                    np.array([p["x"] for p in points]),
-                    np.array([p["y"] for p in points]),
-                )
+                curve = kde1d(x, xlim=self.xlim)
+                self._curve = (np.array(curve["x"]), np.array(curve["y"]))
         return self._curve
 
     def y_range(self):
@@ -4853,9 +4850,9 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, Layer):
             )
 
     def _draw_correlation(self, ax, x, y, color):
-        from ..stats import correlation
+        from ..stats import pearson
 
-        r = correlation(x, y)
+        r = pearson(x, y)
         font = dict(self.correlation_font)
         if color is not None:
             font["color"] = color
@@ -6402,7 +6399,7 @@ class RidgelineLayer(GroupLayer):
                 ends.append((fit[0], fit[0]))
                 continue
             curve = kde1d(fit, bandwidth=self.bandwidth, grid_size=2)
-            ends.append((curve[0]["x"], curve[-1]["x"]))
+            ends.append((curve["x"][0], curve["x"][-1]))
         if not ends:
             return None
         lo, hi = min(e[0] for e in ends), max(e[1] for e in ends)
@@ -6555,7 +6552,7 @@ class RidgelineLayer(GroupLayer):
         curve = kde1d(
             values, bandwidth=self.bandwidth, grid_size=RIDGE_GRIDSIZE, xlim=(lo, hi)
         )
-        return np.array([point["y"] for point in curve])
+        return np.array(curve["y"])
 
     def _draw_inner(self, ax, values, grid, baseline, tops, zorder) -> list:
         """The median or quartile marks, from the baseline up to the ridge."""
