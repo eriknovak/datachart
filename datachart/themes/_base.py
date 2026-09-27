@@ -6,7 +6,7 @@ overriding just the attributes that define its identity via `make_theme`.
 
 import copy
 import warnings
-from typing import Dict
+from typing import Dict, Optional
 
 from ..typings import StyleAttrs
 from ..constants import (
@@ -35,16 +35,22 @@ STYLE_ALIASES = {
 }
 
 
-def warn_aliases(style: dict, stacklevel: int = 2) -> None:
+def warn_aliases(
+    style: dict, stacklevel: int = 2, parameters: Optional[Dict[str, str]] = None
+) -> None:
     """Warn with `DeprecationWarning` for each alias key in `style`.
 
     `stacklevel` counts from the caller of this function, as in `warnings.warn`.
+    `parameters` maps a canonical key to the chart parameter that replaces it
+    in a chart's `style`, where the canonical key itself is ignored (ADR 0071).
     """
 
+    parameters = parameters or {}
     for alias, key in STYLE_ALIASES.items():
         if alias in style:
+            use = f"`{parameters[key]}=`" if key in parameters else repr(key)
             warnings.warn(
-                f"Style key {alias!r} is deprecated; use {key!r}.",
+                f"Style key {alias!r} is deprecated; use {use}.",
                 DeprecationWarning,
                 stacklevel=stacklevel + 1,
             )

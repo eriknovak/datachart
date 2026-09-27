@@ -9,7 +9,17 @@ matplotlib.use("Agg")
 import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 
-from datachart.charts import BarChart, Heatmap, LineChart, RadialChart, RidgelinePlot
+from datetime import date, timedelta
+
+from datachart.charts import (
+    BarChart,
+    CalendarHeatmap,
+    Heatmap,
+    LineChart,
+    NetworkChart,
+    RadialChart,
+    RidgelinePlot,
+)
 from datachart.config import config
 from datachart.constants import THEME
 from datachart.config.configuration import THEMES
@@ -19,6 +29,15 @@ BAR = [{"label": label, "y": y} for label, y in zip("ABC", [3.0, 5.0, 4.0])]
 BAR2 = [{"label": label, "y": y} for label, y in zip("ABC", [2.0, 6.0, 1.0])]
 HEAT = {"z": [[0.0, 0.5], [0.8, 1.0]]}
 LINE = [{"x": x, "y": x * x} for x in range(5)]
+RIDGE = [{"label": "a", "value": float(v)} for v in range(10)]
+CALENDAR = {
+    "date": [date(2024, 1, 1) + timedelta(days=i) for i in range(10)],
+    "value": list(range(10)),
+}
+NETWORK = {
+    "nodes": [{"id": "a"}, {"id": "b"}],
+    "edges": [{"source": "a", "target": "b"}],
+}
 RADIAL = [{"label": d, "y": y} for d, y in zip("NESW", [4.0, 7.0, 3.0, 6.0])]
 
 
@@ -626,14 +645,55 @@ class TestThemeDefaultAliases(unittest.TestCase):
             figure = RidgelinePlot(data, style={"plot_ridgeline_overlap": 0.0})
         self.assertEqual(
             [str(w.message) for w in caught if w.category is DeprecationWarning],
-            [
-                "Style key 'plot_ridgeline_overlap' is deprecated; "
-                "use 'chart_default_ridgeline_overlap'."
-            ],
+            ["Style key 'plot_ridgeline_overlap' is deprecated; use `overlap=`."],
         )
         self.assertEqual(caught[0].filename, __file__)
         layer = figure._chart_metadata["panel"].groups[0].layers[0]
         self.assertEqual(layer.overlap, 0.0)
+
+    def test_chart_style_alias_warning_names_the_parameter(self):
+        cases = [
+            (RidgelinePlot, RIDGE, "plot_ridgeline_overlap", 0.2, "overlap"),
+            (
+                CalendarHeatmap,
+                CALENDAR,
+                "plot_calendar_heatmap_week_start",
+                "sunday",
+                "week_start",
+            ),
+            (
+                NetworkChart,
+                NETWORK,
+                "chart_default_node_label_position",
+                "above",
+                "label_position",
+            ),
+        ]
+        for front, data, alias, value, parameter in cases:
+            with self.subTest(alias=alias):
+                with self.assertWarns(DeprecationWarning) as caught:
+                    front(data, style={alias: value})
+                self.assertEqual(
+                    str(caught.warning),
+                    f"Style key {alias!r} is deprecated; use `{parameter}=`.",
+                )
+                plt.close("all")
+
+    def test_other_chart_style_aliases_name_the_style_key(self):
+        with self.assertWarns(DeprecationWarning) as caught:
+            BarChart(BAR, style={"plot_bar_value_fontsize": 12})
+        self.assertIn("'plot_value_fontsize'", str(caught.warning))
+        plt.close("all")
+
+    def test_old_key_in_a_network_style_sets_the_label_position(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            figure = NetworkChart(
+                NETWORK, style={"chart_default_node_label_position": "above"}
+            )
+        layer = figure._chart_metadata["panel"].groups[0].layers[0]
+        self.assertEqual(layer.label_position, "above")
+        plt.close("all")
 
     def test_every_alias_warns_naming_its_replacement(self):
         for alias, key in self.RENAMED.items():
