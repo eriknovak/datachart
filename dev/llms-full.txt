@@ -22459,7 +22459,18 @@ Examples:
 
 ## Data
 
-Each record in `data` is a [`LineRecordAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/linechart/#datachart.typings.LineRecordAttrs); the `x` and `y` parameters rename its keys.
+Each record in `data` is a [`StackedAreaRecordAttrs`](#datachart.typings.StackedAreaRecordAttrs); the `x` and `y` parameters rename its keys.
+
+### datachart.typings.StackedAreaRecordAttrs
+
+Bases: `TypedDict`
+
+One record of the stacked area chart.
+
+| ATTRIBUTE | DESCRIPTION                       |
+| --------- | --------------------------------- |
+| `x`       | The x-axis value. **TYPE:** \`int |
+| `y`       | The y-axis value. **TYPE:** \`int |
 
 ## Style
 
@@ -22711,7 +22722,18 @@ Examples:
 
 ## Data
 
-Each record in `data` is a [`LineRecordAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/linechart/#datachart.typings.LineRecordAttrs); the `x` and `y` parameters rename its keys.
+Each record in `data` is a [`BumpRecordAttrs`](#datachart.typings.BumpRecordAttrs); the `x` and `y` parameters rename its keys.
+
+### datachart.typings.BumpRecordAttrs
+
+Bases: `TypedDict`
+
+One record of the bump chart.
+
+| ATTRIBUTE | DESCRIPTION                       |
+| --------- | --------------------------------- |
+| `x`       | The x-axis value. **TYPE:** \`int |
+| `y`       | The y-axis value. **TYPE:** \`int |
 
 ## Style
 
@@ -29318,7 +29340,7 @@ register_theme(name: str, theme: StyleAttrs) -> None
 
 Registers a custom theme so it can be applied with `set_theme`.
 
-The theme must define every attribute of the default theme; missing keys are filled from it, unknown keys are rejected.
+Missing attributes are filled from the default theme, alias keys resolve to their canonical name, and unknown keys are rejected. A custom theme of the same name is replaced; the predefined theme names are reserved.
 
 Examples:
 
@@ -29335,6 +29357,10 @@ Examples:
 | --------- | ---------------------------------------------------------- |
 | `name`    | The theme name, later passed to set_theme. **TYPE:** `str` |
 | `theme`   | The style attributes of the theme. **TYPE:** `StyleAttrs`  |
+
+| RAISES       | DESCRIPTION                                                        |
+| ------------ | ------------------------------------------------------------------ |
+| `ValueError` | If name is a predefined theme or theme holds an unknown attribute. |
 
 #### reset_config
 
@@ -29363,7 +29389,7 @@ update_config(config: StyleAttrs) -> None
 
 Updates the global configuration.
 
-Overrides individual style attributes on top of the current theme; the change persists until the next `set_theme` or `reset_config`. Use it for global tweaks such as font family or default colors; unknown attribute names are skipped with a warning.
+Overrides individual style attributes on top of the current theme; the change persists until the next `set_theme` or `reset_config`. Use it for global tweaks such as font family or default colors; the values are copied, and unknown attribute names are skipped with a warning.
 
 Examples:
 
@@ -29377,6 +29403,14 @@ Examples:
 | PARAMETER | DESCRIPTION                                                        |
 | --------- | ------------------------------------------------------------------ |
 | `config`  | The configuration attributes to be updated. **TYPE:** `StyleAttrs` |
+
+#### \_update
+
+```
+_update(config: StyleAttrs, stacklevel: int) -> None
+```
+
+`update_config`, warning at `stacklevel` counted from the caller.
 
 #### \_scope
 
@@ -29502,7 +29536,7 @@ load_theme(
 
 Registers the theme held in a theme file and returns its name.
 
-The file is read as written by `save_theme` and registered through `register_theme`, so missing attributes are filled from the default theme, alias keys resolve to their canonical name, and unknown keys are rejected. The name is, in order of precedence, the `name` argument, the name in the file, or the file's stem; an existing theme of that name is replaced. Loading only registers: apply the theme with `set_theme` or `using_theme`.
+The file is read as written by `save_theme` and registered through `register_theme`, so missing attributes are filled from the default theme, alias keys resolve to their canonical name, and unknown keys are rejected. The name is, in order of precedence, the `name` argument, the name in the file, or the file's stem; an existing custom theme of that name is replaced, while a predefined theme's name is rejected, so a file saved from one loads only with a new `name`. Loading only registers: apply the theme with `set_theme` or `using_theme`.
 
 Examples:
 
@@ -29522,9 +29556,9 @@ Examples:
 | ------- | ---------------------------------------- |
 | `str`   | The name the theme was registered under. |
 
-| RAISES       | DESCRIPTION                                                                                    |
-| ------------ | ---------------------------------------------------------------------------------------------- |
-| `ValueError` | If the file is not a theme file, states another format version, or holds an unknown attribute. |
+| RAISES       | DESCRIPTION                                                                                                                                    |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ValueError` | If the file is not a theme file, states another format version, holds an unknown attribute, or would register under a predefined theme's name. |
 
 #### __getitem__
 
@@ -29637,12 +29671,12 @@ Examples:
 >>> config.set_theme("forest")
 ```
 
-| PARAMETER     | DESCRIPTION                                                                                                                                                                 |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `base`        | A THEME constant, a registered theme name, or a theme dictionary; a partial dictionary is completed from the default theme, as register_theme completes it. **TYPE:** \`str |
-| `lead`        | A COLORS constant, a pypalettes palette name, or a list of colors. A diverging map is not a lead; it is read as categorical. **TYPE:** `Lead`                               |
-| `traits`      | TRAIT members applied in order after the lead; an unknown name raises. **TYPE:** \`Sequence\[TRAIT                                                                          |
-| `**overrides` | Style attributes set on the result; an unknown name raises. **TYPE:** `Any` **DEFAULT:** `{}`                                                                               |
+| PARAMETER     | DESCRIPTION                                                                                                                                                                                                                   |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `base`        | A THEME constant, a registered theme name, or a theme dictionary; a partial dictionary is completed from the default theme, as register_theme completes it: alias keys are renamed and an unknown key raises. **TYPE:** \`str |
+| `lead`        | A COLORS constant, a pypalettes palette name, or a list of colors. A diverging map is not a lead; it is read as categorical. A name that is no palette raises. **TYPE:** `Lead`                                               |
+| `traits`      | TRAIT members applied in order after the lead; an unknown name raises. **TYPE:** \`Sequence\[TRAIT                                                                                                                            |
+| `**overrides` | Style attributes set on the result; an unknown name raises. **TYPE:** `Any` **DEFAULT:** `{}`                                                                                                                                 |
 
 | RETURNS      | DESCRIPTION        |
 | ------------ | ------------------ |
@@ -31990,8 +32024,8 @@ The records a chart's `data` takes and the keys its `style` accepts are document
 | Chart                                                                                                     | Shows                                                                    | Data                                                                                                                                                  | Style                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | [LineChart](https://eriknovak.github.io/datachart/dev/references/charts/linechart/index.md)               | A value along an ordered axis, one line per series.                      | [`LineRecordAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/linechart/#datachart.typings.LineRecordAttrs)                         | [`LineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/linechart/#datachart.typings.LineStyleAttrs)                                                                                                                                                                                                                                                                                                                                                                                              |
-| [StackedAreaChart](https://eriknovak.github.io/datachart/dev/references/charts/stackedareachart/index.md) | Parts of a total along an ordered axis, filled on top of each other.     | [`LineRecordAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/linechart/#datachart.typings.LineRecordAttrs)                         | [`StackedAreaStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/stackedareachart/#datachart.typings.StackedAreaStyleAttrs)                                                                                                                                                                                                                                                                                                                                                                         |
-| [BumpChart](https://eriknovak.github.io/datachart/dev/references/charts/bumpchart/index.md)               | Rank over time, one line per series.                                     | [`LineRecordAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/linechart/#datachart.typings.LineRecordAttrs)                         | [`BumpStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/bumpchart/#datachart.typings.BumpStyleAttrs)                                                                                                                                                                                                                                                                                                                                                                                              |
+| [StackedAreaChart](https://eriknovak.github.io/datachart/dev/references/charts/stackedareachart/index.md) | Parts of a total along an ordered axis, filled on top of each other.     | [`StackedAreaRecordAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/stackedareachart/#datachart.typings.StackedAreaRecordAttrs)    | [`StackedAreaStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/stackedareachart/#datachart.typings.StackedAreaStyleAttrs)                                                                                                                                                                                                                                                                                                                                                                         |
+| [BumpChart](https://eriknovak.github.io/datachart/dev/references/charts/bumpchart/index.md)               | Rank over time, one line per series.                                     | [`BumpRecordAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/bumpchart/#datachart.typings.BumpRecordAttrs)                         | [`BumpStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/bumpchart/#datachart.typings.BumpStyleAttrs)                                                                                                                                                                                                                                                                                                                                                                                              |
 | [BarChart](https://eriknovak.github.io/datachart/dev/references/charts/barchart/index.md)                 | A value per category as bars; series grouped, stacked, or overlaid.      | [`BarRecordAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/barchart/#datachart.typings.BarRecordAttrs)                            | [`BarStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/barchart/#datachart.typings.BarStyleAttrs)                                                                                                                                                                                                                                                                                                                                                                                                 |
 | [PyramidChart](https://eriknovak.github.io/datachart/dev/references/charts/pyramidchart/index.md)         | Two series as horizontal bars mirrored around a shared category axis.    | [`BarRecordAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/barchart/#datachart.typings.BarRecordAttrs)                            | [`BarStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/barchart/#datachart.typings.BarStyleAttrs)                                                                                                                                                                                                                                                                                                                                                                                                 |
 | [RadialChart](https://eriknovak.github.io/datachart/dev/references/charts/radialchart/index.md)           | Series on polar axes, as a radar line, an area, bars, or a histogram.    | [`RadialRecordAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/radialchart/#datachart.typings.RadialRecordAttrs)                   | [`LineStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/linechart/#datachart.typings.LineStyleAttrs), [`BarStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/barchart/#datachart.typings.BarStyleAttrs), [`HistStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/histogram/#datachart.typings.HistStyleAttrs), [`ScatterStyleAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/scatterchart/#datachart.typings.ScatterStyleAttrs) |
@@ -32489,7 +32523,7 @@ A theme default for a front parameter is `chart_default_<parameter>` when severa
 | `chart_default_ridgeline_overlap`           | The theme default for the ridgeline plot's overlap, how far a peak rises into the row above, in [0, 1]. **TYPE:** \`float                                                                                                                                                             |
 | `chart_default_network_label_position`      | The theme default for the network chart's label_position, applied when the chart call leaves it unset. None means the theme has no opinion. **TYPE:** \`NETWORK_LABEL_POSITION                                                                                                        |
 | `plot_hatch_cycle`                          | The hatch patterns assigned per bar/histogram series, parallel to the color cycle; with plot_etch on, line area fills and stacked areas take them too. An explicit per-chart hatch style wins. None disables the cycle. **TYPE:** \`list[str]                                         |
-| `plot_linestyle_cycle`                      | The line styles assigned per line, bump and radial line series, parallel to the color cycle. An explicit per-chart line style wins. None disables the cycle. **TYPE:** \`list\[LINE_STYLE                                                                                             |
+| `plot_linestyle_cycle`                      | The line styles assigned per line, bump and radial line series, parallel to the color cycle: a line style, or a dash pattern \[offset, [on, off, ...]\]. An explicit per-chart line style wins. None disables the cycle. **TYPE:** \`list\[LINE_STYLE                                 |
 | `plot_marker_cycle`                         | The markers assigned per scatter and radial scatter series, parallel to the color cycle, and per network node group: a marker, or {"marker": ..., "hollow": True} to draw it as an outline. An explicit per-chart marker wins. None disables the cycle. **TYPE:** \`list\[LINE_MARKER |
 
 ### datachart.typings.SketchStyleAttrs

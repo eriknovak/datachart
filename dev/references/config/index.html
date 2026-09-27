@@ -4057,6 +4057,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#datachart.config.Config._update" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;_update
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#datachart.config.Config._scope" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4473,6 +4484,17 @@
     <span class="md-ellipsis">
       
         <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;update_config
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#datachart.config.Config._update" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;_update
       
     </span>
   </a>
@@ -5008,8 +5030,10 @@ call <code>update_config</code> on top for per-attribute tweaks.</p>
     <div class="doc doc-contents ">
 
         <p>Registers a custom theme so it can be applied with <code>set_theme</code>.</p>
-<p>The theme must define every attribute of the default theme; missing
-keys are filled from it, unknown keys are rejected.</p>
+<p>Missing attributes are filled from the default theme, alias keys
+resolve to their canonical name, and unknown keys are rejected. A
+custom theme of the same name is replaced; the predefined theme names
+are reserved.</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -5060,6 +5084,31 @@ keys are filled from it, unknown keys are rejected.</p>
                       <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.StyleAttrs&lt;/span&gt;" href="../typings/#datachart.typings.StyleAttrs">StyleAttrs</a></code>
                   </span>
               </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RAISES</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+              <span class="doc-raises-annotation">
+                  <code><span title="ValueError">ValueError</span></code>
+              </span>
+            </td>
+            <td class="doc-raises-details">
+              <div class="doc-md-description">
+                <p>If <code>name</code> is a predefined theme or <code>theme</code> holds an
+unknown attribute.</p>
+              </div>
             </td>
           </tr>
       </tbody>
@@ -5118,8 +5167,8 @@ notebook section or between tests.</p>
         <p>Updates the global configuration.</p>
 <p>Overrides individual style attributes on top of the current theme; the
 change persists until the next <code>set_theme</code> or <code>reset_config</code>. Use it for
-global tweaks such as font family or default colors; unknown attribute
-names are skipped with a warning.</p>
+global tweaks such as font family or default colors; the values are
+copied, and unknown attribute names are skipped with a warning.</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -5156,6 +5205,26 @@ names are skipped with a warning.</p>
           </tr>
       </tbody>
     </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="datachart.config.Config._update" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">_update</span>
+
+
+</h4>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">_update</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.StyleAttrs&lt;/span&gt;" href="../typings/#datachart.typings.StyleAttrs">StyleAttrs</a></span><span class="p">,</span> <span class="n">stacklevel</span><span class="p">:</span> <span class="n"><span title="int">int</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p><code>update_config</code>, warning at <code>stacklevel</code> counted from the caller.</p>
 
 
     </div>
@@ -5521,9 +5590,11 @@ configuration.</p>
 <code>register_theme</code>, so missing attributes are filled from the default
 theme, alias keys resolve to their canonical name, and unknown keys
 are rejected. The name is, in order of precedence, the <code>name</code>
-argument, the name in the file, or the file's stem; an existing theme
-of that name is replaced. Loading only registers: apply the theme with
-<code>set_theme</code> or <code>using_theme</code>.</p>
+argument, the name in the file, or the file's stem; an existing custom
+theme of that name is replaced, while a predefined theme's name is
+rejected, so a file saved from one loads only with a new <code>name</code>.
+Loading only registers: apply the theme with <code>set_theme</code> or
+<code>using_theme</code>.</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -5624,7 +5695,8 @@ in the file, then to the file's stem.</p>
             <td class="doc-raises-details">
               <div class="doc-md-description">
                 <p>If the file is not a theme file, states another
-format version, or holds an unknown attribute.</p>
+format version, holds an unknown attribute, or would register
+under a predefined theme's name.</p>
               </div>
             </td>
           </tr>

@@ -58,12 +58,12 @@ Examples:
 >>> config.set_theme("forest")
 ```
 
-| PARAMETER     | DESCRIPTION                                                                                                                                                                 |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `base`        | A THEME constant, a registered theme name, or a theme dictionary; a partial dictionary is completed from the default theme, as register_theme completes it. **TYPE:** \`str |
-| `lead`        | A COLORS constant, a pypalettes palette name, or a list of colors. A diverging map is not a lead; it is read as categorical. **TYPE:** `Lead`                               |
-| `traits`      | TRAIT members applied in order after the lead; an unknown name raises. **TYPE:** \`Sequence\[TRAIT                                                                          |
-| `**overrides` | Style attributes set on the result; an unknown name raises. **TYPE:** `Any` **DEFAULT:** `{}`                                                                               |
+| PARAMETER     | DESCRIPTION                                                                                                                                                                                                                   |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `base`        | A THEME constant, a registered theme name, or a theme dictionary; a partial dictionary is completed from the default theme, as register_theme completes it: alias keys are renamed and an unknown key raises. **TYPE:** \`str |
+| `lead`        | A COLORS constant, a pypalettes palette name, or a list of colors. A diverging map is not a lead; it is read as categorical. A name that is no palette raises. **TYPE:** `Lead`                                               |
+| `traits`      | TRAIT members applied in order after the lead; an unknown name raises. **TYPE:** \`Sequence\[TRAIT                                                                                                                            |
+| `**overrides` | Style attributes set on the result; an unknown name raises. **TYPE:** `Any` **DEFAULT:** `{}`                                                                                                                                 |
 
 | RETURNS      | DESCRIPTION        |
 | ------------ | ------------------ |

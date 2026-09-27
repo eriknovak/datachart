@@ -97,7 +97,7 @@ register_theme(name: str, theme: StyleAttrs) -> None
 
 Registers a custom theme so it can be applied with `set_theme`.
 
-The theme must define every attribute of the default theme; missing keys are filled from it, unknown keys are rejected.
+Missing attributes are filled from the default theme, alias keys resolve to their canonical name, and unknown keys are rejected. A custom theme of the same name is replaced; the predefined theme names are reserved.
 
 Examples:
 
@@ -114,6 +114,10 @@ Examples:
 | --------- | ---------------------------------------------------------- |
 | `name`    | The theme name, later passed to set_theme. **TYPE:** `str` |
 | `theme`   | The style attributes of the theme. **TYPE:** `StyleAttrs`  |
+
+| RAISES       | DESCRIPTION                                                        |
+| ------------ | ------------------------------------------------------------------ |
+| `ValueError` | If name is a predefined theme or theme holds an unknown attribute. |
 
 #### reset_config
 
@@ -142,7 +146,7 @@ update_config(config: StyleAttrs) -> None
 
 Updates the global configuration.
 
-Overrides individual style attributes on top of the current theme; the change persists until the next `set_theme` or `reset_config`. Use it for global tweaks such as font family or default colors; unknown attribute names are skipped with a warning.
+Overrides individual style attributes on top of the current theme; the change persists until the next `set_theme` or `reset_config`. Use it for global tweaks such as font family or default colors; the values are copied, and unknown attribute names are skipped with a warning.
 
 Examples:
 
@@ -156,6 +160,14 @@ Examples:
 | PARAMETER | DESCRIPTION                                                        |
 | --------- | ------------------------------------------------------------------ |
 | `config`  | The configuration attributes to be updated. **TYPE:** `StyleAttrs` |
+
+#### \_update
+
+```
+_update(config: StyleAttrs, stacklevel: int) -> None
+```
+
+`update_config`, warning at `stacklevel` counted from the caller.
 
 #### \_scope
 
@@ -281,7 +293,7 @@ load_theme(
 
 Registers the theme held in a theme file and returns its name.
 
-The file is read as written by `save_theme` and registered through `register_theme`, so missing attributes are filled from the default theme, alias keys resolve to their canonical name, and unknown keys are rejected. The name is, in order of precedence, the `name` argument, the name in the file, or the file's stem; an existing theme of that name is replaced. Loading only registers: apply the theme with `set_theme` or `using_theme`.
+The file is read as written by `save_theme` and registered through `register_theme`, so missing attributes are filled from the default theme, alias keys resolve to their canonical name, and unknown keys are rejected. The name is, in order of precedence, the `name` argument, the name in the file, or the file's stem; an existing custom theme of that name is replaced, while a predefined theme's name is rejected, so a file saved from one loads only with a new `name`. Loading only registers: apply the theme with `set_theme` or `using_theme`.
 
 Examples:
 
@@ -301,9 +313,9 @@ Examples:
 | ------- | ---------------------------------------- |
 | `str`   | The name the theme was registered under. |
 
-| RAISES       | DESCRIPTION                                                                                    |
-| ------------ | ---------------------------------------------------------------------------------------------- |
-| `ValueError` | If the file is not a theme file, states another format version, or holds an unknown attribute. |
+| RAISES       | DESCRIPTION                                                                                                                                    |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ValueError` | If the file is not a theme file, states another format version, holds an unknown attribute, or would register under a predefined theme's name. |
 
 #### __getitem__
 

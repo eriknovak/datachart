@@ -5160,13 +5160,13 @@ chart's reference page; the shared ones on the typings page.</p>
 <tr>
 <td style="text-align: left;"><a href="../charts/stackedareachart/">StackedAreaChart</a></td>
 <td style="text-align: left;">Parts of a total along an ordered axis, filled on top of each other.</td>
-<td style="text-align: left;"><a href="../charts/linechart/#datachart.typings.LineRecordAttrs"><code>LineRecordAttrs</code></a></td>
+<td style="text-align: left;"><a href="../charts/stackedareachart/#datachart.typings.StackedAreaRecordAttrs"><code>StackedAreaRecordAttrs</code></a></td>
 <td style="text-align: left;"><a href="../charts/stackedareachart/#datachart.typings.StackedAreaStyleAttrs"><code>StackedAreaStyleAttrs</code></a></td>
 </tr>
 <tr>
 <td style="text-align: left;"><a href="../charts/bumpchart/">BumpChart</a></td>
 <td style="text-align: left;">Rank over time, one line per series.</td>
-<td style="text-align: left;"><a href="../charts/linechart/#datachart.typings.LineRecordAttrs"><code>LineRecordAttrs</code></a></td>
+<td style="text-align: left;"><a href="../charts/bumpchart/#datachart.typings.BumpRecordAttrs"><code>BumpRecordAttrs</code></a></td>
 <td style="text-align: left;"><a href="../charts/bumpchart/#datachart.typings.BumpStyleAttrs"><code>BumpStyleAttrs</code></a></td>
 </tr>
 <tr>
@@ -9408,15 +9408,15 @@ explicit per-chart hatch style wins. <code>None</code> disables the cycle.</p>
             <td><code><span title="datachart.typings.ThemeDefaultAttrs.plot_linestyle_cycle">plot_linestyle_cycle</span></code></td>
             <td class="doc-attribute-details">
               <div class="doc-md-description">
-                <p>The
-line styles assigned per line, bump and radial line series, parallel
-to the color cycle. An explicit per-chart line style wins. <code>None</code>
-disables the cycle.</p>
+                <p>The line styles assigned per line, bump and radial line series,
+parallel to the color cycle: a line style, or a dash pattern
+<code>[offset, [on, off, ...]]</code>. An explicit per-chart line style wins.
+<code>None</code> disables the cycle.</p>
               </div>
               <p>
                   <span class="doc-attribute-annotation">
                     <b>TYPE:</b>
-                      <code><span title="list">list</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.LINE_STYLE&lt;/span&gt;" href="../constants/#datachart.constants.LINE_STYLE">LINE_STYLE</a> | <span title="str">str</span>] | None</code>
+                      <code><span title="list">list</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.LINE_STYLE&lt;/span&gt;" href="../constants/#datachart.constants.LINE_STYLE">LINE_STYLE</a> | <span title="str">str</span> | <span title="list">list</span>[<span title="float">float</span> | <span title="list">list</span>[<span title="float">float</span>]]] | None</code>
                   </span>
               </p>
             </td>

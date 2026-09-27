@@ -216,7 +216,18 @@ Examples:
 
 ## Data
 
-Each record in `data` is a [`LineRecordAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/linechart/#datachart.typings.LineRecordAttrs); the `x` and `y` parameters rename its keys.
+Each record in `data` is a [`StackedAreaRecordAttrs`](#datachart.typings.StackedAreaRecordAttrs); the `x` and `y` parameters rename its keys.
+
+### datachart.typings.StackedAreaRecordAttrs
+
+Bases: `TypedDict`
+
+One record of the stacked area chart.
+
+| ATTRIBUTE | DESCRIPTION                       |
+| --------- | --------------------------------- |
+| `x`       | The x-axis value. **TYPE:** \`int |
+| `y`       | The y-axis value. **TYPE:** \`int |
 
 ## Style
 

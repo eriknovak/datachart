@@ -201,7 +201,18 @@ Examples:
 
 ## Data
 
-Each record in `data` is a [`LineRecordAttrs`](https://eriknovak.github.io/datachart/dev/references/charts/linechart/#datachart.typings.LineRecordAttrs); the `x` and `y` parameters rename its keys.
+Each record in `data` is a [`BumpRecordAttrs`](#datachart.typings.BumpRecordAttrs); the `x` and `y` parameters rename its keys.
+
+### datachart.typings.BumpRecordAttrs
+
+Bases: `TypedDict`
+
+One record of the bump chart.
+
+| ATTRIBUTE | DESCRIPTION                       |
+| --------- | --------------------------------- |
+| `x`       | The x-axis value. **TYPE:** \`int |
+| `y`       | The y-axis value. **TYPE:** \`int |
 
 ## Style
 
