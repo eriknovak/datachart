@@ -788,9 +788,7 @@ def _grid_from_dicts(
                 "Mix of custom and automatic layout is not supported."
             )
         validate_layout_specs(layout_specs)
-        use_custom_layout = True
     else:
-        use_custom_layout = False
         layout_specs = None
 
     # Call the underlying implementation

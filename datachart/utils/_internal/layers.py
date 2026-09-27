@@ -360,7 +360,6 @@ NO_LEGEND = "_nolegend_"
 # radial furniture defaults: compass and calendar conventions (ADR 0015)
 DEFAULT_STARTANGLE = "N"
 DEFAULT_DIRECTION = RADIAL_DIRECTION.CLOCKWISE
-COMPASS_LOCATIONS = ("N", "NE", "E", "SE", "S", "SW", "W", "NW")
 # the polar border circle crosses the plot area, so the r-value labels and
 # the legend stack above the spine zorder, not just above the marks
 RADIAL_LABEL_Z_OVER_SPINE = 1
