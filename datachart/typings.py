@@ -828,7 +828,7 @@ class HexbinStyleAttrs(TypedDict):
         plot_hexbin_alpha (Union[float, None]): The alpha value of the hexagons.
         plot_hexbin_edge_width (Union[int, float, None]): The width of the hexagon edges; `0` draws none.
         plot_hexbin_edge_color (Union[str, None]): The color of the hexagon edges.
-        plot_hexbin_gridsize (Union[int, None]): The number of hexagons across the x-axis when the chart sets no `gridsize`.
+        plot_hexbin_gridsize (Union[int, None]): The number of hexagons across the x-axis when the chart sets no `grid_size`.
 
     """
 
@@ -2457,9 +2457,9 @@ class _HexbinSingleChartAttrs(TypedDict):
         ylabel (Union[str, None]): The ylabel of the hexbin chart.
         style (Union[HexbinStyleAttrs, None]): The style of the hexbin chart.
 
-        gridsize (Union[int, None]): The number of hexagons across the x-axis; `None` takes the `plot_hexbin_gridsize` config value.
+        grid_size (Union[int, None]): The number of hexagons across the x-axis; `None` takes the `plot_hexbin_gridsize` config value.
         reduce (Union[HEXBIN_REDUCE, str, None]): The aggregation of the `c` values in a hexagon; `None` takes the mean. Ignored without `c`.
-        mincnt (Union[int, None]): The point count below which a hexagon stays blank; `None` draws every hexagon.
+        min_count (Union[int, None]): The point count below which a hexagon stays blank; `None` draws every hexagon.
         norm (Union[COLOR_NORM, str, None]): The value normalization of the hexagon colors.
         vmin (Union[float, None]): The minimum value to normalize the hexagon values.
         vmax (Union[float, None]): The maximum value to normalize the hexagon values.
@@ -2490,9 +2490,9 @@ class _HexbinSingleChartAttrs(TypedDict):
     ylabel: Union[str, None]
     style: Union[HexbinStyleAttrs, None]
 
-    gridsize: Union[int, None]
+    grid_size: Union[int, None]
     reduce: Union[HEXBIN_REDUCE, str, None]
-    mincnt: Union[int, None]
+    min_count: Union[int, None]
     norm: Union[str, None]
     vmin: Union[float, None]
     vmax: Union[float, None]

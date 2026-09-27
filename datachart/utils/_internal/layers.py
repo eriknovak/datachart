@@ -2275,9 +2275,10 @@ def theme_default(
     """The setting `name`, else the theme's default for it, else None (ADR 0071).
 
     A shared parameter's theme key comes from its `SharedParameter`, so
-    `chart_type` may be None for one; a front's own parameter's comes from
-    the `theme_defaults` of its row. A renamed key in the chart's `style`
-    still sets the default while its alias lasts.
+    `chart_type` may be None for one; a shared parameter without one, or a
+    front's own parameter, takes its key from the `theme_defaults` of its
+    row. A renamed key in the chart's `style` still sets the default while
+    its alias lasts.
     """
 
     # chart_kinds imports this module, so the descriptor is read at call time
@@ -2287,9 +2288,8 @@ def theme_default(
     if value is not None:
         return value
     shared = SHARED_PARAMETERS.get(name)
-    if shared is not None:
-        key = shared.theme_default
-    else:
+    key = shared.theme_default if shared is not None else None
+    if key is None and chart_type is not None:
         key = chart_kind(chart_type).theme_defaults.get(name)
     if key is None:
         return None
@@ -5446,7 +5446,7 @@ class SwarmLayer(UnclippedMarksMixin, PointLabelMixin, GroupLayer):
                 if self.is_horizontal
                 else POINT_LABEL_SPOTS_VERTICAL
             )
-        self.mode = self.settings.get("mode") or DEFAULT_SWARM_MODE
+        self.swarm_mode = self.settings.get("swarm_mode") or DEFAULT_SWARM_MODE
         jitter = theme_default(None, self.settings, "jitter")
         self.jitter = DEFAULT_SWARM_JITTER if jitter is None else float(jitter)
         # a raincloud's rain sits off-center in a narrower cell (ADR 0021)
@@ -5649,7 +5649,7 @@ def pack_swarms(ax, layers: list, side: int = 0) -> None:
     for i, (layer, _, groups, _) in enumerate(entries):
         layer_side = layer.side or side
         for j, (position, values) in enumerate(groups):
-            if layer.mode == SWARM_MODE.STRIP:
+            if layer.swarm_mode == SWARM_MODE.STRIP:
                 offsets[i, j] = layer.jitter_offsets(values, layer_side)
             else:
                 key = (position, layer_side, layer.is_horizontal)
@@ -6401,7 +6401,7 @@ class RidgelineLayer(GroupLayer):
             if np.ptp(fit) == 0:
                 ends.append((fit[0], fit[0]))
                 continue
-            curve = kde1d(fit, bandwidth=self.bandwidth, gridsize=2)
+            curve = kde1d(fit, bandwidth=self.bandwidth, grid_size=2)
             ends.append((curve[0]["x"], curve[-1]["x"]))
         if not ends:
             return None
@@ -6553,7 +6553,7 @@ class RidgelineLayer(GroupLayer):
         if np.ptp(values) == 0:
             return np.zeros(RIDGE_GRIDSIZE)
         curve = kde1d(
-            values, bandwidth=self.bandwidth, gridsize=RIDGE_GRIDSIZE, xlim=(lo, hi)
+            values, bandwidth=self.bandwidth, grid_size=RIDGE_GRIDSIZE, xlim=(lo, hi)
         )
         return np.array([point["y"] for point in curve])
 
@@ -6797,9 +6797,9 @@ class HeatmapLayer(Layer):
     style_prefix = "plot_heatmap"
 
     def _resolve_style(self):
-        self.show_colorbars = self.settings.get("show_colorbars")
+        self.show_colorbar = self.settings.get("show_colorbar")
         self.colorbar = get_colorbar_setting(self.chart.get("colorbar"))
-        self.colorbar_edge = self._colorbar_edge(self.show_colorbars)
+        self.colorbar_edge = self._colorbar_edge(self.show_colorbar)
         self.centred = self.chart.get("norm") in CENTRED_NORMS
         self.scaling = colormap_scaling(self.chart)
         self.vcenter = self.scaling["norm"].vcenter if self.centred else None
@@ -6907,9 +6907,9 @@ class HeatmapLayer(Layer):
         if self.edge_style.get("linewidth"):
             self._draw_cell_borders(ax, len(data), len(data[0]))
 
-        if self.show_colorbars and self.value_etch_steps:
+        if self.show_colorbar and self.value_etch_steps:
             self._draw_even_step_legend(ax, im.norm, self.colorbar["label"])
-        elif self.show_colorbars:
+        elif self.show_colorbar:
             _draw_colorbar(ax, im, self.colorbar, ctx.aspect_locked, self.vcenter)
 
         self._draw_frame(ax)
@@ -7292,12 +7292,12 @@ class ContourLayer(Layer):
     kind = "contour"
 
     def _resolve_style(self):
-        self.filled = bool(self.settings.get("filled"))
-        self.surface = self.filled
+        self.fill = bool(self.settings.get("fill"))
+        self.surface = self.fill
         self.show_labels = self.settings.get("show_labels")
-        self.show_colorbars = self.settings.get("show_colorbars")
+        self.show_colorbar = self.settings.get("show_colorbar")
         self.colorbar = get_colorbar_setting(self.chart.get("colorbar"))
-        self.colorbar_edge = self._colorbar_edge(self.filled and self.show_colorbars)
+        self.colorbar_edge = self._colorbar_edge(self.fill and self.show_colorbar)
         style = get_contour_style(self.style)
         self.centred = self.chart.get("norm") in CENTRED_NORMS
         self.scaling = colormap_scaling(self.chart)
@@ -7309,7 +7309,7 @@ class ContourLayer(Layer):
         # lines take a pinned contour cmap only, past its washed-out low end
         self.line_cmap = None
         cmap_pinned = get_attr_value("plot_contour_cmap", self.style, config)
-        if not self.filled and cmap_pinned is not None:
+        if not self.fill and cmap_pinned is not None:
             self.line_cmap = LinearSegmentedColormap.from_list(
                 f"{self.cmap.name}_lines",
                 self.cmap(np.linspace(CONTOUR_LINE_CMAP_START, 1, 256)),
@@ -7325,7 +7325,7 @@ class ContourLayer(Layer):
             self.levels, self.extend, self.band_edges = None, "neither", None
             return
         self.levels = contour_levels(self.z, self.settings.get("levels"))
-        if self.filled:
+        if self.fill:
             validate_filled_levels(self.levels)
         self.extend, self.band_edges = self._coverage()
 
@@ -7386,7 +7386,7 @@ class ContourLayer(Layer):
         scaling = dict(self.scaling)
         label = self.label(ctx)
 
-        if self.filled:
+        if self.fill:
             for key in ("color", "linewidths", "linestyles"):
                 style.pop(key, None)
             if ctx.emphasis == EMPHASIS_BACKGROUND:
@@ -7409,7 +7409,7 @@ class ContourLayer(Layer):
             self.register_hover(bands, self._level_resolver(bands, label, edges))
             if self.value_etch_steps:
                 self._draw_relief(ax, ctx, bands, proxy, edges)
-            elif self.show_colorbars:
+            elif self.show_colorbar:
                 _draw_colorbar(
                     ax, bands, self.colorbar, ctx.aspect_locked, self.vcenter
                 )
@@ -7443,7 +7443,7 @@ class ContourLayer(Layer):
         self._draw_value_steps(ax, steps, band_paths, bands.get_zorder())
         bands.set_alpha(0)
         self._draw_lines(ax, ctx, True, legend_proxy=False)
-        if not self.show_colorbars:
+        if not self.show_colorbar:
             return
         entries = []
         for k, low, high in zip(steps, levels[:-1], levels[1:]):
@@ -7502,7 +7502,7 @@ class ContourLayer(Layer):
             if ctx.emphasis == EMPHASIS_BACKGROUND:
                 label_style["colors"] = self.muted_color
             # a relief's labels sit over the etching and read through a halo
-            halo = self.value_halo if self.filled and self.value_etch_steps else []
+            halo = self.value_halo if self.fill and self.value_etch_steps else []
             for text in ax.clabel(lines, **label_style):
                 text.set_fontfamily(self.label_family)
                 text.set_path_effects(halo)
@@ -7541,12 +7541,12 @@ class HexbinLayer(Layer):
     surface = True
 
     def _resolve_style(self):
-        self.show_colorbars = self.settings.get("show_colorbars")
+        self.show_colorbar = self.settings.get("show_colorbar")
         # value_format is the tick format the colorbar setting falls back on
         self.colorbar = get_colorbar_setting(
             self.chart.get("colorbar"), self.chart.get("value_format")
         )
-        self.colorbar_edge = self._colorbar_edge(self.show_colorbars)
+        self.colorbar_edge = self._colorbar_edge(self.show_colorbar)
         self.centred = self.chart.get("norm") in CENTRED_NORMS
         self.scaling = colormap_scaling(self.chart)
         self.vcenter = self.scaling["norm"].vcenter if self.centred else None
@@ -7556,10 +7556,10 @@ class HexbinLayer(Layer):
         style["cmap"] = get_colormap(style["cmap"])
         self.hexbin_style = style
         self.x, self.y, self.c = self._columns()
-        self.gridsize = self.chart.get("gridsize")
-        if self.gridsize is None:
-            self.gridsize = get_attr_value("plot_hexbin_gridsize", self.style, config)
-        self.mincnt = self.chart.get("mincnt")
+        self.grid_size = self.chart.get("grid_size")
+        if self.grid_size is None:
+            self.grid_size = get_attr_value("plot_hexbin_gridsize", self.style, config)
+        self.min_count = self.chart.get("min_count")
         # bins exist only once drawn, so the rule resolves in draw (ADR 0045)
         self.emphasis_rule = validate_emphasis_rule(self.settings.get("emphasis_rule"))
         self.highlight_color = config["font_general_color"]
@@ -7622,12 +7622,12 @@ class HexbinLayer(Layer):
             self.x,
             self.y,
             C=self.c,
-            gridsize=self.gridsize,
+            gridsize=self.grid_size,
             # hexagons bin in the axes' scale; a later log scale would warp them
             xscale="log" if ctx.category_scale == AXIS_SCALE.LOG else "linear",
             yscale="log" if ctx.value_scale == AXIS_SCALE.LOG else "linear",
             reduce_C_function=self.reduce,
-            mincnt=self.mincnt,
+            mincnt=self.min_count,
             **self.scaling,
             **style,
         )
@@ -7649,9 +7649,9 @@ class HexbinLayer(Layer):
             }
 
         self.register_hover(tiles, resolve)
-        if self.show_colorbars and self.value_etch_steps:
+        if self.show_colorbar and self.value_etch_steps:
             self._draw_even_step_legend(ax, tiles.norm, self.colorbar["label"])
-        elif self.show_colorbars:
+        elif self.show_colorbar:
             _draw_colorbar(ax, tiles, self.colorbar, ctx.aspect_locked, self.vcenter)
 
     def _draw_bin_steps(self, ax, tiles, values, faded: bool) -> None:
@@ -8452,7 +8452,7 @@ class RadialLineLayer(AreaFillMixin, RadialLayer):
         )
 
         if self.show_area:
-            # the fill reaches the center (or the innerradius hole clips it)
+            # the fill reaches the center (or the inner_radius hole clips it)
             area = ax.fill_between(theta, 0.0, y, **self._resolved_area_style(ctx))
             self._etch([area], wash=False)
 
@@ -13116,24 +13116,24 @@ class Panel:
 
         s = self.settings
 
-        startangle = s.get("startangle")
-        startangle = DEFAULT_STARTANGLE if startangle is None else startangle
-        if isinstance(startangle, str):
-            ax.set_theta_zero_location(startangle)
+        start_angle = s.get("start_angle")
+        start_angle = DEFAULT_STARTANGLE if start_angle is None else start_angle
+        if isinstance(start_angle, str):
+            ax.set_theta_zero_location(start_angle)
         else:
-            # a numeric startangle is a compass bearing: degrees clockwise
+            # a numeric start_angle is a compass bearing: degrees clockwise
             # from north, matching the compass-string form
-            ax.set_theta_zero_location("N", offset=-float(startangle))
+            ax.set_theta_zero_location("N", offset=-float(start_angle))
 
         direction = s.get("direction") or DEFAULT_DIRECTION
         ax.set_theta_direction(-1 if direction == RADIAL_DIRECTION.CLOCKWISE else 1)
 
-        innerradius = s.get("innerradius") or 0.0
-        if innerradius:
+        inner_radius = s.get("inner_radius") or 0.0
+        if inner_radius:
             rmin, rmax = ax.get_ylim()
             # r = rorigin maps to the center: the hole takes the given
             # fraction of the drawn radial extent
-            ax.set_rorigin(rmin - innerradius / (1 - innerradius) * (rmax - rmin))
+            ax.set_rorigin(rmin - inner_radius / (1 - inner_radius) * (rmax - rmin))
 
         if s.get("show_border") is False:
             for spine in ax.spines.values():

@@ -243,7 +243,7 @@ class TestCartesianLayers:
     def test_hexbin_hexagons_report_center_and_count(self):
         rng = np.random.default_rng(0)
         figure = HexbinChart(
-            data={"x": rng.random(200), "y": rng.random(200)}, gridsize=4
+            data={"x": rng.random(200), "y": rng.random(200)}, grid_size=4
         )
         ((tiles, resolver),) = _targets(figure)
         assert isinstance(tiles, PolyCollection)
@@ -259,7 +259,7 @@ class TestCartesianLayers:
     def test_hexbin_reduced_values_name_the_reducer(self):
         figure = HexbinChart(
             data={"x": [0, 0.1, 1, 1.1], "y": [0, 0.1, 1, 1.1], "c": [2, 4, 6, 8]},
-            gridsize=2,
+            grid_size=2,
             reduce="mean",
         )
         ((tiles, resolver),) = _targets(figure)
@@ -287,7 +287,7 @@ class TestCartesianLayers:
         ((contours, resolver),) = _targets(lines)
         assert isinstance(contours, ContourSet)
         assert resolver((1, 0.4)) == {"label": "height", "level": 3}
-        filled = ContourChart(data={"z": z}, levels=[1, 3, 5], filled=True)
+        filled = ContourChart(data={"z": z}, levels=[1, 3, 5], fill=True)
         ((bands, resolver),) = _targets(filled)
         assert resolver((1, 2)) == {"label": None, "level": "1 – 3"}
         # the overflow bands span to the surface extremes
@@ -657,7 +657,7 @@ class TestShowInteractive:
         assert texts == [f"growth\nx: 2\nVisits: {visits}"]
         rng = np.random.default_rng(1)
         hexbin = HexbinChart(
-            data={"x": rng.random(300), "y": rng.random(300)}, gridsize=3
+            data={"x": rng.random(300), "y": rng.random(300)}, grid_size=3
         )
         _show_interactive(hexbin)
         ((tiles, _),) = _targets(hexbin)

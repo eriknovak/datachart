@@ -55,7 +55,7 @@ def RaincloudPlot(
     show_outliers: Optional[bool] = None,
     show_values: Optional[bool] = None,
     value_format: Optional[Union[VALUE_FORMAT, str]] = None,
-    mode: Optional[Union[SWARM_MODE, str]] = None,
+    swarm_mode: Optional[Union[SWARM_MODE, str]] = None,
     jitter: Optional[float] = None,
     bandwidth: Optional[Union[BANDWIDTH, str, float]] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
@@ -131,6 +131,7 @@ def RaincloudPlot(
     ] = None,
     label: Optional[Union[str, List[Optional[str]]]] = None,
     value: Optional[Union[str, List[Optional[str]]]] = None,
+    mode: Optional[Union[SWARM_MODE, str]] = None,
 ) -> plt.Figure:
     """Creates the raincloud plot.
 
@@ -195,12 +196,12 @@ def RaincloudPlot(
         value_format: Format string for the value labels: a
             [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT] constant or any
             `"{x:.1f}"`, `"{:.1f}%"`, or `"%g"` style string.
-        mode: How the rain spreads across its width. See
+        swarm_mode: How the rain spreads across its width. See
             [`SWARM_MODE`][datachart.constants.SWARM_MODE]: "swarm" packs the points so
             none overlap; "strip" jitters them uniformly.
         jitter: The strip jitter width, as a fraction of the category width
             like `SwarmPlot`, scaled down to the rain's narrower cell. Only
-            used with `mode="strip"`. None takes the theme's
+            used with `swarm_mode="strip"`. None takes the theme's
             `chart_default_jitter`.
         bandwidth: The cloud's KDE bandwidth: None or "scott" (Scott's rule),
             "silverman" (Silverman's rule), or a scalar factor. See
@@ -237,6 +238,7 @@ def RaincloudPlot(
         texts: Text annotation(s) to draw.
         label: The key name in data for label/category values (default: "label").
         value: The key name in data for numeric values (default: "value").
+        mode: Deprecated; use `swarm_mode`. Removed in the next release.
 
     Returns:
         The figure containing the raincloud plot.

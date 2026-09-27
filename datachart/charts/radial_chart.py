@@ -27,8 +27,6 @@ from ..constants import (
     VALUE_FORMAT,
 )
 
-_COMPASS = ("N", "NE", "E", "SE", "S", "SW", "W", "NW")
-
 _RadialStyleAttrs = Union[
     LineStyleAttrs, BarStyleAttrs, HistStyleAttrs, ScatterStyleAttrs
 ]
@@ -64,9 +62,9 @@ def RadialChart(
     sort_by: Optional[str] = None,
     emphasis_rule: Optional[EmphasisRuleAttrs] = None,
     num_bins: Optional[int] = None,
-    startangle: Optional[Union[str, int, float]] = None,
+    start_angle: Optional[Union[str, int, float]] = None,
     direction: Optional[Union[RADIAL_DIRECTION, str]] = None,
-    innerradius: Optional[float] = None,
+    inner_radius: Optional[float] = None,
     scalex: None = None,
     scaley: Optional[Union[AXIS_SCALE, str]] = None,
     subplots: Optional[bool] = None,
@@ -104,6 +102,8 @@ def RadialChart(
     y: Optional[Union[str, List[Optional[str]]]] = None,
     yerr: Optional[Union[str, List[Optional[str]]]] = None,
     type: Optional[Union[RADIAL_TYPE, str]] = None,
+    startangle: Optional[Union[str, int, float]] = None,
+    innerradius: Optional[float] = None,
 ) -> plt.Figure:
     """Creates the radial chart.
 
@@ -177,13 +177,13 @@ def RadialChart(
             `{"top": n}` or `{"bottom": n}`. Reads each bar's own value; a
             record's own `emphasis` key wins over the rule.
         num_bins: The number of angular bins over [0, 360) (histogram visual).
-        startangle: Where the first point sits: a compass location ("N", "NE",
+        start_angle: Where the first point sits: a compass location ("N", "NE",
             "E", "SE", "S", "SW", "W", "NW") or a numeric compass bearing in
             degrees clockwise from north. Defaults to "N".
         direction: Which way the angles increase: "clockwise" (default) or
             "counterclockwise". See
             [`RADIAL_DIRECTION`][datachart.constants.RADIAL_DIRECTION].
-        innerradius: The donut hole, as a fraction (0 <= f < 1) of the radial
+        inner_radius: The donut hole, as a fraction (0 <= f < 1) of the radial
             extent. Defaults to 0.
         scalex: Not supported; the angular axis has no scale. Raises when passed.
         scaley: The radial-axis scale (e.g., "log", "linear").
@@ -212,22 +212,13 @@ def RadialChart(
         y: The key name in data for radial values (default: "y").
         yerr: The key name in data for radial error values (default: "yerr").
         type: Deprecated; use `mark`. Removed in the next release.
+        startangle: Deprecated; use `start_angle`. Removed in the next release.
+        innerradius: Deprecated; use `inner_radius`. Removed in the next release.
 
     Returns:
         The figure containing the radial chart.
 
     """
     params = dict(locals())
-
-    if innerradius is not None and not 0 <= innerradius < 1:
-        raise ValueError(
-            f"Invalid `innerradius` value {innerradius!r}. "
-            "Must be a fraction 0 <= f < 1 of the radial extent."
-        )
-    if isinstance(startangle, str) and startangle not in _COMPASS:
-        raise ValueError(
-            f"Invalid `startangle` value {startangle!r}. Must be a compass "
-            f"location {_COMPASS} or a numeric bearing in degrees."
-        )
 
     return render("radialchart", params)

@@ -200,7 +200,7 @@ GRID_FRONTS = {
         lambda f: max(f.axes[0].collections[0].levels) <= 10,
     ),
     "HexbinChart": (
-        lambda m: HexbinChart(hexbin(m), gridsize=3),
+        lambda m: HexbinChart(hexbin(m), grid_size=3),
         lambda f: f.axes[0].collections[0].get_array().sum() == 4,
     ),
     "CalendarHeatmap": (

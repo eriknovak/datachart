@@ -8,6 +8,7 @@ over the finite values, and a pair with a missing half is left out.
 
 """
 
+import warnings
 from datetime import datetime, timezone
 from numbers import Real
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
@@ -848,6 +849,23 @@ def loess(
 # ================================================
 
 
+def _grid_size(grid_size, gridsize, default):
+    """`grid_size`, else its deprecated name `gridsize`, else `default`."""
+
+    if gridsize is None:
+        return default if grid_size is None else grid_size
+    # this function, the kde function, then the caller
+    warnings.warn(
+        "`gridsize` is deprecated and will be removed in the next release; "
+        "use `grid_size` instead.",
+        DeprecationWarning,
+        stacklevel=3,
+    )
+    if grid_size is not None:
+        raise ValueError("Pass `grid_size` only; `gridsize` is its deprecated name.")
+    return gridsize
+
+
 def _kde(points: np.ndarray, bandwidth, cut: float) -> Tuple[GaussianKDE, np.ndarray]:
     """The kernel over the (n_dims, n_points) array and its per-axis padding."""
 
@@ -871,13 +889,14 @@ def kde1d(
     values: List[Union[int, float]],
     *,
     bandwidth: Optional[Union[BANDWIDTH, str, float]] = None,
-    gridsize: int = 100,
+    grid_size: Optional[int] = None,
     cut: float = 3,
     xlim: Optional[Tuple[float, float]] = None,
+    gridsize: Optional[int] = None,
 ) -> List[Dict[str, float]]:
     """Estimates the density of the values as a curve.
 
-    A Gaussian kernel density estimate evaluated on `gridsize` evenly spaced
+    A Gaussian kernel density estimate evaluated on `grid_size` evenly spaced
     points over the range of the values, extended by `cut` bandwidths on each
     side so the curve tails off instead of being clipped at the extremes, or
     over an explicit `xlim` so several curves share one grid. The
@@ -886,7 +905,7 @@ def kde1d(
 
     Examples:
         >>> from datachart.utils.stats import kde1d
-        >>> curve = kde1d([1, 2, 2, 3, 3, 3, 4, 4, 5], gridsize=5, cut=0)
+        >>> curve = kde1d([1, 2, 2, 3, 3, 3, 4, 4, 5], grid_size=5, cut=0)
         >>> [round(point["x"], 2) for point in curve]
         [1.0, 2.0, 3.0, 4.0, 5.0]
         >>> round(sum(point["y"] for point in curve), 2)
@@ -897,9 +916,11 @@ def kde1d(
             NaN, infinities) are ignored.
         bandwidth: The kernel bandwidth: None or "scott" (Scott's rule),
             "silverman", or a scalar factor. See `BANDWIDTH`.
-        gridsize: The number of points the curve is evaluated on.
+        grid_size: The number of points the curve is evaluated on; 100 by
+            default.
         cut: How many bandwidths to extend the grid past the extremes.
         xlim: The `(min, max)` range of the grid; overrides the padded range.
+        gridsize: Deprecated; use `grid_size`. Removed in the next release.
 
     Returns:
         The `{x, y}` points of the density curve.
@@ -908,10 +929,11 @@ def kde1d(
         ValueError: If the bandwidth is invalid, there are fewer than two
             finite values, or the values are all equal.
     """
+    grid_size = _grid_size(grid_size, gridsize, 100)
     points = np.asarray(_present(values), dtype=float).reshape(1, -1)
     kde, (padding,) = _kde(points, bandwidth, cut)
     lo, hi = xlim or (points.min() - padding, points.max() + padding)
-    grid = np.linspace(lo, hi, gridsize)
+    grid = np.linspace(lo, hi, grid_size)
     density = kde.evaluate(grid)
     return [{"x": float(x), "y": float(y)} for x, y in zip(grid, density)]
 
@@ -921,14 +943,15 @@ def kde2d(
     y: List[Union[int, float]],
     *,
     bandwidth: Optional[Union[BANDWIDTH, str, float]] = None,
-    gridsize: Union[int, Tuple[int, int]] = 100,
+    grid_size: Optional[Union[int, Tuple[int, int]]] = None,
     cut: float = 3,
     xlim: Optional[Tuple[Any, Any]] = None,
     ylim: Optional[Tuple[float, float]] = None,
+    gridsize: Optional[Union[int, Tuple[int, int]]] = None,
 ) -> Dict[str, List]:
     """Estimates the density of the (x, y) points as a gridded surface.
 
-    A Gaussian kernel density estimate evaluated on a `gridsize` × `gridsize`
+    A Gaussian kernel density estimate evaluated on a `grid_size` × `grid_size`
     grid over the range of the points, extended by `cut` bandwidths on each
     side so the outer contours close instead of being clipped, or over explicit
     `xlim`/`ylim` so several surfaces share one grid. The result is
@@ -939,7 +962,7 @@ def kde2d(
 
     Examples:
         >>> from datachart.utils.stats import kde2d
-        >>> surface = kde2d([1, 2, 3, 4], [1, 3, 2, 4], gridsize=(3, 2), cut=0)
+        >>> surface = kde2d([1, 2, 3, 4], [1, 3, 2, 4], grid_size=(3, 2), cut=0)
         >>> surface["x"], surface["y"]
         ([1.0, 2.5, 4.0], [1.0, 4.0])
         >>> [[round(z, 3) for z in row] for row in surface["z"]]
@@ -951,11 +974,12 @@ def kde2d(
             missing `x` or `y` (None, NaN, an infinity) is left out.
         bandwidth: The kernel bandwidth: None or "scott" (Scott's rule),
             "silverman", or a scalar factor. See `BANDWIDTH`.
-        gridsize: The number of grid columns and rows, as one number or an
-            `(x, y)` pair.
+        grid_size: The number of grid columns and rows, as one number or an
+            `(x, y)` pair; 100 by default.
         cut: How many bandwidths to extend the grid past the extremes.
         xlim: The `(min, max)` x range of the grid; overrides the padded range.
         ylim: The `(min, max)` y range of the grid; overrides the padded range.
+        gridsize: Deprecated; use `grid_size`. Removed in the next release.
 
     Returns:
         The `{x, y, z}` chart dict of the density surface.
@@ -967,13 +991,14 @@ def kde2d(
             there are fewer than two finite points, or the
             points have no spread (all equal, or on one straight line).
     """
+    grid_size = _grid_size(grid_size, gridsize, 100)
     if len(x) != len(y):
         raise ValueError("x and y must have the same length.")
     x, y = _present_pairs(x, y)
     xs, as_x = _x_numbers(x)
     points = np.asarray([xs, np.asarray(y, dtype=float)])
     kde, (pad_x, pad_y) = _kde(points, bandwidth, cut)
-    n_cols, n_rows = (gridsize, gridsize) if isinstance(gridsize, int) else gridsize
+    n_cols, n_rows = (grid_size, grid_size) if isinstance(grid_size, int) else grid_size
     if xlim is None:
         x_lo, x_hi = xs.min() - pad_x, xs.max() + pad_x
     elif _is_temporal_column(xlim, "xlim") != _is_temporal_column(x, "x"):

@@ -63,7 +63,7 @@ Classes:
                        setting.
     VIOLIN_INNER:      `inner` of `ViolinPlot` and `RidgelinePlot`.
     BANDWIDTH:         `bandwidth` of the density charts.
-    SWARM_MODE:        `mode` of `SwarmPlot` and `RaincloudPlot`.
+    SWARM_MODE:        `swarm_mode` of `SwarmPlot` and `RaincloudPlot`.
     VALUE_FORMAT:      `value_format`, `xticks_format`, and `yticks_format`.
     DATE_FORMAT:       `xticks_format` and `yticks_format` on a date axis.
     SHOW_GRID:         `show_grid`.
@@ -1000,8 +1000,8 @@ class CALENDAR_WEEKDAY(Domain):
 class SWARM_MODE(Domain):
     """The supported swarm plot modes.
 
-    Passed as the `mode` setting of swarm plots: how the points of one group
-    spread across the category width.
+    Passed as the `swarm_mode` setting of swarm plots: how the points of one
+    group spread across the category width.
 
     ![SWARM_MODE at a glance](../assets/imgs/const-swarm-mode.svg){ width="100%" }
 

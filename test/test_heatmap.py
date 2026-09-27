@@ -249,7 +249,7 @@ class TestCenteredColorbar(unittest.TestCase):
         plt.close("all")
 
     def _bar_ticks(self, **kwargs):
-        figure = Heatmap({"z": SIGNED}, show_colorbars=True, **kwargs)
+        figure = Heatmap({"z": SIGNED}, show_colorbar=True, **kwargs)
         figure.canvas.draw()
         bar = [ax for ax in figure.axes if ax is not figure.axes[0]][0]
         return [float(t) for t in bar.get_yticks()]
@@ -262,7 +262,7 @@ class TestCenteredColorbar(unittest.TestCase):
 
     def test_colorbar_ticks_include_the_centre(self):
         figure = Heatmap(
-            {"z": SIGNED}, norm=COLOR_NORM.CENTERED, vcenter=1, show_colorbars=True
+            {"z": SIGNED}, norm=COLOR_NORM.CENTERED, vcenter=1, show_colorbar=True
         )
         figure.canvas.draw()
         bar = [ax for ax in figure.axes if ax is not figure.axes[0]][0]
@@ -278,7 +278,7 @@ class TestCenteredValueSteps(unittest.TestCase):
 
     def _step_ranges(self, **kwargs):
         config.set_theme(THEME.QUILL)
-        figure = Heatmap({"z": SIGNED}, show_colorbars=True, **kwargs)
+        figure = Heatmap({"z": SIGNED}, show_colorbar=True, **kwargs)
         legend = figure.axes[0].get_children()
         (legend,) = [c for c in legend if hasattr(c, "get_texts")]
         return [t.get_text() for t in legend.get_texts()]
