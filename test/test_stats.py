@@ -544,11 +544,11 @@ class TestStatsMissingValues(unittest.TestCase):
         self.assertEqual(histogram(HOLED, bins=3), histogram(FINITE, bins=3))
 
     def test_densities_ignore_missing_values(self):
-        self.assertEqual(kde1d(HOLED, gridsize=5), kde1d(FINITE, gridsize=5))
+        self.assertEqual(kde1d(HOLED, grid_size=5), kde1d(FINITE, grid_size=5))
         y = [2.0, 1.0, 5.0, 3.0, 4.0]
         holed_y = [2.0, 9.0, 1.0, 9.0, 5.0, 9.0, 3.0, 9.0, 4.0]
         self.assertEqual(
-            kde2d(HOLED, holed_y, gridsize=4), kde2d(FINITE, y, gridsize=4)
+            kde2d(HOLED, holed_y, grid_size=4), kde2d(FINITE, y, grid_size=4)
         )
 
     def test_smoothers_keep_one_value_per_input(self):
