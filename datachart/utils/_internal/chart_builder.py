@@ -332,7 +332,7 @@ def _record_datasets(kind: ChartKind, data: Any) -> Any:
         data: A list of records, a list of such lists, or a dict of columns.
 
     Returns:
-        The data in the same shape, every sequence a list.
+        The data as records or lists of records, every sequence a list.
 
     Raises:
         ValueError: If the data has none of the three shapes, naming the
@@ -367,8 +367,8 @@ def _record_datasets(kind: ChartKind, data: Any) -> Any:
     return data
 
 
-def _columns(kind: ChartKind, data: dict, where: str) -> dict:
-    # a dict of columns: each value one sequence, never a scalar
+def _columns(kind: ChartKind, data: dict, where: str) -> List[dict]:
+    # a dict of columns reads as one record per row, so layers see one form
     columns = {key: _as_list(values) for key, values in data.items()}
     for key, values in columns.items():
         if not isinstance(values, (list, np.ndarray)):
@@ -376,7 +376,13 @@ def _columns(kind: ChartKind, data: dict, where: str) -> dict:
                 f"{_front(kind)} column `{where}[{key!r}]` must be a list; "
                 f"got {_type_name(values)}."
             )
-    return columns
+    lengths = {key: len(values) for key, values in columns.items()}
+    if len(set(lengths.values())) > 1:
+        raise ValueError(
+            f"{_front(kind)} columns in `{where}` must have equal lengths; "
+            f"got {lengths}."
+        )
+    return [dict(zip(columns, row)) for row in zip(*columns.values())]
 
 
 def _dict_datasets(data: Any) -> Any:
@@ -551,7 +557,7 @@ def canonical_records(
 
     Args:
         kind: The front's row, declaring the record keys.
-        chart: One chart dict, its `data` a list of records or of columns.
+        chart: One chart dict, its `data` a list of records.
         where: How the error names the chart's records, e.g. `"data[1]"`.
         required_keys: The record keys every record must carry; None takes
             the row's `required_keys`.
@@ -569,8 +575,8 @@ def canonical_records(
             new in kind.record_keys
             and sources[new] == new
             and old not in sources.values()
-            and _carries(data, old)
-            and not _carries(data, new)
+            and any(old in record for record in data)
+            and not any(new in record for record in data)
         ):
             warnings.warn(
                 f"The `{old}` record key is deprecated and will be removed in "
@@ -581,32 +587,15 @@ def canonical_records(
             sources[new] = old
             # the row's `check_records` validates it like the parameter
             chart.setdefault("renamed", {})[new] = old
-    if isinstance(data, dict):
-        return _canonical(data, sources)
-    if not isinstance(data, list):
-        return data
     required = kind.required_keys if required_keys is None else required_keys
-    records = []
     for index, record in enumerate(data):
-        if isinstance(record, dict):
-            for key in required:
-                if sources[key] is not None and sources[key] not in record:
-                    raise ValueError(
-                        f"{_front(kind)} record "
-                        f"`{where}[{index}]` has no `{sources[key]}` key."
-                    )
-            record = _canonical(record, sources)
-        records.append(record)
-    return records
-
-
-def _carries(data: Any, key: str) -> bool:
-    # a list of records, or one dict of columns
-    if isinstance(data, dict):
-        return key in data
-    return isinstance(data, list) and any(
-        isinstance(record, dict) and key in record for record in data
-    )
+        for key in required:
+            if sources[key] is not None and sources[key] not in record:
+                raise ValueError(
+                    f"{_front(kind)} record "
+                    f"`{where}[{index}]` has no `{sources[key]}` key."
+                )
+    return [_canonical(record, sources) for record in data]
 
 
 def _canonical(record: dict, sources: Dict[str, str]) -> dict:

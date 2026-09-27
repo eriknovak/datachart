@@ -8,7 +8,13 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-from datachart.charts import CalendarHeatmap, DumbbellChart, GanttChart, LineChart
+from datachart.charts import (
+    CalendarHeatmap,
+    DumbbellChart,
+    GanttChart,
+    LineChart,
+    ScatterChart,
+)
 from datachart.utils._internal.chart_builder import build_charts_structure
 from datachart.utils._internal.chart_kinds import CHART_KINDS
 
@@ -84,7 +90,8 @@ class TestRecordRows(unittest.TestCase):
 
     def test_columns_are_renamed_too(self):
         charts = build_charts_structure("linechart", {"t": [1, 2], "y": [3, 4]}, x="t")
-        self.assertEqual(charts, [{"data": {"t": [1, 2], "x": [1, 2], "y": [3, 4]}}])
+        records = [{"t": 1, "x": 1, "y": 3}, {"t": 2, "x": 2, "y": 4}]
+        self.assertEqual(charts, [{"data": records}])
 
     def test_caller_records_are_not_mutated(self):
         data = [{"t": 1, "v": 2}]
@@ -158,9 +165,25 @@ class TestMalformedData(unittest.TestCase):
     def test_a_column_that_is_not_a_list_is_named(self):
         self.assertRejects("linechart", {"x": 1, "y": 2}, r"`data\['x'\]`.*int")
 
-    def test_columns_and_empty_data_still_pass(self):
-        columns = {"x": [1, 2], "y": np.array([3, 4])}
-        self.assertEqual(len(build_charts_structure("linechart", columns)), 1)
+    def test_columns_read_as_records(self):
+        columns = {"x": (1, 2), "y": np.array([3, 4])}
+        self.assertEqual(
+            build_charts_structure("linechart", columns),
+            [{"data": [{"x": 1, "y": 3}, {"x": 2, "y": 4}]}],
+        )
+
+    def test_columns_of_unequal_length_are_named(self):
+        self.assertRejects(
+            "linechart", {"x": [1, 2], "y": [3]}, r"equal lengths.*'x': 2, 'y': 1"
+        )
+
+    def test_scatter_draws_columns_like_records(self):
+        figure = ScatterChart({"x": [1, 2], "y": [3, 4]})
+        offsets = figure.axes[0].collections[0].get_offsets()
+        self.assertEqual(offsets.tolist(), [[1, 3], [2, 4]])
+        plt.close(figure)
+
+    def test_empty_data_still_passes(self):
         self.assertEqual(build_charts_structure("linechart", []), [{"data": []}])
 
     def test_tuples_and_generators_read_as_lists(self):
