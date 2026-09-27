@@ -786,6 +786,8 @@ def Grid(
     ymin: Optional[Union[int, float]] = None,
     ymax: Optional[Union[int, float]] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
+    scalex: Optional[Union[AXIS_SCALE, str]] = None,
+    scaley: Optional[Union[AXIS_SCALE, str]] = None,
 ) -> plt.Figure:
     """Arrange rendered chart figures in a grid.
 
@@ -803,9 +805,9 @@ def Grid(
     reverse — a Grid figure inside a Panel — stays an error.
 
     The grid's title, axis labels and legend are drawn once for the whole
-    figure. Its limits, `show_grid` and `aspect_ratio` apply to every cell,
-    nested grids included; one left unset keeps what each cell's chart was
-    built with.
+    figure. Its limits, scales, `show_grid` and `aspect_ratio` apply to every
+    cell, nested grids included; one left unset keeps what each cell's chart
+    was built with.
 
     Examples:
         >>> from datachart.charts import LineChart, BarChart, ScatterChart
@@ -875,6 +877,10 @@ def Grid(
             keeps a map of longitude against latitude at true proportions.
             Default: each cell's own. See
             [`ASPECT_RATIO`][datachart.constants.ASPECT_RATIO].
+        scalex: The category-axis scale of every cell ("linear", "log",
+            "symlog", "asinh"). Default: each cell's own.
+        scaley: The value-axis scale of every cell, the x axis of a
+            horizontal chart. Default: each cell's own.
 
     Returns:
         A new matplotlib Figure containing all charts in a grid layout.
@@ -882,8 +888,9 @@ def Grid(
     Raises:
         ValueError: If charts is empty, rows are mixed with flat items, a cell
             is invalid, two `layout_spec` cells overlap, `max_cols` is not a
-            positive integer, the legend location is unknown, or a figure
-            cannot be composed (missing metadata).
+            positive integer, the legend location is unknown, a figure
+            cannot be composed (missing metadata), or a log scale meets a
+            non-positive value.
     """
     check_domains(locals(), {})
     validate_max_cols(max_cols)
@@ -901,6 +908,8 @@ def Grid(
         "ymin": ymin,
         "ymax": ymax,
         "aspect_ratio": aspect_ratio,
+        "scalex": scalex,
+        "scaley": scaley,
     }
 
     if any(isinstance(item, (list, tuple)) for item in charts):

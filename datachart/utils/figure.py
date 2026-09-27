@@ -146,9 +146,24 @@ def _render_cell(
     if panel.layers:
         if overrides:
             panel = copy.copy(panel)
-            panel.settings = {**panel.settings, **overrides}
+            panel.settings = {**panel.settings, **_literal_scales(overrides, panel)}
         panel.render(target_ax)
     return target_ax, panel
+
+
+def _literal_scales(overrides: Dict[str, Any], panel: Any) -> Dict[str, Any]:
+    """The overrides with the grid's scales on the panel's literal axes.
+
+    A grid's `scalex` names the category axis and its `scaley` the value
+    axis, as a `Panel`'s do, so a horizontal panel takes them swapped.
+    """
+    if not panel.horizontal:
+        return overrides
+    swapped = {k: v for k, v in overrides.items() if k not in ("scalex", "scaley")}
+    for key, literal in (("scalex", "scaley"), ("scaley", "scalex")):
+        if key in overrides:
+            swapped[literal] = overrides[key]
+    return swapped
 
 
 def _render_subplot_panels(
@@ -540,7 +555,16 @@ GRID_LEGEND_EDGES = {
     "lower center": "bottom",
 }
 # the grid furniture laid over every cell's own panel settings
-CELL_OVERRIDE_KEYS = ("show_grid", "xmin", "xmax", "ymin", "ymax", "aspect_ratio")
+CELL_OVERRIDE_KEYS = (
+    "show_grid",
+    "xmin",
+    "xmax",
+    "ymin",
+    "ymax",
+    "aspect_ratio",
+    "scalex",
+    "scaley",
+)
 
 
 def _figure_grid_layout_impl(
@@ -562,6 +586,8 @@ def _figure_grid_layout_impl(
     ymin: Optional[float] = None,
     ymax: Optional[float] = None,
     aspect_ratio: Optional[str] = None,
+    scalex: Optional[str] = None,
+    scaley: Optional[str] = None,
 ) -> plt.Figure:
     """Internal implementation for figure grid layout.
 
@@ -581,8 +607,9 @@ def _figure_grid_layout_impl(
         sharey: Whether to share the y-axis across all subplots.
         show_legend: Whether to draw one legend for the whole grid.
         legend: The legend setting; its location picks the grid edge.
-        show_grid, xmin, xmax, ymin, ymax, aspect_ratio: Laid over every
-            cell's own setting when given.
+        show_grid, xmin, xmax, ymin, ymax, aspect_ratio, scalex, scaley: Laid
+            over every cell's own setting when given; the scales name the
+            category and value axes.
 
     Returns:
         A new matplotlib Figure containing all charts in a grid layout.
@@ -636,7 +663,10 @@ def _figure_grid_layout_impl(
         location = (legend or {}).get("location")
         grid_legend = node_legend(legend, GRID_LEGEND_EDGES.get(location, "right"))
     given = dict(
-        zip(CELL_OVERRIDE_KEYS, (show_grid, xmin, xmax, ymin, ymax, aspect_ratio))
+        zip(
+            CELL_OVERRIDE_KEYS,
+            (show_grid, xmin, xmax, ymin, ymax, aspect_ratio, scalex, scaley),
+        )
     )
     overrides = {key: value for key, value in given.items() if value is not None}
     if "show_grid" in overrides:

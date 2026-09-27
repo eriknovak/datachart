@@ -589,3 +589,59 @@ def test_hline_spans_the_final_log_axis():
     (line,) = [c for c in ax.collections if c.get_label() == "h"]
     np.testing.assert_allclose(line.get_segments()[0][:, 0], ax.get_xlim())
     plt.close("all")
+
+
+class TestGridScales:
+    def test_scales_apply_to_every_cell(self):
+        grid = Grid([LineChart(data=LINE), LineChart(data=LINE2)], scaley="log")
+        assert [scales(ax) for ax in render(grid)] == [("linear", "log")] * 2
+
+    def test_scalex_applies_to_every_cell(self):
+        grid = Grid([[LineChart(data=LINE)], [LineChart(data=LINE2)]], scalex="log")
+        assert [scales(ax) for ax in render(grid)] == [("log", "linear")] * 2
+
+    def test_explicit_scale_overrides_the_cells_own(self):
+        grid = Grid([LineChart(data=LINE, scaley="log")], scaley="linear")
+        assert scales(render(grid)[0]) == ("linear", "linear")
+
+    def test_unset_scale_keeps_the_cells_own(self):
+        grid = Grid([LineChart(data=LINE, scaley="log"), LineChart(data=LINE)])
+        assert [scales(ax) for ax in render(grid)] == [
+            ("linear", "log"),
+            ("linear", "linear"),
+        ]
+
+    def test_scaley_is_the_value_axis_of_a_horizontal_cell(self):
+        grid = Grid([hbar(), LineChart(data=LINE)], scaley="log")
+        assert [scales(ax) for ax in render(grid)] == [
+            ("log", "linear"),
+            ("linear", "log"),
+        ]
+
+    def test_nested_grid_takes_the_outer_scales(self):
+        inner = Grid([LineChart(data=LINE), LineChart(data=LINE2)])
+        grid = Grid([inner, LineChart(data=LINE)], scaley="log")
+        assert [scales(ax) for ax in render(grid) if ax.has_data()] == [
+            ("linear", "log")
+        ] * 3
+
+    def test_non_positive_data_raises(self):
+        with pytest.raises(ValueError, match=r"`scaley` 'log' cannot show the value 0"):
+            Grid([LineChart(data=LINE), LineChart(data=ZERO_LINE)], scaley="log")
+
+    def test_non_positive_data_in_a_nested_grid_raises(self):
+        inner = Grid([LineChart(data=ZERO_LINE)])
+        with pytest.raises(ValueError, match=r"`scaley` 'log'"):
+            Grid([inner, LineChart(data=LINE)], scaley="log")
+
+    def test_unknown_scale_raises(self):
+        with pytest.raises(ValueError, match="scaley"):
+            Grid([LineChart(data=LINE)], scaley="logarithmic")
+
+    def test_nested_grid_keeps_its_own_scales_when_nested(self):
+        inner = Grid([LineChart(data=LINE)], scaley="log")
+        grid = Grid([inner, LineChart(data=LINE)])
+        assert sorted(scales(ax) for ax in render(grid) if ax.has_data()) == [
+            ("linear", "linear"),
+            ("linear", "log"),
+        ]
