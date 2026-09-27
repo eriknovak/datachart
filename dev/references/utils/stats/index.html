@@ -5038,7 +5038,9 @@
         <p>The module containing the <code>stats</code> methods.</p>
 <p>The <code>stats</code> module provides the statistics behind the charts: centers and
 spreads, shape, correlation, a linear fit, bootstrap intervals, histogram bins,
-smoothers, and density estimates. Every function takes plain Python lists.</p>
+smoothers, and density estimates. Every function takes plain Python lists.
+A missing value (None, NaN, or an infinity) is ignored: each function computes
+over the finite values, and a pair with a missing half is left out.</p>
 
 
 
@@ -5154,7 +5156,8 @@ smoothers, and density estimates. Every function takes plain Python lists.</p>
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>The list of values.</p>
+                <p>The list of values; missing ones (None, NaN, infinities)
+are ignored.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -5233,7 +5236,8 @@ smoothers, and density estimates. Every function takes plain Python lists.</p>
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>The list of values.</p>
+                <p>The list of values; missing ones (None, NaN, infinities)
+are ignored.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -5295,6 +5299,8 @@ smoothers, and density estimates. Every function takes plain Python lists.</p>
     <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.utils.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">mean</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">mean</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="go">3.0</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">mean</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="go">2.0</span>
 </code></pre></div>
 
 
@@ -5312,7 +5318,8 @@ smoothers, and density estimates. Every function takes plain Python lists.</p>
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>The list of values.</p>
+                <p>The list of values; missing ones (None, NaN, infinities)
+are ignored.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -5391,7 +5398,8 @@ smoothers, and density estimates. Every function takes plain Python lists.</p>
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>The list of values.</p>
+                <p>The list of values; missing ones (None, NaN, infinities)
+are ignored.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -5473,7 +5481,8 @@ broken by taking the smallest of the most frequent values.</p>
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>The list of values.</p>
+                <p>The list of values; missing ones (None, NaN, infinities)
+are ignored.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -5577,7 +5586,8 @@ broken by taking the smallest of the most frequent values.</p>
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>The list of values.</p>
+                <p>The list of values; missing ones (None, NaN, infinities)
+are ignored.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -5656,7 +5666,8 @@ broken by taking the smallest of the most frequent values.</p>
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>The list of values.</p>
+                <p>The list of values; missing ones (None, NaN, infinities)
+are ignored.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -5735,7 +5746,8 @@ broken by taking the smallest of the most frequent values.</p>
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>The list of values.</p>
+                <p>The list of values; missing ones (None, NaN, infinities)
+are ignored.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -5833,7 +5845,8 @@ dispersion and is useful for identifying outliers.</p>
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>The list of values.</p>
+                <p>The list of values; missing ones (None, NaN, infinities)
+are ignored.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -5896,7 +5909,7 @@ datetimes, return their minimum unchanged.</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.utils.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">minimum</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">minimum</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="go">1</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="go">1.0</span>
 </code></pre></div>
 
 
@@ -5914,7 +5927,8 @@ datetimes, return their minimum unchanged.</p>
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>The list of values.</p>
+                <p>The list of values; missing ones (None, NaN, infinities)
+are ignored.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -5977,7 +5991,7 @@ datetimes, return their maximum unchanged.</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.utils.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">maximum</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">maximum</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="go">5</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="go">5.0</span>
 </code></pre></div>
 
 
@@ -5995,7 +6009,8 @@ datetimes, return their maximum unchanged.</p>
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>The list of values.</p>
+                <p>The list of values; missing ones (None, NaN, infinities)
+are ignored.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -6080,7 +6095,8 @@ left, and zero for a symmetric distribution.</p>
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>The list of values.</p>
+                <p>The list of values; missing ones (None, NaN, infinities)
+are ignored.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -6198,7 +6214,8 @@ and sharper peaks, negative for lighter tails and flatter shapes.</p>
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>The list of values.</p>
+                <p>The list of values; missing ones (None, NaN, infinities)
+are ignored.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -6302,9 +6319,9 @@ correlated as matplotlib date numbers.</p>
 
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datachart.utils.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">correlation</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">correlation</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">correlation</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]),</span> <span class="mi">6</span><span class="p">)</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="go">1.0</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">correlation</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="gp">&gt;&gt;&gt; </span><span class="nb">round</span><span class="p">(</span><span class="n">correlation</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span> <span class="mi">6</span><span class="p">)</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="go">-1.0</span>
 </code></pre></div>
 
@@ -6339,7 +6356,8 @@ correlated as matplotlib date numbers.</p>
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>The second list of values.</p>
+                <p>The second list of values; a pair with a missing half (None,
+NaN, an infinity) is left out.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -6479,7 +6497,8 @@ accepts a temporal <code>x</code>.</p>
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>The second list of values.</p>
+                <p>The second list of values; a pair with a missing half (None,
+NaN, an infinity) is left out.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -6632,7 +6651,8 @@ slope is per day and the intercept is relative to matplotlib's date epoch.</p>
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>The y values of the points, one per x value.</p>
+                <p>The y values of the points, one per x value; a point with a
+missing <code>x</code> or <code>y</code> (None, NaN, an infinity) is left out.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -6800,7 +6820,8 @@ of the interval is a ready-made error bar for a <code>BarChart</code>.</p>
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>The list of values.</p>
+                <p>The list of values; missing ones (None, NaN, infinities)
+are ignored.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -7018,7 +7039,8 @@ gives the edges explicitly. These rules are unrelated to the
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>The list of values.</p>
+                <p>The list of values; missing ones (None, NaN, infinities)
+are ignored.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -7116,7 +7138,7 @@ gives the edges explicitly. These rules are unrelated to the
             </td>
             <td class="doc-raises-details">
               <div class="doc-md-description">
-                <p>If a value is NaN, or the bin rule is unknown.</p>
+                <p>If the bin rule is unknown.</p>
               </div>
             </td>
           </tr>
@@ -7146,7 +7168,8 @@ gives the edges explicitly. These rules are unrelated to the
 
         <p>Smooths the values with a trailing moving average.</p>
 <p>Each output is the mean of the <code>window</code> values ending at that index, so
-the result lines up with the input and is <code>nan</code> until the window fills.</p>
+the result lines up with the input and is <code>nan</code> until the window fills.
+A window averages its finite values, and is <code>nan</code> when it has none.</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -7170,7 +7193,7 @@ the result lines up with the input and is <code>nan</code> until the window fill
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>The list of values.</p>
+                <p>The list of values; a window averages its finite values.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -7284,7 +7307,7 @@ not an integer.</p>
 <p>Each output blends the current value with the previous output,
 <code>alpha * value + (1 - alpha) * previous</code>, starting from the first value.
 A larger <code>alpha</code> follows the data more closely; a smaller one smooths
-harder.</p>
+harder. A missing value outputs <code>nan</code> and leaves the average unchanged.</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -7308,7 +7331,7 @@ harder.</p>
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>The list of values.</p>
+                <p>The list of values; a missing one outputs <code>nan</code>.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -7467,7 +7490,8 @@ curve's <code>x</code> values come back as datetimes, in the input's zone.</p>
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>The y values of the points, one per x value.</p>
+                <p>The y values of the points, one per x value; a point with a
+missing <code>x</code> or <code>y</code> (None, NaN, an infinity) is left out.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -7529,7 +7553,7 @@ curve's <code>x</code> values come back as datetimes, in the input's zone.</p>
             </td>
             <td class="doc-returns-details">
               <div class="doc-md-description">
-                <p><code>nan</code> for fewer than two points. NaN passes through: a NaN <code>y</code> enters</p>
+                <p><code>nan</code> for fewer than two points. A point with a missing <code>x</code> or <code>y</code></p>
               </div>
             </td>
           </tr>
@@ -7541,7 +7565,7 @@ curve's <code>x</code> values come back as datetimes, in the input's zone.</p>
             </td>
             <td class="doc-returns-details">
               <div class="doc-md-description">
-                <p>every local fit, so every smoothed <code>y</code> is <code>nan</code>.</p>
+                <p>is left out.</p>
               </div>
             </td>
           </tr>
@@ -7646,7 +7670,8 @@ integrates to 1, so it overlays a density <code>Histogram</code> of the same val
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>The values to estimate the density of.</p>
+                <p>The values to estimate the density of; missing ones (None,
+NaN, infinities) are ignored.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -7803,7 +7828,7 @@ default.</p>
             <td class="doc-raises-details">
               <div class="doc-md-description">
                 <p>If the bandwidth is invalid, there are fewer than two
-values, a value is not finite, or the values are all equal.</p>
+finite values, or the values are all equal.</p>
               </div>
             </td>
           </tr>
@@ -7889,7 +7914,8 @@ in the input's zone, and <code>xlim</code> may then be a pair of datetimes.</p>
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>The y values of the points, one per x value.</p>
+                <p>The y values of the points, one per x value; a point with a
+missing <code>x</code> or <code>y</code> (None, NaN, an infinity) is left out.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -8079,7 +8105,7 @@ is temporal while x is not, or the other way around.</p>
             <td class="doc-raises-details">
               <div class="doc-md-description">
                 <p>If the bandwidth is invalid, x and y differ in length,
-there are fewer than two points, a value is not finite, or the
+there are fewer than two finite points, or the
 points have no spread (all equal, or on one straight line).</p>
               </div>
             </td>

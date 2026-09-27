@@ -4,7 +4,7 @@
 
 The module containing the `stats` methods.
 
-The `stats` module provides the statistics behind the charts: centers and spreads, shape, correlation, a linear fit, bootstrap intervals, histogram bins, smoothers, and density estimates. Every function takes plain Python lists.
+The `stats` module provides the statistics behind the charts: centers and spreads, shape, correlation, a linear fit, bootstrap intervals, histogram bins, smoothers, and density estimates. Every function takes plain Python lists. A missing value (None, NaN, or an infinity) is ignored: each function computes over the finite values, and a pair with a missing half is left out.
 
 ## Choosing a Function
 
@@ -40,9 +40,9 @@ Examples:
 5
 ```
 
-| PARAMETER | DESCRIPTION                               |
-| --------- | ----------------------------------------- |
-| `values`  | The list of values. **TYPE:** \`list\[int |
+| PARAMETER | DESCRIPTION                                                                                 |
+| --------- | ------------------------------------------------------------------------------------------- |
+| `values`  | The list of values; missing ones (None, NaN, infinities) are ignored. **TYPE:** \`list\[int |
 
 | RETURNS | DESCRIPTION                         |
 | ------- | ----------------------------------- |
@@ -64,9 +64,9 @@ Examples:
 15.0
 ```
 
-| PARAMETER | DESCRIPTION                               |
-| --------- | ----------------------------------------- |
-| `values`  | The list of values. **TYPE:** \`list\[int |
+| PARAMETER | DESCRIPTION                                                                                 |
+| --------- | ------------------------------------------------------------------------------------------- |
+| `values`  | The list of values; missing ones (None, NaN, infinities) are ignored. **TYPE:** \`list\[int |
 
 | RETURNS | DESCRIPTION            |
 | ------- | ---------------------- |
@@ -86,11 +86,13 @@ Examples:
 >>> from datachart.utils.stats import mean
 >>> mean([1, 2, 3, 4, 5])
 3.0
+>>> mean([1, None, 3])
+2.0
 ```
 
-| PARAMETER | DESCRIPTION                               |
-| --------- | ----------------------------------------- |
-| `values`  | The list of values. **TYPE:** \`list\[int |
+| PARAMETER | DESCRIPTION                                                                                 |
+| --------- | ------------------------------------------------------------------------------------------- |
+| `values`  | The list of values; missing ones (None, NaN, infinities) are ignored. **TYPE:** \`list\[int |
 
 | RETURNS | DESCRIPTION             |
 | ------- | ----------------------- |
@@ -112,9 +114,9 @@ Examples:
 3.0
 ```
 
-| PARAMETER | DESCRIPTION                               |
-| --------- | ----------------------------------------- |
-| `values`  | The list of values. **TYPE:** \`list\[int |
+| PARAMETER | DESCRIPTION                                                                                 |
+| --------- | ------------------------------------------------------------------------------------------- |
+| `values`  | The list of values; missing ones (None, NaN, infinities) are ignored. **TYPE:** \`list\[int |
 
 | RETURNS | DESCRIPTION               |
 | ------- | ------------------------- |
@@ -138,9 +140,9 @@ Examples:
 1.0
 ```
 
-| PARAMETER | DESCRIPTION                               |
-| --------- | ----------------------------------------- |
-| `values`  | The list of values. **TYPE:** \`list\[int |
+| PARAMETER | DESCRIPTION                                                                                 |
+| --------- | ------------------------------------------------------------------------------------------- |
+| `values`  | The list of values; missing ones (None, NaN, infinities) are ignored. **TYPE:** \`list\[int |
 
 | RETURNS | DESCRIPTION                                              |
 | ------- | -------------------------------------------------------- |
@@ -168,9 +170,9 @@ Examples:
 1.4142135623730951
 ```
 
-| PARAMETER | DESCRIPTION                               |
-| --------- | ----------------------------------------- |
-| `values`  | The list of values. **TYPE:** \`list\[int |
+| PARAMETER | DESCRIPTION                                                                                 |
+| --------- | ------------------------------------------------------------------------------------------- |
+| `values`  | The list of values; missing ones (None, NaN, infinities) are ignored. **TYPE:** \`list\[int |
 
 | RETURNS | DESCRIPTION                           |
 | ------- | ------------------------------------- |
@@ -192,9 +194,9 @@ Examples:
 2.0
 ```
 
-| PARAMETER | DESCRIPTION                               |
-| --------- | ----------------------------------------- |
-| `values`  | The list of values. **TYPE:** \`list\[int |
+| PARAMETER | DESCRIPTION                                                                                 |
+| --------- | ------------------------------------------------------------------------------------------- |
+| `values`  | The list of values; missing ones (None, NaN, infinities) are ignored. **TYPE:** \`list\[int |
 
 | RETURNS | DESCRIPTION                 |
 | ------- | --------------------------- |
@@ -216,10 +218,10 @@ Examples:
 2.0
 ```
 
-| PARAMETER | DESCRIPTION                                          |
-| --------- | ---------------------------------------------------- |
-| `values`  | The list of values. **TYPE:** \`list\[int            |
-| `q`       | The quantile to calculate (0-100). **TYPE:** `float` |
+| PARAMETER | DESCRIPTION                                                                                 |
+| --------- | ------------------------------------------------------------------------------------------- |
+| `values`  | The list of values; missing ones (None, NaN, infinities) are ignored. **TYPE:** \`list\[int |
+| `q`       | The quantile to calculate (0-100). **TYPE:** `float`                                        |
 
 | RETURNS | DESCRIPTION                 |
 | ------- | --------------------------- |
@@ -243,9 +245,9 @@ Examples:
 4.5
 ```
 
-| PARAMETER | DESCRIPTION                               |
-| --------- | ----------------------------------------- |
-| `values`  | The list of values. **TYPE:** \`list\[int |
+| PARAMETER | DESCRIPTION                                                                                 |
+| --------- | ------------------------------------------------------------------------------------------- |
+| `values`  | The list of values; missing ones (None, NaN, infinities) are ignored. **TYPE:** \`list\[int |
 
 | RETURNS | DESCRIPTION                            |
 | ------- | -------------------------------------- |
@@ -266,12 +268,12 @@ Examples:
 ```
 >>> from datachart.utils.stats import minimum
 >>> minimum([1, 2, 3, 4, 5])
-1
+1.0
 ```
 
-| PARAMETER | DESCRIPTION                               |
-| --------- | ----------------------------------------- |
-| `values`  | The list of values. **TYPE:** `list[Any]` |
+| PARAMETER | DESCRIPTION                                                                                 |
+| --------- | ------------------------------------------------------------------------------------------- |
+| `values`  | The list of values; missing ones (None, NaN, infinities) are ignored. **TYPE:** `list[Any]` |
 
 | RETURNS | DESCRIPTION                                                            |
 | ------- | ---------------------------------------------------------------------- |
@@ -292,12 +294,12 @@ Examples:
 ```
 >>> from datachart.utils.stats import maximum
 >>> maximum([1, 2, 3, 4, 5])
-5
+5.0
 ```
 
-| PARAMETER | DESCRIPTION                               |
-| --------- | ----------------------------------------- |
-| `values`  | The list of values. **TYPE:** `list[Any]` |
+| PARAMETER | DESCRIPTION                                                                                 |
+| --------- | ------------------------------------------------------------------------------------------- |
+| `values`  | The list of values; missing ones (None, NaN, infinities) are ignored. **TYPE:** `list[Any]` |
 
 | RETURNS | DESCRIPTION                                                            |
 | ------- | ---------------------------------------------------------------------- |
@@ -325,9 +327,9 @@ Examples:
 1.457
 ```
 
-| PARAMETER | DESCRIPTION                               |
-| --------- | ----------------------------------------- |
-| `values`  | The list of values. **TYPE:** \`list\[int |
+| PARAMETER | DESCRIPTION                                                                                 |
+| --------- | ------------------------------------------------------------------------------------------- |
+| `values`  | The list of values; missing ones (None, NaN, infinities) are ignored. **TYPE:** \`list\[int |
 
 | RETURNS | DESCRIPTION                                                    |
 | ------- | -------------------------------------------------------------- |
@@ -356,9 +358,9 @@ Examples:
 -1.3
 ```
 
-| PARAMETER | DESCRIPTION                               |
-| --------- | ----------------------------------------- |
-| `values`  | The list of values. **TYPE:** \`list\[int |
+| PARAMETER | DESCRIPTION                                                                                 |
+| --------- | ------------------------------------------------------------------------------------------- |
+| `values`  | The list of values; missing ones (None, NaN, infinities) are ignored. **TYPE:** \`list\[int |
 
 | RETURNS | DESCRIPTION                                                         |
 | ------- | ------------------------------------------------------------------- |
@@ -387,16 +389,16 @@ Examples:
 
 ```
 >>> from datachart.utils.stats import correlation
->>> correlation([1, 2, 3, 4, 5], [1, 2, 3, 4, 5])
+>>> round(correlation([1, 2, 3, 4, 5], [1, 2, 3, 4, 5]), 6)
 1.0
->>> correlation([1, 2, 3, 4, 5], [5, 4, 3, 2, 1])
+>>> round(correlation([1, 2, 3, 4, 5], [5, 4, 3, 2, 1]), 6)
 -1.0
 ```
 
-| PARAMETER | DESCRIPTION                                                          |
-| --------- | -------------------------------------------------------------------- |
-| `x`       | The first list of values, numeric or temporal. **TYPE:** \`list\[int |
-| `y`       | The second list of values. **TYPE:** \`list\[int                     |
+| PARAMETER | DESCRIPTION                                                                                                       |
+| --------- | ----------------------------------------------------------------------------------------------------------------- |
+| `x`       | The first list of values, numeric or temporal. **TYPE:** \`list\[int                                              |
+| `y`       | The second list of values; a pair with a missing half (None, NaN, an infinity) is left out. **TYPE:** \`list\[int |
 
 | RETURNS | DESCRIPTION                          |
 | ------- | ------------------------------------ |
@@ -429,10 +431,10 @@ Examples:
 -1.0
 ```
 
-| PARAMETER | DESCRIPTION                                                          |
-| --------- | -------------------------------------------------------------------- |
-| `x`       | The first list of values, numeric or temporal. **TYPE:** \`list\[int |
-| `y`       | The second list of values. **TYPE:** \`list\[int                     |
+| PARAMETER | DESCRIPTION                                                                                                       |
+| --------- | ----------------------------------------------------------------------------------------------------------------- |
+| `x`       | The first list of values, numeric or temporal. **TYPE:** \`list\[int                                              |
+| `y`       | The second list of values; a pair with a missing half (None, NaN, an infinity) is left out. **TYPE:** \`list\[int |
 
 | RETURNS | DESCRIPTION                                                       |
 | ------- | ----------------------------------------------------------------- |
@@ -467,10 +469,10 @@ Examples:
 (2.0, 1.0, 1.0)
 ```
 
-| PARAMETER | DESCRIPTION                                                            |
-| --------- | ---------------------------------------------------------------------- |
-| `x`       | The x values of the points, numeric or temporal. **TYPE:** \`list\[int |
-| `y`       | The y values of the points, one per x value. **TYPE:** \`list\[int     |
+| PARAMETER | DESCRIPTION                                                                                                                            |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `x`       | The x values of the points, numeric or temporal. **TYPE:** \`list\[int                                                                 |
+| `y`       | The y values of the points, one per x value; a point with a missing x or y (None, NaN, an infinity) is left out. **TYPE:** \`list\[int |
 
 | RETURNS                      | DESCRIPTION                                                       |
 | ---------------------------- | ----------------------------------------------------------------- |
@@ -517,7 +519,7 @@ True
 
 | PARAMETER     | DESCRIPTION                                                                                                                         |
 | ------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `values`      | The list of values. **TYPE:** \`list\[int                                                                                           |
+| `values`      | The list of values; missing ones (None, NaN, infinities) are ignored. **TYPE:** \`list\[int                                         |
 | `statistic`   | The function of the values to estimate, mean by default. **TYPE:** `Callable[[List[Union[int, float]]], float]` **DEFAULT:** `mean` |
 | `level`       | The confidence level, strictly between 0 and 1. **TYPE:** `float` **DEFAULT:** `0.95`                                               |
 | `n_resamples` | The number of resamples to draw. **TYPE:** `int` **DEFAULT:** `1000`                                                                |
@@ -556,20 +558,20 @@ Examples:
 ([1, 2, 4], [1.0, 2.0, 3.0, 4.0])
 ```
 
-| PARAMETER | DESCRIPTION                                                                |
-| --------- | -------------------------------------------------------------------------- |
-| `values`  | The list of values. **TYPE:** \`list\[int                                  |
-| `bins`    | A bin rule name, a number of bins, or a list of bin edges. **TYPE:** \`str |
+| PARAMETER | DESCRIPTION                                                                                 |
+| --------- | ------------------------------------------------------------------------------------------- |
+| `values`  | The list of values; missing ones (None, NaN, infinities) are ignored. **TYPE:** \`list\[int |
+| `bins`    | A bin rule name, a number of bins, or a list of bin edges. **TYPE:** \`str                  |
 
 | RETURNS       | DESCRIPTION                                                     |
 | ------------- | --------------------------------------------------------------- |
 | `list[int]`   | The (counts, edges) lists, with one more edge than counts; both |
 | `list[float]` | empty for an empty list.                                        |
 
-| RAISES       | DESCRIPTION                                    |
-| ------------ | ---------------------------------------------- |
-| `TypeError`  | If values is not a list or numpy array.        |
-| `ValueError` | If a value is NaN, or the bin rule is unknown. |
+| RAISES       | DESCRIPTION                             |
+| ------------ | --------------------------------------- |
+| `TypeError`  | If values is not a list or numpy array. |
+| `ValueError` | If the bin rule is unknown.             |
 
 ## Smoothing
 
@@ -583,7 +585,7 @@ rolling_mean(
 
 Smooths the values with a trailing moving average.
 
-Each output is the mean of the `window` values ending at that index, so the result lines up with the input and is `nan` until the window fills.
+Each output is the mean of the `window` values ending at that index, so the result lines up with the input and is `nan` until the window fills. A window averages its finite values, and is `nan` when it has none.
 
 Examples:
 
@@ -593,10 +595,10 @@ Examples:
 [nan, nan, 2.0, 3.0, 4.0]
 ```
 
-| PARAMETER | DESCRIPTION                                                |
-| --------- | ---------------------------------------------------------- |
-| `values`  | The list of values. **TYPE:** \`list\[int                  |
-| `window`  | The number of values averaged, at least 1. **TYPE:** `int` |
+| PARAMETER | DESCRIPTION                                                                    |
+| --------- | ------------------------------------------------------------------------------ |
+| `values`  | The list of values; a window averages its finite values. **TYPE:** \`list\[int |
+| `window`  | The number of values averaged, at least 1. **TYPE:** `int`                     |
 
 | RETURNS       | DESCRIPTION                               |
 | ------------- | ----------------------------------------- |
@@ -617,7 +619,7 @@ ewma(
 
 Smooths the values with an exponentially weighted moving average.
 
-Each output blends the current value with the previous output, `alpha * value + (1 - alpha) * previous`, starting from the first value. A larger `alpha` follows the data more closely; a smaller one smooths harder.
+Each output blends the current value with the previous output, `alpha * value + (1 - alpha) * previous`, starting from the first value. A larger `alpha` follows the data more closely; a smaller one smooths harder. A missing value outputs `nan` and leaves the average unchanged.
 
 Examples:
 
@@ -627,10 +629,10 @@ Examples:
 [1.0, 1.5, 2.25]
 ```
 
-| PARAMETER | DESCRIPTION                                                    |
-| --------- | -------------------------------------------------------------- |
-| `values`  | The list of values. **TYPE:** \`list\[int                      |
-| `alpha`   | The weight of the current value, in (0, 1\]. **TYPE:** `float` |
+| PARAMETER | DESCRIPTION                                                          |
+| --------- | -------------------------------------------------------------------- |
+| `values`  | The list of values; a missing one outputs nan. **TYPE:** \`list\[int |
+| `alpha`   | The weight of the current value, in (0, 1\]. **TYPE:** `float`       |
 
 | RETURNS       | DESCRIPTION                               |
 | ------------- | ----------------------------------------- |
@@ -664,17 +666,17 @@ Examples:
 [(1.0, 3.0), (2.0, 5.0), (3.0, 7.0), (4.0, 9.0), (5.0, 11.0)]
 ```
 
-| PARAMETER | DESCRIPTION                                                                                   |
-| --------- | --------------------------------------------------------------------------------------------- |
-| `x`       | The x values of the points, numeric or temporal. **TYPE:** \`list\[int                        |
-| `y`       | The y values of the points, one per x value. **TYPE:** \`list\[int                            |
-| `frac`    | The share of the points each local fit uses, in (0, 1\]. **TYPE:** `float` **DEFAULT:** `0.3` |
+| PARAMETER | DESCRIPTION                                                                                                                            |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `x`       | The x values of the points, numeric or temporal. **TYPE:** \`list\[int                                                                 |
+| `y`       | The y values of the points, one per x value; a point with a missing x or y (None, NaN, an infinity) is left out. **TYPE:** \`list\[int |
+| `frac`    | The share of the points each local fit uses, in (0, 1\]. **TYPE:** `float` **DEFAULT:** `0.3`                                          |
 
-| RETURNS                  | DESCRIPTION                                                       |
-| ------------------------ | ----------------------------------------------------------------- |
-| `list[dict[str, float]]` | The {x, y} points of the smoothed curve, sorted by x; the y is    |
-| `list[dict[str, float]]` | nan for fewer than two points. NaN passes through: a NaN y enters |
-| `list[dict[str, float]]` | every local fit, so every smoothed y is nan.                      |
+| RETURNS                  | DESCRIPTION                                                    |
+| ------------------------ | -------------------------------------------------------------- |
+| `list[dict[str, float]]` | The {x, y} points of the smoothed curve, sorted by x; the y is |
+| `list[dict[str, float]]` | nan for fewer than two points. A point with a missing x or y   |
+| `list[dict[str, float]]` | is left out.                                                   |
 
 | RAISES       | DESCRIPTION                                                                     |
 | ------------ | ------------------------------------------------------------------------------- |
@@ -714,7 +716,7 @@ Examples:
 
 | PARAMETER   | DESCRIPTION                                                                                                                 |
 | ----------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `values`    | The values to estimate the density of. **TYPE:** \`list\[int                                                                |
+| `values`    | The values to estimate the density of; missing ones (None, NaN, infinities) are ignored. **TYPE:** \`list\[int              |
 | `bandwidth` | The kernel bandwidth: None or "scott" (Scott's rule), "silverman", or a scalar factor. See BANDWIDTH. **TYPE:** \`BANDWIDTH |
 | `grid_size` | The number of points the curve is evaluated on; 100 by default. **TYPE:** \`int                                             |
 | `cut`       | How many bandwidths to extend the grid past the extremes. **TYPE:** `float` **DEFAULT:** `3`                                |
@@ -725,9 +727,9 @@ Examples:
 | ------------------------ | --------------------------------------- |
 | `list[dict[str, float]]` | The {x, y} points of the density curve. |
 
-| RAISES       | DESCRIPTION                                                                                                       |
-| ------------ | ----------------------------------------------------------------------------------------------------------------- |
-| `ValueError` | If the bandwidth is invalid, there are fewer than two values, a value is not finite, or the values are all equal. |
+| RAISES       | DESCRIPTION                                                                                       |
+| ------------ | ------------------------------------------------------------------------------------------------- |
+| `ValueError` | If the bandwidth is invalid, there are fewer than two finite values, or the values are all equal. |
 
 ### datachart.utils.stats.kde2d
 
@@ -760,22 +762,22 @@ Examples:
 [[0.075, 0.038, 0.001], [0.001, 0.038, 0.075]]
 ```
 
-| PARAMETER   | DESCRIPTION                                                                                                                 |
-| ----------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `x`         | The x values of the points, numeric or temporal. **TYPE:** \`list\[int                                                      |
-| `y`         | The y values of the points, one per x value. **TYPE:** \`list\[int                                                          |
-| `bandwidth` | The kernel bandwidth: None or "scott" (Scott's rule), "silverman", or a scalar factor. See BANDWIDTH. **TYPE:** \`BANDWIDTH |
-| `grid_size` | The number of grid columns and rows, as one number or an (x, y) pair; 100 by default. **TYPE:** \`int                       |
-| `cut`       | How many bandwidths to extend the grid past the extremes. **TYPE:** `float` **DEFAULT:** `3`                                |
-| `xlim`      | The (min, max) x range of the grid; overrides the padded range. **TYPE:** \`tuple[Any, Any]                                 |
-| `ylim`      | The (min, max) y range of the grid; overrides the padded range. **TYPE:** \`tuple[float, float]                             |
-| `gridsize`  | Deprecated; use grid_size. Removed in the next release. **TYPE:** \`int                                                     |
+| PARAMETER   | DESCRIPTION                                                                                                                            |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `x`         | The x values of the points, numeric or temporal. **TYPE:** \`list\[int                                                                 |
+| `y`         | The y values of the points, one per x value; a point with a missing x or y (None, NaN, an infinity) is left out. **TYPE:** \`list\[int |
+| `bandwidth` | The kernel bandwidth: None or "scott" (Scott's rule), "silverman", or a scalar factor. See BANDWIDTH. **TYPE:** \`BANDWIDTH            |
+| `grid_size` | The number of grid columns and rows, as one number or an (x, y) pair; 100 by default. **TYPE:** \`int                                  |
+| `cut`       | How many bandwidths to extend the grid past the extremes. **TYPE:** `float` **DEFAULT:** `3`                                           |
+| `xlim`      | The (min, max) x range of the grid; overrides the padded range. **TYPE:** \`tuple[Any, Any]                                            |
+| `ylim`      | The (min, max) y range of the grid; overrides the padded range. **TYPE:** \`tuple[float, float]                                        |
+| `gridsize`  | Deprecated; use grid_size. Removed in the next release. **TYPE:** \`int                                                                |
 
 | RETURNS           | DESCRIPTION                                      |
 | ----------------- | ------------------------------------------------ |
 | `dict[str, list]` | The {x, y, z} chart dict of the density surface. |
 
-| RAISES       | DESCRIPTION                                                                                                                                                                       |
-| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `TypeError`  | If x or xlim mixes temporal and numeric values, or xlim is temporal while x is not, or the other way around.                                                                      |
-| `ValueError` | If the bandwidth is invalid, x and y differ in length, there are fewer than two points, a value is not finite, or the points have no spread (all equal, or on one straight line). |
+| RAISES       | DESCRIPTION                                                                                                                                                       |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `TypeError`  | If x or xlim mixes temporal and numeric values, or xlim is temporal while x is not, or the other way around.                                                      |
+| `ValueError` | If the bandwidth is invalid, x and y differ in length, there are fewer than two finite points, or the points have no spread (all equal, or on one straight line). |
