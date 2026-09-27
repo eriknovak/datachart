@@ -1,5 +1,6 @@
 ---
 status: accepted
+amended-by: [0085]
 ---
 
 # Nested grids render in the parent gridspec, with a reserved heading row
