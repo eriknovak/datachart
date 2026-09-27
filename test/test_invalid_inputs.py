@@ -165,13 +165,13 @@ class TestRadialRequiredY(InvalidInputCase):
 
 
 class TestStatsNan(unittest.TestCase):
-    def test_histogram_raises_on_nan(self):
-        with self.assertRaisesRegex(ValueError, "NaN"):
-            histogram([1, 2, NAN, 4])
+    def test_histogram_leaves_out_nan(self):
+        self.assertEqual(histogram([1, 2, NAN, 4]), histogram([1, 2, 4]))
 
-    def test_loess_passes_nan_through(self):
+    def test_loess_leaves_out_a_nan_point(self):
         curve = loess([1, 2, 3, 4, 5, 6], [1, 2, NAN, 4, 5, 6])
-        self.assertTrue(all(np.isnan(point["y"]) for point in curve))
+        self.assertEqual([point["x"] for point in curve], [1, 2, 4, 5, 6])
+        self.assertTrue(all(np.isfinite(point["y"]) for point in curve))
 
 
 if __name__ == "__main__":
