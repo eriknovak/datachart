@@ -3,6 +3,8 @@
 The `stats` module provides the statistics behind the charts: centers and
 spreads, shape, correlation, a linear fit, bootstrap intervals, histogram bins,
 smoothers, and density estimates. Every function takes plain Python lists.
+A missing value (None, NaN, or an infinity) is ignored: each function computes
+over the finite values, and a pair with a missing half is left out.
 
 """
 
@@ -16,7 +18,39 @@ import numpy as np
 from matplotlib.mlab import GaussianKDE
 
 from ..constants import BANDWIDTH
-from ._internal.validate import validate_bandwidth
+from ._internal.validate import is_missing, validate_bandwidth
+
+# ================================================
+# Missing values
+# ================================================
+
+
+def _present(values: Any) -> Any:
+    """The values without the missing ones: None, NaN, infinities, NaT."""
+
+    if isinstance(values, np.ndarray) and values.dtype.kind in "fiubM":
+        values = values.ravel()
+        if values.dtype.kind == "f":
+            return values[np.isfinite(values)]
+        return values[~np.isnat(values)] if values.dtype.kind == "M" else values
+    return [value for value in values if not is_missing(value)]
+
+
+def _present_pairs(x: Any, y: Any) -> Tuple[Any, Any]:
+    """The (x, y) pairs whose halves are both present, as two columns."""
+
+    keep = [not (is_missing(a) or is_missing(b)) for a, b in zip(x, y)]
+    if all(keep):
+        return x, y
+    return tuple(
+        v[np.asarray(keep)] if isinstance(v, np.ndarray) else _kept(v, keep)
+        for v in (x, y)
+    )
+
+
+def _kept(values: Any, keep: List[bool]) -> list:
+    return [value for value, kept in zip(values, keep) if kept]
+
 
 # ================================================
 # Statistical values
@@ -32,13 +66,15 @@ def count(values: List[Union[int, float]]) -> int:
         5
 
     Args:
-        values: The list of values.
+        values: The list of values; missing ones (None, NaN, infinities)
+            are ignored.
 
     Returns:
         The number of elements in the list.
     """
     if not isinstance(values, (list, np.ndarray)):
         raise TypeError("The values variable must be a list or numpy array.")
+    values = _present(values)
     return len(values)
 
 
@@ -51,13 +87,15 @@ def sum_values(values: List[Union[int, float]]) -> float:
         15.0
 
     Args:
-        values: The list of values.
+        values: The list of values; missing ones (None, NaN, infinities)
+            are ignored.
 
     Returns:
         The sum of all values.
     """
     if not isinstance(values, (list, np.ndarray)):
         raise TypeError("The values variable must be a list or numpy array.")
+    values = _present(values)
     return float(np.sum(values))
 
 
@@ -68,15 +106,19 @@ def mean(values: List[Union[int, float]]) -> float:
         >>> from datachart.utils.stats import mean
         >>> mean([1, 2, 3, 4, 5])
         3.0
+        >>> mean([1, None, 3])
+        2.0
 
     Args:
-        values: The list of values.
+        values: The list of values; missing ones (None, NaN, infinities)
+            are ignored.
 
     Returns:
         The mean of the values.
     """
     if not isinstance(values, (list, np.ndarray)):
         raise TypeError("The values variable must be a list or numpy array.")
+    values = _present(values)
     if len(values) == 0:
         return np.nan
     return float(np.mean(values))
@@ -91,7 +133,8 @@ def median(values: List[Union[int, float]]) -> float:
         3.0
 
     Args:
-        values: The list of values.
+        values: The list of values; missing ones (None, NaN, infinities)
+            are ignored.
 
     Returns:
         The median of the values.
@@ -99,6 +142,7 @@ def median(values: List[Union[int, float]]) -> float:
 
     if not isinstance(values, (list, np.ndarray)):
         raise TypeError("The values variable must be a list or numpy array.")
+    values = _present(values)
     if len(values) == 0:
         return np.nan
     return float(np.median(values))
@@ -113,7 +157,8 @@ def stdev(values: List[Union[int, float]]) -> float:
         1.4142135623730951
 
     Args:
-        values: The list of values.
+        values: The list of values; missing ones (None, NaN, infinities)
+            are ignored.
 
     Returns:
         The standard deviation of the values.
@@ -121,6 +166,7 @@ def stdev(values: List[Union[int, float]]) -> float:
 
     if not isinstance(values, (list, np.ndarray)):
         raise TypeError("The values variable must be a list or numpy array.")
+    values = _present(values)
     if len(values) == 0:
         return np.nan
     return float(np.std(values))
@@ -135,13 +181,15 @@ def variance(values: List[Union[int, float]]) -> float:
         2.0
 
     Args:
-        values: The list of values.
+        values: The list of values; missing ones (None, NaN, infinities)
+            are ignored.
 
     Returns:
         The variance of the values.
     """
     if not isinstance(values, (list, np.ndarray)):
         raise TypeError("The values variable must be a list or numpy array.")
+    values = _present(values)
     if len(values) == 0:
         return np.nan
     return float(np.var(values))
@@ -156,7 +204,8 @@ def quantile(values: List[Union[int, float]], q: float) -> float:
         2.0
 
     Args:
-        values: The list of values.
+        values: The list of values; missing ones (None, NaN, infinities)
+            are ignored.
         q: The quantile to calculate (0-100).
 
     Returns:
@@ -164,6 +213,7 @@ def quantile(values: List[Union[int, float]], q: float) -> float:
     """
     if not isinstance(values, (list, np.ndarray)):
         raise TypeError("The values variable must be a list or numpy array.")
+    values = _present(values)
     if len(values) == 0:
         return np.nan
     return float(np.percentile(values, q))
@@ -182,13 +232,15 @@ def iqr(values: List[Union[int, float]]) -> float:
         4.5
 
     Args:
-        values: The list of values.
+        values: The list of values; missing ones (None, NaN, infinities)
+            are ignored.
 
     Returns:
         The interquartile range of the values.
     """
     if not isinstance(values, (list, np.ndarray)):
         raise TypeError("The values variable must be a list or numpy array.")
+    values = _present(values)
     if len(values) == 0:
         return np.nan
     return float(np.percentile(values, 75) - np.percentile(values, 25))
@@ -209,10 +261,11 @@ def minimum(values: List[Any]) -> Any:
     Examples:
         >>> from datachart.utils.stats import minimum
         >>> minimum([1, 2, 3, 4, 5])
-        1
+        1.0
 
     Args:
-        values: The list of values.
+        values: The list of values; missing ones (None, NaN, infinities)
+            are ignored.
 
     Returns:
         The minimum of the values: a float for numbers, else the value itself.
@@ -220,6 +273,7 @@ def minimum(values: List[Any]) -> Any:
     """
     if not isinstance(values, (list, np.ndarray)):
         raise TypeError("The values variable must be a list or numpy array.")
+    values = _present(values)
     if len(values) == 0:
         return np.nan
     return _as_float(np.min(values))
@@ -234,10 +288,11 @@ def maximum(values: List[Any]) -> Any:
     Examples:
         >>> from datachart.utils.stats import maximum
         >>> maximum([1, 2, 3, 4, 5])
-        5
+        5.0
 
     Args:
-        values: The list of values.
+        values: The list of values; missing ones (None, NaN, infinities)
+            are ignored.
 
     Returns:
         The maximum of the values: a float for numbers, else the value itself.
@@ -245,6 +300,7 @@ def maximum(values: List[Any]) -> Any:
     """
     if not isinstance(values, (list, np.ndarray)):
         raise TypeError("The values variable must be a list or numpy array.")
+    values = _present(values)
     if len(values) == 0:
         return np.nan
     return _as_float(np.max(values))
@@ -261,14 +317,15 @@ def correlation(x: List[Union[int, float]], y: List[Union[int, float]]) -> float
 
     Examples:
         >>> from datachart.utils.stats import correlation
-        >>> correlation([1, 2, 3, 4, 5], [1, 2, 3, 4, 5])
+        >>> round(correlation([1, 2, 3, 4, 5], [1, 2, 3, 4, 5]), 6)
         1.0
-        >>> correlation([1, 2, 3, 4, 5], [5, 4, 3, 2, 1])
+        >>> round(correlation([1, 2, 3, 4, 5], [5, 4, 3, 2, 1]), 6)
         -1.0
 
     Args:
         x: The first list of values, numeric or temporal.
-        y: The second list of values.
+        y: The second list of values; a pair with a missing half (None,
+            NaN, an infinity) is left out.
 
     Returns:
         The Pearson correlation coefficient.
@@ -323,6 +380,8 @@ def _paired(
 ) -> Tuple[np.ndarray, np.ndarray, Callable[[np.ndarray], List[Any]]]:
     """The (x, y) inputs as float arrays, checked for type and equal length.
 
+    A pair with a missing half is left out.
+
     The third item maps float x positions back to x's type (see `_x_numbers`).
     """
 
@@ -335,6 +394,7 @@ def _paired(
         raise TypeError("The y variable must be a list or numpy array.")
     if len(x) != len(y):
         raise ValueError("x and y must have the same length.")
+    x, y = _present_pairs(x, y)
     xs, as_x = _x_numbers(x)
     return xs, np.asarray(y, dtype=float), as_x
 
@@ -356,7 +416,8 @@ def spearman(x: List[Union[int, float]], y: List[Union[int, float]]) -> float:
 
     Args:
         x: The first list of values, numeric or temporal.
-        y: The second list of values.
+        y: The second list of values; a pair with a missing half (None,
+            NaN, an infinity) is left out.
 
     Returns:
         The Spearman rank correlation; `nan` for fewer than two points or a
@@ -388,7 +449,8 @@ def mode(values: List[Union[int, float]]) -> float:
         1.0
 
     Args:
-        values: The list of values.
+        values: The list of values; missing ones (None, NaN, infinities)
+            are ignored.
 
     Returns:
         The smallest most frequent value; `nan` for an empty list.
@@ -398,6 +460,7 @@ def mode(values: List[Union[int, float]]) -> float:
     """
     if not isinstance(values, (list, np.ndarray)):
         raise TypeError("The values variable must be a list or numpy array.")
+    values = _present(values)
     if len(values) == 0:
         return np.nan
     from scipy import stats as scipy_stats
@@ -410,6 +473,7 @@ def _shape(name: str, values: Any) -> float:
 
     if not isinstance(values, (list, np.ndarray)):
         raise TypeError("The values variable must be a list or numpy array.")
+    values = _present(values)
     if len(values) < 2 or np.ptp(values) == 0:
         return np.nan
     from scipy import stats as scipy_stats
@@ -432,7 +496,8 @@ def skewness(values: List[Union[int, float]]) -> float:
         1.457
 
     Args:
-        values: The list of values.
+        values: The list of values; missing ones (None, NaN, infinities)
+            are ignored.
 
     Returns:
         The skewness of the values; `nan` for fewer than two values or a
@@ -457,7 +522,8 @@ def kurtosis(values: List[Union[int, float]]) -> float:
         -1.3
 
     Args:
-        values: The list of values.
+        values: The list of values; missing ones (None, NaN, infinities)
+            are ignored.
 
     Returns:
         The excess kurtosis of the values; `nan` for fewer than two values or
@@ -488,7 +554,8 @@ def linear_fit(
 
     Args:
         x: The x values of the points, numeric or temporal.
-        y: The y values of the points, one per x value.
+        y: The y values of the points, one per x value; a point with a
+            missing `x` or `y` (None, NaN, an infinity) is left out.
 
     Returns:
         The `(slope, intercept, r2)` of the fitted line, the slope per day
@@ -535,7 +602,8 @@ def bootstrap_ci(
         True
 
     Args:
-        values: The list of values.
+        values: The list of values; missing ones (None, NaN, infinities)
+            are ignored.
         statistic: The function of the values to estimate, `mean` by default.
         level: The confidence level, strictly between 0 and 1.
         n_resamples: The number of resamples to draw.
@@ -553,6 +621,7 @@ def bootstrap_ci(
     """
     if not isinstance(values, (list, np.ndarray)):
         raise TypeError("The values variable must be a list or numpy array.")
+    values = _present(values)
     if not 0 < level < 1:
         raise ValueError("The `level` must be strictly between 0 and 1.")
     if n_resamples < 1:
@@ -599,7 +668,8 @@ def histogram(
         ([1, 2, 4], [1.0, 2.0, 3.0, 4.0])
 
     Args:
-        values: The list of values.
+        values: The list of values; missing ones (None, NaN, infinities)
+            are ignored.
         bins: A bin rule name, a number of bins, or a list of bin edges.
 
     Returns:
@@ -608,15 +678,13 @@ def histogram(
 
     Raises:
         TypeError: If values is not a list or numpy array.
-        ValueError: If a value is NaN, or the bin rule is unknown.
+        ValueError: If the bin rule is unknown.
     """
     if not isinstance(values, (list, np.ndarray)):
         raise TypeError("The values variable must be a list or numpy array.")
+    values = _present(values)
     if len(values) == 0:
         return ([], [])
-    # NaN has no bin, and a count cannot pass it through as NaN
-    if np.isnan(np.asarray(values, dtype=float)).any():
-        raise ValueError("The `values` contain NaN, which falls in no bin.")
     edges = np.histogram_bin_edges(values, bins=bins)
     counts, _ = np.histogram(values, bins=edges)
     return (counts.tolist(), edges.tolist())
@@ -632,6 +700,7 @@ def rolling_mean(values: List[Union[int, float]], window: int) -> List[float]:
 
     Each output is the mean of the `window` values ending at that index, so
     the result lines up with the input and is `nan` until the window fills.
+    A window averages its finite values, and is `nan` when it has none.
 
     Examples:
         >>> from datachart.utils.stats import rolling_mean
@@ -639,7 +708,7 @@ def rolling_mean(values: List[Union[int, float]], window: int) -> List[float]:
         [nan, nan, 2.0, 3.0, 4.0]
 
     Args:
-        values: The list of values.
+        values: The list of values; a window averages its finite values.
         window: The number of values averaged, at least 1.
 
     Returns:
@@ -656,10 +725,14 @@ def rolling_mean(values: List[Union[int, float]], window: int) -> List[float]:
         raise TypeError("The `window` must be an integer.")
     if window < 1:
         raise ValueError("The `window` must be a positive integer.")
-    series = np.asarray(values, dtype=float)
+    series = np.asarray([np.nan if is_missing(v) else v for v in values], dtype=float)
+    present = np.isfinite(series)
     result = np.full(len(series), np.nan)
     if len(series) >= window:
-        result[window - 1 :] = np.convolve(series, np.ones(window), "valid") / window
+        sums = np.convolve(np.where(present, series, 0), np.ones(window), "valid")
+        counts = np.convolve(present, np.ones(window), "valid")
+        with np.errstate(invalid="ignore", divide="ignore"):
+            result[window - 1 :] = np.where(counts > 0, sums / counts, np.nan)
     return result.tolist()
 
 
@@ -669,7 +742,7 @@ def ewma(values: List[Union[int, float]], alpha: float) -> List[float]:
     Each output blends the current value with the previous output,
     `alpha * value + (1 - alpha) * previous`, starting from the first value.
     A larger `alpha` follows the data more closely; a smaller one smooths
-    harder.
+    harder. A missing value outputs `nan` and leaves the average unchanged.
 
     Examples:
         >>> from datachart.utils.stats import ewma
@@ -677,7 +750,7 @@ def ewma(values: List[Union[int, float]], alpha: float) -> List[float]:
         [1.0, 1.5, 2.25]
 
     Args:
-        values: The list of values.
+        values: The list of values; a missing one outputs `nan`.
         alpha: The weight of the current value, in `(0, 1]`.
 
     Returns:
@@ -692,9 +765,14 @@ def ewma(values: List[Union[int, float]], alpha: float) -> List[float]:
     if not 0 < alpha <= 1:
         raise ValueError("The `alpha` must be in the interval (0, 1].")
     result: List[float] = []
-    for value in np.asarray(values, dtype=float):
-        previous = result[-1] if result else value
-        result.append(float(alpha * value + (1 - alpha) * previous))
+    previous = None
+    for value in values:
+        if is_missing(value):
+            result.append(np.nan)
+            continue
+        previous = value if previous is None else previous
+        previous = float(alpha * value + (1 - alpha) * previous)
+        result.append(previous)
     return result
 
 
@@ -719,13 +797,14 @@ def loess(
 
     Args:
         x: The x values of the points, numeric or temporal.
-        y: The y values of the points, one per x value.
+        y: The y values of the points, one per x value; a point with a
+            missing `x` or `y` (None, NaN, an infinity) is left out.
         frac: The share of the points each local fit uses, in `(0, 1]`.
 
     Returns:
         The `{x, y}` points of the smoothed curve, sorted by `x`; the `y` is
-        `nan` for fewer than two points. NaN passes through: a NaN `y` enters
-        every local fit, so every smoothed `y` is `nan`.
+        `nan` for fewer than two points. A point with a missing `x` or `y`
+        is left out.
 
     Raises:
         TypeError: If x or y is not a list or numpy array, or x mixes
@@ -795,8 +874,6 @@ def _kde(points: np.ndarray, bandwidth, cut: float) -> Tuple[GaussianKDE, np.nda
         BANDWIDTH.check(bandwidth, "bandwidth")
     if points.shape[1] < 2:
         raise ValueError("A density estimate needs at least two points.")
-    if not np.isfinite(points).all():
-        raise ValueError("The values must be finite numbers.")
     if cut < 0:
         raise ValueError("The `cut` must be a non-negative number.")
     # a singular covariance: equal values, or 2-D points on one line
@@ -835,7 +912,8 @@ def kde1d(
         0.94
 
     Args:
-        values: The values to estimate the density of.
+        values: The values to estimate the density of; missing ones (None,
+            NaN, infinities) are ignored.
         bandwidth: The kernel bandwidth: None or "scott" (Scott's rule),
             "silverman", or a scalar factor. See `BANDWIDTH`.
         grid_size: The number of points the curve is evaluated on; 100 by
@@ -849,10 +927,10 @@ def kde1d(
 
     Raises:
         ValueError: If the bandwidth is invalid, there are fewer than two
-            values, a value is not finite, or the values are all equal.
+            finite values, or the values are all equal.
     """
     grid_size = _grid_size(grid_size, gridsize, 100)
-    points = np.asarray(values, dtype=float).reshape(1, -1)
+    points = np.asarray(_present(values), dtype=float).reshape(1, -1)
     kde, (padding,) = _kde(points, bandwidth, cut)
     lo, hi = xlim or (points.min() - padding, points.max() + padding)
     grid = np.linspace(lo, hi, grid_size)
@@ -892,7 +970,8 @@ def kde2d(
 
     Args:
         x: The x values of the points, numeric or temporal.
-        y: The y values of the points, one per x value.
+        y: The y values of the points, one per x value; a point with a
+            missing `x` or `y` (None, NaN, an infinity) is left out.
         bandwidth: The kernel bandwidth: None or "scott" (Scott's rule),
             "silverman", or a scalar factor. See `BANDWIDTH`.
         grid_size: The number of grid columns and rows, as one number or an
@@ -909,12 +988,13 @@ def kde2d(
         TypeError: If x or xlim mixes temporal and numeric values, or xlim
             is temporal while x is not, or the other way around.
         ValueError: If the bandwidth is invalid, x and y differ in length,
-            there are fewer than two points, a value is not finite, or the
+            there are fewer than two finite points, or the
             points have no spread (all equal, or on one straight line).
     """
     grid_size = _grid_size(grid_size, gridsize, 100)
     if len(x) != len(y):
         raise ValueError("x and y must have the same length.")
+    x, y = _present_pairs(x, y)
     xs, as_x = _x_numbers(x)
     points = np.asarray([xs, np.asarray(y, dtype=float)])
     kde, (pad_x, pad_y) = _kde(points, bandwidth, cut)

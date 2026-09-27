@@ -84,10 +84,10 @@ class TestDumbbellValidation(unittest.TestCase):
     def test_bool_endpoint_raises(self):
         self.assertRaisesWith("`end`", data=[{"label": "A", "start": 1, "end": True}])
 
-    def test_nan_endpoint_raises(self):
-        self.assertRaisesWith(
-            "`end`", data=[{"label": "A", "start": 1, "end": float("nan")}]
-        )
+    def test_nan_endpoint_drops_the_record(self):
+        data = [{"label": "A", "start": 1, "end": float("nan")}, *records()[1:]]
+        figure = DumbbellChart(data)
+        self.assertEqual(category_labels(figure.axes[0]), ["B", "C"])
 
     def test_duplicate_label_raises(self):
         self.assertRaisesWith(

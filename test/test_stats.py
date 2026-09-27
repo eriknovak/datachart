@@ -16,6 +16,9 @@ except ImportError:
 from datachart.charts import ContourChart
 
 from datachart.utils.stats import (
+    count,
+    stdev,
+    quantile,
     minimum,
     maximum,
     sum_values,
@@ -461,11 +464,87 @@ class TestStats(unittest.TestCase):
         with self.assertRaises(ValueError):
             kde1d([1])
         with self.assertRaises(ValueError):
-            kde1d([1, float("nan"), 3])
-        with self.assertRaises(ValueError):
             kde2d([1, 2, 3], [1, 2])
         with self.assertRaises(ValueError):
             kde2d([1, 2, 3], [1, 2, 3], cut=-1)
+
+
+# =====================================
+# Test Stats: missing values
+# =====================================
+
+NAN, INF = float("nan"), float("inf")
+# the same finite values, and with every kind of missing value among them
+FINITE = [1.0, 4.0, 2.0, 8.0, 3.0]
+HOLED = [1.0, None, 4.0, NAN, 2.0, INF, 8.0, -INF, 3.0]
+
+
+class TestStatsMissingValues(unittest.TestCase):
+    def test_mean_ignores_none(self):
+        self.assertEqual(mean([1, None, 3]), 2.0)
+
+    def test_one_value_helpers_ignore_missing_values(self):
+        helpers = {
+            "count": count,
+            "sum_values": sum_values,
+            "mean": mean,
+            "median": median,
+            "stdev": stdev,
+            "variance": variance,
+            "quantile": lambda v: quantile(v, 25),
+            "iqr": iqr,
+            "minimum": minimum,
+            "maximum": maximum,
+            "mode": mode,
+            "skewness": skewness,
+            "kurtosis": kurtosis,
+        }
+        for name, helper in helpers.items():
+            with self.subTest(helper=name):
+                self.assertEqual(helper(HOLED), helper(FINITE))
+                self.assertEqual(helper(np.array(HOLED, dtype=float)), helper(FINITE))
+
+    def test_all_missing_is_nan(self):
+        for helper in (mean, median, minimum, maximum):
+            with self.subTest(helper=helper.__name__):
+                self.assertTrue(np.isnan(helper([None, NAN])))
+
+    def test_minimum_skips_a_missing_date(self):
+        days = [datetime(2024, 1, 2), None, datetime(2024, 1, 1)]
+        self.assertEqual(minimum(days), datetime(2024, 1, 1))
+        dates = np.array(["2024-01-02", "NaT", "2024-01-03"], dtype="datetime64[D]")
+        self.assertEqual(minimum(dates), np.datetime64("2024-01-02"))
+
+    def test_paired_helpers_drop_a_pair_with_a_missing_value(self):
+        x, y = [1, 2, 3, 4, 5], [2, 1, 4, 3, 6]
+        pairs = [(1, 2), (None, 7), (2, 1), (3, INF), (3, 4), (NAN, 9), (4, 3)]
+        holed_x, holed_y = map(list, zip(*pairs, (5, 6)))
+        for helper in (correlation, spearman, linear_fit, loess):
+            with self.subTest(helper=helper.__name__):
+                self.assertEqual(helper(holed_x, holed_y), helper(x, y))
+
+    def test_bootstrap_ignores_missing_values(self):
+        self.assertEqual(bootstrap_ci(HOLED, seed=0), bootstrap_ci(FINITE, seed=0))
+
+    def test_histogram_ignores_missing_values(self):
+        self.assertEqual(histogram(HOLED, bins=3), histogram(FINITE, bins=3))
+
+    def test_densities_ignore_missing_values(self):
+        self.assertEqual(kde1d(HOLED, gridsize=5), kde1d(FINITE, gridsize=5))
+        y = [2.0, 1.0, 5.0, 3.0, 4.0]
+        holed_y = [2.0, 9.0, 1.0, 9.0, 5.0, 9.0, 3.0, 9.0, 4.0]
+        self.assertEqual(
+            kde2d(HOLED, holed_y, gridsize=4), kde2d(FINITE, y, gridsize=4)
+        )
+
+    def test_smoothers_keep_one_value_per_input(self):
+        smoothed = rolling_mean([1, None, 3, 5], 2)
+        self.assertEqual(smoothed[2:], [3.0, 4.0])
+        self.assertTrue(np.isnan(smoothed[0]))
+        averaged = ewma([1, NAN, 3], 0.5)
+        self.assertEqual(averaged[0], 1.0)
+        self.assertTrue(np.isnan(averaged[1]))
+        self.assertEqual(averaged[2], 2.0)
 
 
 # =====================================

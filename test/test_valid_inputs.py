@@ -69,7 +69,7 @@ class TestNanValues(ValidInputCase):
         self.assertEqual(heights[0], heights[1])
 
     def test_histogram_of_nan_alone_raises(self):
-        with self.assertRaisesRegex(ValueError, "histogram `s` has no finite"):
+        with self.assertRaisesRegex(ValueError, "Histogram has nothing to draw"):
             Histogram([{"x": [NAN, NAN]}], subtitle="s")
 
     def test_scatter_fit_leaves_out_a_nan_point(self):
@@ -103,17 +103,20 @@ class TestNanValues(ValidInputCase):
                 ]
                 self.assertEqual(lines[0], lines[1])
 
-    def test_group_of_nan_alone_raises(self):
+    def test_group_of_nan_alone_is_dropped(self):
         data = group([NAN, NAN], "b") + group([1, 2, 3])
         for front in (BoxPlot, ViolinPlot, SwarmPlot, RaincloudPlot, RidgelinePlot):
             with self.subTest(front=front.__name__):
-                with self.assertRaisesRegex(ValueError, "group `b` has no finite"):
-                    front(data)
+                ax = front(data).axes[0]
+                ticks = ax.get_xticklabels() + ax.get_yticklabels()
+                labels = [t.get_text() for t in ticks]
+                self.assertIn("a", labels)
+                self.assertNotIn("b", labels)
 
     def test_contour_of_nan_alone_raises(self):
         for levels in ("rice", "fd", "auto", 5):
             with self.subTest(levels=levels):
-                with self.assertRaisesRegex(ValueError, "`z` grid has no finite"):
+                with self.assertRaisesRegex(ValueError, "chart has nothing to draw"):
                     ContourChart({"z": [[NAN, NAN], [NAN, NAN]]}, levels=levels)
 
 
