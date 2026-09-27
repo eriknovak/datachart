@@ -39,7 +39,7 @@ The parameters that accept a constant, with the class in [datachart.constants](.
 | `figsize` | [`FIG_SIZE`](../constants.md#datachart.constants.FIG_SIZE) |
 | `legend={"location": ..., "alignment": ...}` | [`LEGEND_LOCATION`](../constants.md#datachart.constants.LEGEND_LOCATION), [`LEGEND_ALIGN`](../constants.md#datachart.constants.LEGEND_ALIGN) |
 | `show_grid` | [`SHOW_GRID`](../constants.md#datachart.constants.SHOW_GRID) |
-| `mode` | [`SWARM_MODE`](../constants.md#datachart.constants.SWARM_MODE) |
+| `swarm_mode` | [`SWARM_MODE`](../constants.md#datachart.constants.SWARM_MODE) |
 | `value_format` | [`VALUE_FORMAT`](../constants.md#datachart.constants.VALUE_FORMAT) |
 | `aspect_ratio` | [`ASPECT_RATIO`](../constants.md#datachart.constants.ASPECT_RATIO) |
 | `orientation` | [`ORIENTATION`](../constants.md#datachart.constants.ORIENTATION) |

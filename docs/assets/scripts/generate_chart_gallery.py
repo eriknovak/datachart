@@ -342,7 +342,7 @@ def contour():
     )
     return ContourChart(
         data={"x": x.tolist(), "y": y.tolist(), "z": z.tolist()},
-        filled=True,
+        fill=True,
         xlabel="x",
         ylabel="y",
         figsize=FIGSIZE,
@@ -355,7 +355,7 @@ def hexbin():
     xy = np.vstack([a, b])
     return HexbinChart(
         data={"x": xy[:, 0].tolist(), "y": xy[:, 1].tolist()},
-        gridsize=22,
+        grid_size=22,
         xlabel="x",
         ylabel="y",
         figsize=FIGSIZE,
