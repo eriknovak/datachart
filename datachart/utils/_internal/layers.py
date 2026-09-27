@@ -10346,7 +10346,7 @@ class NetworkLayer(PointLabelMixin, Layer):
             }
         self.node_markers = [self.group_markers.get(g, plain) for g in groups]
         self.label_position = (
-            theme_default("networkchart", self.settings, "label_position")
+            theme_default("networkchart", self.settings, "label_position", self.style)
             or NETWORK_LABEL_POSITION.DEFAULT
         )
         roles = [node.get("emphasis") for node in self.nodes]

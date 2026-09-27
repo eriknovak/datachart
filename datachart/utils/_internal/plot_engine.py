@@ -138,9 +138,10 @@ def render(chart_type: str, params: dict) -> plt.Figure:
             raise ValueError(reason)
     check_domains(params, kind.domains)
     styles = params.get("style")
+    parameters = {key: name for name, key in kind.theme_defaults.items()}
     for style in styles if isinstance(styles, list) else [styles]:
         # `render`, the front, then the caller
-        warn_aliases(style or {}, stacklevel=3)
+        warn_aliases(style or {}, stacklevel=3, parameters=parameters)
     chart_keys = kind.per_chart_keys
     per_chart = {k: v for k, v in params.items() if k in chart_keys}
     settings = {k: v for k, v in params.items() if k not in chart_keys and k != "data"}
