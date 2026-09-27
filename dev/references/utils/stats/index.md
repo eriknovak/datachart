@@ -566,10 +566,10 @@ Examples:
 | `list[int]`   | The (counts, edges) lists, with one more edge than counts; both |
 | `list[float]` | empty for an empty list.                                        |
 
-| RAISES       | DESCRIPTION                             |
-| ------------ | --------------------------------------- |
-| `TypeError`  | If values is not a list or numpy array. |
-| `ValueError` | If the bin rule is unknown.             |
+| RAISES       | DESCRIPTION                                    |
+| ------------ | ---------------------------------------------- |
+| `TypeError`  | If values is not a list or numpy array.        |
+| `ValueError` | If a value is NaN, or the bin rule is unknown. |
 
 ## Smoothing
 
@@ -670,10 +670,11 @@ Examples:
 | `y`       | The y values of the points, one per x value. **TYPE:** \`list\[int                            |
 | `frac`    | The share of the points each local fit uses, in (0, 1\]. **TYPE:** `float` **DEFAULT:** `0.3` |
 
-| RETURNS                  | DESCRIPTION                                                    |
-| ------------------------ | -------------------------------------------------------------- |
-| `list[dict[str, float]]` | The {x, y} points of the smoothed curve, sorted by x; the y is |
-| `list[dict[str, float]]` | nan for fewer than two points.                                 |
+| RETURNS                  | DESCRIPTION                                                       |
+| ------------------------ | ----------------------------------------------------------------- |
+| `list[dict[str, float]]` | The {x, y} points of the smoothed curve, sorted by x; the y is    |
+| `list[dict[str, float]]` | nan for fewer than two points. NaN passes through: a NaN y enters |
+| `list[dict[str, float]]` | every local fit, so every smoothed y is nan.                      |
 
 | RAISES       | DESCRIPTION                                                                     |
 | ------------ | ------------------------------------------------------------------------------- |

@@ -28228,9 +28228,9 @@ Examples:
 | ------------ | --------------------------------------------------- |
 | `plt.Figure` | A matplotlib Figure containing the overlaid charts. |
 
-| RAISES       | DESCRIPTION                                                                                                                                                                        |
-| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ValueError` | If charts is empty, an item is not a figure or a valid dict, a figure cannot be overlaid (missing metadata, Grid figure), or the figures mix horizontal and vertical orientations. |
+| RAISES       | DESCRIPTION                                                                                                                                                                                                                                                                                               |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ValueError` | If charts is empty, an item is not a figure or a valid dict (an unknown key, a y_axis other than "left", "right" or "auto", a non-integer z_order), the legend location is unknown, a figure cannot be overlaid (missing metadata, Grid figure), or the figures mix horizontal and vertical orientations. |
 
 ### datachart.utils.Grid
 
@@ -28326,9 +28326,9 @@ Examples:
 | ------------ | --------------------------------------------------------------- |
 | `plt.Figure` | A new matplotlib Figure containing all charts in a grid layout. |
 
-| RAISES       | DESCRIPTION                                                                                                               |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------- |
-| `ValueError` | If charts is empty, rows are mixed with flat items, a cell is invalid, or a figure cannot be composed (missing metadata). |
+| RAISES       | DESCRIPTION                                                                                                                                                                                                                  |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ValueError` | If charts is empty, rows are mixed with flat items, a cell is invalid, two layout_spec cells overlap, max_cols is not a positive integer, the legend location is unknown, or a figure cannot be composed (missing metadata). |
 
 ### datachart.utils.Annotate
 
@@ -29009,10 +29009,10 @@ Examples:
 | `list[int]`   | The (counts, edges) lists, with one more edge than counts; both |
 | `list[float]` | empty for an empty list.                                        |
 
-| RAISES       | DESCRIPTION                             |
-| ------------ | --------------------------------------- |
-| `TypeError`  | If values is not a list or numpy array. |
-| `ValueError` | If the bin rule is unknown.             |
+| RAISES       | DESCRIPTION                                    |
+| ------------ | ---------------------------------------------- |
+| `TypeError`  | If values is not a list or numpy array.        |
+| `ValueError` | If a value is NaN, or the bin rule is unknown. |
 
 ## Smoothing
 
@@ -29113,10 +29113,11 @@ Examples:
 | `y`       | The y values of the points, one per x value. **TYPE:** \`list\[int                            |
 | `frac`    | The share of the points each local fit uses, in (0, 1\]. **TYPE:** `float` **DEFAULT:** `0.3` |
 
-| RETURNS                  | DESCRIPTION                                                    |
-| ------------------------ | -------------------------------------------------------------- |
-| `list[dict[str, float]]` | The {x, y} points of the smoothed curve, sorted by x; the y is |
-| `list[dict[str, float]]` | nan for fewer than two points.                                 |
+| RETURNS                  | DESCRIPTION                                                       |
+| ------------------------ | ----------------------------------------------------------------- |
+| `list[dict[str, float]]` | The {x, y} points of the smoothed curve, sorted by x; the y is    |
+| `list[dict[str, float]]` | nan for fewer than two points. NaN passes through: a NaN y enters |
+| `list[dict[str, float]]` | every local fit, so every smoothed y is nan.                      |
 
 | RAISES       | DESCRIPTION                                                                     |
 | ------------ | ------------------------------------------------------------------------------- |

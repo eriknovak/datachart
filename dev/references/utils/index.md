@@ -140,9 +140,9 @@ Examples:
 | ------------ | --------------------------------------------------- |
 | `plt.Figure` | A matplotlib Figure containing the overlaid charts. |
 
-| RAISES       | DESCRIPTION                                                                                                                                                                        |
-| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ValueError` | If charts is empty, an item is not a figure or a valid dict, a figure cannot be overlaid (missing metadata, Grid figure), or the figures mix horizontal and vertical orientations. |
+| RAISES       | DESCRIPTION                                                                                                                                                                                                                                                                                               |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ValueError` | If charts is empty, an item is not a figure or a valid dict (an unknown key, a y_axis other than "left", "right" or "auto", a non-integer z_order), the legend location is unknown, a figure cannot be overlaid (missing metadata, Grid figure), or the figures mix horizontal and vertical orientations. |
 
 ### datachart.utils.Grid
 
@@ -238,9 +238,9 @@ Examples:
 | ------------ | --------------------------------------------------------------- |
 | `plt.Figure` | A new matplotlib Figure containing all charts in a grid layout. |
 
-| RAISES       | DESCRIPTION                                                                                                               |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------- |
-| `ValueError` | If charts is empty, rows are mixed with flat items, a cell is invalid, or a figure cannot be composed (missing metadata). |
+| RAISES       | DESCRIPTION                                                                                                                                                                                                                  |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ValueError` | If charts is empty, rows are mixed with flat items, a cell is invalid, two layout_spec cells overlap, max_cols is not a positive integer, the legend location is unknown, or a figure cannot be composed (missing metadata). |
 
 ### datachart.utils.Annotate
 

@@ -7116,7 +7116,7 @@ gives the edges explicitly. These rules are unrelated to the
             </td>
             <td class="doc-raises-details">
               <div class="doc-md-description">
-                <p>If the bin rule is unknown.</p>
+                <p>If a value is NaN, or the bin rule is unknown.</p>
               </div>
             </td>
           </tr>
@@ -7529,7 +7529,19 @@ curve's <code>x</code> values come back as datetimes, in the input's zone.</p>
             </td>
             <td class="doc-returns-details">
               <div class="doc-md-description">
-                <p><code>nan</code> for fewer than two points.</p>
+                <p><code>nan</code> for fewer than two points. NaN passes through: a NaN <code>y</code> enters</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code><span title="list">list</span>[<span title="dict">dict</span>[<span title="str">str</span>, <span title="float">float</span>]]</code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                <p>every local fit, so every smoothed <code>y</code> is <code>nan</code>.</p>
               </div>
             </td>
           </tr>

@@ -4951,9 +4951,11 @@ count ranks across every composed series. See
             </td>
             <td class="doc-raises-details">
               <div class="doc-md-description">
-                <p>If charts is empty, an item is not a figure or a valid dict,
-a figure cannot be overlaid (missing metadata, Grid figure), or the
-figures mix horizontal and vertical orientations.</p>
+                <p>If charts is empty, an item is not a figure or a valid dict
+(an unknown key, a <code>y_axis</code> other than "left", "right" or "auto",
+a non-integer <code>z_order</code>), the legend location is unknown, a figure
+cannot be overlaid (missing metadata, Grid figure), or the figures
+mix horizontal and vertical orientations.</p>
               </div>
             </td>
           </tr>
@@ -5439,7 +5441,9 @@ Default: each cell's own. See
             <td class="doc-raises-details">
               <div class="doc-md-description">
                 <p>If charts is empty, rows are mixed with flat items, a cell
-is invalid, or a figure cannot be composed (missing metadata).</p>
+is invalid, two <code>layout_spec</code> cells overlap, <code>max_cols</code> is not a
+positive integer, the legend location is unknown, or a figure
+cannot be composed (missing metadata).</p>
               </div>
             </td>
           </tr>
