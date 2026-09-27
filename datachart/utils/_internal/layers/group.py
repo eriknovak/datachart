@@ -30,7 +30,7 @@ from ..config_helpers import (
     get_violin_inner_style,
     get_ridgeline_style,
 )
-from ...stats import iqr, kde1d
+from ...stats import kde1d
 from ....constants import (
     COLORS,
     DUMBBELL_SORT_KEY,
