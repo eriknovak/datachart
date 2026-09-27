@@ -1,5 +1,6 @@
 ---
 status: accepted
+amended-by: [0082]
 ---
 
 # The builder is the one record-reading seam; the row declares the record shape and the dataset policy

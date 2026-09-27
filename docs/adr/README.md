@@ -40,7 +40,8 @@ adds no tag; one that reverses, narrows, widens or replaces a commitment does.
 - [0065](0065-chart-kind-descriptor.md) — A chart front's identity is one `ChartKind` row, not eight registries (amended by [0069](0069-record-reading-seam.md))
 - [0066](0066-front-body-one-call.md) — A chart front's body is one engine call; the row declares the key split (amended by [0067](0067-shared-parameter-table.md), [0069](0069-record-reading-seam.md))
 - [0067](0067-shared-parameter-table.md) — A shared parameter has one name, type and default; a table enforces it (amended by [0069](0069-record-reading-seam.md))
-- [0069](0069-record-reading-seam.md) — The builder is the one record-reading seam; the row declares the record shape and the dataset policy
+- [0069](0069-record-reading-seam.md) — The builder is the one record-reading seam; the row declares the record shape and the dataset policy (amended by [0082](0082-missing-values-not-drawn.md))
+- [0082](0082-missing-values-not-drawn.md) — A missing value is not drawn; the builder normalises it once
 
 ## Composition: Panel and Grid
 
@@ -90,7 +91,7 @@ theme faces out of the wheel.
 
 ## Axes, scales, and colormaps
 
-- [0037](0037-temporal-axis.md) — The axis kind is a panel snapshot, and date strings are never parsed
+- [0037](0037-temporal-axis.md) — The axis kind is a panel snapshot, and date strings are never parsed (amended by [0082](0082-missing-values-not-drawn.md))
 - [0056](0056-centred-norm-and-diverging-colormap.md) — A centred norm selects the theme's diverging colormap
 
 ## Annotations and reference marks
