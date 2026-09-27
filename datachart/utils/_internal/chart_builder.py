@@ -2,16 +2,19 @@
 
 The data shape and the front's `ChartKind` row alone decide how many charts
 there are, and every record comes out under the row's canonical keys
-(ADR 0069).
+(ADR 0069). A missing value (None, NaN, an infinity) reads as NaN, and a
+record whose position is missing is dropped (ADR 0082).
 """
 
 import warnings
 from collections.abc import Iterable, Iterator
+from numbers import Real
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 
 from .chart_kinds import ChartKind, chart_kind
+from .validate import is_missing
 
 # extra attrs whose single value is itself a list, like the tick positions
 LIST_TYPE_EXTRA_ATTRS = {"dimensions"}
@@ -481,7 +484,8 @@ def build_charts_structure(
 
     Raises:
         ValueError: If the chart type has no row, the data misses the row's
-            dict shape, or a record misses a required key.
+            dict shape, a record misses a required key, or every value the
+            data gives is missing.
     """
     kind = chart_kind(chart_type)
     data = _dict_datasets(data) if kind.dict_data else _record_datasets(kind, data)
@@ -531,11 +535,112 @@ def build_charts_structure(
         ]
     else:
         charts = [build_chart_dict_single(data, **common_args)]
+    # a chart given data whose every value is missing has nothing to draw
+    emptied = []
     if kind.record_keys:
         for index, chart in enumerate(charts):
             where = f"data[{index}]" if is_multi_chart else "data"
-            chart["data"] = canonical_records(kind, chart, where, required_keys)
+            records = canonical_records(kind, chart, where, required_keys)
+            chart["data"] = _drawn_records(kind, records)
+            emptied.append(bool(records) and not _has_values(kind, chart))
+    elif kind.dict_data:
+        for chart in charts:
+            if isinstance(chart["data"], dict):
+                chart["data"] = _drawn_columns(kind, chart["data"])
+            emptied.append(not _has_values(kind, chart))
+    if charts and all(emptied) and len(emptied) == len(charts):
+        raise ValueError(
+            f"{_front(kind)} has nothing to draw: every value in `data` is "
+            "missing (None, NaN, or inf)."
+        )
     return charts
+
+
+def _drawn_records(kind: ChartKind, records: List[dict]) -> List[dict]:
+    # a missing position drops the record; a missing value stays as NaN
+    drawn = []
+    for record in records:
+        if any(is_missing(record.get(key, 0)) for key in kind.position_keys):
+            continue
+        keys = [k for k in (*kind.position_keys, *kind.value_keys) if k in record]
+        drawn.append({**record, **{key: _missing_as_nan(record[key]) for key in keys}})
+    return drawn
+
+
+def _drawn_columns(kind: ChartKind, data: dict) -> dict:
+    # a grid front's columns drop the rows whose position is missing
+    positions = [data[key] for key in kind.position_keys if key in data]
+    kept = [
+        index
+        for index, row in enumerate(zip(*positions))
+        if not any(is_missing(value) for value in row)
+    ]
+    if positions and len(kept) < len(positions[0]):
+        size = len(positions[0])
+        data = {
+            key: (
+                [values[index] for index in kept]
+                if isinstance(values, (list, np.ndarray)) and len(values) == size
+                else values
+            )
+            for key, values in data.items()
+        }
+    return {
+        **data,
+        **{k: _missing_as_nan(data[k]) for k in kind.value_keys if k in data},
+    }
+
+
+def _has_values(kind: ChartKind, chart: dict) -> bool:
+    # the value keys decide, or the position keys where a record has none
+
+    data = chart.get("data")
+    if isinstance(data, dict):
+        columns = [data]
+    elif isinstance(data, list):
+        columns = [record for record in data if isinstance(record, dict)]
+    else:
+        return True
+    for keys in (kind.value_keys, kind.position_keys):
+        cells = [column[key] for column in columns for key in keys if key in column]
+        if cells:
+            return any(_holds_a_value(cell) for cell in cells)
+    return not kind.position_keys
+
+
+def _holds_a_value(cell: Any) -> bool:
+    if isinstance(cell, (list, tuple, np.ndarray)):
+        return any(_holds_a_value(value) for value in cell)
+    return not is_missing(cell)
+
+
+def _missing_as_nan(value: Any) -> Any:
+    """A value with its missing numbers as NaN; anything else as given.
+
+    A grid or list of numbers holding a missing one reads as a float array;
+    finite numbers, dates, and strings keep their type.
+    """
+
+    if is_missing(value) and not isinstance(value, np.datetime64):
+        return np.nan
+    if not isinstance(value, (list, tuple, np.ndarray)):
+        return value
+    try:
+        cells = np.asarray(value, dtype=object).ravel()
+    except ValueError:
+        # a ragged grid is the layer's to reject
+        return value
+    numbers = all(
+        cell is None or (isinstance(cell, Real) and not isinstance(cell, bool))
+        for cell in cells
+    )
+    if not numbers or not any(is_missing(cell) for cell in cells):
+        return value
+    array = np.asarray(value, dtype=object)
+    array[array == None] = np.nan  # noqa: E711 - elementwise comparison
+    array = array.astype(float)
+    array[~np.isfinite(array)] = np.nan
+    return array
 
 
 def canonical_records(

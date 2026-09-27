@@ -69,7 +69,7 @@ class TestNanValues(ValidInputCase):
         self.assertEqual(heights[0], heights[1])
 
     def test_histogram_of_nan_alone_raises(self):
-        with self.assertRaisesRegex(ValueError, "histogram `s` has no finite"):
+        with self.assertRaisesRegex(ValueError, "Histogram has nothing to draw"):
             Histogram([{"x": [NAN, NAN]}], subtitle="s")
 
     def test_scatter_fit_leaves_out_a_nan_point(self):
@@ -113,7 +113,7 @@ class TestNanValues(ValidInputCase):
     def test_contour_of_nan_alone_raises(self):
         for levels in ("rice", "fd", "auto", 5):
             with self.subTest(levels=levels):
-                with self.assertRaisesRegex(ValueError, "`z` grid has no finite"):
+                with self.assertRaisesRegex(ValueError, "chart has nothing to draw"):
                     ContourChart({"z": [[NAN, NAN], [NAN, NAN]]}, levels=levels)
 
 

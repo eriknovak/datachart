@@ -982,11 +982,13 @@ def validate_dumbbell_sort_by(sort, sort_by) -> str:
 
 
 def is_missing(value) -> bool:
-    """Whether a value is absent: None or NaN."""
+    """Whether a value is missing: None, NaN, an infinity, or a NaT date."""
 
-    return value is None or (
-        isinstance(value, (float, np.floating)) and math.isnan(value)
-    )
+    if value is None:
+        return True
+    if isinstance(value, (float, np.floating)):
+        return not math.isfinite(value)
+    return isinstance(value, np.datetime64) and np.isnat(value)
 
 
 def validate_finite_groups(chart: dict, name: str) -> None:

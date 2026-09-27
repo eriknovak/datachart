@@ -331,5 +331,127 @@ class TestMarkLists(unittest.TestCase):
         self.assertEqual(self.vline_positions(axes[1]), [2, 3])
 
 
+MISSING = (None, float("nan"), float("inf"), -float("inf"))
+
+
+def finite_record(kind):
+    """A record whose position and value keys hold the number 1."""
+
+    keys = set(kind.position_keys) | set(kind.value_keys)
+    return {**record(kind), **{key: 1 for key in keys}}
+
+
+class TestMissingValues(unittest.TestCase):
+    def record_rows(self):
+        for name, kind in CHART_KINDS.items():
+            if not kind.dict_data and kind.record_keys:
+                yield name, kind
+
+    def test_every_record_row_declares_a_position(self):
+        for name, kind in self.record_rows():
+            with self.subTest(kind=name):
+                self.assertTrue(kind.position_keys)
+                self.assertLessEqual(set(kind.position_keys), set(kind.record_keys))
+                self.assertLessEqual(set(kind.value_keys), set(kind.record_keys))
+
+    def test_a_missing_position_drops_the_record(self):
+        for name, kind in self.record_rows():
+            for key in kind.position_keys:
+                for missing in MISSING:
+                    with self.subTest(kind=name, key=key, missing=missing):
+                        kept = finite_record(kind)
+                        data = [kept, {**kept, key: missing}]
+                        (chart,) = build_charts_structure(name, data)
+                        self.assertEqual(chart["data"], [kept])
+
+    def test_a_missing_value_reads_as_nan(self):
+        for name, kind in self.record_rows():
+            for key in kind.value_keys:
+                for missing in MISSING:
+                    with self.subTest(kind=name, key=key, missing=missing):
+                        kept = finite_record(kind)
+                        data = [{**kept, key: missing}, kept]
+                        (chart,) = build_charts_structure(name, data)
+                        self.assertTrue(np.isnan(chart["data"][0][key]))
+                        self.assertEqual(chart["data"][1], kept)
+
+    def test_finite_values_keep_their_type(self):
+        data = [{"x": 1, "y": 2}, {"x": 2, "y": 3.5}]
+        (chart,) = build_charts_structure("linechart", data)
+        self.assertEqual(chart["data"], data)
+        self.assertIsInstance(chart["data"][0]["y"], int)
+
+    def test_a_list_of_observations_reads_missing_as_nan(self):
+        (chart,) = build_charts_structure("histogram", [{"x": [1, None, np.inf]}])
+        x = chart["data"][0]["x"]
+        self.assertEqual(x[0], 1)
+        self.assertTrue(np.isnan(x[1:]).all())
+
+    def test_a_missing_date_drops_the_record(self):
+        kept = {"x": date(2024, 1, 1), "y": 1}
+        data = [kept, {"x": np.datetime64("NaT"), "y": 2}]
+        (chart,) = build_charts_structure("linechart", data)
+        self.assertEqual(chart["data"], [kept])
+
+    def test_an_absent_key_still_raises(self):
+        with self.assertRaisesRegex(ValueError, "record `data\\[0\\]` has no `y`"):
+            build_charts_structure("linechart", [{"x": 1}])
+
+    def test_every_value_missing_raises(self):
+        for data in (
+            [{"x": 1, "y": None}, {"x": None, "y": 1}],
+            [[{"x": None, "y": 1}]],
+        ):
+            with self.subTest(data=data):
+                with self.assertRaisesRegex(
+                    ValueError, "Line chart has nothing to draw"
+                ):
+                    build_charts_structure("linechart", data)
+        with self.assertRaisesRegex(ValueError, "Heatmap has nothing to draw"):
+            build_charts_structure("heatmap", {"z": [[None, np.nan]]})
+
+    def test_one_chart_with_values_is_enough(self):
+        data = [[{"x": 1, "y": None}], [{"x": 1, "y": 2}]]
+        charts = build_charts_structure("linechart", data)
+        self.assertEqual(len(charts), 2)
+
+    def test_empty_data_is_not_missing(self):
+        self.assertEqual(build_charts_structure("linechart", []), [{"data": []}])
+
+    def test_caller_records_are_not_mutated(self):
+        data = [{"x": 1, "y": None}, {"x": None, "y": 1}, {"x": 2, "y": 3}]
+        before = copy.deepcopy(data)
+        build_charts_structure("linechart", data)
+        self.assertEqual(data, before)
+
+    def test_a_grid_with_a_missing_cell_is_a_float_array(self):
+        for name in ("heatmap", "contourchart"):
+            for missing in MISSING:
+                with self.subTest(kind=name, missing=missing):
+                    (chart,) = build_charts_structure(name, {"z": [[1, missing]]})
+                    z = chart["data"]["z"]
+                    self.assertEqual(z.dtype, float)
+                    self.assertEqual(z[0, 0], 1)
+                    self.assertTrue(np.isnan(z[0, 1]))
+
+    def test_a_finite_grid_is_left_as_given(self):
+        for name, grid in GRIDS.items():
+            with self.subTest(kind=name):
+                self.assertEqual(build_charts_structure(name, grid), [{"data": grid}])
+
+    def test_a_missing_grid_position_drops_the_row(self):
+        (chart,) = build_charts_structure(
+            "hexbinchart", {"x": [0, None, 2], "y": [1, 1, np.inf], "c": [1, 2, 3]}
+        )
+        self.assertEqual(chart["data"], {"x": [0], "y": [1], "c": [1]})
+        (chart,) = build_charts_structure(
+            "calendarheatmap",
+            {"date": [date(2024, 1, 1), None, date(2024, 1, 3)], "value": [None, 2, 3]},
+        )
+        self.assertEqual(chart["data"]["date"], [date(2024, 1, 1), date(2024, 1, 3)])
+        self.assertTrue(np.isnan(chart["data"]["value"][0]))
+        self.assertEqual(chart["data"]["value"][1], 3)
+
+
 if __name__ == "__main__":
     unittest.main()

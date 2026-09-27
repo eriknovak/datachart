@@ -243,6 +243,10 @@ class ChartKind:
         record_keys: The canonical keys of one record, in order; each is a
             remap parameter the builder reads the caller's key name from.
         required_keys: The record keys every record must carry.
+        position_keys: The record keys, or a grid front's columns, placed on
+            an axis; a record whose position is missing is not drawn.
+        value_keys: The numeric record keys, or a grid front's grids and
+            columns, whose missing values read as NaN.
         required_by: The record keys every record must carry, given the
             settings, for a front whose marks read different keys; it
             overrides `required_keys`.
@@ -301,6 +305,8 @@ class ChartKind:
     projection: Optional[str] = None
     record_keys: Tuple[str, ...] = ()
     required_keys: Tuple[str, ...] = ()
+    position_keys: Tuple[str, ...] = ()
+    value_keys: Tuple[str, ...] = ()
     required_by: Optional[Callable[[dict], Tuple[str, ...]]] = None
     check_records: Optional[Callable[[List[dict], dict], None]] = None
     expand: Optional[Expand] = None
@@ -554,6 +560,8 @@ _KINDS = (
         domains={"label_position": LINE_LABEL_POSITION},
         record_keys=("x", "y", "yerr"),
         required_keys=("x", "y"),
+        position_keys=("x",),
+        value_keys=("y",),
         tighten_xlim=True,
         emphasis_units=series_units("y"),
         emphasis_by="mean",
@@ -568,6 +576,8 @@ _KINDS = (
         },
         record_keys=("x", "y"),
         required_keys=("x", "y"),
+        position_keys=("x",),
+        value_keys=("y",),
         tighten_xlim=True,
         emphasis_units=series_units("y"),
         emphasis_by="mean",
@@ -579,6 +589,8 @@ _KINDS = (
         domains={"rank_by": BUMP_RANK, "label_position": LINE_LABEL_POSITION},
         record_keys=("x", "y"),
         required_keys=("x", "y"),
+        position_keys=("x",),
+        value_keys=("y",),
         legend_default=_bump_legend,
         # a bump chart's ranks read from the lines and labels
         gridless=_always,
@@ -596,6 +608,8 @@ _KINDS = (
         BarLayer,
         record_keys=("label", "y", "yerr"),
         required_keys=("label", "y"),
+        position_keys=("label",),
+        value_keys=("y",),
         defaults={"orientation": ORIENTATION.VERTICAL},
         swaps_horizontal_labels=True,
         emphasis_units=bar_units,
@@ -608,6 +622,8 @@ _KINDS = (
         BarLayer,
         record_keys=("label", "y", "yerr"),
         required_keys=("label", "y"),
+        position_keys=("label",),
+        value_keys=("y",),
         # the panel mirrors the value ticks to both halves (ADR 0017)
         figure_keys=frozenset({"xticks", "xticklabels", "xtickrotate"}),
         defaults={"pyramid": True, "orientation": ORIENTATION.HORIZONTAL},
@@ -626,6 +642,8 @@ _KINDS = (
         domains={"mark": RADIAL_TYPE, "direction": RADIAL_DIRECTION},
         # the histogram visual reads `x`, the others `label` and `y`
         record_keys=("label", "x", "y", "yerr"),
+        position_keys=("label", "x"),
+        value_keys=("y",),
         required_by=_radial_required,
         build=_radial_layers,
         projection="polar",
@@ -654,6 +672,8 @@ _KINDS = (
         defaults={"aspect_ratio": ASPECT_RATIO.EQUAL, "max_cols": 1},
         dict_data=True,
         data_keys=("date", "value"),
+        position_keys=("date",),
+        value_keys=("value",),
         record_rows=True,
         # one calendar per year of each dataset
         expand=_year_panels,
@@ -677,6 +697,7 @@ _KINDS = (
         },
         record_keys=("task", "start", "end", "group", "progress", "depends_on"),
         required_keys=("task", "start", "end"),
+        position_keys=("start", "end"),
         check_records=_check_tasks,
         defaults={"max_cols": 1, "orientation": ORIENTATION.HORIZONTAL},
         legend_default=_gantt_legend,
@@ -698,6 +719,7 @@ _KINDS = (
         },
         record_keys=("label", "start", "end"),
         required_keys=("label", "start", "end"),
+        position_keys=("label", "start", "end"),
         check_records=_check_dumbbells,
         defaults={"orientation": ORIENTATION.HORIZONTAL},
         legend_default=_dumbbell_legend,
@@ -712,6 +734,7 @@ _KINDS = (
         HistogramLayer,
         record_keys=("x",),
         required_keys=("x",),
+        position_keys=("x",),
         defaults={"orientation": ORIENTATION.VERTICAL},
         # histograms stack by default; bars group (ADR 0014)
         bar_mode="stack",
@@ -720,7 +743,14 @@ _KINDS = (
         emphasis_by="mean",
     ),
     # the ScatterMatrix diagonal's density curves; no front draws it alone
-    ChartKind("kde", "density", KdeLayer, record_keys=("x",), required_keys=("x",)),
+    ChartKind(
+        "kde",
+        "density",
+        KdeLayer,
+        record_keys=("x",),
+        required_keys=("x",),
+        position_keys=("x",),
+    ),
     ChartKind(
         "boxplot",
         "box plot",
@@ -728,6 +758,8 @@ _KINDS = (
         check_records=_finite_groups("box plot"),
         record_keys=("label", "value"),
         required_keys=("label", "value"),
+        position_keys=("label",),
+        value_keys=("value",),
         defaults={"orientation": ORIENTATION.VERTICAL},
         datasets=DatasetPolicy.RAISE,
         group=True,
@@ -743,6 +775,8 @@ _KINDS = (
         check_records=_finite_groups("violin plot"),
         record_keys=("label", "value"),
         required_keys=("label", "value"),
+        position_keys=("label",),
+        value_keys=("value",),
         defaults={"orientation": ORIENTATION.VERTICAL},
         datasets=DatasetPolicy.RAISE,
         group=True,
@@ -756,6 +790,8 @@ _KINDS = (
         check_records=_finite_groups("swarm plot"),
         record_keys=("label", "value"),
         required_keys=("label", "value"),
+        position_keys=("label",),
+        value_keys=("value",),
         defaults={"orientation": ORIENTATION.VERTICAL, "mode": SWARM_MODE.SWARM},
         group=True,
         emphasis_units=group_units,
@@ -768,6 +804,8 @@ _KINDS = (
         check_records=_finite_groups("raincloud plot"),
         record_keys=("label", "value"),
         required_keys=("label", "value"),
+        position_keys=("label",),
+        value_keys=("value",),
         defaults={
             "orientation": ORIENTATION.VERTICAL,
             "mode": SWARM_MODE.SWARM,
@@ -792,6 +830,8 @@ _KINDS = (
         check_records=_finite_groups("ridgeline plot"),
         record_keys=("label", "value"),
         required_keys=("label", "value"),
+        position_keys=("label",),
+        value_keys=("value",),
         defaults={"orientation": ORIENTATION.HORIZONTAL},
         build=_ridgeline_layers,
         datasets=DatasetPolicy.SUBPLOT,
@@ -806,6 +846,8 @@ _KINDS = (
         ScatterLayer,
         record_keys=("x", "y", "size", "hue", "annotation", "xerr", "yerr"),
         required_keys=("x", "y"),
+        position_keys=("x",),
+        value_keys=("y",),
         # `label` is the category key on every other front (ADR 0069)
         renamed={"label": "annotation"},
         check_records=_check_annotations,
@@ -821,6 +863,7 @@ _KINDS = (
         ),
         dict_data=True,
         data_keys=("z",),
+        value_keys=("z",),
         datasets=DatasetPolicy.SUBPLOT,
         rejects=_no_emphasis(
             "Heatmap",
@@ -844,6 +887,7 @@ _KINDS = (
         ),
         dict_data=True,
         data_keys=(),
+        value_keys=("z",),
         renamed={"valfmt": "value_format"},
         # filled contour bands cover the grid
         gridless=_filled,
@@ -871,6 +915,8 @@ _KINDS = (
         defaults={"show_colorbars": True},
         dict_data=True,
         data_keys=(),
+        position_keys=("x", "y"),
+        value_keys=("c",),
         rejects=_no_emphasis(
             "HexbinChart",
             "a hexbin chart is a single colormapped layer with no series to "
@@ -914,7 +960,14 @@ _KINDS = (
         datasets=DatasetPolicy.SUBPLOT,
         overlayable=False,
     ),
-    ChartKind("imagechart", "image chart", ImageLayer, dict_data=True, data_keys=()),
+    ChartKind(
+        "imagechart",
+        "image chart",
+        ImageLayer,
+        dict_data=True,
+        data_keys=(),
+        value_keys=("image",),
+    ),
     ChartKind(
         "basemapchart",
         "basemap chart",
