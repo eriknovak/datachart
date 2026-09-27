@@ -373,6 +373,42 @@ def _radial_mark(charts: List[dict], settings: dict) -> List[dict]:
     return charts
 
 
+_COMPASS = ("N", "NE", "E", "SE", "S", "SW", "W", "NW")
+
+
+def _check_radial(charts: List[dict], settings: dict) -> None:
+    inner_radius = settings.get("inner_radius")
+    if inner_radius is not None and not 0 <= inner_radius < 1:
+        raise ValueError(
+            f"Invalid `inner_radius` value {inner_radius!r}. "
+            "Must be a fraction 0 <= f < 1 of the radial extent."
+        )
+    start_angle = settings.get("start_angle")
+    if isinstance(start_angle, str) and start_angle not in _COMPASS:
+        raise ValueError(
+            f"Invalid `start_angle` value {start_angle!r}. Must be a compass "
+            f"location {_COMPASS} or a numeric bearing in degrees."
+        )
+
+
+def _check_contour(charts: List[dict], settings: dict) -> None:
+    # filled bands take the colormap, never a series color
+    if not settings.get("fill"):
+        return
+    if settings.get("emphasis_rule") is not None:
+        raise ValueError(
+            "ContourChart does not support `emphasis_rule` when `fill=True`: "
+            "filled bands take the colormap, not a series color to mute or "
+            "highlight. Use line contours instead."
+        )
+    if any(chart.get("emphasis") is not None for chart in charts):
+        raise ValueError(
+            "ContourChart does not support `emphasis` when `fill=True`: "
+            "filled bands take the colormap, not a series color to mute or "
+            "highlight. Use line contours instead."
+        )
+
+
 def _radial_required(settings: dict) -> Tuple[str, ...]:
     # the histogram visual bins `x`; the others plot `y`, as a bar chart
     visual = settings.get("mark") or RADIAL_TYPE.DEFAULT
@@ -643,6 +679,7 @@ _KINDS = (
             "startangle": "start_angle",
             "innerradius": "inner_radius",
         },
+        check_records=_check_radial,
         prepare=_radial_mark,
         # the front takes a rule and a sort on the bar visual only
         emphasis_units=bar_units,
@@ -860,6 +897,7 @@ _KINDS = (
             "filled": "fill",
             "show_colorbars": "show_colorbar",
         },
+        check_records=_check_contour,
         # filled contour bands cover the grid
         gridless=_filled,
         emphasis_units=series_units("z"),

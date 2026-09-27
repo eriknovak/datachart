@@ -401,6 +401,23 @@ class TestDeprecatedNames(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "`show_values` only"):
                 Heatmap(GRID, show_values=True, show_heatmap_values=True)
 
+    def test_old_name_warns_before_its_value_is_checked(self):
+        bad = [
+            (RadialChart, WIND, {"innerradius": 1.0}, "`inner_radius`"),
+            (RadialChart, WIND, {"startangle": "north"}, "`start_angle`"),
+            (
+                ContourChart,
+                GRID,
+                {"filled": True, "emphasis_rule": {"top": 1}},
+                "`fill",
+            ),
+        ]
+        for front, data, kwargs, message in bad:
+            with self.subTest(front=front.__name__, kwargs=kwargs):
+                with self.assertWarns(DeprecationWarning):
+                    with self.assertRaisesRegex(ValueError, message):
+                        front(data, **kwargs)
+
     def test_both_names_raise_for_every_rename(self):
         for front, data, old, new, value in RENAMES:
             with self.subTest(front=front.__name__, name=old):

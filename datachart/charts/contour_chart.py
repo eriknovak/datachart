@@ -261,19 +261,4 @@ def ContourChart(
     """
     params = dict(locals())
 
-    fill = filled if fill is None else fill
-    if fill and emphasis_rule is not None:
-        raise ValueError(
-            "ContourChart does not support `emphasis_rule` when `fill=True`: "
-            "filled bands take the colormap, not a series color to mute or "
-            "highlight. Use line contours instead."
-        )
-    roles = emphasis if isinstance(emphasis, list) else [emphasis]
-    if fill and any(role is not None for role in roles):
-        raise ValueError(
-            "ContourChart does not support `emphasis` when `fill=True`: "
-            "filled bands take the colormap, not a series color to mute or "
-            "highlight. Use line contours instead."
-        )
-
     return render("contourchart", params)

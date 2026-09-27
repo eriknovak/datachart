@@ -27,8 +27,6 @@ from ..constants import (
     VALUE_FORMAT,
 )
 
-_COMPASS = ("N", "NE", "E", "SE", "S", "SW", "W", "NW")
-
 _RadialStyleAttrs = Union[
     LineStyleAttrs, BarStyleAttrs, HistStyleAttrs, ScatterStyleAttrs
 ]
@@ -222,18 +220,5 @@ def RadialChart(
 
     """
     params = dict(locals())
-
-    inner_radius = innerradius if inner_radius is None else inner_radius
-    start_angle = startangle if start_angle is None else start_angle
-    if inner_radius is not None and not 0 <= inner_radius < 1:
-        raise ValueError(
-            f"Invalid `inner_radius` value {inner_radius!r}. "
-            "Must be a fraction 0 <= f < 1 of the radial extent."
-        )
-    if isinstance(start_angle, str) and start_angle not in _COMPASS:
-        raise ValueError(
-            f"Invalid `start_angle` value {start_angle!r}. Must be a compass "
-            f"location {_COMPASS} or a numeric bearing in degrees."
-        )
 
     return render("radialchart", params)
