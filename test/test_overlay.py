@@ -5,7 +5,15 @@ import warnings
 import numpy as np
 import matplotlib.pyplot as plt
 
-from datachart.charts import LineChart, BarChart, ScatterChart, Heatmap, Histogram
+from datachart.charts import (
+    LineChart,
+    BarChart,
+    ScatterChart,
+    Heatmap,
+    Histogram,
+    StackedAreaChart,
+)
+from datachart.config import config
 from datachart.utils import Panel, Grid
 
 
@@ -734,3 +742,113 @@ class TestGridFurniture:
             with pytest.raises(ValueError, match="bogus"):
                 Grid([_lines(0, "a")], **bad)
         plt.close("all")
+
+
+def _bars(a, b):
+    return BarChart([{"label": "x", "y": a}, {"label": "y", "y": b}])
+
+
+def _twin(fig):
+    """The panel's host and twin axes."""
+    host, right = fig.axes[:2]
+    return host, right
+
+
+class TestTwinAxisStacking:
+    """Each value axis stacks only its own layers (issue #303)."""
+
+    def teardown_method(self):
+        plt.close("all")
+
+    def test_stacked_bars_start_from_zero_on_the_right_axis(self):
+        fig = Panel(
+            [_bars(1000, 2000), {"figure": _bars(1, 2), "y_axis": "right"}],
+            bar_mode="stack",
+        )
+        host, right = _twin(fig)
+        assert [p.get_y() for p in right.patches] == [0, 0]
+        assert [p.get_height() for p in right.patches] == [1, 2]
+        assert right.get_ylim()[0] == 0
+        assert right.get_ylim()[1] < 10
+
+    def test_stacked_bars_still_stack_within_one_axis(self):
+        fig = Panel(
+            [
+                _bars(1000, 2000),
+                {"figure": _bars(1, 2), "y_axis": "right"},
+                {"figure": _bars(3, 4), "y_axis": "right"},
+            ],
+            bar_mode="stack",
+        )
+        host, right = _twin(fig)
+        assert [p.get_y() for p in right.patches] == [0, 0, 1, 2]
+
+    def test_stacked_histograms_start_from_zero_on_the_right_axis(self):
+        left = Histogram([{"x": v} for v in np.repeat(np.arange(5), 1000)])
+        small = Histogram([{"x": v} for v in np.arange(5)])
+        fig = Panel([left, {"figure": small, "y_axis": "right"}], bar_mode="stack")
+        host, right = _twin(fig)
+        assert right.patches
+        assert all(p.get_y() == 0 for p in right.patches)
+
+    def test_stacked_areas_keep_their_zero_floor_on_the_right_axis(self):
+        left = StackedAreaChart([{"x": i, "y": 1000} for i in range(3)])
+        small = StackedAreaChart([{"x": i, "y": 2} for i in range(3)])
+        fig = Panel([left, {"figure": small, "y_axis": "right"}])
+        host, right = _twin(fig)
+        lo, hi = right.get_ylim()
+        assert lo == 0
+        assert 2 <= hi < 3
+
+    def test_stacked_areas_share_x_across_both_axes(self):
+        # the axes share one category axis, so the x values must still match
+        left = StackedAreaChart([{"x": i, "y": 1000} for i in range(3)])
+        small = StackedAreaChart([{"x": i, "y": 2} for i in range(5)])
+        with pytest.raises(ValueError, match="share the same `x`"):
+            Panel([left, {"figure": small, "y_axis": "right"}])
+
+    def test_value_label_headroom_on_the_right_axis(self):
+        alone = BarChart([{"label": "x", "y": 2000}], show_values=True)
+        single_hi = alone.axes[0].get_ylim()[1]
+        labelled = BarChart([{"label": "x", "y": 2000}], show_values=True)
+        fig = Panel([{"figure": labelled, "y_axis": "right"}])
+        host, right = _twin(fig)
+        assert right.get_ylim()[1] == pytest.approx(single_hi)
+
+    @staticmethod
+    def _sides(charts):
+        """Lines per side, and whether the >2-groups warning fired."""
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            host, right = _twin(Panel(charts))
+        warned = any("scale-incompatible groups" in str(w.message) for w in caught)
+        return [len(host.lines), len(right.lines)], warned
+
+    @staticmethod
+    def _lines(*spans):
+        return [
+            LineChart([{"x": i, "y": base + span * i / 4} for i in range(5)])
+            for base, span in spans
+        ]
+
+    def test_axis_assignment_ignores_the_warning_flag(self):
+        spans = ((1, 1), (1000, 100), (1200, 100))
+        on, _ = self._sides(self._lines(*spans))
+        config.update_config({"overlay_warn_scale_groups": False})
+        try:
+            off, _ = self._sides(self._lines(*spans))
+        finally:
+            config.reset_config()
+        # the big pair shares the primary axis; `small` sits on the twin
+        assert on == off == [2, 1]
+
+    def test_the_warning_flag_only_silences_the_warning(self):
+        spans = ((1, 1), (1000, 100), (0, 100000))
+        on, warned_on = self._sides(self._lines(*spans))
+        config.update_config({"overlay_warn_scale_groups": False})
+        try:
+            off, warned_off = self._sides(self._lines(*spans))
+        finally:
+            config.reset_config()
+        assert on == off
+        assert warned_on and not warned_off

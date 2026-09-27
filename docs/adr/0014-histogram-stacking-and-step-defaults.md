@@ -1,5 +1,6 @@
 ---
 status: accepted
+amended-by: [0080]
 ---
 
 # Histogram stacking moves to bar_mode; step edges follow the series

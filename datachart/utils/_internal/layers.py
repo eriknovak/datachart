@@ -3613,7 +3613,6 @@ def stack_first_line(y: np.ndarray, baseline: str) -> np.ndarray:
 def _stack_slots(layers: List[StackedAreaLayer], baseline: str) -> dict:
     """Per-layer (bottom, top) bands of the stack; series order is stack order."""
 
-    validate_shared_x([l.x_values() for l in layers])
     y = np.vstack([l.y_values() for l in layers])
     if baseline == STACKED_AREA_BASELINE.PERCENT:
         total = y.sum(0)
@@ -11274,7 +11273,8 @@ def determine_axis_assignment(
     prefs = [g.y_axis for g in groups]
     all_auto = all(p == "auto" for p in prefs)
 
-    if all_auto and warn_scale_groups:
+    # the flag silences the warning only; placement never depends on it
+    if all_auto:
         clusters = _cluster_by_scale_compatibility(ranges, threshold)
         sorted_clusters = sorted(clusters, key=len, reverse=True)
 
@@ -11283,7 +11283,7 @@ def determine_axis_assignment(
             for idx in sorted_clusters[1]:
                 assignments[idx] = "right"
 
-        if len(sorted_clusters) > 2:
+        if warn_scale_groups and len(sorted_clusters) > 2:
             warnings.warn(
                 f"Found {len(sorted_clusters)} scale-incompatible groups but only 2 axes available. "
                 f"Groups: {[len(g) for g in sorted_clusters]}. "
@@ -11669,6 +11669,20 @@ class Panel:
                 for group in self.groups
             ]
 
+        # each value axis stacks only its own layers (ADR 0080)
+        group_axes = [ax_right if a == "right" else ax for a in assignments]
+        layer_axes = {
+            id(layer): target_ax
+            for group, target_ax in zip(self.groups, group_axes)
+            for layer in group.layers
+        }
+
+        def by_axis(layers):
+            pools = defaultdict(list)
+            for layer in layers:
+                pools[layer_axes[id(layer)]].append(layer)
+            return pools.values()
+
         # bar slotting across every layer in the panel; radial bars share the
         # machinery — their slots are sector fractions, scaled at draw time
         bar_layers = [
@@ -11703,19 +11717,20 @@ class Panel:
                     )
             elif bar_mode == "stack":
                 # bottoms accumulate per category slot, whatever the record order
-                bottoms = np.zeros(len(category_index or ()))
-                for idx, layer in enumerate(bar_layers):
-                    labels, y = _layer_category_labels(layer), layer.y_values()
-                    stacks = category_index is not None and labels is not None
-                    positions = _category_positions(labels or (), category_index)
-                    bar_slots[id(layer)] = BarSlot(
-                        offset=0.0,
-                        width=layer.bar_width,
-                        bottom=bottoms[positions] if stacks else None,
-                        show_yerr=idx == len(bar_layers) - 1,
-                    )
-                    if stacks and y is not None:
-                        np.add.at(bottoms, positions, np.asarray(y, dtype=float))
+                for stack in by_axis(bar_layers):
+                    bottoms = np.zeros(len(category_index or ()))
+                    for idx, layer in enumerate(stack):
+                        labels, y = _layer_category_labels(layer), layer.y_values()
+                        stacks = category_index is not None and labels is not None
+                        positions = _category_positions(labels or (), category_index)
+                        bar_slots[id(layer)] = BarSlot(
+                            offset=0.0,
+                            width=layer.bar_width,
+                            bottom=bottoms[positions] if stacks else None,
+                            show_yerr=idx == len(stack) - 1,
+                        )
+                        if stacks and y is not None:
+                            np.add.at(bottoms, positions, np.asarray(y, dtype=float))
             else:  # overlay
                 for layer in bar_layers:
                     bar_slots[id(layer)] = BarSlot(offset=0.0, width=layer.bar_width)
@@ -11751,14 +11766,18 @@ class Panel:
                     np.hstack(tuple(l.x_values() for _, l in hist_pairs)),
                     bins=hist_pairs[0][0].num_bins,
                 )[1]
-            hist_slots = _hist_stack_slots([l for _, l in hist_pairs], stack_bins)
+            for stack in by_axis(l for _, l in hist_pairs):
+                hist_slots.update(_hist_stack_slots(stack, stack_bins))
 
         # stacked areas always stack; the baseline is a panel setting (ADR 0025)
         stack_layers = [l for l in self.layers if isinstance(l, StackedAreaLayer)]
         stack_slots = {}
+        # both value axes share the one category axis, so every stack shares x
         if stack_layers:
-            stack_slots = _stack_slots(
-                stack_layers, s.get("baseline") or STACKED_AREA_BASELINE.DEFAULT
+            validate_shared_x([l.x_values() for l in stack_layers])
+        for stack in by_axis(stack_layers):
+            stack_slots.update(
+                _stack_slots(stack, s.get("baseline") or STACKED_AREA_BASELINE.DEFAULT)
             )
 
         zorder_defaults = s.get("zorder_defaults", {})
@@ -11820,7 +11839,6 @@ class Panel:
             figure._hover_targets = []
             figure._hover_style = self.snapshot_hover_style()
         hover_targets = figure._hover_targets
-        group_axes = [ax_right if a == "right" else ax for a in assignments]
         size_extents = _size_extents(
             (layer, target_ax)
             for group, target_ax in zip(self.groups, group_axes)
@@ -12185,6 +12203,10 @@ class Panel:
 
         # scales, per axis: an explicit setting beats the groups' stamps
         scalex, scaley, scale_right = scales
+        # each value axis and the layers drawn on it; the host always counts
+        value_axes = {ax: []}
+        for group, owner_ax in zip(self.groups, group_axes):
+            value_axes.setdefault(owner_ax, []).extend(group.layers)
         value_scale = scalex if horizontal else scaley
         if layers and not bare and (scalex or scaley):
             layers[0].apply_scales(ax, scalex, scaley)
@@ -12315,31 +12337,39 @@ class Panel:
                 lo, hi = ax.get_ylim()
                 ax.set_ylim(lo, hi + (hi - lo) * extra)
         else:
-            # band and median labels sit inside the marks and need no room
-            value_layers = [l for l in layers if l.labels_past_mark and l.show_values]
-            if value_layers:
-                lo, hi = ax.get_xlim() if horizontal else ax.get_ylim()
+            # band and median labels sit inside the marks and need no room;
+            # each value axis pads for the labels it carries (ADR 0080)
+            for owner_ax, owned in value_axes.items():
+                value_layers = [
+                    l for l in owned if l.labels_past_mark and l.show_values
+                ]
+                if not value_layers:
+                    continue
+                lo, hi = owner_ax.get_xlim() if horizontal else owner_ax.get_ylim()
                 pad = (hi - lo) * (
                     VALUE_HEADROOM_HORIZONTAL if horizontal else VALUE_HEADROOM_VERTICAL
                 )
                 below = lo < 0 or any(l.labels_below_range for l in value_layers)
                 lo = lo - pad if below else lo
                 hi = hi + pad
-                (ax.set_xlim if horizontal else ax.set_ylim)(lo, hi)
+                (owner_ax.set_xlim if horizontal else owner_ax.set_ylim)(lo, hi)
 
         # pyramid mirror furniture reads the value axis after the headroom pad
         if s.get("pyramid"):
             self._apply_pyramid_mirror(ax)
 
-        # a stack from zero sits on the axis floor, like bars (ADR 0025);
-        # a log value axis cannot reach zero, so it keeps its own floor
-        if (
-            any(isinstance(l, StackedAreaLayer) for l in layers)
-            and (s.get("baseline") or STACKED_AREA_BASELINE.DEFAULT)
-            in (STACKED_AREA_BASELINE.ZERO, STACKED_AREA_BASELINE.PERCENT)
-            and value_scale != "log"
+        # a stack from zero sits on the floor of its value axis, like bars
+        # (ADR 0025, ADR 0080); a log value axis keeps its own floor
+        if (s.get("baseline") or STACKED_AREA_BASELINE.DEFAULT) in (
+            STACKED_AREA_BASELINE.ZERO,
+            STACKED_AREA_BASELINE.PERCENT,
         ):
-            (ax.set_xlim if horizontal else ax.set_ylim)(0, None)
+            for owner_ax, owned in value_axes.items():
+                scale = scale_right if owner_ax is ax_right else value_scale
+                if scale != "log" and any(
+                    isinstance(l, StackedAreaLayer) for l in owned
+                ):
+                    (owner_ax.set_xlim if horizontal else owner_ax.set_ylim)(0, None)
         # a stack alone fills its frame: the value axis ends exactly where the
         # stack does (a percent stack at 100), with no margin above it
         if (
