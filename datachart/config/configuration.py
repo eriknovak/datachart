@@ -10,7 +10,12 @@ from datachart.typings import StyleAttrs
 from datachart.constants import THEME
 
 # import the themes
-from ..themes._base import STYLE_ALIASES, canonical_style, warn_aliases
+from ..themes._base import (
+    STYLE_ALIASES,
+    canonical_style,
+    complete_theme,
+    warn_aliases,
+)
 from ..themes.score import warn_failing_palette
 from ..themes import (
     DEFAULT_THEME,
@@ -45,6 +50,8 @@ THEMES = {
     THEME.SLATEHATCH: SLATEHATCH_THEME,
     THEME.DARK: DARK_THEME,
 }
+# reset_config and set_theme("default") must never disagree
+BUILTIN_THEMES = frozenset(THEMES)
 
 # bumped only when a reader of the current shape could misread an older file
 THEME_FILE_VERSION = 1
@@ -120,8 +127,10 @@ class Config:
     def register_theme(self, name: str, theme: StyleAttrs) -> None:
         """Registers a custom theme so it can be applied with `set_theme`.
 
-        The theme must define every attribute of the default theme; missing
-        keys are filled from it, unknown keys are rejected.
+        Missing attributes are filled from the default theme, alias keys
+        resolve to their canonical name, and unknown keys are rejected. A
+        custom theme of the same name is replaced; the predefined theme names
+        are reserved.
 
         Examples:
             >>> from datachart.config import config
@@ -135,13 +144,17 @@ class Config:
             name: The theme name, later passed to `set_theme`.
             theme: The style attributes of the theme.
 
+        Raises:
+            ValueError: If `name` is a predefined theme or `theme` holds an
+                unknown attribute.
+
         """
-        warn_aliases(theme)
-        theme = canonical_style(theme)
-        unknown = set(theme) - set(DEFAULT_THEME)
-        if unknown:
-            raise ValueError(f"Unknown theme attributes: {sorted(unknown)}")
-        THEMES[name] = {**copy.deepcopy(DEFAULT_THEME), **copy.deepcopy(theme)}
+        if name in BUILTIN_THEMES:
+            raise ValueError(
+                f"{name!r} is a predefined theme and cannot be replaced; "
+                "register the theme under another name."
+            )
+        THEMES[name] = complete_theme(theme, stacklevel=2)
         warn_failing_palette(THEMES[name])
 
     def reset_config(self) -> None:
@@ -167,8 +180,8 @@ class Config:
 
         Overrides individual style attributes on top of the current theme; the
         change persists until the next `set_theme` or `reset_config`. Use it for
-        global tweaks such as font family or default colors; unknown attribute
-        names are skipped with a warning.
+        global tweaks such as font family or default colors; the values are
+        copied, and unknown attribute names are skipped with a warning.
 
         Examples:
             >>> from datachart.config import config
@@ -181,12 +194,20 @@ class Config:
 
         """
 
-        warn_aliases(config)
+        self._update(config, stacklevel=2)
+
+    def _update(self, config: StyleAttrs, stacklevel: int) -> None:
+        """`update_config`, warning at `stacklevel` counted from the caller."""
+
+        warn_aliases(config, stacklevel=stacklevel + 1)
         for key, val in canonical_style(config).items():
             if key not in self.config:
-                print(f"Warning: Attribute '{key}' is not valid. Skipping attribute...")
+                warnings.warn(
+                    f"Attribute {key!r} is not valid. Skipping attribute...",
+                    stacklevel=stacklevel + 1,
+                )
                 continue
-            self.config[key] = val
+            self.config[key] = copy.deepcopy(val)
 
     # both scopes restore wholesale, exceptions included (ADR 0040)
     @contextmanager
@@ -230,7 +251,8 @@ class Config:
         overrides: dict = dict(config or {})
         overrides.update(attrs)
         with self._scope():
-            self.update_config(overrides)
+            # this generator, contextmanager's `__enter__`, then the caller
+            self._update(overrides, stacklevel=3)
             yield
 
     @contextmanager
@@ -334,9 +356,11 @@ class Config:
         `register_theme`, so missing attributes are filled from the default
         theme, alias keys resolve to their canonical name, and unknown keys
         are rejected. The name is, in order of precedence, the `name`
-        argument, the name in the file, or the file's stem; an existing theme
-        of that name is replaced. Loading only registers: apply the theme with
-        `set_theme` or `using_theme`.
+        argument, the name in the file, or the file's stem; an existing custom
+        theme of that name is replaced, while a predefined theme's name is
+        rejected, so a file saved from one loads only with a new `name`.
+        Loading only registers: apply the theme with `set_theme` or
+        `using_theme`.
 
         Examples:
             >>> from datachart.config import config
@@ -354,7 +378,8 @@ class Config:
 
         Raises:
             ValueError: If the file is not a theme file, states another
-                format version, or holds an unknown attribute.
+                format version, holds an unknown attribute, or would register
+                under a predefined theme's name.
 
         """
         path = Path(path)

@@ -410,7 +410,7 @@ class TestQuillTheme(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             path = os.path.join(folder, "quill_copy.json")
             config.save_theme(path, name=THEME.QUILL)
-            config.set_theme(config.load_theme(path))
+            config.set_theme(config.load_theme(path, name="quill_copy"))
         loaded = png(LineChart([LINE, LINE_2])) + png(BarChart(bars))
         self.assertEqual(native, loaded)
 
