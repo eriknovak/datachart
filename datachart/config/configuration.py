@@ -50,11 +50,23 @@ THEMES = {
     THEME.SLATEHATCH: SLATEHATCH_THEME,
     THEME.DARK: DARK_THEME,
 }
-# reset_config and set_theme("default") must never disagree
+# reset and set_theme("default") must never disagree
 BUILTIN_THEMES = frozenset(THEMES)
 
 # bumped only when a reader of the current shape could misread an older file
 THEME_FILE_VERSION = 1
+
+
+def _warn_renamed(old: str, new: str) -> None:
+    """Warn at the deprecated method's caller that `old` is now `new`."""
+
+    # this function, the deprecated method, then its caller
+    warnings.warn(
+        f"`{old}` is deprecated and will be removed in the next release; "
+        f"use `{new}` instead.",
+        DeprecationWarning,
+        stacklevel=3,
+    )
 
 
 class Config:
@@ -67,9 +79,9 @@ class Config:
     Methods:
         set_theme(theme):
             Set the global configuration to match the theme.
-        reset_config():
+        reset():
             Resets the global configuration.
-        update_config(config):
+        update(config):
             Updates the global configuration.
         override(config, **attrs):
             Applies attribute overrides for the duration of a `with` block.
@@ -96,13 +108,13 @@ class Config:
         self.config = copy.deepcopy(DEFAULT_THEME)
         self.theme = THEME.DEFAULT
 
-    def set_theme(self, theme: THEME) -> None:
+    def set_theme(self, theme: Union[THEME, str]) -> None:
         """Sets the global configuration to match the theme.
 
         Replaces the whole style configuration with a deep copy of the theme: one of the
         [`THEME`][datachart.constants.THEME] constants or a name registered with
         `register_theme`. Use it to switch the look of every chart rendered afterwards;
-        call `update_config` on top for per-attribute tweaks.
+        call `update` on top for per-attribute tweaks.
 
         Examples:
             >>> from datachart.constants import THEME
@@ -157,17 +169,17 @@ class Config:
         THEMES[name] = complete_theme(theme, stacklevel=2)
         warn_failing_palette(THEMES[name])
 
-    def reset_config(self) -> None:
+    def reset(self) -> None:
         """Resets the global configuration.
 
         Restores the default theme, discarding the current theme and every
-        `update_config` override, and resets the active theme name to match.
+        `update` override, and resets the active theme name to match.
         Use it to return to a known state, for example at the start of a
         notebook section or between tests.
 
         Examples:
             >>> from datachart.config import config
-            >>> config.reset_config()
+            >>> config.reset()
             >>> config.theme
             'default'
 
@@ -175,17 +187,23 @@ class Config:
         self.config = copy.deepcopy(DEFAULT_THEME)
         self.theme = THEME.DEFAULT
 
-    def update_config(self, config: StyleAttrs) -> None:
+    def reset_config(self) -> None:
+        """Deprecated: use `reset`, which it forwards to."""
+
+        _warn_renamed("reset_config", "reset")
+        self.reset()
+
+    def update(self, config: StyleAttrs) -> None:
         """Updates the global configuration.
 
         Overrides individual style attributes on top of the current theme; the
-        change persists until the next `set_theme` or `reset_config`. Use it for
+        change persists until the next `set_theme` or `reset`. Use it for
         global tweaks such as font family or default colors; the values are
         copied, and unknown attribute names are skipped with a warning.
 
         Examples:
             >>> from datachart.config import config
-            >>> config.update_config({"font_general_color": "#FFFFFF"})
+            >>> config.update({"font_general_color": "#FFFFFF"})
             >>> config.get("font_general_color")
             '#FFFFFF'
 
@@ -196,8 +214,19 @@ class Config:
 
         self._update(config, stacklevel=2)
 
+    def update_config(self, config: StyleAttrs) -> None:
+        """Deprecated: use `update`, which it forwards to.
+
+        Args:
+            config: The configuration attributes to be updated.
+
+        """
+
+        _warn_renamed("update_config", "update")
+        self._update(config, stacklevel=2)
+
     def _update(self, config: StyleAttrs, stacklevel: int) -> None:
-        """`update_config`, warning at `stacklevel` counted from the caller."""
+        """`update`, warning at `stacklevel` counted from the caller."""
 
         warn_aliases(config, stacklevel=stacklevel + 1)
         for key, val in canonical_style(config).items():
@@ -227,9 +256,9 @@ class Config:
     ) -> Iterator[None]:
         """Applies style overrides for the duration of a `with` block.
 
-        On entry the attributes are applied the way `update_config` applies
+        On entry the attributes are applied the way `update` applies
         them; on exit the configuration that entered the block is restored,
-        also when the block raises. Any `set_theme` or `update_config` performed
+        also when the block raises. Any `set_theme` or `update` performed
         inside the block is discarded at exit. Use it for a one-off figure that
         needs a different font or palette without touching the global state.
         The scope is plain save-and-restore on the global configuration: it is
@@ -256,13 +285,13 @@ class Config:
             yield
 
     @contextmanager
-    def using_theme(self, theme: THEME) -> Iterator[None]:
+    def using_theme(self, theme: Union[THEME, str]) -> Iterator[None]:
         """Applies a theme for the duration of a `with` block.
 
         On entry the theme is applied the way `set_theme` applies it; on exit
         both the configuration and the active theme name that entered the
         block are restored, also when the block raises. Any `set_theme` or
-        `update_config` performed inside the block is discarded at exit. The
+        `update` performed inside the block is discarded at exit. The
         scope is plain save-and-restore on the global configuration: it is
         neither thread-safe nor async-safe.
 
@@ -305,7 +334,7 @@ class Config:
         """Writes a theme file.
 
         With no name the live configuration is saved, so a look assembled
-        with `update_config` can be shared or committed directly; the file is
+        with `update` can be shared or committed directly; the file is
         named after its stem. With a name that registered theme is saved
         instead. The file is JSON and carries only the attributes that differ
         from the default theme, so it stays short and reviewable; load it back
@@ -313,7 +342,7 @@ class Config:
 
         Examples:
             >>> from datachart.config import config
-            >>> config.update_config({"font_general_size": 14})
+            >>> config.update({"font_general_size": 14})
             >>> config.save_theme("house.json")
             >>> config.save_theme("ink.json", name="ink")
 

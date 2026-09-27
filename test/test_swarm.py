@@ -112,7 +112,7 @@ class TestSwarmPlot(unittest.TestCase):
         self.assertLessEqual(np.abs(xs - np.round(xs)).max(), 0.1)
 
     def test_theme_sets_the_jitter_and_a_call_overrides_it(self):
-        config.update_config({"chart_default_jitter": 0.0})
+        config.update({"chart_default_jitter": 0.0})
         ax = SwarmPlot(group_data(), swarm_mode="strip").axes[0]
         xs = _swarm_collections(ax)[0].get_offsets()[:, 0]
         np.testing.assert_array_equal(xs, np.round(xs))

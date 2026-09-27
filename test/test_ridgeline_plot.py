@@ -103,7 +103,7 @@ class TestRidgelineLayout(unittest.TestCase):
         self.assertAlmostEqual(
             rise(fills(ax)[0], 0), 1 + config["chart_default_ridgeline_overlap"]
         )
-        config.update_config({"chart_default_ridgeline_overlap": 0.8})
+        config.update({"chart_default_ridgeline_overlap": 0.8})
         ax = RidgelinePlot(ridge_data(), overlap=None).axes[0]
         self.assertAlmostEqual(rise(fills(ax)[0], 0), 1.8)
         ax = RidgelinePlot(ridge_data(), overlap=0.2).axes[0]
@@ -167,11 +167,11 @@ class TestRidgelineMarks(unittest.TestCase):
         self.assertEqual((len(fills(no_outline)), len(no_outline.lines)), (3, 0))
 
     def test_theme_sets_the_marks_and_a_call_overrides_them(self):
-        config.update_config({"chart_default_ridgeline_fill": False})
+        config.update({"chart_default_ridgeline_fill": False})
         ax = RidgelinePlot(ridge_data()).axes[0]
         self.assertEqual((len(fills(ax)), len(ax.lines)), (0, 3))
         self.assertEqual(len(fills(RidgelinePlot(ridge_data(), fill=True).axes[0])), 3)
-        config.update_config(
+        config.update(
             {
                 "chart_default_ridgeline_fill": True,
                 "chart_default_ridgeline_show_outline": False,

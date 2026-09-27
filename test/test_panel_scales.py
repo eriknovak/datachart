@@ -54,7 +54,7 @@ def scales(ax):
 def close_figures():
     yield
     plt.close("all")
-    config.reset_config()
+    config.reset()
 
 
 class TestExplicitScales:
@@ -350,7 +350,7 @@ class TestWarnings:
         assert ax.get_yscale() == "linear"
 
     def test_config_key_silences_the_conflict_only(self):
-        config.update_config({"overlay_warn_scale_conflict": False})
+        config.update({"overlay_warn_scale_conflict": False})
         huge = [{"x": i, "y": v} for i, v in enumerate([1, 10, 1000, 100000])]
         with pytest.warns(UserWarning) as record:
             Panel(
@@ -364,7 +364,7 @@ class TestWarnings:
         assert any("incompatible scales" in m for m in messages)
 
     def test_config_key_silences_the_missing_twin(self):
-        config.update_config({"overlay_warn_scale_conflict": False})
+        config.update({"overlay_warn_scale_conflict": False})
         with warnings.catch_warnings():
             warnings.simplefilter("error")
             Panel([LineChart(data=LINE)], scaley_right="log")

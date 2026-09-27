@@ -232,11 +232,11 @@ class TestDivergingColormap(unittest.TestCase):
         )
 
     def test_theme_sequential_colormap_never_applies_under_a_centred_norm(self):
-        config.update_config({"plot_heatmap_cmap": "Greens"})
+        config.update({"plot_heatmap_cmap": "Greens"})
         self.assertNotEqual(self._cmap(norm=COLOR_NORM.CENTERED), "Greens")
 
     def test_a_config_without_a_diverging_map_falls_back_to_the_sequential_one(self):
-        config.update_config(
+        config.update(
             {"plot_heatmap_cmap": "Greens", "plot_heatmap_cmap_diverging": None}
         )
         self.assertEqual(self._cmap(norm=COLOR_NORM.CENTERED), "Greens")

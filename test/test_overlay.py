@@ -834,21 +834,21 @@ class TestTwinAxisStacking:
     def test_axis_assignment_ignores_the_warning_flag(self):
         spans = ((1, 1), (1000, 100), (1200, 100))
         on, _ = self._sides(self._lines(*spans))
-        config.update_config({"overlay_warn_scale_groups": False})
+        config.update({"overlay_warn_scale_groups": False})
         try:
             off, _ = self._sides(self._lines(*spans))
         finally:
-            config.reset_config()
+            config.reset()
         # the big pair shares the primary axis; `small` sits on the twin
         assert on == off == [2, 1]
 
     def test_the_warning_flag_only_silences_the_warning(self):
         spans = ((1, 1), (1000, 100), (0, 100000))
         on, warned_on = self._sides(self._lines(*spans))
-        config.update_config({"overlay_warn_scale_groups": False})
+        config.update({"overlay_warn_scale_groups": False})
         try:
             off, warned_off = self._sides(self._lines(*spans))
         finally:
-            config.reset_config()
+            config.reset()
         assert on == off
         assert warned_on and not warned_off

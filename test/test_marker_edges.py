@@ -34,7 +34,7 @@ def _points(ax):
 class TestMarkerEdgeWidths(unittest.TestCase):
     def tearDown(self):
         plt.close("all")
-        config.reset_config()
+        config.reset()
 
     def test_helper_scalar_and_per_marker(self):
         self.assertEqual(_marker_edge_widths(0.5, 36), 0.5)
@@ -95,7 +95,7 @@ class TestUnfilledMarkers(unittest.TestCase):
 
     def tearDown(self):
         plt.close("all")
-        config.reset_config()
+        config.reset()
 
     def _assert_stroked(self, collection, color):
         widths = collection.get_linewidths()

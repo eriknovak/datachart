@@ -59,7 +59,7 @@ class TestLegendStyle(unittest.TestCase):
 
     def test_setting_overrides_theme_field_by_field(self):
         """A non-None setting field wins; a None field falls back to the theme."""
-        config.update_config({"plot_legend_title": "Series", "plot_legend_ncols": 3})
+        config.update({"plot_legend_title": "Series", "plot_legend_ncols": 3})
         style = get_legend_style({"title": None, "ncols": 2, "location": None})
         self.assertEqual(style["title"], "Series")
         self.assertEqual(style["ncols"], 2)
@@ -72,7 +72,7 @@ class TestLegendStyle(unittest.TestCase):
         self.assertEqual(style["loc"], "upper left")
         self.assertEqual(style["bbox_to_anchor"], (1.0, 1.0))
 
-        config.update_config({"plot_legend_location": LEGEND_LOCATION.OUTSIDE_BOTTOM})
+        config.update({"plot_legend_location": LEGEND_LOCATION.OUTSIDE_BOTTOM})
         style = get_legend_style()
         self.assertEqual(style["loc"], "upper center")
         self.assertEqual(style["bbox_to_anchor"], (0.5, 0.0))

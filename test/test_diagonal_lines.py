@@ -70,7 +70,7 @@ class TestTypingsAndThemes(unittest.TestCase):
                 self.assertIn(f"plot_dline_{key}", theme, theme_name)
 
     def test_base_defaults_follow_the_horizontal_line(self):
-        config.reset_config()
+        config.reset()
         for key in DLINE_KEYS:
             self.assertEqual(config[f"plot_dline_{key}"], config[f"plot_hline_{key}"])
 
@@ -84,7 +84,7 @@ class TestTypingsAndThemes(unittest.TestCase):
 
 class TestStyleResolver(unittest.TestCase):
     def tearDown(self):
-        config.reset_config()
+        config.reset()
 
     def test_defaults(self):
         style = get_dline_style({})
@@ -180,7 +180,7 @@ class TestGeometry(unittest.TestCase):
 
 class TestStyleAndLegend(unittest.TestCase):
     def tearDown(self):
-        config.reset_config()
+        config.reset()
         plt.close("all")
 
     def test_label_reaches_the_legend(self):

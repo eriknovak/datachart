@@ -145,7 +145,7 @@ class TestColorbarSetting(unittest.TestCase):
         self.assertIn("orientation", str(cm.exception))
 
     def test_label_style_is_the_ylabel_font(self):
-        config.update_config({"font_ylabel_size": 17})
+        config.update({"font_ylabel_size": 17})
         setting = get_colorbar_setting({"label": "count"})
         self.assertEqual(setting["label_style"], get_text_style("ylabel"))
         self.assertEqual(setting["label_style"]["fontsize"], 17)
@@ -188,7 +188,7 @@ class TestColorbarRendering(unittest.TestCase):
         self.assertEqual(edge_of(figure, colorbar), "left")
 
     def test_label_renders_in_the_ylabel_font(self):
-        config.update_config({"font_ylabel_size": 17, "font_ylabel_color": "#FF0000"})
+        config.update({"font_ylabel_size": 17, "font_ylabel_color": "#FF0000"})
         for name, front in FRONTS.items():
             with self.subTest(front=name):
                 figure = front(colorbar={"label": "Count"})

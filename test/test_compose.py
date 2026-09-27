@@ -189,12 +189,12 @@ class TestPanelBarMode:
         plt.close("all")
 
     def test_panel_falls_back_to_the_config_bar_mode(self):
-        config.update_config({"overlay_bar_mode": BAR_MODE.OVERLAY})
+        config.update({"overlay_bar_mode": BAR_MODE.OVERLAY})
         try:
             fig = Panel([_bar_fig(), _bar_fig()])
             assert self._bar_mode(fig) == BAR_MODE.OVERLAY
         finally:
-            config.reset_config()
+            config.reset()
         plt.close("all")
 
     def test_a_histograms_default_stack_is_not_a_source_mode(self):
@@ -550,9 +550,9 @@ class TestStyleFreeze:
 
     # fixture instead of the file's inline plt.close: reset must survive a failed assert
     @pytest.fixture(autouse=True)
-    def _reset_config(self):
+    def _reset(self):
         yield
-        config.reset_config()
+        config.reset()
         plt.close("all")
 
     def test_panel_ignores_theme_swap(self):
@@ -616,13 +616,13 @@ class TestBarWidth:
         plt.close(figure)
 
     def test_config_width_still_applies(self):
-        config.update_config({"plot_bar_width": 0.5})
+        config.update({"plot_bar_width": 0.5})
         try:
             figure = BarChart(data=[self.data, self.data])
             assert _bar_widths(figure) == [0.25, 0.25, 0.25, 0.25]
             plt.close(figure)
         finally:
-            config.reset_config()
+            config.reset()
 
 
 class TestBarValueFormat:

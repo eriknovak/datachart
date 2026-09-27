@@ -242,7 +242,7 @@ class TestCalendarFront(unittest.TestCase):
         )
 
     def test_theme_week_start_is_the_default(self):
-        config.update_config(
+        config.update(
             {"chart_default_calendar_heatmap_week_start": CALENDAR_WEEKDAY.SUNDAY}
         )
         figure = calendar(date(2024, 1, 1), 3)
@@ -323,7 +323,7 @@ class TestCalendarFront(unittest.TestCase):
         self.assertEqual([t.get_text() for t in fmt.axes[0].texts], ["1.0", "2.0"])
 
     def test_theme_value_default_applies(self):
-        config.update_config({"chart_default_show_values": True})
+        config.update({"chart_default_show_values": True})
         figure = calendar(date(2024, 1, 1), 2)
         self.assertEqual(len(figure.axes[0].texts), 2)
 
@@ -433,7 +433,7 @@ class TestYearPanels(unittest.TestCase):
 
     def test_month_line_color_none_follows_the_theme_frame(self):
         config.set_theme(THEME.INK)
-        config.update_config({"plot_calendar_heatmap_month_line_color": None})
+        config.update({"plot_calendar_heatmap_month_line_color": None})
         (lines,) = _month_lines(year_calendar(2024).axes[0])
         self.assertEqual(
             lines.get_edgecolor()[0].tolist(),

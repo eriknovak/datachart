@@ -295,7 +295,7 @@ class TestPaddedPalettes(unittest.TestCase):
     def test_two_series_get_two_colors(self):
         for name in self.PADDED:
             with self.subTest(palette=name):
-                config.update_config({"color_general_multiple": name})
+                config.update({"color_general_multiple": name})
                 lines = [[{"x": 0, "y": i}, {"x": 1, "y": i}] for i in range(2)]
                 figure = LineChart(lines)
                 colors = [to_hex(l.get_color()) for l in figure.axes[0].lines]
@@ -319,7 +319,7 @@ class TestPaddedPalettes(unittest.TestCase):
         theme = derive_theme(THEME.DEFAULT, COLORS.Set2)
         palette = theme["color_general_multiple"]
         self.assertEqual(len(palette), len(set(palette)))
-        config.update_config({"color_general_multiple": palette})
+        config.update({"color_general_multiple": palette})
         lines = [[{"x": 0, "y": i}, {"x": 1, "y": i}] for i in range(10)]
         with warnings.catch_warnings(record=True) as caught:
             warnings.simplefilter("always")

@@ -152,7 +152,7 @@ class TestMutedTransform(unittest.TestCase):
         self.assertEqual(bg.get_color(), config["muted_color"])
 
     def test_muted_color_follows_theme(self):
-        config.update_config({"muted_color": "#ABCDEF"})
+        config.update({"muted_color": "#ABCDEF"})
         figure = LineChart([LINE1, LINE2], emphasis=["background", None])
         bg = data_lines(figure.axes[0])[0]
         self.assertEqual(bg.get_color(), "#ABCDEF")

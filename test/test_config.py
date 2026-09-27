@@ -1,12 +1,13 @@
 import copy
 import json
 import tempfile
+import typing
 import unittest
 import warnings
 from pathlib import Path
 
 from datachart.config import config
-from datachart.config.configuration import THEMES
+from datachart.config.configuration import THEMES, Config
 from datachart.constants import THEME
 from datachart.themes import DEFAULT_THEME
 
@@ -17,26 +18,26 @@ from datachart.themes import DEFAULT_THEME
 
 class TestConfig(unittest.TestCase):
     def tearDown(self):
-        config.reset_config()
+        config.reset()
 
     def test_initial_config(self):
         for key, val in DEFAULT_THEME.items():
             self.assertEqual(config[key], val)
 
-    def test_update_config(self):
+    def test_update(self):
         updated_config = {"font_general_color": "#FFFFFF"}
-        config.update_config(config=updated_config)
+        config.update(config=updated_config)
         for key, val in updated_config.items():
             self.assertEqual(config[key], val)
 
-    def test_reset_config(self):
-        config.reset_config()
+    def test_reset(self):
+        config.reset()
         for key, val in DEFAULT_THEME.items():
             self.assertEqual(config[key], val)
 
-    def test_reset_config_resets_theme_name(self):
+    def test_reset_resets_theme_name(self):
         config.set_theme(THEME.INK)
-        config.reset_config()
+        config.reset()
         self.assertEqual(config.theme, THEME.DEFAULT)
         self.assertEqual(config.config, DEFAULT_THEME)
 
@@ -56,7 +57,7 @@ class TestConfig(unittest.TestCase):
         self.assertEqual(
             config["font_general_family"], DEFAULT_THEME["font_general_family"]
         )
-        config.reset_config()
+        config.reset()
 
     def test_register_theme_rejects_unknown_keys(self):
         with self.assertRaises(ValueError):
@@ -67,7 +68,7 @@ class TestConfig(unittest.TestCase):
             with self.subTest(name=name):
                 with self.assertRaises(ValueError):
                     config.register_theme(name, {"font_general_size": 42})
-        config.reset_config()
+        config.reset()
         reset = copy.deepcopy(config.config)
         config.set_theme("default")
         self.assertEqual(config.config, reset)
@@ -79,25 +80,58 @@ class TestConfig(unittest.TestCase):
         config.set_theme("mine")
         self.assertEqual(config["font_general_size"], 9)
 
-    def test_update_config_copies_its_values(self):
+    def test_update_copies_its_values(self):
         colors = ["#111111", "#222222"]
-        config.update_config({"color_general_multiple": colors})
+        config.update({"color_general_multiple": colors})
         colors.append("#333333")
         self.assertEqual(config["color_general_multiple"], ["#111111", "#222222"])
 
-    def test_update_config_warns_on_unknown_keys(self):
+    def test_update_warns_on_unknown_keys(self):
         with self.assertWarnsRegex(UserWarning, "not_a_key") as caught:
-            config.update_config({"not_a_key": 1})
+            config.update({"not_a_key": 1})
         self.assertEqual(caught.filename, __file__)
         self.assertNotIn("not_a_key", config.config)
+
+    def test_deprecated_names_warn_once_and_forward(self):
+        for old, new, call in (
+            (
+                "update_config",
+                "update",
+                lambda: config.update_config({"font_general_size": 8}),
+            ),
+            ("reset_config", "reset", config.reset_config),
+        ):
+            with self.subTest(old=old):
+                with warnings.catch_warnings(record=True) as caught:
+                    warnings.simplefilter("always")
+                    call()
+                deprecations = [w for w in caught if w.category is DeprecationWarning]
+                self.assertEqual(len(deprecations), 1)
+                self.assertIn(f"`{old}`", str(deprecations[0].message))
+                self.assertIn(f"`{new}`", str(deprecations[0].message))
+                self.assertEqual(deprecations[0].filename, __file__)
+        self.assertEqual(config.config, DEFAULT_THEME)
+
+    def test_deprecated_update_config_forwards(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            config.update_config({"font_general_size": 8})
+        self.assertEqual(config["font_general_size"], 8)
+
+    def test_theme_setters_accept_a_registered_name(self):
+        for method in (Config.set_theme, Config.using_theme):
+            with self.subTest(method=method.__name__):
+                hint = typing.get_type_hints(method)["theme"]
+                self.assertIn(str, typing.get_args(hint))
+                self.assertIn(THEME, typing.get_args(hint))
 
 
 class TestScopes(unittest.TestCase):
     def tearDown(self):
-        config.reset_config()
+        config.reset()
 
     def test_override_applies_and_restores(self):
-        config.update_config({"font_general_size": 8})
+        config.update({"font_general_size": 8})
         with config.override(font_general_size=20, font_title_size=30):
             self.assertEqual(config["font_general_size"], 20)
             self.assertEqual(config["font_title_size"], 30)
@@ -120,9 +154,9 @@ class TestScopes(unittest.TestCase):
         self.assertEqual(len(deprecations), 1)
         self.assertEqual(deprecations[0].filename, __file__)
 
-    def test_update_config_alias_warning_points_at_the_caller(self):
+    def test_update_alias_warning_points_at_the_caller(self):
         with self.assertWarns(DeprecationWarning) as caught:
-            config.update_config({"plot_bar_value_fontsize": 12})
+            config.update({"plot_bar_value_fontsize": 12})
         self.assertEqual(caught.filename, __file__)
 
     def test_override_restores_after_exception(self):
@@ -135,7 +169,7 @@ class TestScopes(unittest.TestCase):
     def test_override_discards_inner_changes(self):
         before = copy.deepcopy(config.config)
         with config.override(font_general_size=20):
-            config.update_config({"font_title_size": 99})
+            config.update({"font_title_size": 99})
             config.set_theme(THEME.INK)
         self.assertEqual(config.config, before)
         self.assertEqual(config.theme, THEME.DEFAULT)
@@ -149,7 +183,7 @@ class TestScopes(unittest.TestCase):
 
     def test_using_theme_restores_after_exception(self):
         config.set_theme(THEME.MINIMAL)
-        config.update_config({"font_general_size": 8})
+        config.update({"font_general_size": 8})
         before = copy.deepcopy(config.config)
         with self.assertRaises(RuntimeError):
             with config.using_theme(THEME.INK):
@@ -183,7 +217,7 @@ class TestThemeFiles(unittest.TestCase):
 
     def tearDown(self):
         self._tmp.cleanup()
-        config.reset_config()
+        config.reset()
 
     def test_list_themes(self):
         names = config.list_themes()
@@ -194,7 +228,7 @@ class TestThemeFiles(unittest.TestCase):
 
     def test_live_config_round_trip(self):
         config.set_theme(THEME.MINIMAL)
-        config.update_config({"font_general_size": 8, "font_general_color": "#333"})
+        config.update({"font_general_size": 8, "font_general_color": "#333"})
         original = copy.deepcopy(config.config)
         path = self.dir / "house.json"
         config.save_theme(path)
@@ -213,7 +247,7 @@ class TestThemeFiles(unittest.TestCase):
                 self.assertEqual(config.config, theme)
 
     def test_saved_file_holds_only_the_diff(self):
-        config.update_config({"font_general_size": 8})
+        config.update({"font_general_size": 8})
         path = self.dir / "diff.json"
         config.save_theme(path)
         data = json.loads(path.read_text())
