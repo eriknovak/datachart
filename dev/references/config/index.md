@@ -97,7 +97,7 @@ register_theme(name: str, theme: StyleAttrs) -> None
 
 Registers a custom theme so it can be applied with `set_theme`.
 
-Missing attributes are filled from the default theme, alias keys resolve to their canonical name, and unknown keys are rejected. A custom theme of the same name is replaced; the predefined theme names are reserved.
+Missing attributes are filled from the default theme and unknown keys are rejected. A custom theme of the same name is replaced; the predefined theme names are reserved.
 
 Examples:
 
@@ -138,14 +138,6 @@ Examples:
 'default'
 ```
 
-#### reset_config
-
-```
-reset_config() -> None
-```
-
-Deprecated: use `reset`, which it forwards to.
-
 #### update
 
 ```
@@ -164,18 +156,6 @@ Examples:
 >>> config.get("font_general_color")
 '#FFFFFF'
 ```
-
-| PARAMETER | DESCRIPTION                                                        |
-| --------- | ------------------------------------------------------------------ |
-| `config`  | The configuration attributes to be updated. **TYPE:** `StyleAttrs` |
-
-#### update_config
-
-```
-update_config(config: StyleAttrs) -> None
-```
-
-Deprecated: use `update`; it applies the attributes the same way.
 
 | PARAMETER | DESCRIPTION                                                        |
 | --------- | ------------------------------------------------------------------ |
@@ -313,7 +293,7 @@ load_theme(
 
 Registers the theme held in a theme file and returns its name.
 
-The file is read as written by `save_theme` and registered through `register_theme`, so missing attributes are filled from the default theme, alias keys resolve to their canonical name, and unknown keys are rejected. The name is, in order of precedence, the `name` argument, the name in the file, or the file's stem; an existing custom theme of that name is replaced, while a predefined theme's name is rejected, so a file saved from one loads only with a new `name`. Loading only registers: apply the theme with `set_theme` or `using_theme`.
+The file is read as written by `save_theme` and registered through `register_theme`, so missing attributes are filled from the default theme and unknown keys are rejected. The name is, in order of precedence, the `name` argument, the name in the file, or the file's stem; an existing custom theme of that name is replaced, while a predefined theme's name is rejected, so a file saved from one loads only with a new `name`. Loading only registers: apply the theme with `set_theme` or `using_theme`.
 
 Examples:
 

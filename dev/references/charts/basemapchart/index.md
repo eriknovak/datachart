@@ -26,10 +26,7 @@ BasemapChart(
     ymax: int | float | None = None,
     show_grid: SHOW_GRID | str | bool | None = None,
     aspect_ratio: ASPECT_RATIO | str | None = None,
-    style: BasemapStyleAttrs | None = None,
-    features: (
-        BASEMAP_FEATURE | str | list[str] | None
-    ) = None
+    style: BasemapStyleAttrs | None = None
 ) -> DatachartFigure
 ```
 
@@ -79,7 +76,6 @@ Examples:
 | `show_grid`    | Which grid lines to show ("both", "x", "y"); False draws none. The grid draws over a map placed below. See SHOW_GRID. **TYPE:** \`SHOW_GRID                                                                          |
 | `aspect_ratio` | The aspect ratio of the axes box; "geographic" keeps the region at true proportions. See ASPECT_RATIO. **TYPE:** \`ASPECT_RATIO                                                                                      |
 | `style`        | Style configuration of the map. See BasemapStyleAttrs. **TYPE:** \`BasemapStyleAttrs                                                                                                                                 |
-| `features`     | Deprecated; use data. Removed in the next release. **TYPE:** \`BASEMAP_FEATURE                                                                                                                                       |
 
 | RETURNS           | DESCRIPTION                              |
 | ----------------- | ---------------------------------------- |

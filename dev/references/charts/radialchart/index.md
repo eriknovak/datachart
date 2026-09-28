@@ -87,10 +87,7 @@ RadialChart(
     label: str | list[str | None] | None = None,
     x: str | list[str | None] | None = None,
     y: str | list[str | None] | None = None,
-    yerr: str | list[str | None] | None = None,
-    type: RADIAL_TYPE | str | None = None,
-    startangle: str | int | float | None = None,
-    innerradius: float | None = None
+    yerr: str | list[str | None] | None = None
 ) -> DatachartFigure
 ```
 
@@ -160,9 +157,6 @@ Examples:
 | `x`               | The key name in data for the histogram observations (default: "x"). **TYPE:** \`str                                                                                                                                                                                                                                                                                            |
 | `y`               | The key name in data for radial values (default: "y"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                         |
 | `yerr`            | The key name in data for radial error values (default: "yerr"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                |
-| `type`            | Deprecated; use mark. Removed in the next release. **TYPE:** \`RADIAL_TYPE                                                                                                                                                                                                                                                                                                     |
-| `startangle`      | Deprecated; use start_angle. Removed in the next release. **TYPE:** \`str                                                                                                                                                                                                                                                                                                      |
-| `innerradius`     | Deprecated; use inner_radius. Removed in the next release. **TYPE:** \`float                                                                                                                                                                                                                                                                                                   |
 
 | RETURNS           | DESCRIPTION                             |
 | ----------------- | --------------------------------------- |

@@ -93,8 +93,6 @@ Each class and what reads it: a chart parameter, a style attribute, or the confi
 | `BASEMAP_FEATURE`         | data of BasemapChart; the feature of its geometry.                                             |
 | `BASEMAP_RESOLUTION`      | resolution of BasemapChart.                                                                    |
 
-Deprecated names, removed in the next release: `SCALE` (now `AXIS_SCALE`), `NORMALIZE` (now `COLOR_NORM`), `LINE_MARKER.NONE` (now `NO_MARKER`), `LINE_STYLE.NONE` (now `NO_LINE`), and `SCATTER_MATRIX_DIAGONAL.NONE` (now `BLANK`).
-
 ## Constants by Chart
 
 Which constants the parameters of each chart accept, by chart family. A constant used by one chart, or by one chart family, carries that chart's prefix; one shared across families carries none. Style attributes take the constants named in their [typings](https://eriknovak.github.io/datachart/dev/references/typings/index.md).

@@ -694,8 +694,7 @@ kde1d(
     bandwidth: BANDWIDTH | str | float | None = None,
     grid_size: int | None = None,
     cut: float = 3,
-    xlim: tuple[float, float] | None = None,
-    gridsize: int | None = None
+    xlim: tuple[float, float] | None = None
 ) -> dict[str, list[float]]
 ```
 
@@ -721,7 +720,6 @@ Examples:
 | `grid_size` | The number of points the curve is evaluated on; 100 by default. **TYPE:** \`int                                             |
 | `cut`       | How many bandwidths to extend the grid past the extremes. **TYPE:** `float` **DEFAULT:** `3`                                |
 | `xlim`      | The (min, max) range of the grid; overrides the padded range. **TYPE:** \`tuple[float, float]                               |
-| `gridsize`  | Deprecated; use grid_size. Removed in the next release. **TYPE:** \`int                                                     |
 
 | RETURNS                  | DESCRIPTION                                                 |
 | ------------------------ | ----------------------------------------------------------- |
@@ -742,8 +740,7 @@ kde2d(
     grid_size: int | tuple[int, int] | None = None,
     cut: float = 3,
     xlim: tuple[Any, Any] | None = None,
-    ylim: tuple[float, float] | None = None,
-    gridsize: int | tuple[int, int] | None = None
+    ylim: tuple[float, float] | None = None
 ) -> dict[str, list]
 ```
 
@@ -771,7 +768,6 @@ Examples:
 | `cut`       | How many bandwidths to extend the grid past the extremes. **TYPE:** `float` **DEFAULT:** `3`                                           |
 | `xlim`      | The (min, max) x range of the grid; overrides the padded range. **TYPE:** \`tuple[Any, Any]                                            |
 | `ylim`      | The (min, max) y range of the grid; overrides the padded range. **TYPE:** \`tuple[float, float]                                        |
-| `gridsize`  | Deprecated; use grid_size. Removed in the next release. **TYPE:** \`int                                                                |
 
 | RETURNS           | DESCRIPTION                                      |
 | ----------------- | ------------------------------------------------ |

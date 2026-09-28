@@ -133,8 +133,7 @@ RidgelinePlot(
     inner: VIOLIN_INNER | str | None = None,
     fill: bool | None = None,
     show_outline: bool | None = None,
-    sort: SORT | str | None = SORT.NONE,
-    normalize: RIDGELINE_SCALE | str | None = None
+    sort: SORT | str | None = SORT.NONE
 ) -> DatachartFigure
 ```
 
@@ -210,7 +209,6 @@ Examples:
 | `fill`          | Whether to fill each ridge. None takes the theme's chart_default_ridgeline_fill. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                   |
 | `show_outline`  | Whether to stroke each ridge's density curve. None takes the theme's chart_default_ridgeline_show_outline. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                         |
 | `sort`          | The row order: None keeps input order, "ascending" or "descending" orders the rows by their median; ties keep input order. See SORT. **TYPE:** \`SORT                                                                                                                                                                                                                                                                               |
-| `normalize`     | Deprecated; use ridge_scale. Removed in the next release. **TYPE:** \`RIDGELINE_SCALE                                                                                                                                                                                                                                                                                                                                               |
 
 | RETURNS           | DESCRIPTION                               |
 | ----------------- | ----------------------------------------- |

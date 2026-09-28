@@ -4065,32 +4065,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#datachart.config.Config.reset_config" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;reset_config
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#datachart.config.Config.update" class="md-nav__link">
     <span class="md-ellipsis">
       
         <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;update
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#datachart.config.Config.update_config" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;update_config
       
     </span>
   </a>
@@ -4548,32 +4526,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#datachart.config.Config.reset_config" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;reset_config
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#datachart.config.Config.update" class="md-nav__link">
     <span class="md-ellipsis">
       
         <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;update
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#datachart.config.Config.update_config" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;update_config
       
     </span>
   </a>
@@ -5120,10 +5076,9 @@ call <code>update</code> on top for per-attribute tweaks.</p>
     <div class="doc doc-contents ">
 
         <p>Registers a custom theme so it can be applied with <code>set_theme</code>.</p>
-<p>Missing attributes are filled from the default theme, alias keys
-resolve to their canonical name, and unknown keys are rejected. A
-custom theme of the same name is replaced; the predefined theme names
-are reserved.</p>
+<p>Missing attributes are filled from the default theme and unknown keys
+are rejected. A custom theme of the same name is replaced; the
+predefined theme names are reserved.</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -5244,26 +5199,6 @@ notebook section or between tests.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="datachart.config.Config.reset_config" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">reset_config</span>
-
-
-</h4>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">reset_config</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Deprecated: use <code>reset</code>, which it forwards to.</p>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
 <h4 id="datachart.config.Config.update" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">update</span>
 
@@ -5287,54 +5222,6 @@ copied, and unknown attribute names are skipped with a warning.</p>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="gp">&gt;&gt;&gt; </span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"font_general_color"</span><span class="p">)</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="go">'#FFFFFF'</span>
 </code></pre></div>
-
-
-<table>
-      <thead>
-        <tr>
-          <th><span class="doc-section-title">PARAMETER</span></th>
-          <th><span>DESCRIPTION</span></th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>config</code>
-            </td>
-            <td class="doc-param-details">
-              <div class="doc-md-description">
-                <p>The configuration attributes to be updated.</p>
-              </div>
-              <p>
-                  <span class="doc-param-annotation">
-                    <b>TYPE:</b>
-                      <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.StyleAttrs&lt;/span&gt;" href="../typings/#datachart.typings.StyleAttrs">StyleAttrs</a></code>
-                  </span>
-              </p>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="datachart.config.Config.update_config" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">update_config</span>
-
-
-</h4>
-<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">update_config</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.StyleAttrs&lt;/span&gt;" href="../typings/#datachart.typings.StyleAttrs">StyleAttrs</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Deprecated: use <code>update</code>; it applies the attributes the same way.</p>
 
 
 <table>
@@ -5746,8 +5633,7 @@ configuration.</p>
         <p>Registers the theme held in a theme file and returns its name.</p>
 <p>The file is read as written by <code>save_theme</code> and registered through
 <code>register_theme</code>, so missing attributes are filled from the default
-theme, alias keys resolve to their canonical name, and unknown keys
-are rejected. The name is, in order of precedence, the <code>name</code>
+theme and unknown keys are rejected. The name is, in order of precedence, the <code>name</code>
 argument, the name in the file, or the file's stem; an existing custom
 theme of that name is replaced, while a predefined theme's name is
 rejected, so a file saved from one loads only with a new <code>name</code>.

@@ -313,9 +313,6 @@ save_figure(
         FIG_FORMAT | str | list[FIG_FORMAT | str] | None
     ) = None,
     transparent: bool = False,
-    format: (
-        FIG_FORMAT | str | list[FIG_FORMAT | str] | None
-    ) = None,
 ) -> list[str]
 ```
 
@@ -354,15 +351,14 @@ Examples:
 | `dpi`         | The DPI of the figure. **TYPE:** `int` **DEFAULT:** `300`                                                                                       |
 | `fmt`         | The format of the figure, or a list of formats to write. If None, the format will be determined from the file extension. **TYPE:** \`FIG_FORMAT |
 | `transparent` | Whether to make the background transparent. **TYPE:** `bool` **DEFAULT:** `False`                                                               |
-| `format`      | Deprecated; use fmt. **TYPE:** \`FIG_FORMAT                                                                                                     |
 
 | RETURNS     | DESCRIPTION                                             |
 | ----------- | ------------------------------------------------------- |
 | `list[str]` | The paths written, in the order the formats were given. |
 
-| RAISES       | DESCRIPTION                                                 |
-| ------------ | ----------------------------------------------------------- |
-| `ValueError` | If fmt is an empty list, or both fmt and format are passed. |
+| RAISES       | DESCRIPTION              |
+| ------------ | ------------------------ |
+| `ValueError` | If fmt is an empty list. |
 
 ## The Figure
 

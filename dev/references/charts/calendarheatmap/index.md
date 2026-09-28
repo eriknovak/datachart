@@ -47,8 +47,7 @@ CalendarHeatmap(
             TextSettingAttrs | list[TextSettingAttrs] | None
         ]
         | None
-    ) = None,
-    show_colorbars: bool | None = None
+    ) = None
 ) -> DatachartFigure
 ```
 
@@ -92,7 +91,6 @@ Examples:
 | `vcenter`             | The value(s) a centred normalization holds in the middle of the colormap (0 by default); ignored by every other norm. **TYPE:** \`float                                                                                                                                                                                                                                                                                          |
 | `colorbar`            | The colorbar setting(s): label, location, tick format, and tick positions. See ColorbarSettingAttrs. **TYPE:** \`ColorbarSettingAttrs                                                                                                                                                                                                                                                                                            |
 | `texts`               | Text annotation(s) to draw, on every calendar of their dataset. The cells sit at integer positions: the week column along x, the weekday row along y, counted from zero at the top-left cell of the drawn range. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                    |
-| `show_colorbars`      | Deprecated; use show_colorbar. Removed in the next release. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                     |
 
 | RETURNS           | DESCRIPTION                                    |
 | ----------------- | ---------------------------------------------- |

@@ -276,7 +276,7 @@ Style groups several charts read from their `style` dictionary: the value labels
 
 Bases: `TypedDict`
 
-The typing for the value labels: the numbers a chart prints beside its marks when `show_values` is on. One style serves every chart that takes `show_values`; the `plot_bar_value_*` style keys are aliases of these.
+The typing for the value labels: the numbers a chart prints beside its marks when `show_values` is on. One style serves every chart that takes `show_values`.
 
 | ATTRIBUTE               | DESCRIPTION                                                                                                                                                                                                                                                     |
 | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

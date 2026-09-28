@@ -169,7 +169,7 @@ ScatterMatrix(
 
 ### Correlation
 
-A cloud of points shows the shape of a relationship, but not its strength as a number. `show_correlation=True` replaces the cells above the diagonal with the Pearson correlation coefficient of each pair, from -1 (a perfect falling line) to 1 (a perfect rising line). Pooled over all penguins, bill length and bill depth have a coefficient of -0.24: deeper bills seem to go with shorter ones. `lower_only` wins over `show_correlation`: with both set, the upper cells stay empty. The same coefficient is available in code as [datachart.utils.stats.correlation](https://eriknovak.github.io/datachart/dev/references/utils/stats/#datachart.utils.stats.correlation).
+A cloud of points shows the shape of a relationship, but not its strength as a number. `show_correlation=True` replaces the cells above the diagonal with the Pearson correlation coefficient of each pair, from -1 (a perfect falling line) to 1 (a perfect rising line). Pooled over all penguins, bill length and bill depth have a coefficient of -0.24: deeper bills seem to go with shorter ones. `lower_only` wins over `show_correlation`: with both set, the upper cells stay empty. The same coefficient is available in code as [datachart.utils.stats.pearson](https://eriknovak.github.io/datachart/dev/references/utils/stats/#datachart.utils.stats.pearson).
 
 ```
 ScatterMatrix(

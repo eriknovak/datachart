@@ -197,11 +197,8 @@ def guide_title(name):
 def params(name):
     source = inspect.getsource(getattr(ch, name))
     sig = source.split('"""', 1)[0]
-    # a parameter the docstring marks "Not supported" raises when passed, and
-    # one it marks "Deprecated" is a renamed parameter's old name
-    unsupported = set(
-        re.findall(r"^        (\w+): (?:Not supported|Deprecated)", source, re.M)
-    )
+    # a parameter the docstring marks "Not supported" raises when passed
+    unsupported = set(re.findall(r"^        (\w+): Not supported", source, re.M))
     rows, seen = [], set()
     for line in sig.splitlines():
         m = re.match(r"\s*(\w+):\s*([^=]*)", line)

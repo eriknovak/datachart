@@ -130,8 +130,7 @@ SwarmPlot(
         | None
     ) = None,
     label: str | list[str | None] | None = None,
-    value: str | list[str | None] | None = None,
-    mode: SWARM_MODE | str | None = None
+    value: str | list[str | None] | None = None
 ) -> DatachartFigure
 ```
 
@@ -204,7 +203,6 @@ Examples:
 | `texts`         | Text annotation(s) to draw. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                                                                                                                                                                                                            |
 | `label`         | The key name in data for label/category values (default: "label"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                  |
 | `value`         | The key name in data for numeric values (default: "value"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                         |
-| `mode`          | Deprecated; use swarm_mode. Removed in the next release. **TYPE:** \`SWARM_MODE                                                                                                                                                                                                                                                                                                                                                     |
 
 | RETURNS           | DESCRIPTION                           |
 | ----------------- | ------------------------------------- |
