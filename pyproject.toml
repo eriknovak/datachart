@@ -28,11 +28,11 @@ classifiers = [
     "Framework :: Matplotlib",
 ]
 dependencies = [
-    "numpy>=1.24",
-    "matplotlib>=3.8",
-    "scipy>=1.10",
+    "numpy>=2.0",
+    "matplotlib>=3.10.1",
+    "scipy>=1.15",
     "typing-extensions; python_version < '3.11'",
-    "pypalettes>=0.1",
+    "pypalettes>=0.2.1",
 ]
 
 # zoom, pan, and hover via `figure.show(interactive=True)`

@@ -31,16 +31,31 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: uv sync --group test
-      # the outlines and faces download on first use; fetched once per key (ADR 0062, 0063)
-      - uses: actions/cache@v4
-        with:
-          path: ~/.cache/datachart
-          key: datachart-cache-${{ hashFiles('datachart/utils/_internal/cache.py', 'datachart/utils/_internal/basemap.py', 'datachart/utils/_internal/fonts.py') }}-fonts-110m-50m
-      - run: uv run python datachart/utils/_internal/prewarm.py fonts 110m 50m
+      - uses: ./.github/actions/prewarm-cache
       - run: uv run python -m unittest discover test
       # the public annotations stay usable by an installed copy (ADR 0087)
       - if: matrix.python-version == '3.12'
         run: uv run pyright test/typecheck/usage.py
+
+  # tests that pyproject.toml's floors actually work (issue #316)
+  # uses uv pip install, not `uv sync --resolution lowest-direct`, which
+  # would also floor unrelated dev tools (coverage, ...) to broken versions
+  minimum-versions:
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.1.0
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.10"
+      - run: uv venv
+      - run: uv pip install --resolution lowest-direct -e .
+      - run: uv pip install pytest
+      - uses: ./.github/actions/prewarm-cache
+        with:
+          no-sync: "true"
+      - run: uv run --no-sync python -m unittest discover test
 
   # early warning on the private matplotlib touchpoint; never blocks (ADR 0085)
   matplotlib-pre:
@@ -54,12 +69,10 @@ jobs:
           python-version: "3.13"
       - run: uv sync --group test
       - run: uv pip install --prerelease allow --upgrade matplotlib
-      - uses: actions/cache@v4
-        with:
-          path: ~/.cache/datachart
-          key: datachart-cache-${{ hashFiles('datachart/utils/_internal/cache.py', 'datachart/utils/_internal/basemap.py', 'datachart/utils/_internal/fonts.py') }}-fonts-110m-50m
       # --no-sync keeps the pre-release instead of restoring the locked version
-      - run: uv run --no-sync python datachart/utils/_internal/prewarm.py fonts 110m 50m
+      - uses: ./.github/actions/prewarm-cache
+        with:
+          no-sync: "true"
       - run: uv run --no-sync python -c "import matplotlib; print(matplotlib.__version__)"
       - run: uv run --no-sync python -m unittest discover test
 
@@ -73,10 +86,5 @@ jobs:
         with:
           python-version: "3.12"
       - run: uv sync --group test
-      # the outlines and faces download on first use; fetched once per key (ADR 0062, 0063)
-      - uses: actions/cache@v4
-        with:
-          path: ~/.cache/datachart
-          key: datachart-cache-${{ hashFiles('datachart/utils/_internal/cache.py', 'datachart/utils/_internal/basemap.py', 'datachart/utils/_internal/fonts.py') }}-fonts-110m-50m
-      - run: uv run python datachart/utils/_internal/prewarm.py fonts 110m 50m
+      - uses: ./.github/actions/prewarm-cache
       - run: uv run pytest
