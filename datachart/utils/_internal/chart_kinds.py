@@ -277,8 +277,6 @@ class ChartKind:
         subplots: The charts may split into one subplot each.
         rejects: Parameters the front takes only as None, with the reason
             a value raises.
-        renamed: Deprecated parameter names the front still takes, mapped
-            to their new names; each is removed one release after it ships.
         domains: The constant class each of the front's own constant-typed
             parameters takes (ADR 0068); a shared parameter's comes from its
             `SharedParameter` annotation.
@@ -347,7 +345,6 @@ class ChartKind:
     datasets: DatasetPolicy = DatasetPolicy.OVERLAY
     subplots: bool = True
     rejects: Mapping[str, str] = field(default_factory=dict)
-    renamed: Mapping[str, str] = field(default_factory=dict)
     domains: Mapping[str, Type[Domain]] = field(default_factory=dict)
     theme_defaults: Mapping[str, str] = field(default_factory=dict)
     group: bool = False

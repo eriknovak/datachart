@@ -1,5 +1,3 @@
-import ast
-import inspect
 import re
 import unittest
 from pathlib import Path
@@ -56,41 +54,11 @@ def documented_names():
     return surfaces
 
 
-def deprecated_wrapper_names(module):
-    """Top-level functions that only warn-and-redirect under their own name.
-
-    A function like `stats.correlation` stays callable (and `import *`-able)
-    through its deprecation window even though the docs no longer advertise
-    it, so it belongs in `__all__` without being "documented".
-    """
-    tree = ast.parse(inspect.getsource(module))
-    names = set()
-    for node in tree.body:
-        if not isinstance(node, ast.FunctionDef):
-            continue
-        for call in ast.walk(node):
-            if (
-                isinstance(call, ast.Call)
-                and isinstance(call.func, ast.Name)
-                and call.func.id == "warn_renamed"
-                and call.args
-                and isinstance(call.args[0], ast.Constant)
-                and call.args[0].value == node.name
-            ):
-                names.add(node.name)
-                break
-    return names
-
-
 class TestPublicSurface(unittest.TestCase):
     def test_all_matches_documented_surface(self):
         surfaces = documented_names()
         for prefix, modules, exceptions in GROUPS:
-            documented = surfaces[prefix] - exceptions
-            deprecated = set()
-            for module in modules:
-                deprecated |= deprecated_wrapper_names(module)
-            expected = documented | deprecated
+            expected = surfaces[prefix] - exceptions
             actual = set()
             for module in modules:
                 actual |= set(module.__all__)

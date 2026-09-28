@@ -36,7 +36,6 @@ from .constants import (
     FONT_WEIGHT,
     GANTT_ARROW_ENTRY,
     HATCH_STYLE,
-    HEXBIN_REDUCE,
     HISTOGRAM_TYPE,
     LEGEND_ALIGN,
     LEGEND_LOCATION,

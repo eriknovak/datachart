@@ -1,7 +1,6 @@
 """Tests for theme-driven defaults and cycles (ADR 0004) and the value-label fixes."""
 
 import unittest
-import warnings
 
 import matplotlib
 
@@ -9,16 +8,12 @@ matplotlib.use("Agg")
 import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 
-from datetime import date, timedelta
 
 from datachart.charts import (
     BarChart,
-    CalendarHeatmap,
     Heatmap,
     LineChart,
-    NetworkChart,
     RadialChart,
-    RidgelinePlot,
 )
 from datachart.config import config
 from datachart.constants import THEME
@@ -29,15 +24,6 @@ BAR = [{"label": label, "y": y} for label, y in zip("ABC", [3.0, 5.0, 4.0])]
 BAR2 = [{"label": label, "y": y} for label, y in zip("ABC", [2.0, 6.0, 1.0])]
 HEAT = {"z": [[0.0, 0.5], [0.8, 1.0]]}
 LINE = [{"x": x, "y": x * x} for x in range(5)]
-RIDGE = [{"label": "a", "value": float(v)} for v in range(10)]
-CALENDAR = {
-    "date": [date(2024, 1, 1) + timedelta(days=i) for i in range(10)],
-    "value": list(range(10)),
-}
-NETWORK = {
-    "nodes": [{"id": "a"}, {"id": "b"}],
-    "edges": [{"source": "a", "target": "b"}],
-}
 RADIAL = [{"label": d, "y": y} for d, y in zip("NESW", [4.0, 7.0, 3.0, 6.0])]
 
 

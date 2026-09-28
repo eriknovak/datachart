@@ -120,8 +120,7 @@ class TestSharedParameters(unittest.TestCase):
         for front, params in self.signatures():
             kind = CHART_KINDS[front.lower()]
             for name, row in SHARED_PARAMETERS.items():
-                # a deprecated name keeps the type it had
-                if name not in params or name in kind.renamed:
+                if name not in params:
                     continue
                 with self.subTest(front=front, parameter=name):
                     self.assertEqual(

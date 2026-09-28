@@ -6,7 +6,6 @@ there are, and every record comes out under the row's canonical keys
 record whose position is missing is dropped (ADR 0082).
 """
 
-import warnings
 from collections.abc import Iterable, Iterator
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -665,9 +664,6 @@ def canonical_records(
     canonical key, which it defaults to; None in a per-chart list leaves
     that chart without the key. The caller's records are never
     mutated; keys the row does not declare, like `emphasis`, carry over.
-    Records carrying a key the row has `renamed`, and not its new name,
-    are read under the old name with a warning, unless another record key
-    already reads the old one.
 
     Args:
         kind: The front's row, declaring the record keys.
@@ -684,21 +680,6 @@ def canonical_records(
     """
     sources = {key: chart.pop(key) if key in chart else key for key in kind.record_keys}
     data = chart["data"]
-    for old, new in kind.renamed.items():
-        if (
-            new in kind.record_keys
-            and sources[new] == new
-            and old not in sources.values()
-            and any(old in record for record in data)
-            and not any(new in record for record in data)
-        ):
-            warnings.warn(
-                f"The `{old}` record key is deprecated and will be removed in "
-                f"the next release; use `{new}` instead.",
-                DeprecationWarning,
-                stacklevel=5,
-            )
-            sources[new] = old
     required = kind.required_keys if required_keys is None else required_keys
     for index, record in enumerate(data):
         for key in required:
