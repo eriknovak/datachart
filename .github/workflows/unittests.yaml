@@ -42,11 +42,9 @@ jobs:
       - if: matrix.python-version == '3.12'
         run: uv run pyright test/typecheck/usage.py
 
-  # confirms the floors in pyproject.toml actually work (issue #316); `uv sync
-  # --resolution lowest-direct` can't be used here because it re-resolves the
-  # whole dependency-group graph at once, dragging dev-only tools (coverage,
-  # nbmake, pyright) down to ancient, broken versions along with it — so this
-  # resolves the project's own dependencies in isolation via `uv pip install`
+  # tests that pyproject.toml's floors actually work (issue #316)
+  # uses uv pip install, not `uv sync --resolution lowest-direct`, which
+  # would also floor unrelated dev tools (coverage, ...) to broken versions
   minimum-versions:
     if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
