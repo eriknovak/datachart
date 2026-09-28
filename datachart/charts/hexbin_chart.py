@@ -135,10 +135,6 @@ def HexbinChart(
             List[Union[TextSettingAttrs, List[TextSettingAttrs], None]],
         ]
     ] = None,
-    valfmt: Optional[Union[VALUE_FORMAT, str, List[Optional[str]]]] = None,
-    show_colorbars: Optional[bool] = None,
-    gridsize: Optional[Union[int, List[Optional[int]]]] = None,
-    mincnt: Optional[Union[int, List[Optional[int]]]] = None,
 ) -> DatachartFigure:
     """Creates the hexbin chart.
 
@@ -245,10 +241,6 @@ def HexbinChart(
             positions. See
             [`ColorbarSettingAttrs`][datachart.typings.ColorbarSettingAttrs].
         texts: Text annotation(s) to draw.
-        valfmt: Deprecated; use `value_format`. Removed in the next release.
-        show_colorbars: Deprecated; use `show_colorbar`. Removed in the next release.
-        gridsize: Deprecated; use `grid_size`. Removed in the next release.
-        mincnt: Deprecated; use `min_count`. Removed in the next release.
 
     Returns:
         The figure containing the hexbin chart.

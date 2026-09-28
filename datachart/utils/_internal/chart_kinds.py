@@ -77,7 +77,6 @@ from .layers import (
     value_label_font,
 )
 from .validate import (
-    validate_annotation,
     validate_calendar_dates,
     validate_calendar_year,
     validate_dumbbell_records,
@@ -502,13 +501,6 @@ def _check_dumbbells(charts: List[dict], settings: dict) -> None:
         validate_dumbbell_records(chart["data"])
 
 
-def _check_annotations(charts: List[dict], settings: dict) -> None:
-    # a `label` key read as the annotation meets the `annotation` check
-    for chart in charts:
-        label_key = chart.pop("renamed", {}).get("annotation")
-        validate_annotation(label_key, settings.get("show_values"))
-
-
 def _check_tasks(charts: List[dict], settings: dict) -> None:
     sort = settings.get("sort")
     sort_key = validate_gantt_sort_by(sort, settings.get("sort_by"))
@@ -733,11 +725,6 @@ _KINDS = (
                 for name in ("vlines", "hlines", "dlines", "brackets")
             },
         },
-        renamed={
-            "type": "mark",
-            "startangle": "start_angle",
-            "innerradius": "inner_radius",
-        },
         check_records=_check_radial,
         prepare=_radial_mark,
         # the front takes a rule and a sort on the bar visual only
@@ -765,7 +752,6 @@ _KINDS = (
             "a calendar is a single raster layer with no series to mute or "
             "highlight.",
         ),
-        renamed={"show_colorbars": "show_colorbar"},
         overlayable=False,
         gridless=_always,
     ),
@@ -877,7 +863,6 @@ _KINDS = (
         position_keys=("label",),
         value_keys=("value",),
         defaults={"orientation": ORIENTATION.VERTICAL, "swarm_mode": SWARM_MODE.SWARM},
-        renamed={"mode": "swarm_mode"},
         group=True,
         emphasis_units=group_units,
         emphasis_by="median",
@@ -897,7 +882,6 @@ _KINDS = (
         },
         build=_raincloud_layers,
         datasets=DatasetPolicy.SUBPLOT,
-        renamed={"mode": "swarm_mode"},
         group=True,
         emphasis_units=group_units,
         emphasis_by="median",
@@ -919,7 +903,6 @@ _KINDS = (
         defaults={"orientation": ORIENTATION.HORIZONTAL},
         build=_ridgeline_layers,
         datasets=DatasetPolicy.SUBPLOT,
-        renamed={"normalize": "ridge_scale"},
         group=True,
         emphasis_units=group_units,
         emphasis_by="median",
@@ -934,9 +917,6 @@ _KINDS = (
         required_keys=("x", "y"),
         position_keys=("x",),
         value_keys=("y", "size", "xerr", "yerr"),
-        # `label` is the category key on every other front (ADR 0069)
-        renamed={"label": "annotation"},
-        check_records=_check_annotations,
         emphasis_units=series_units("y"),
         emphasis_by="mean",
     ),
@@ -956,11 +936,6 @@ _KINDS = (
             "a heatmap has no series to mute or highlight. Set the `emphasis` "
             "grid on `data` for per-cell roles instead.",
         ),
-        renamed={
-            "show_heatmap_values": "show_values",
-            "valfmt": "value_format",
-            "show_colorbars": "show_colorbar",
-        },
         overlayable=False,
         # a raster covers the grid
         gridless=_always,
@@ -978,11 +953,6 @@ _KINDS = (
         dict_data=True,
         data_keys=(),
         value_keys=("z",),
-        renamed={
-            "valfmt": "value_format",
-            "filled": "fill",
-            "show_colorbars": "show_colorbar",
-        },
         check_records=_check_contour,
         # filled contour bands cover the grid
         gridless=_filled,
@@ -1017,12 +987,6 @@ _KINDS = (
             "a hexbin chart is a single colormapped layer with no series to "
             "mute or highlight.",
         ),
-        renamed={
-            "valfmt": "value_format",
-            "gridsize": "grid_size",
-            "mincnt": "min_count",
-            "show_colorbars": "show_colorbar",
-        },
         # hexagons cover the grid
         gridless=_always,
     ),
@@ -1077,7 +1041,6 @@ _KINDS = (
         dict_data=True,
         datasets=DatasetPolicy.SUBPLOT,
         subplots=False,
-        renamed={"features": "data"},
         expand=_basemap_chart,
         map_underlay=True,
     ),

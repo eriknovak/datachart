@@ -138,7 +138,7 @@ class TestFronts(ValueLabelCase):
 
     def test_scatter_label_and_show_values_are_exclusive(self):
         with self.assertRaises(ValueError):
-            ScatterChart(NAMED, label="name", show_values=True)
+            ScatterChart(NAMED, annotation="name", show_values=True)
 
     def test_value_step_labels_every_nth_point(self):
         figure = LineChart(LONG_LINE, show_values=True, value_step=50)
@@ -250,9 +250,9 @@ class TestSwarm(ValueLabelCase):
 
     def test_strip_and_horizontal(self):
         for kwargs in (
-            {"mode": SWARM_MODE.STRIP},
+            {"swarm_mode": SWARM_MODE.STRIP},
             {"orientation": ORIENTATION.HORIZONTAL},
-            {"mode": SWARM_MODE.STRIP, "orientation": ORIENTATION.HORIZONTAL},
+            {"swarm_mode": SWARM_MODE.STRIP, "orientation": ORIENTATION.HORIZONTAL},
         ):
             figure = SwarmPlot(GROUPS, show_values=True, **kwargs)
             ax = figure.axes[0]
@@ -339,7 +339,7 @@ class TestThemeDefault(ValueLabelCase):
 
     def test_point_labels_win_over_the_theme_default(self):
         config.update({"chart_default_show_values": True})
-        figure = ScatterChart(NAMED, label="name")
+        figure = ScatterChart(NAMED, annotation="name")
         self.assertEqual(texts(figure.axes[0]), ["p0", "p1", "p2"])
 
 

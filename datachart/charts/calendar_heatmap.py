@@ -55,7 +55,6 @@ def CalendarHeatmap(
             List[Union[TextSettingAttrs, List[TextSettingAttrs], None]],
         ]
     ] = None,
-    show_colorbars: Optional[bool] = None,
 ) -> DatachartFigure:
     """Creates the calendar heatmap.
 
@@ -132,7 +131,6 @@ def CalendarHeatmap(
             dataset. The cells sit at integer positions: the week column
             along x, the weekday row along y, counted from zero at the
             top-left cell of the drawn range.
-        show_colorbars: Deprecated; use `show_colorbar`. Removed in the next release.
 
     Returns:
         The figure containing the calendar heatmap(s).

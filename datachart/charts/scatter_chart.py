@@ -139,7 +139,6 @@ def ScatterChart(
     xerr: Optional[Union[str, List[Optional[str]]]] = None,
     yerr: Optional[Union[str, List[Optional[str]]]] = None,
     size_range: Optional[Tuple[float, float]] = None,
-    label: Optional[Union[str, List[Optional[str]]]] = None,
 ) -> DatachartFigure:
     """Creates a scatter chart.
 
@@ -302,7 +301,6 @@ def ScatterChart(
         yerr: The key name in data for the y-axis error values (default: "yerr"),
             read like `xerr`.
         size_range: Tuple of (min_size, max_size) for bubble charts (default: (20, 200)).
-        label: Deprecated; use `annotation`. Removed in the next release.
 
     Returns:
         The figure containing the scatter chart.
@@ -310,5 +308,5 @@ def ScatterChart(
     """
     params = dict(locals())
 
-    validate_annotation(annotation if label is None else label, show_values)
+    validate_annotation(annotation, show_values)
     return render("scatterchart", params)

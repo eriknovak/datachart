@@ -2,8 +2,6 @@ import ast
 import inspect
 import textwrap
 import unittest
-import warnings
-from datetime import date
 from typing import Optional
 from unittest import mock
 
@@ -347,97 +345,36 @@ class TestRenderSplit(unittest.TestCase):
         )
 
 
-GRID = {"z": [[1, 2], [3, 4]]}
-POINTS = {"x": [0, 1, 2], "y": [0, 1, 2]}
-GROUPS = [{"label": "a", "value": v} for v in (1, 2, 3, 5)]
-WIND = [{"label": "N", "y": 1}, {"label": "E", "y": 2}, {"label": "S", "y": 3}]
-NAMED = [{"x": 0, "y": 1, "name": "a"}, {"x": 1, "y": 2, "name": "b"}]
-DAYS = {"date": [date(2024, 1, 1), date(2024, 1, 2)], "value": [1, 2]}
-
-# front, its data, the deprecated name, the new name, and a value for both
-RENAMES = [
-    (Heatmap, GRID, "show_heatmap_values", "show_values", True),
-    (Heatmap, GRID, "valfmt", "value_format", "{x:.2f}"),
-    (ContourChart, GRID, "valfmt", "value_format", "{x:.2f}"),
-    (HexbinChart, POINTS, "valfmt", "value_format", "{x:.2f}"),
-    (RidgelinePlot, GROUPS, "normalize", "ridge_scale", "common"),
-    (RadialChart, WIND, "type", "mark", "bar"),
-    (ScatterChart, NAMED, "label", "annotation", "name"),
-    (RadialChart, WIND, "startangle", "start_angle", "E"),
-    (RadialChart, WIND, "innerradius", "inner_radius", 0.3),
-    (ContourChart, GRID, "filled", "fill", True),
-    (SwarmPlot, GROUPS, "mode", "swarm_mode", "strip"),
-    (RaincloudPlot, GROUPS, "mode", "swarm_mode", "strip"),
-    (HexbinChart, POINTS, "mincnt", "min_count", 2),
-    (HexbinChart, POINTS, "gridsize", "grid_size", 5),
-    (Heatmap, GRID, "show_colorbars", "show_colorbar", False),
-    (CalendarHeatmap, DAYS, "show_colorbars", "show_colorbar", True),
-    (ContourChart, GRID, "show_colorbars", "show_colorbar", False),
-    (HexbinChart, POINTS, "show_colorbars", "show_colorbar", False),
+# front and a name it took before 1.0, removed with its deprecation
+REMOVED = [
+    (Heatmap, "show_heatmap_values"),
+    (Heatmap, "valfmt"),
+    (Heatmap, "show_colorbars"),
+    (ContourChart, "valfmt"),
+    (ContourChart, "filled"),
+    (ContourChart, "show_colorbars"),
+    (HexbinChart, "valfmt"),
+    (HexbinChart, "gridsize"),
+    (HexbinChart, "mincnt"),
+    (HexbinChart, "show_colorbars"),
+    (RidgelinePlot, "normalize"),
+    (RadialChart, "type"),
+    (RadialChart, "startangle"),
+    (RadialChart, "innerradius"),
+    (ScatterChart, "label"),
+    (SwarmPlot, "mode"),
+    (RaincloudPlot, "mode"),
+    (CalendarHeatmap, "show_colorbars"),
+    (BasemapChart, "features"),
 ]
 
 
-class TestDeprecatedNames(unittest.TestCase):
-    def test_old_name_warns_at_the_caller_and_maps_to_the_new(self):
-        for front, data, old, new, value in RENAMES:
+class TestRemovedNames(unittest.TestCase):
+    def test_removed_name_is_an_unknown_keyword(self):
+        for front, old in REMOVED:
             with self.subTest(front=front.__name__, name=old):
-                expected = captured(front, data, **{new: value})
-                with self.assertWarnsRegex(DeprecationWarning, f"`{new}`") as caught:
-                    got = captured(front, data, **{old: value})
-                self.assertEqual(caught.filename, __file__)
-                self.assertEqual(got, expected)
-
-    def test_old_name_warns_once(self):
-        for front, data, old, _, value in RENAMES:
-            with self.subTest(front=front.__name__, name=old):
-                with warnings.catch_warnings(record=True) as caught:
-                    warnings.simplefilter("always")
-                    captured(front, data, **{old: value})
-                deprecations = [
-                    w for w in caught if issubclass(w.category, DeprecationWarning)
-                ]
-                self.assertEqual(len(deprecations), 1)
-                self.assertIn(f"`{old}`", str(deprecations[0].message))
-
-    def test_old_name_is_listed_in_its_row(self):
-        for front, _, old, new, _ in RENAMES:
-            with self.subTest(front=front.__name__, name=old):
-                self.assertEqual(CHART_KINDS[front.__name__.lower()].renamed[old], new)
-
-    def test_basemap_features_is_data(self):
-        expected = captured(BasemapChart, "land")
-        with self.assertWarnsRegex(DeprecationWarning, "`data`"):
-            got = captured(BasemapChart, features="land")
-        self.assertEqual(got, expected)
-
-    def test_both_names_raise(self):
-        with self.assertWarns(DeprecationWarning):
-            with self.assertRaisesRegex(ValueError, "`show_values` only"):
-                Heatmap(GRID, show_values=True, show_heatmap_values=True)
-
-    def test_old_name_warns_before_its_value_is_checked(self):
-        bad = [
-            (RadialChart, WIND, {"innerradius": 1.0}, "`inner_radius`"),
-            (RadialChart, WIND, {"startangle": "north"}, "`start_angle`"),
-            (
-                ContourChart,
-                GRID,
-                {"filled": True, "emphasis_rule": {"top": 1}},
-                "`fill",
-            ),
-        ]
-        for front, data, kwargs, message in bad:
-            with self.subTest(front=front.__name__, kwargs=kwargs):
-                with self.assertWarns(DeprecationWarning):
-                    with self.assertRaisesRegex(ValueError, message):
-                        front(data, **kwargs)
-
-    def test_both_names_raise_for_every_rename(self):
-        for front, data, old, new, value in RENAMES:
-            with self.subTest(front=front.__name__, name=old):
-                with self.assertWarns(DeprecationWarning):
-                    with self.assertRaisesRegex(ValueError, f"`{new}` only"):
-                        front(data, **{old: value, new: value})
+                with self.assertRaisesRegex(TypeError, f"'{old}'"):
+                    front([], **{old: 1})
 
 
 class TestDictShape(unittest.TestCase):

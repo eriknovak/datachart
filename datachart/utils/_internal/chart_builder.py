@@ -667,8 +667,7 @@ def canonical_records(
     mutated; keys the row does not declare, like `emphasis`, carry over.
     Records carrying a key the row has `renamed`, and not its new name,
     are read under the old name with a warning, unless another record key
-    already reads the old one; the chart's `renamed` maps each such new
-    name to the old one it read.
+    already reads the old one.
 
     Args:
         kind: The front's row, declaring the record keys.
@@ -700,8 +699,6 @@ def canonical_records(
                 stacklevel=5,
             )
             sources[new] = old
-            # the row's `check_records` validates it like the parameter
-            chart.setdefault("renamed", {})[new] = old
     required = kind.required_keys if required_keys is None else required_keys
     for index, record in enumerate(data):
         for key in required:

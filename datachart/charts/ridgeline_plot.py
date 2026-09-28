@@ -134,7 +134,6 @@ def RidgelinePlot(
     fill: Optional[bool] = None,
     show_outline: Optional[bool] = None,
     sort: Optional[Union[SORT, str]] = SORT.NONE,
-    normalize: Optional[Union[RIDGELINE_SCALE, str]] = None,
 ) -> DatachartFigure:
     """Creates the ridgeline plot.
 
@@ -247,7 +246,6 @@ def RidgelinePlot(
         sort: The row order: None keeps input order, "ascending" or
             "descending" orders the rows by their median; ties keep input
             order. See [`SORT`][datachart.constants.SORT].
-        normalize: Deprecated; use `ridge_scale`. Removed in the next release.
 
     Returns:
         The figure containing the ridgeline plot.
