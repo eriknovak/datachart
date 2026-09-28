@@ -802,11 +802,11 @@ test = [
 [package.metadata]
 requires-dist = [
     { name = "ipympl", marker = "extra == 'interactive'" },
-    { name = "matplotlib", specifier = ">=3.8" },
+    { name = "matplotlib", specifier = ">=3.10.1" },
     { name = "mplcursors", marker = "extra == 'interactive'" },
-    { name = "numpy", specifier = ">=1.24" },
-    { name = "pypalettes", specifier = ">=0.1" },
-    { name = "scipy", specifier = ">=1.10" },
+    { name = "numpy", specifier = ">=2.0" },
+    { name = "pypalettes", specifier = ">=0.2.1" },
+    { name = "scipy", specifier = ">=1.15" },
     { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
 provides-extras = ["interactive"]
