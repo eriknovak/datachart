@@ -77,9 +77,6 @@ def Heatmap(
             List[Union[TextSettingAttrs, List[TextSettingAttrs], None]],
         ]
     ] = None,
-    show_heatmap_values: Optional[bool] = None,
-    valfmt: Optional[Union[VALUE_FORMAT, str, List[Optional[str]]]] = None,
-    show_colorbars: Optional[bool] = None,
 ) -> DatachartFigure:
     """Creates the heatmap.
 
@@ -174,9 +171,6 @@ def Heatmap(
             positions. See
             [`ColorbarSettingAttrs`][datachart.typings.ColorbarSettingAttrs].
         texts: Text annotation(s) to draw.
-        show_heatmap_values: Deprecated; use `show_values`. Removed in the next release.
-        valfmt: Deprecated; use `value_format`. Removed in the next release.
-        show_colorbars: Deprecated; use `show_colorbar`. Removed in the next release.
 
     Returns:
         The figure containing the heatmap.

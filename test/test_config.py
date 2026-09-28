@@ -3,7 +3,6 @@ import json
 import tempfile
 import typing
 import unittest
-import warnings
 from pathlib import Path
 
 from datachart.config import config
@@ -92,31 +91,10 @@ class TestConfig(unittest.TestCase):
         self.assertEqual(caught.filename, __file__)
         self.assertNotIn("not_a_key", config.config)
 
-    def test_deprecated_names_warn_once_and_forward(self):
-        for old, new, call in (
-            (
-                "update_config",
-                "update",
-                lambda: config.update_config({"font_general_size": 8}),
-            ),
-            ("reset_config", "reset", config.reset_config),
-        ):
+    def test_deprecated_methods_are_gone(self):
+        for old in ("update_config", "reset_config"):
             with self.subTest(old=old):
-                with warnings.catch_warnings(record=True) as caught:
-                    warnings.simplefilter("always")
-                    call()
-                deprecations = [w for w in caught if w.category is DeprecationWarning]
-                self.assertEqual(len(deprecations), 1)
-                self.assertIn(f"`{old}`", str(deprecations[0].message))
-                self.assertIn(f"`{new}`", str(deprecations[0].message))
-                self.assertEqual(deprecations[0].filename, __file__)
-        self.assertEqual(config.config, DEFAULT_THEME)
-
-    def test_deprecated_update_config_forwards(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
-            config.update_config({"font_general_size": 8})
-        self.assertEqual(config["font_general_size"], 8)
+                self.assertFalse(hasattr(config, old))
 
     def test_theme_setters_accept_a_registered_name(self):
         for method in (Config.set_theme, Config.using_theme):
@@ -144,20 +122,6 @@ class TestScopes(unittest.TestCase):
         self.assertEqual(
             config["font_general_size"], DEFAULT_THEME["font_general_size"]
         )
-
-    def test_override_alias_warning_points_at_the_caller(self):
-        with warnings.catch_warnings(record=True) as caught:
-            warnings.simplefilter("always")
-            with config.override(plot_bar_value_fontsize=12):
-                self.assertEqual(config["plot_value_fontsize"], 12)
-        deprecations = [w for w in caught if w.category is DeprecationWarning]
-        self.assertEqual(len(deprecations), 1)
-        self.assertEqual(deprecations[0].filename, __file__)
-
-    def test_update_alias_warning_points_at_the_caller(self):
-        with self.assertWarns(DeprecationWarning) as caught:
-            config.update({"plot_bar_value_fontsize": 12})
-        self.assertEqual(caught.filename, __file__)
 
     def test_override_restores_after_exception(self):
         before = copy.deepcopy(config.config)
@@ -307,17 +271,6 @@ class TestThemeFiles(unittest.TestCase):
         path.write_text(json.dumps({"font_general_size": 8}))
         with self.assertRaises(ValueError):
             config.load_theme(path)
-
-    def test_load_canonicalises_alias_keys(self):
-        path = self.dir / "alias.json"
-        path.write_text(
-            json.dumps(
-                {"format_version": 1, "attributes": {"plot_bar_value_fontsize": 3}}
-            )
-        )
-        config.set_theme(config.load_theme(path))
-        self.assertEqual(config["plot_value_fontsize"], 3)
-        self.assertNotIn("plot_bar_value_fontsize", config.config)
 
 
 if __name__ == "__main__":

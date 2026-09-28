@@ -9,7 +9,6 @@ chart's reference page; the shared ones on the typings page.
 """
 
 import os
-import warnings
 from datetime import date, datetime
 import sys
 from typing import TypedDict, Union, Tuple, List, Optional, Dict, Literal
@@ -37,7 +36,6 @@ from .constants import (
     FONT_WEIGHT,
     GANTT_ARROW_ENTRY,
     HATCH_STYLE,
-    HEXBIN_REDUCE,
     HISTOGRAM_TYPE,
     LEGEND_ALIGN,
     LEGEND_LOCATION,
@@ -534,7 +532,7 @@ class BarStyleAttrs(TypedDict):
 class ValueLabelStyleAttrs(TypedDict):
     """The typing for the value labels: the numbers a chart prints beside its
     marks when `show_values` is on. One style serves every chart that takes
-    `show_values`; the `plot_bar_value_*` style keys are aliases of these.
+    `show_values`.
 
     Attributes:
         plot_value_fontsize (Union[int, float, None]): The font size of the value labels.
@@ -1711,66 +1709,6 @@ class LineRecordAttrs(TypedDict):
     yerr: NotRequired[Optional[Union[int, float]]]
 
 
-class _LineSingleChartAttrs(TypedDict):
-    """The single chart attributes for the line chart.
-
-    Attributes:
-        data (List[LineRecordAttrs]): The list of data points defining the line chart.
-        subtitle (Union[str, None]): The subtitle of the line chart. Also used as the label in the legend.
-        xlabel (Union[str, None]): The xlabel of the line chart.
-        ylabel (Union[str, None]): The ylabel of the line chart.
-        style (Union[LineStyleAttrs, None]): The style of the line chart.
-        xticks (Union[int, float, None]): The xtick positions list.
-        xticklabels (Union[List[str], None]): The xtick labels.
-        xtickrotate (Union[int, None]): The xtick rotation value.
-        yticks (Union[int, float, None]): the ytick position list.
-        yticklabels (Union[List[str], None]): The ytick labels.
-        ytickrotate (Union[int, None]): The ytick rotation value.
-        vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
-        hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
-        dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
-        brackets (Union[BracketSettingAttrs, List[BracketSettingAttrs], None]): The pairwise comparison brackets to be drawn.
-        vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
-        hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
-        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
-        x (Union[str, None]): The key name in `data` that contains the x-axis value. Defaults to `"x"`.
-        y (Union[str, None]): The key name in `data` that contains the y-axis value. Defaults to `"y"`.
-        yerr (Union[str, None]): The key name in `data` that contains the y-axis error value. Defaults to `"yerr"`.
-
-    """
-
-    data: List[LineRecordAttrs]
-    subtitle: NotRequired[Union[str, None]]
-    xlabel: NotRequired[Union[str, None]]
-    ylabel: NotRequired[Union[str, None]]
-    style: NotRequired[Union[LineStyleAttrs, None]]
-
-    xticks: NotRequired[Union[int, float, None]]
-    xticklabels: NotRequired[Union[List[str], None]]
-    xtickrotate: NotRequired[Union[int, None]]
-    yticks: NotRequired[Union[int, float, None]]
-    yticklabels: NotRequired[Union[List[str], None]]
-    ytickrotate: NotRequired[Union[int, None]]
-
-    vlines: NotRequired[Union[VLineSettingAttrs, List[VLineSettingAttrs]]]
-    hlines: NotRequired[Union[HLineSettingAttrs, List[HLineSettingAttrs]]]
-    dlines: NotRequired[Union[DLineSettingAttrs, List[DLineSettingAttrs]]]
-    brackets: NotRequired[Union[BracketSettingAttrs, List[BracketSettingAttrs]]]
-    vspans: NotRequired[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]]
-    hspans: NotRequired[Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]]
-    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
-
-    x: NotRequired[
-        Union[str, None]
-    ]  # the name of the x attribute in data (default: "x")
-    y: NotRequired[
-        Union[str, None]
-    ]  # the name of the y attribute in data (default: "y")
-    yerr: NotRequired[
-        Union[str, None]
-    ]  # the name of the yerr attribute in data (default: "yerr")
-
-
 # ================================================
 # Stacked Area Chart Attributes
 # ================================================
@@ -1789,58 +1727,6 @@ class StackedAreaRecordAttrs(TypedDict):
     y: Union[int, float]
 
 
-class _StackedAreaSingleChartAttrs(TypedDict):
-    """The single chart attributes for the stacked area chart.
-
-    Attributes:
-        data (List[StackedAreaRecordAttrs]): The list of data points defining one series; every series shares the same `x` values.
-        subtitle (Union[str, None]): The subtitle of the series. Also used as the label in the legend.
-        xlabel (Union[str, None]): The xlabel of the chart.
-        ylabel (Union[str, None]): The ylabel of the chart.
-        style (Union[StackedAreaStyleAttrs, None]): The style of the series.
-        xticks (Union[int, float, None]): The xtick positions list.
-        xticklabels (Union[List[str], None]): The xtick labels.
-        xtickrotate (Union[int, None]): The xtick rotation value.
-        yticks (Union[int, float, None]): the ytick position list.
-        yticklabels (Union[List[str], None]): The ytick labels.
-        ytickrotate (Union[int, None]): The ytick rotation value.
-        vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
-        hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
-        dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
-        brackets (Union[BracketSettingAttrs, List[BracketSettingAttrs], None]): The pairwise comparison brackets to be drawn.
-        vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
-        hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
-        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
-        x (Union[str, None]): The key name in `data` that contains the x-axis value. Defaults to `"x"`.
-        y (Union[str, None]): The key name in `data` that contains the y-axis value. Defaults to `"y"`.
-
-    """
-
-    data: List[StackedAreaRecordAttrs]
-    subtitle: NotRequired[Union[str, None]]
-    xlabel: NotRequired[Union[str, None]]
-    ylabel: NotRequired[Union[str, None]]
-    style: NotRequired[Union[StackedAreaStyleAttrs, None]]
-
-    xticks: NotRequired[Union[int, float, None]]
-    xticklabels: NotRequired[Union[List[str], None]]
-    xtickrotate: NotRequired[Union[int, None]]
-    yticks: NotRequired[Union[int, float, None]]
-    yticklabels: NotRequired[Union[List[str], None]]
-    ytickrotate: NotRequired[Union[int, None]]
-
-    vlines: NotRequired[Union[VLineSettingAttrs, List[VLineSettingAttrs]]]
-    hlines: NotRequired[Union[HLineSettingAttrs, List[HLineSettingAttrs]]]
-    dlines: NotRequired[Union[DLineSettingAttrs, List[DLineSettingAttrs]]]
-    brackets: NotRequired[Union[BracketSettingAttrs, List[BracketSettingAttrs]]]
-    vspans: NotRequired[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]]
-    hspans: NotRequired[Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]]
-    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
-
-    x: NotRequired[Union[str, None]]
-    y: NotRequired[Union[str, None]]
-
-
 # ================================================
 # Bump Chart Attributes
 # ================================================
@@ -1857,52 +1743,6 @@ class BumpRecordAttrs(TypedDict):
 
     x: Union[int, float]
     y: Union[int, float]
-
-
-class _BumpSingleChartAttrs(TypedDict):
-    """The single chart attributes for the bump chart.
-
-    Attributes:
-        data (List[BumpRecordAttrs]): The list of data points defining one series; `y` is a value ranked per period, or the rank itself.
-        subtitle (Union[str, None]): The subtitle of the series. Also used as its end label and legend label.
-        xlabel (Union[str, None]): The xlabel of the chart.
-        ylabel (Union[str, None]): The ylabel of the chart.
-        style (Union[BumpStyleAttrs, None]): The style of the series.
-        xticks (Union[int, float, None]): The xtick positions list.
-        xticklabels (Union[List[str], None]): The xtick labels.
-        xtickrotate (Union[int, None]): The xtick rotation value.
-        vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
-        hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
-        dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
-        brackets (Union[BracketSettingAttrs, List[BracketSettingAttrs], None]): The pairwise comparison brackets to be drawn.
-        vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
-        hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
-        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
-        x (Union[str, None]): The key name in `data` that contains the x-axis value. Defaults to `"x"`.
-        y (Union[str, None]): The key name in `data` that contains the y-axis value. Defaults to `"y"`.
-
-    """
-
-    data: List[BumpRecordAttrs]
-    subtitle: NotRequired[Union[str, None]]
-    xlabel: NotRequired[Union[str, None]]
-    ylabel: NotRequired[Union[str, None]]
-    style: NotRequired[Union[BumpStyleAttrs, None]]
-
-    xticks: NotRequired[Union[int, float, None]]
-    xticklabels: NotRequired[Union[List[str], None]]
-    xtickrotate: NotRequired[Union[int, None]]
-
-    vlines: NotRequired[Union[VLineSettingAttrs, List[VLineSettingAttrs]]]
-    hlines: NotRequired[Union[HLineSettingAttrs, List[HLineSettingAttrs]]]
-    dlines: NotRequired[Union[DLineSettingAttrs, List[DLineSettingAttrs]]]
-    brackets: NotRequired[Union[BracketSettingAttrs, List[BracketSettingAttrs]]]
-    vspans: NotRequired[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]]
-    hspans: NotRequired[Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]]
-    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
-
-    x: NotRequired[Union[str, None]]
-    y: NotRequired[Union[str, None]]
 
 
 # ================================================
@@ -2067,60 +1907,6 @@ class BarRecordAttrs(TypedDict):
     emphasis: NotRequired[Optional[Union[EMPHASIS, str]]]
 
 
-class _BarSingleChartAttrs(TypedDict):
-    """The single chart attributes for the bar chart.
-
-    Attributes:
-        data (List[BarRecordAttrs]): The list of data points defining the bar chart.
-        subtitle (Union[str, None]): The subtitle of the bar chart. Also used as the label in the legend.
-        xlabel (Union[str, None]): The xlabel of the bar chart.
-        ylabel (Union[str, None]): The ylabel of the bar chart.
-        style (Union[BarStyleAttrs, None]): The style of the bar chart.
-        xticks (Union[int, float, None]): The xtick positions list.
-        xticklabels (Union[List[str], None]): The xtick labels.
-        xtickrotate (Union[int, None]): The xtick rotation value.
-        yticks (Union[int, float, None]): the ytick position list.
-        yticklabels (Union[List[str], None]): The ytick labels.
-        ytickrotate (Union[int, None]): The ytick rotation value.
-        vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
-        hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
-        dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
-        brackets (Union[BracketSettingAttrs, List[BracketSettingAttrs], None]): The pairwise comparison brackets to be drawn.
-        vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
-        hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
-        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
-        label (Union[str, None]): The key name in `data` that contains the label value. Defaults to `"label"`.
-        y (Union[str, None]): The key name in `data` that contains the y-axis value. Defaults to `"y"`.
-        yerr (Union[str, None]): The key name in `data` that contains the y-axis error value. Defaults to `"yerr"`.
-
-    """
-
-    data: List[BarRecordAttrs]
-    subtitle: NotRequired[Union[str, None]]
-    xlabel: NotRequired[Union[str, None]]
-    ylabel: NotRequired[Union[str, None]]
-    style: NotRequired[Union[BarStyleAttrs, None]]
-
-    xticks: NotRequired[Union[int, float, None]]
-    xticklabels: NotRequired[Union[List[str], None]]
-    xtickrotate: NotRequired[Union[int, None]]
-    yticks: NotRequired[Union[int, float, None]]
-    yticklabels: NotRequired[Union[List[str], None]]
-    ytickrotate: NotRequired[Union[int, None]]
-
-    vlines: NotRequired[Union[VLineSettingAttrs, List[VLineSettingAttrs]]]
-    hlines: NotRequired[Union[HLineSettingAttrs, List[HLineSettingAttrs]]]
-    dlines: NotRequired[Union[DLineSettingAttrs, List[DLineSettingAttrs]]]
-    brackets: NotRequired[Union[BracketSettingAttrs, List[BracketSettingAttrs]]]
-    vspans: NotRequired[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]]
-    hspans: NotRequired[Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]]
-    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
-
-    label: NotRequired[Union[str, None]]  # the name of the label attribute in data
-    y: NotRequired[Union[str, None]]  # the name of the y attribute in data
-    yerr: NotRequired[Union[str, None]]  # the name of the yerr attribute in data
-
-
 # ================================================
 # Hist Chart Attributes
 # ================================================
@@ -2136,56 +1922,6 @@ class HistRecordAttrs(TypedDict):
 
     # the default attributes, could be anything
     x: Union[int, float]
-
-
-class _HistogramSingleChartAttrs(TypedDict):
-    """The single chart attributes for the histogram chart.
-
-    Attributes:
-        data (List[HistRecordAttrs]): The list of data points defining the histogram chart.
-        subtitle (Union[str, None]): The subtitle of the histogram chart. Also used as the label in the legend.
-        xlabel (Union[str, None]): The xlabel of the histogram chart.
-        ylabel (Union[str, None]): The ylabel of the histogram chart.
-        style (Union[HistStyleAttrs, None]): The style of the histogram chart.
-        xticks (Union[int, float, None]): The xtick positions list.
-        xticklabels (Union[List[str], None]): The xtick labels.
-        xtickrotate (Union[int, None]): The xtick rotation value.
-        yticks (Union[int, float, None]): the ytick position list.
-        yticklabels (Union[List[str], None]): The ytick labels.
-        ytickrotate (Union[int, None]): The ytick rotation value.
-        vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
-        hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
-        dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
-        brackets (Union[BracketSettingAttrs, List[BracketSettingAttrs], None]): The pairwise comparison brackets to be drawn.
-        vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
-        hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
-        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
-        x (Union[str, None]): The key name in `data` that contains the x-axis value. Defaults to `"x"`.
-
-    """
-
-    data: List[HistRecordAttrs]
-    subtitle: NotRequired[Union[str, None]]
-    xlabel: NotRequired[Union[str, None]]
-    ylabel: NotRequired[Union[str, None]]
-    style: NotRequired[Union[HistStyleAttrs, None]]
-
-    xticks: NotRequired[Union[int, float, None]]
-    xticklabels: NotRequired[Union[List[str], None]]
-    xtickrotate: NotRequired[Union[int, None]]
-    yticks: NotRequired[Union[int, float, None]]
-    yticklabels: NotRequired[Union[List[str], None]]
-    ytickrotate: NotRequired[Union[int, None]]
-
-    vlines: NotRequired[Union[VLineSettingAttrs, List[VLineSettingAttrs]]]
-    hlines: NotRequired[Union[HLineSettingAttrs, List[HLineSettingAttrs]]]
-    dlines: NotRequired[Union[DLineSettingAttrs, List[DLineSettingAttrs]]]
-    brackets: NotRequired[Union[BracketSettingAttrs, List[BracketSettingAttrs]]]
-    vspans: NotRequired[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]]
-    hspans: NotRequired[Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]]
-    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
-
-    x: NotRequired[Union[str, None]]  # the name of the x attribute in data
 
 
 # ================================================
@@ -2285,53 +2021,6 @@ class HeatmapDataAttrs(TypedDict):
     emphasis: NotRequired[Union[List[List[Union[EMPHASIS, str, None]]], None]]
 
 
-class _HeatmapSingleChartAttrs(TypedDict):
-    """The single chart attributes for the heatmap chart.
-
-    Attributes:
-        data (HeatmapDataAttrs): The labelled grid defining the heatmap chart.
-        subtitle (Union[str, None]): The subtitle of the heatmap chart. Also used as the label in the legend.
-        xlabel (Union[str, None]): The xlabel of the heatmap chart.
-        ylabel (Union[str, None]): The ylabel of the heatmap chart.
-        style (Union[HeatmapStyleAttrs, None]): The style of the heatmap chart.
-
-        norm (Union[COLOR_NORM, str, None]): The value normalization.
-        vmin (Union[str, None]): The minimum value to normalize the data points.
-        vmax (Union[str, None]): The maximum value to normalize the data points.
-
-        xticks (Union[int, float, None]): The xtick positions list.
-        xticklabels (Union[List[str], None]): The xtick labels.
-        xtickrotate (Union[int, None]): The xtick rotation value.
-        yticks (Union[int, float, None]): the ytick position list.
-        yticklabels (Union[List[str], None]): The ytick labels.
-        ytickrotate (Union[int, None]): The ytick rotation value.
-
-        colorbar (Union[ColorbarSettingAttrs, None]): The colorbar setting of the heatmap.
-        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
-
-    """
-
-    data: HeatmapDataAttrs
-    subtitle: NotRequired[Union[str, None]]
-    xlabel: NotRequired[Union[str, None]]
-    ylabel: NotRequired[Union[str, None]]
-    style: NotRequired[Union[HeatmapStyleAttrs, None]]
-
-    norm: NotRequired[Union[str, None]]
-    vmin: NotRequired[Union[float, None]]
-    vmax: NotRequired[Union[float, None]]
-
-    xticks: NotRequired[Union[int, float, None]]
-    xticklabels: NotRequired[Union[List[str], None]]
-    xtickrotate: NotRequired[Union[int, None]]
-    yticks: NotRequired[Union[int, float, None]]
-    yticklabels: NotRequired[Union[List[str], None]]
-    ytickrotate: NotRequired[Union[int, None]]
-
-    colorbar: NotRequired[Union[ColorbarSettingAttrs, None]]
-    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
-
-
 # ================================================
 # Calendar Heatmap Attributes
 # ================================================
@@ -2348,35 +2037,6 @@ class CalendarHeatmapDataAttrs(TypedDict):
 
     date: List[Union[date, datetime]]
     value: List[Union[int, float, None]]
-
-
-class _CalendarHeatmapSingleChartAttrs(TypedDict):
-    """The single chart attributes for the calendar heatmap.
-
-    Attributes:
-        data (CalendarHeatmapDataAttrs): The dated values defining the calendar.
-        subtitle (Union[str, None]): The subtitle of the calendar; a multi-year calendar appends the year to it.
-        style (Union[CalendarHeatmapStyleAttrs, None]): The style of the calendar.
-
-        norm (Union[COLOR_NORM, str, None]): The value normalization.
-        vmin (Union[float, None]): The minimum value to normalize the data points.
-        vmax (Union[float, None]): The maximum value to normalize the data points.
-
-        colorbar (Union[ColorbarSettingAttrs, None]): The colorbar setting of the calendar.
-        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
-
-    """
-
-    data: CalendarHeatmapDataAttrs
-    subtitle: NotRequired[Union[str, None]]
-    style: NotRequired[Union[CalendarHeatmapStyleAttrs, None]]
-
-    norm: NotRequired[Union[str, None]]
-    vmin: NotRequired[Union[float, None]]
-    vmax: NotRequired[Union[float, None]]
-
-    colorbar: NotRequired[Union[ColorbarSettingAttrs, None]]
-    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
 
 
 # ================================================
@@ -2407,33 +2067,6 @@ class GanttTaskRecordAttrs(TypedDict):
     emphasis: NotRequired[Optional[Union[EMPHASIS, str]]]
 
 
-class _GanttSingleChartAttrs(TypedDict):
-    """The single chart attributes for the gantt chart.
-
-    Attributes:
-        data (List[GanttTaskRecordAttrs]): The task records defining one schedule.
-        subtitle (Union[str, None]): The subtitle of the schedule.
-        style (Union[GanttStyleAttrs, None]): The style of the schedule.
-        xtickrotate (Union[int, None]): The xtick rotation value.
-        ytickrotate (Union[int, None]): The ytick rotation value.
-        vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
-        vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
-        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
-
-    """
-
-    data: List[GanttTaskRecordAttrs]
-    subtitle: NotRequired[Union[str, None]]
-    style: NotRequired[Union[GanttStyleAttrs, None]]
-
-    xtickrotate: NotRequired[Union[int, None]]
-    ytickrotate: NotRequired[Union[int, None]]
-
-    vlines: NotRequired[Union[VLineSettingAttrs, List[VLineSettingAttrs]]]
-    vspans: NotRequired[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]]
-    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
-
-
 # ================================================
 # Dumbbell Chart Attributes
 # ================================================
@@ -2456,41 +2089,6 @@ class DumbbellRecordAttrs(TypedDict):
     emphasis: NotRequired[Optional[Union[EMPHASIS, str]]]
 
 
-class _DumbbellSingleChartAttrs(TypedDict):
-    """The single chart attributes for the dumbbell chart.
-
-    Attributes:
-        data (List[DumbbellRecordAttrs]): The records defining one set of dumbbells.
-        subtitle (Union[str, None]): The subtitle of the set.
-        style (Union[DumbbellStyleAttrs, None]): The style of the set.
-        xtickrotate (Union[int, None]): The xtick rotation value.
-        ytickrotate (Union[int, None]): The ytick rotation value.
-        vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
-        hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
-        dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
-        brackets (Union[BracketSettingAttrs, List[BracketSettingAttrs], None]): The pairwise comparison brackets to be drawn.
-        vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
-        hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
-        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
-
-    """
-
-    data: List[DumbbellRecordAttrs]
-    subtitle: NotRequired[Union[str, None]]
-    style: NotRequired[Union[DumbbellStyleAttrs, None]]
-
-    xtickrotate: NotRequired[Union[int, None]]
-    ytickrotate: NotRequired[Union[int, None]]
-
-    vlines: NotRequired[Union[VLineSettingAttrs, List[VLineSettingAttrs]]]
-    hlines: NotRequired[Union[HLineSettingAttrs, List[HLineSettingAttrs]]]
-    dlines: NotRequired[Union[DLineSettingAttrs, List[DLineSettingAttrs]]]
-    brackets: NotRequired[Union[BracketSettingAttrs, List[BracketSettingAttrs]]]
-    vspans: NotRequired[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]]
-    hspans: NotRequired[Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]]
-    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
-
-
 # ================================================
 # Contour Chart Attributes
 # ================================================
@@ -2511,69 +2109,6 @@ class ContourDataAttrs(TypedDict):
     z: List[List[Union[int, float]]]
 
 
-class _ContourSingleChartAttrs(TypedDict):
-    """The single chart attributes for the contour chart.
-
-    Attributes:
-        data (ContourDataAttrs): The gridded surface defining the contour chart.
-        subtitle (Union[str, None]): The subtitle of the contour chart. Also used as the label in the legend.
-        xlabel (Union[str, None]): The xlabel of the contour chart.
-        ylabel (Union[str, None]): The ylabel of the contour chart.
-        style (Union[ContourStyleAttrs, None]): The style of the contour chart.
-
-        norm (Union[COLOR_NORM, str, None]): The value normalization of the filled bands.
-        vmin (Union[float, None]): The minimum value to normalize the surface values.
-        vmax (Union[float, None]): The maximum value to normalize the surface values.
-        vcenter (Union[float, None]): The value a centred norm holds mid-colormap.
-        value_format (Union[VALUE_FORMAT, str, None]): The format of the inline level labels.
-
-        xticks (Union[int, float, None]): The xtick positions list.
-        xticklabels (Union[List[str], None]): The xtick labels.
-        xtickrotate (Union[int, None]): The xtick rotation value.
-        yticks (Union[int, float, None]): the ytick position list.
-        yticklabels (Union[List[str], None]): The ytick labels.
-        ytickrotate (Union[int, None]): The ytick rotation value.
-
-        vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
-        hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
-        dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
-        brackets (Union[BracketSettingAttrs, List[BracketSettingAttrs], None]): The pairwise comparison brackets to be drawn.
-        vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
-        hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
-        colorbar (Union[ColorbarSettingAttrs, None]): The colorbar setting of a filled contour.
-        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
-
-    """
-
-    data: ContourDataAttrs
-    subtitle: NotRequired[Union[str, None]]
-    xlabel: NotRequired[Union[str, None]]
-    ylabel: NotRequired[Union[str, None]]
-    style: NotRequired[Union[ContourStyleAttrs, None]]
-
-    norm: NotRequired[Union[str, None]]
-    vmin: NotRequired[Union[float, None]]
-    vmax: NotRequired[Union[float, None]]
-    vcenter: NotRequired[Union[float, None]]
-    value_format: NotRequired[Union[str, None]]
-
-    xticks: NotRequired[Union[int, float, None]]
-    xticklabels: NotRequired[Union[List[str], None]]
-    xtickrotate: NotRequired[Union[int, None]]
-    yticks: NotRequired[Union[int, float, None]]
-    yticklabels: NotRequired[Union[List[str], None]]
-    ytickrotate: NotRequired[Union[int, None]]
-
-    vlines: NotRequired[Union[VLineSettingAttrs, List[VLineSettingAttrs]]]
-    hlines: NotRequired[Union[HLineSettingAttrs, List[HLineSettingAttrs]]]
-    dlines: NotRequired[Union[DLineSettingAttrs, List[DLineSettingAttrs]]]
-    brackets: NotRequired[Union[BracketSettingAttrs, List[BracketSettingAttrs]]]
-    vspans: NotRequired[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]]
-    hspans: NotRequired[Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]]
-    colorbar: NotRequired[Union[ColorbarSettingAttrs, None]]
-    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
-
-
 # ================================================
 # Hexbin Chart Attributes
 # ================================================
@@ -2592,75 +2127,6 @@ class HexbinDataAttrs(TypedDict):
     x: List[Union[int, float]]
     y: List[Union[int, float]]
     c: NotRequired[Union[List[Union[int, float]], None]]
-
-
-class _HexbinSingleChartAttrs(TypedDict):
-    """The single chart attributes for the hexbin chart.
-
-    Attributes:
-        data (HexbinDataAttrs): The points binned by the hexbin chart.
-        subtitle (Union[str, None]): The subtitle of the hexbin chart.
-        xlabel (Union[str, None]): The xlabel of the hexbin chart.
-        ylabel (Union[str, None]): The ylabel of the hexbin chart.
-        style (Union[HexbinStyleAttrs, None]): The style of the hexbin chart.
-
-        grid_size (Union[int, None]): The number of hexagons across the x-axis; `None` takes the `plot_hexbin_gridsize` config value.
-        reduce (Union[HEXBIN_REDUCE, str, None]): The aggregation of the `c` values in a hexagon; `None` takes the mean. Ignored without `c`.
-        min_count (Union[int, None]): The point count below which a hexagon stays blank; `None` draws every hexagon.
-        norm (Union[COLOR_NORM, str, None]): The value normalization of the hexagon colors.
-        vmin (Union[float, None]): The minimum value to normalize the hexagon values.
-        vmax (Union[float, None]): The maximum value to normalize the hexagon values.
-        vcenter (Union[float, None]): The value a centred norm holds mid-colormap.
-        value_format (Union[VALUE_FORMAT, str, None]): The format of the colorbar tick labels when the colorbar setting names none.
-
-        xticks (Union[int, float, None]): The xtick positions list.
-        xticklabels (Union[List[str], None]): The xtick labels.
-        xtickrotate (Union[int, None]): The xtick rotation value.
-        yticks (Union[int, float, None]): the ytick position list.
-        yticklabels (Union[List[str], None]): The ytick labels.
-        ytickrotate (Union[int, None]): The ytick rotation value.
-
-        vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
-        hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
-        dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
-        brackets (Union[BracketSettingAttrs, List[BracketSettingAttrs], None]): The pairwise comparison brackets to be drawn.
-        vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
-        hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
-        colorbar (Union[ColorbarSettingAttrs, None]): The colorbar setting.
-        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
-
-    """
-
-    data: HexbinDataAttrs
-    subtitle: NotRequired[Union[str, None]]
-    xlabel: NotRequired[Union[str, None]]
-    ylabel: NotRequired[Union[str, None]]
-    style: NotRequired[Union[HexbinStyleAttrs, None]]
-
-    grid_size: NotRequired[Union[int, None]]
-    reduce: NotRequired[Union[HEXBIN_REDUCE, str, None]]
-    min_count: NotRequired[Union[int, None]]
-    norm: NotRequired[Union[str, None]]
-    vmin: NotRequired[Union[float, None]]
-    vmax: NotRequired[Union[float, None]]
-    vcenter: NotRequired[Union[float, None]]
-    value_format: NotRequired[Union[str, None]]
-
-    xticks: NotRequired[Union[int, float, None]]
-    xticklabels: NotRequired[Union[List[str], None]]
-    xtickrotate: NotRequired[Union[int, None]]
-    yticks: NotRequired[Union[int, float, None]]
-    yticklabels: NotRequired[Union[List[str], None]]
-    ytickrotate: NotRequired[Union[int, None]]
-
-    vlines: NotRequired[Union[VLineSettingAttrs, List[VLineSettingAttrs]]]
-    hlines: NotRequired[Union[HLineSettingAttrs, List[HLineSettingAttrs]]]
-    dlines: NotRequired[Union[DLineSettingAttrs, List[DLineSettingAttrs]]]
-    brackets: NotRequired[Union[BracketSettingAttrs, List[BracketSettingAttrs]]]
-    vspans: NotRequired[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]]
-    hspans: NotRequired[Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]]
-    colorbar: NotRequired[Union[ColorbarSettingAttrs, None]]
-    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
 
 
 # ================================================
@@ -2736,68 +2202,6 @@ class ScatterRecordAttrs(TypedDict):
     yerr: NotRequired[Optional[Union[float, Tuple[float, float]]]]
 
 
-class _ScatterSingleChartAttrs(TypedDict):
-    """The single chart attributes for the scatter chart.
-
-    Attributes:
-        data (List[ScatterRecordAttrs]): The list of data points defining the scatter chart.
-        subtitle (Union[str, None]): The subtitle of the scatter chart. Also used as the label in the legend.
-        xlabel (Union[str, None]): The xlabel of the scatter chart.
-        ylabel (Union[str, None]): The ylabel of the scatter chart.
-        style (Union[ScatterStyleAttrs, None]): The style of the scatter chart.
-        xticks (Union[int, float, None]): The xtick positions list.
-        xticklabels (Union[List[str], None]): The xtick labels.
-        xtickrotate (Union[int, None]): The xtick rotation value.
-        yticks (Union[int, float, None]): The ytick position list.
-        yticklabels (Union[List[str], None]): The ytick labels.
-        ytickrotate (Union[int, None]): The ytick rotation value.
-        vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
-        hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
-        dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
-        brackets (Union[BracketSettingAttrs, List[BracketSettingAttrs], None]): The pairwise comparison brackets to be drawn.
-        vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
-        hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
-        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
-        x (Union[str, None]): The key name in `data` that contains the x-axis value. Defaults to `"x"`.
-        y (Union[str, None]): The key name in `data` that contains the y-axis value. Defaults to `"y"`.
-        size (Union[str, None]): The key name in `data` that contains the marker size value.
-        hue (Union[str, None]): The key name in `data` that contains the hue/category value.
-        annotation (Union[str, None]): The key name in `data` that contains the point annotation.
-        xerr (Union[str, None]): The key name in `data` that contains the x-axis error. Defaults to `"xerr"`.
-        yerr (Union[str, None]): The key name in `data` that contains the y-axis error. Defaults to `"yerr"`.
-
-    """
-
-    data: List[ScatterRecordAttrs]
-    subtitle: NotRequired[Union[str, None]]
-    xlabel: NotRequired[Union[str, None]]
-    ylabel: NotRequired[Union[str, None]]
-    style: NotRequired[Union[ScatterStyleAttrs, None]]
-
-    xticks: NotRequired[Union[int, float, None]]
-    xticklabels: NotRequired[Union[List[str], None]]
-    xtickrotate: NotRequired[Union[int, None]]
-    yticks: NotRequired[Union[int, float, None]]
-    yticklabels: NotRequired[Union[List[str], None]]
-    ytickrotate: NotRequired[Union[int, None]]
-
-    vlines: NotRequired[Union[VLineSettingAttrs, List[VLineSettingAttrs]]]
-    hlines: NotRequired[Union[HLineSettingAttrs, List[HLineSettingAttrs]]]
-    dlines: NotRequired[Union[DLineSettingAttrs, List[DLineSettingAttrs]]]
-    brackets: NotRequired[Union[BracketSettingAttrs, List[BracketSettingAttrs]]]
-    vspans: NotRequired[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]]
-    hspans: NotRequired[Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]]
-    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
-
-    x: NotRequired[Union[str, None]]
-    y: NotRequired[Union[str, None]]
-    size: NotRequired[Union[str, None]]
-    hue: NotRequired[Union[str, None]]
-    annotation: NotRequired[Union[str, None]]
-    xerr: NotRequired[Union[str, None]]
-    yerr: NotRequired[Union[str, None]]
-
-
 # ================================================
 # Box Plot Attributes
 # ================================================
@@ -2814,58 +2218,6 @@ class BoxRecordAttrs(TypedDict):
 
     label: str
     value: Union[int, float]
-
-
-class _BoxSingleChartAttrs(TypedDict):
-    """The single chart attributes for the box plot.
-
-    Attributes:
-        data (List[BoxRecordAttrs]): The list of data points defining the box plot.
-        subtitle (Union[str, None]): The subtitle of the box plot. Also used as the label in the legend.
-        xlabel (Union[str, None]): The xlabel of the box plot.
-        ylabel (Union[str, None]): The ylabel of the box plot.
-        style (Union[BoxStyleAttrs, None]): The style of the box plot.
-        xticks (Union[int, float, None]): The xtick positions list.
-        xticklabels (Union[List[str], None]): The xtick labels.
-        xtickrotate (Union[int, None]): The xtick rotation value.
-        yticks (Union[int, float, None]): The ytick position list.
-        yticklabels (Union[List[str], None]): The ytick labels.
-        ytickrotate (Union[int, None]): The ytick rotation value.
-        vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
-        hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
-        dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
-        brackets (Union[BracketSettingAttrs, List[BracketSettingAttrs], None]): The pairwise comparison brackets to be drawn.
-        vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
-        hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
-        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
-        label (Union[str, None]): The key name in `data` that contains the label value. Defaults to `"label"`.
-        value (Union[str, None]): The key name in `data` that contains the value. Defaults to `"value"`.
-
-    """
-
-    data: List[BoxRecordAttrs]
-    subtitle: NotRequired[Union[str, None]]
-    xlabel: NotRequired[Union[str, None]]
-    ylabel: NotRequired[Union[str, None]]
-    style: NotRequired[Union[BoxStyleAttrs, None]]
-
-    xticks: NotRequired[Union[int, float, None]]
-    xticklabels: NotRequired[Union[List[str], None]]
-    xtickrotate: NotRequired[Union[int, None]]
-    yticks: NotRequired[Union[int, float, None]]
-    yticklabels: NotRequired[Union[List[str], None]]
-    ytickrotate: NotRequired[Union[int, None]]
-
-    vlines: NotRequired[Union[VLineSettingAttrs, List[VLineSettingAttrs]]]
-    hlines: NotRequired[Union[HLineSettingAttrs, List[HLineSettingAttrs]]]
-    dlines: NotRequired[Union[DLineSettingAttrs, List[DLineSettingAttrs]]]
-    brackets: NotRequired[Union[BracketSettingAttrs, List[BracketSettingAttrs]]]
-    vspans: NotRequired[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]]
-    hspans: NotRequired[Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]]
-    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
-
-    label: NotRequired[Union[str, None]]  # the name of the label attribute in data
-    value: NotRequired[Union[str, None]]  # the name of the value attribute in data
 
 
 # ================================================
@@ -2890,58 +2242,6 @@ class SwarmRecordAttrs(TypedDict):
     emphasis: NotRequired[Optional[Union[EMPHASIS, str]]]
 
 
-class _SwarmSingleChartAttrs(TypedDict):
-    """The single chart attributes for the swarm plot.
-
-    Attributes:
-        data (List[SwarmRecordAttrs]): The list of data points defining the swarm plot.
-        subtitle (Union[str, None]): The subtitle of the swarm plot. Also used as the label in the legend.
-        xlabel (Union[str, None]): The xlabel of the swarm plot.
-        ylabel (Union[str, None]): The ylabel of the swarm plot.
-        style (Union[SwarmStyleAttrs, None]): The style of the swarm plot.
-        xticks (Union[int, float, None]): The xtick positions list.
-        xticklabels (Union[List[str], None]): The xtick labels.
-        xtickrotate (Union[int, None]): The xtick rotation value.
-        yticks (Union[int, float, None]): The ytick position list.
-        yticklabels (Union[List[str], None]): The ytick labels.
-        ytickrotate (Union[int, None]): The ytick rotation value.
-        vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
-        hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
-        dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
-        brackets (Union[BracketSettingAttrs, List[BracketSettingAttrs], None]): The pairwise comparison brackets to be drawn.
-        vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
-        hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
-        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
-        label (Union[str, None]): The key name in `data` that contains the label value. Defaults to `"label"`.
-        value (Union[str, None]): The key name in `data` that contains the value. Defaults to `"value"`.
-
-    """
-
-    data: List[SwarmRecordAttrs]
-    subtitle: NotRequired[Union[str, None]]
-    xlabel: NotRequired[Union[str, None]]
-    ylabel: NotRequired[Union[str, None]]
-    style: NotRequired[Union[SwarmStyleAttrs, None]]
-
-    xticks: NotRequired[Union[int, float, None]]
-    xticklabels: NotRequired[Union[List[str], None]]
-    xtickrotate: NotRequired[Union[int, None]]
-    yticks: NotRequired[Union[int, float, None]]
-    yticklabels: NotRequired[Union[List[str], None]]
-    ytickrotate: NotRequired[Union[int, None]]
-
-    vlines: NotRequired[Union[VLineSettingAttrs, List[VLineSettingAttrs]]]
-    hlines: NotRequired[Union[HLineSettingAttrs, List[HLineSettingAttrs]]]
-    dlines: NotRequired[Union[DLineSettingAttrs, List[DLineSettingAttrs]]]
-    brackets: NotRequired[Union[BracketSettingAttrs, List[BracketSettingAttrs]]]
-    vspans: NotRequired[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]]
-    hspans: NotRequired[Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]]
-    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
-
-    label: NotRequired[Union[str, None]]  # the name of the label attribute in data
-    value: NotRequired[Union[str, None]]  # the name of the value attribute in data
-
-
 # Violin Plot Attributes
 # ================================================
 
@@ -2957,58 +2257,6 @@ class ViolinRecordAttrs(TypedDict):
 
     label: str
     value: Union[int, float]
-
-
-class _ViolinSingleChartAttrs(TypedDict):
-    """The single chart attributes for the violin plot.
-
-    Attributes:
-        data (List[ViolinRecordAttrs]): The list of data points defining the violin plot.
-        subtitle (Union[str, None]): The subtitle of the violin plot. Also used as the label in the legend.
-        xlabel (Union[str, None]): The xlabel of the violin plot.
-        ylabel (Union[str, None]): The ylabel of the violin plot.
-        style (Union[ViolinStyleAttrs, None]): The style of the violin plot.
-        xticks (Union[int, float, None]): The xtick positions list.
-        xticklabels (Union[List[str], None]): The xtick labels.
-        xtickrotate (Union[int, None]): The xtick rotation value.
-        yticks (Union[int, float, None]): The ytick position list.
-        yticklabels (Union[List[str], None]): The ytick labels.
-        ytickrotate (Union[int, None]): The ytick rotation value.
-        vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
-        hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
-        dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
-        brackets (Union[BracketSettingAttrs, List[BracketSettingAttrs], None]): The pairwise comparison brackets to be drawn.
-        vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
-        hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
-        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
-        label (Union[str, None]): The key name in `data` that contains the label value. Defaults to `"label"`.
-        value (Union[str, None]): The key name in `data` that contains the value. Defaults to `"value"`.
-
-    """
-
-    data: List[ViolinRecordAttrs]
-    subtitle: NotRequired[Union[str, None]]
-    xlabel: NotRequired[Union[str, None]]
-    ylabel: NotRequired[Union[str, None]]
-    style: NotRequired[Union[ViolinStyleAttrs, None]]
-
-    xticks: NotRequired[Union[int, float, None]]
-    xticklabels: NotRequired[Union[List[str], None]]
-    xtickrotate: NotRequired[Union[int, None]]
-    yticks: NotRequired[Union[int, float, None]]
-    yticklabels: NotRequired[Union[List[str], None]]
-    ytickrotate: NotRequired[Union[int, None]]
-
-    vlines: NotRequired[Union[VLineSettingAttrs, List[VLineSettingAttrs]]]
-    hlines: NotRequired[Union[HLineSettingAttrs, List[HLineSettingAttrs]]]
-    dlines: NotRequired[Union[DLineSettingAttrs, List[DLineSettingAttrs]]]
-    brackets: NotRequired[Union[BracketSettingAttrs, List[BracketSettingAttrs]]]
-    vspans: NotRequired[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]]
-    hspans: NotRequired[Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]]
-    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
-
-    label: NotRequired[Union[str, None]]  # the name of the label attribute in data
-    value: NotRequired[Union[str, None]]  # the name of the value attribute in data
 
 
 # ================================================
@@ -3029,58 +2277,6 @@ class RidgelineRecordAttrs(TypedDict):
     value: Union[int, float]
 
 
-class _RidgelineSingleChartAttrs(TypedDict):
-    """The single chart attributes for the ridgeline plot.
-
-    Attributes:
-        data (List[RidgelineRecordAttrs]): The list of data points defining the ridgeline plot.
-        subtitle (Union[str, None]): The subtitle of the ridgeline plot.
-        xlabel (Union[str, None]): The xlabel of the ridgeline plot.
-        ylabel (Union[str, None]): The ylabel of the ridgeline plot.
-        style (Union[RidgelineStyleAttrs, None]): The style of the ridgeline plot.
-        xticks (Union[int, float, None]): The xtick positions list.
-        xticklabels (Union[List[str], None]): The xtick labels.
-        xtickrotate (Union[int, None]): The xtick rotation value.
-        yticks (Union[int, float, None]): The ytick position list.
-        yticklabels (Union[List[str], None]): The ytick labels.
-        ytickrotate (Union[int, None]): The ytick rotation value.
-        vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
-        hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
-        dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
-        brackets (Union[BracketSettingAttrs, List[BracketSettingAttrs], None]): The pairwise comparison brackets to be drawn.
-        vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
-        hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
-        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
-        label (Union[str, None]): The key name in `data` that contains the label value. Defaults to `"label"`.
-        value (Union[str, None]): The key name in `data` that contains the value. Defaults to `"value"`.
-
-    """
-
-    data: List[RidgelineRecordAttrs]
-    subtitle: NotRequired[Union[str, None]]
-    xlabel: NotRequired[Union[str, None]]
-    ylabel: NotRequired[Union[str, None]]
-    style: NotRequired[Union[RidgelineStyleAttrs, None]]
-
-    xticks: NotRequired[Union[int, float, None]]
-    xticklabels: NotRequired[Union[List[str], None]]
-    xtickrotate: NotRequired[Union[int, None]]
-    yticks: NotRequired[Union[int, float, None]]
-    yticklabels: NotRequired[Union[List[str], None]]
-    ytickrotate: NotRequired[Union[int, None]]
-
-    vlines: NotRequired[Union[VLineSettingAttrs, List[VLineSettingAttrs]]]
-    hlines: NotRequired[Union[HLineSettingAttrs, List[HLineSettingAttrs]]]
-    dlines: NotRequired[Union[DLineSettingAttrs, List[DLineSettingAttrs]]]
-    brackets: NotRequired[Union[BracketSettingAttrs, List[BracketSettingAttrs]]]
-    vspans: NotRequired[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]]
-    hspans: NotRequired[Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]]
-    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
-
-    label: NotRequired[Union[str, None]]  # the name of the label attribute in data
-    value: NotRequired[Union[str, None]]  # the name of the value attribute in data
-
-
 # ================================================
 # Raincloud Plot Attributes
 # ================================================
@@ -3097,58 +2293,6 @@ class RaincloudRecordAttrs(TypedDict):
 
     label: str
     value: Union[int, float]
-
-
-class _RaincloudSingleChartAttrs(TypedDict):
-    """The single chart attributes for the raincloud plot.
-
-    Attributes:
-        data (List[RaincloudRecordAttrs]): The list of data points defining the raincloud plot.
-        subtitle (Union[str, None]): The subtitle of the raincloud plot.
-        xlabel (Union[str, None]): The xlabel of the raincloud plot.
-        ylabel (Union[str, None]): The ylabel of the raincloud plot.
-        style (Union[RaincloudStyleAttrs, None]): The style of the raincloud plot.
-        xticks (Union[int, float, None]): The xtick positions list.
-        xticklabels (Union[List[str], None]): The xtick labels.
-        xtickrotate (Union[int, None]): The xtick rotation value.
-        yticks (Union[int, float, None]): The ytick position list.
-        yticklabels (Union[List[str], None]): The ytick labels.
-        ytickrotate (Union[int, None]): The ytick rotation value.
-        vlines (Union[VLineSettingAttrs, List[VLineSettingAttrs], None]): The vertical lines to be plot.
-        hlines (Union[HLineSettingAttrs, List[HLineSettingAttrs], None]): The horizontal lines to be plot.
-        dlines (Union[DLineSettingAttrs, List[DLineSettingAttrs], None]): The diagonal lines to be plot.
-        brackets (Union[BracketSettingAttrs, List[BracketSettingAttrs], None]): The pairwise comparison brackets to be drawn.
-        vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The vertical reference bands to be plot.
-        hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The horizontal reference bands to be plot.
-        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
-        label (Union[str, None]): The key name in `data` that contains the label value. Defaults to `"label"`.
-        value (Union[str, None]): The key name in `data` that contains the value. Defaults to `"value"`.
-
-    """
-
-    data: List[RaincloudRecordAttrs]
-    subtitle: NotRequired[Union[str, None]]
-    xlabel: NotRequired[Union[str, None]]
-    ylabel: NotRequired[Union[str, None]]
-    style: NotRequired[Union[RaincloudStyleAttrs, None]]
-
-    xticks: NotRequired[Union[int, float, None]]
-    xticklabels: NotRequired[Union[List[str], None]]
-    xtickrotate: NotRequired[Union[int, None]]
-    yticks: NotRequired[Union[int, float, None]]
-    yticklabels: NotRequired[Union[List[str], None]]
-    ytickrotate: NotRequired[Union[int, None]]
-
-    vlines: NotRequired[Union[VLineSettingAttrs, List[VLineSettingAttrs]]]
-    hlines: NotRequired[Union[HLineSettingAttrs, List[HLineSettingAttrs]]]
-    dlines: NotRequired[Union[DLineSettingAttrs, List[DLineSettingAttrs]]]
-    brackets: NotRequired[Union[BracketSettingAttrs, List[BracketSettingAttrs]]]
-    vspans: NotRequired[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]]
-    hspans: NotRequired[Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]]
-    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
-
-    label: NotRequired[Union[str, None]]  # the name of the label attribute in data
-    value: NotRequired[Union[str, None]]  # the name of the value attribute in data
 
 
 # ================================================
@@ -3168,33 +2312,6 @@ class ParallelCoordsRecordAttrs(TypedDict):
     """
 
     hue: NotRequired[Optional[str]]
-
-
-class _ParallelCoordsSingleChartAttrs(TypedDict):
-    """The single chart attributes for the parallel coordinates chart.
-
-    Attributes:
-        data (List[ParallelCoordsRecordAttrs]): The list of data points.
-        subtitle (Union[str, None]): The subtitle of the chart.
-        xlabel (Union[str, None]): The xlabel of the chart.
-        ylabel (Union[str, None]): The ylabel of the chart.
-        style (Union[ParallelCoordsStyleAttrs, None]): The style of the chart.
-        dimensions (Union[List[str], None]): The dimensions to include and their order.
-        hue (Union[str, None]): The key name in `data` for categorical coloring.
-        category_orders (Union[Dict[str, List[str]], None]): Custom order for categorical dimensions.
-        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
-
-    """
-
-    data: List[ParallelCoordsRecordAttrs]
-    subtitle: NotRequired[Union[str, None]]
-    xlabel: NotRequired[Union[str, None]]
-    ylabel: NotRequired[Union[str, None]]
-    style: NotRequired[Union[ParallelCoordsStyleAttrs, None]]
-    dimensions: NotRequired[Union[List[str], None]]
-    hue: NotRequired[Union[str, None]]
-    category_orders: NotRequired[Union[Dict[str, List[str]], None]]
-    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
 
 
 # ================================================
@@ -3245,94 +2362,3 @@ class RadialRecordAttrs(TypedDict):
     y: Union[int, float]
     yerr: NotRequired[Optional[Union[int, float]]]
     x: NotRequired[Optional[Union[int, float]]]
-
-
-class _RadialSingleChartAttrs(TypedDict):
-    """The single chart attributes for the radial chart.
-
-    Attributes:
-        data (List[RadialRecordAttrs]): The list of data points defining the radial chart.
-        subtitle (Union[str, None]): The subtitle of the radial chart. Also used as the label in the legend.
-        style (Union[LineStyleAttrs, BarStyleAttrs, HistStyleAttrs, ScatterStyleAttrs, None]): The style of the radial chart, matching its visual.
-        texts (Union[TextSettingAttrs, List[TextSettingAttrs], None]): The text annotations to be drawn.
-        vspans (Union[VSpanSettingAttrs, List[VSpanSettingAttrs], None]): The angular wedges to be plot, bounded in degrees.
-        hspans (Union[HSpanSettingAttrs, List[HSpanSettingAttrs], None]): The annuli to be plot, bounded in radius.
-        label (Union[str, None]): The key name in `data` that contains the category label. Defaults to `"label"`.
-        x (Union[str, None]): The key name in `data` that contains the angular observation. Defaults to `"x"`.
-        y (Union[str, None]): The key name in `data` that contains the radial value. Defaults to `"y"`.
-        yerr (Union[str, None]): The key name in `data` that contains the radial error value. Defaults to `"yerr"`.
-
-    """
-
-    data: List[RadialRecordAttrs]
-    subtitle: NotRequired[Union[str, None]]
-    style: NotRequired[
-        Union[LineStyleAttrs, BarStyleAttrs, HistStyleAttrs, ScatterStyleAttrs, None]
-    ]
-    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
-    vspans: NotRequired[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]]
-    hspans: NotRequired[Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]]
-
-    label: NotRequired[Union[str, None]]
-    x: NotRequired[Union[str, None]]
-    y: NotRequired[Union[str, None]]
-    yerr: NotRequired[Union[str, None]]
-
-
-# ================================================
-# Deprecated Names
-# ================================================
-
-# old name -> new name; removed one release after it ships (ADR 0043)
-# None: no public replacement; the type is kept privately as `_<old name>`
-_DEPRECATED_ALIASES = {
-    "LineDataPointAttrs": "LineRecordAttrs",
-    "BarDataPointAttrs": "BarRecordAttrs",
-    "HistDataPointAttrs": "HistRecordAttrs",
-    "ScatterDataPointAttrs": "ScatterRecordAttrs",
-    "BoxDataPointAttrs": "BoxRecordAttrs",
-    "SwarmDataPointAttrs": "SwarmRecordAttrs",
-    "ViolinDataPointAttrs": "ViolinRecordAttrs",
-    "RidgelineDataPointAttrs": "RidgelineRecordAttrs",
-    "RaincloudDataPointAttrs": "RaincloudRecordAttrs",
-    "ParallelCoordsDataPointAttrs": "ParallelCoordsRecordAttrs",
-    "ScatterMatrixDataPointAttrs": "ScatterMatrixRecordAttrs",
-    "RadialDataPointAttrs": "RadialRecordAttrs",
-    "SankeyLinkAttrs": "SankeyLinkRecordAttrs",
-    "NetworkNodeAttrs": "NetworkNodeRecordAttrs",
-    "NetworkEdgeAttrs": "NetworkEdgeRecordAttrs",
-    "GanttTaskAttrs": "GanttTaskRecordAttrs",
-    "LineSingleChartAttrs": None,
-    "StackedAreaSingleChartAttrs": None,
-    "BumpSingleChartAttrs": None,
-    "BarSingleChartAttrs": None,
-    "HistogramSingleChartAttrs": None,
-    "HeatmapSingleChartAttrs": None,
-    "CalendarHeatmapSingleChartAttrs": None,
-    "GanttSingleChartAttrs": None,
-    "DumbbellSingleChartAttrs": None,
-    "ContourSingleChartAttrs": None,
-    "HexbinSingleChartAttrs": None,
-    "ScatterSingleChartAttrs": None,
-    "BoxSingleChartAttrs": None,
-    "SwarmSingleChartAttrs": None,
-    "ViolinSingleChartAttrs": None,
-    "RidgelineSingleChartAttrs": None,
-    "RaincloudSingleChartAttrs": None,
-    "ParallelCoordsSingleChartAttrs": None,
-    "RadialSingleChartAttrs": None,
-}
-
-
-def __getattr__(name):
-    if name in _DEPRECATED_ALIASES:
-        new_name = _DEPRECATED_ALIASES[name]
-        hint = f"use `{new_name}` instead" if new_name else "it has no replacement"
-        warnings.warn(
-            f"`{name}` is deprecated and will be removed in the next release; "
-            f"{hint}.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return globals()[new_name or f"_{name}"]
-    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

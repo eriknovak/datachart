@@ -131,7 +131,6 @@ def RaincloudPlot(
     ] = None,
     label: Optional[Union[str, List[Optional[str]]]] = None,
     value: Optional[Union[str, List[Optional[str]]]] = None,
-    mode: Optional[Union[SWARM_MODE, str]] = None,
 ) -> DatachartFigure:
     """Creates the raincloud plot.
 
@@ -238,7 +237,6 @@ def RaincloudPlot(
         texts: Text annotation(s) to draw.
         label: The key name in data for label/category values (default: "label").
         value: The key name in data for numeric values (default: "value").
-        mode: Deprecated; use `swarm_mode`. Removed in the next release.
 
     Returns:
         The figure containing the raincloud plot.

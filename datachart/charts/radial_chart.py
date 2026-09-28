@@ -101,9 +101,6 @@ def RadialChart(
     x: Optional[Union[str, List[Optional[str]]]] = None,
     y: Optional[Union[str, List[Optional[str]]]] = None,
     yerr: Optional[Union[str, List[Optional[str]]]] = None,
-    type: Optional[Union[RADIAL_TYPE, str]] = None,
-    startangle: Optional[Union[str, int, float]] = None,
-    innerradius: Optional[float] = None,
 ) -> DatachartFigure:
     """Creates the radial chart.
 
@@ -211,9 +208,6 @@ def RadialChart(
         x: The key name in data for the histogram observations (default: "x").
         y: The key name in data for radial values (default: "y").
         yerr: The key name in data for radial error values (default: "yerr").
-        type: Deprecated; use `mark`. Removed in the next release.
-        startangle: Deprecated; use `start_angle`. Removed in the next release.
-        innerradius: Deprecated; use `inner_radius`. Removed in the next release.
 
     Returns:
         The figure containing the radial chart.

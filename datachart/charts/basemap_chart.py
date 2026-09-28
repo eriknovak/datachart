@@ -36,7 +36,6 @@ def BasemapChart(
     show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     style: Optional[BasemapStyleAttrs] = None,
-    features: Optional[Union[BASEMAP_FEATURE, str, List[str]]] = None,
 ) -> DatachartFigure:
     """Creates the basemap chart.
 
@@ -120,7 +119,6 @@ def BasemapChart(
             [`ASPECT_RATIO`][datachart.constants.ASPECT_RATIO].
         style: Style configuration of the map. See
             [`BasemapStyleAttrs`][datachart.typings.BasemapStyleAttrs].
-        features: Deprecated; use `data`. Removed in the next release.
 
     Returns:
         The figure containing the basemap chart.

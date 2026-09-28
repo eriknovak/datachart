@@ -6,7 +6,6 @@ so the fronts fail early with one message instead of deep inside matplotlib.
 
 import math
 import os
-import warnings
 from collections import defaultdict
 from datetime import date, datetime
 from numbers import Integral, Real
@@ -68,20 +67,6 @@ def is_number(value) -> bool:
 
     # numpy integers are not Python ints, so an (int, float) check drops them
     return isinstance(value, Real) and not isinstance(value, bool)
-
-
-def warn_renamed(old: str, new: str, stacklevel: int = 2) -> None:
-    """Warn that the public name `old` is deprecated in favour of `new`.
-
-    `stacklevel` counts from the deprecated name's own frame: 2 points at
-    the caller of the function that calls this one.
-    """
-    warnings.warn(
-        f"`{old}` is deprecated and will be removed in the next release; "
-        f"use `{new}` instead.",
-        DeprecationWarning,
-        stacklevel=stacklevel + 1,
-    )
 
 
 def validate_bandwidth(bandwidth) -> None:
@@ -942,22 +927,9 @@ def validate_gantt_arrow_entry(value):
 def _validate_value_kind(show_values, value_kind, default: str):
     """`show_values` and the value label kind of a range front.
 
-    A kind passed as `show_values` warns at the front's caller and moves to
-    `value_kind`; an unset kind is `default`.
+    An unset kind is `default`.
     """
 
-    if isinstance(show_values, str):
-        # this function, its front wrapper, the front, then the caller
-        warnings.warn(
-            "Passing the label kind as `show_values` is deprecated and will be "
-            "removed in the next release; use `show_values=True, "
-            f"value_kind={show_values!r}` instead.",
-            DeprecationWarning,
-            stacklevel=4,
-        )
-        if value_kind is not None:
-            raise ValueError("Pass the label kind as `value_kind` only.")
-        show_values, value_kind = True, show_values
     return show_values, default if value_kind is None else value_kind
 
 

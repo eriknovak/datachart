@@ -1,5 +1,4 @@
 import unittest
-import warnings
 from datetime import datetime, timedelta, timezone
 
 import matplotlib
@@ -25,7 +24,6 @@ from datachart.utils.stats import (
     sum_values,
     variance,
     iqr,
-    correlation,
     pearson,
     mean,
     median,
@@ -166,16 +164,6 @@ class TestStats(unittest.TestCase):
         y = [1, 2]
         with self.assertRaises(ValueError):
             pearson(x, y)
-
-    def test_correlation_is_the_deprecated_pearson(self):
-        with warnings.catch_warnings(record=True) as caught:
-            warnings.simplefilter("always")
-            self.assertEqual(correlation([1, 2, 3], [3, 2, 1]), -1.0)
-        deprecations = [w for w in caught if w.category is DeprecationWarning]
-        self.assertEqual(len(deprecations), 1)
-        self.assertIn("`correlation`", str(deprecations[0].message))
-        self.assertIn("`pearson`", str(deprecations[0].message))
-        self.assertEqual(deprecations[0].filename, __file__)
 
     def test_pearson_type_error(self):
         # check that invalid types raise TypeError
@@ -438,17 +426,11 @@ class TestStats(unittest.TestCase):
         curve = kde1d([1, 2, 3, 4], grid_size=4, cut=0)
         self.assertEqual(curve["x"], [1.0, 2.0, 3.0, 4.0])
 
-    def test_kde_gridsize_is_deprecated(self):
+    def test_kde_gridsize_is_unknown(self):
         for kde, args in ((kde1d, ([1, 2, 3],)), (kde2d, ([1, 2, 3], [1, 3, 2]))):
             with self.subTest(kde=kde.__name__):
-                expected = kde(*args, grid_size=3)
-                with self.assertWarnsRegex(DeprecationWarning, "`grid_size`") as caught:
-                    got = kde(*args, gridsize=3)
-                self.assertEqual(caught.filename, __file__)
-                self.assertEqual(got, expected)
-                with self.assertWarns(DeprecationWarning):
-                    with self.assertRaisesRegex(ValueError, "`grid_size` only"):
-                        kde(*args, gridsize=3, grid_size=3)
+                with self.assertRaisesRegex(TypeError, "'gridsize'"):
+                    kde(*args, gridsize=3)
 
     def test_kde2d_shape_and_symmetry(self):
         surface = kde2d([1, 2, 3, 4], [1, 3, 2, 4], grid_size=(3, 2), cut=0)
@@ -533,7 +515,7 @@ class TestStatsMissingValues(unittest.TestCase):
         x, y = [1, 2, 3, 4, 5], [2, 1, 4, 3, 6]
         pairs = [(1, 2), (None, 7), (2, 1), (3, INF), (3, 4), (NAN, 9), (4, 3)]
         holed_x, holed_y = map(list, zip(*pairs, (5, 6)))
-        for helper in (correlation, spearman, linear_fit, loess):
+        for helper in (pearson, spearman, linear_fit, loess):
             with self.subTest(helper=helper.__name__):
                 self.assertEqual(helper(holed_x, holed_y), helper(x, y))
 

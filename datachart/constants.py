@@ -103,14 +103,8 @@ Classes:
                              `geometry`.
     BASEMAP_RESOLUTION:      `resolution` of `BasemapChart`.
 
-Deprecated names, removed in the next release: `SCALE` (now `AXIS_SCALE`),
-`NORMALIZE` (now `COLOR_NORM`), `LINE_MARKER.NONE` (now `NO_MARKER`),
-`LINE_STYLE.NONE` (now `NO_LINE`), and `SCATTER_MATRIX_DIAGONAL.NONE` (now
-`BLANK`).
-
 """
 
-import warnings
 from typing import Any
 
 __all__ = [
@@ -186,20 +180,6 @@ class _DomainMeta(type):
             values.remove(default)
         cls._members = tuple(v for i, v in enumerate(values) if v not in values[:i])
         return cls
-
-    def __getattr__(cls, name):
-        renamed = cls.__dict__.get("_RENAMED", {})
-        if name not in renamed:
-            raise AttributeError(
-                f"type object {cls.__name__!r} has no attribute {name!r}"
-            )
-        warnings.warn(
-            f"`{cls.__name__}.{name}` is deprecated and will be removed in the next "
-            f"release; use `{cls.__name__}.{renamed[name]}` instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return getattr(cls, renamed[name])
 
 
 class Domain(metaclass=_DomainMeta):
@@ -495,8 +475,6 @@ class LINE_MARKER(Domain):
     VLINE = "|"
     HLINE = "_"
 
-    _RENAMED = {"NONE": "NO_MARKER"}
-
 
 class LINE_STYLE(Domain):
     """The supported line styles.
@@ -526,8 +504,6 @@ class LINE_STYLE(Domain):
     DASHED = "--"
     DASHDOT = "-."
     DOTTED = ":"
-
-    _RENAMED = {"NONE": "NO_LINE"}
 
 
 class ARROW_STYLE(Domain):
@@ -1658,8 +1634,6 @@ class SCATTER_MATRIX_DIAGONAL(Domain):
     KDE = "kde"
     BLANK = "none"
 
-    _RENAMED = {"NONE": "BLANK"}
-
 
 class GANTT_DATE_PERIOD(Domain):
     """The supported date axis periods.
@@ -2105,24 +2079,3 @@ class DRAW_POSITION(Domain):
     DEFAULT = "below"
     BELOW = "below"
     ABOVE = "above"
-
-
-# renamed classes, each removed one release after its rename shipped
-_DEPRECATED_ALIASES = {
-    "SCALE": "AXIS_SCALE",
-    "NORMALIZE": "COLOR_NORM",
-    "BUMP_LABEL_POSITION": "LINE_LABEL_POSITION",
-}
-
-
-def __getattr__(name):
-    if name in _DEPRECATED_ALIASES:
-        new_name = _DEPRECATED_ALIASES[name]
-        warnings.warn(
-            f"`{name}` is deprecated and will be removed in the next release; "
-            f"use `{new_name}` instead.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return globals()[new_name]
-    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

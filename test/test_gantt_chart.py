@@ -271,12 +271,6 @@ class TestGanttMarks(unittest.TestCase):
         ax = GanttChart(schedule(), value_kind=GANTT_VALUE.PROGRESS).axes[0]
         self.assertEqual(len(ax.texts), 0)
 
-    def test_kind_as_show_values_warns_and_maps(self):
-        with self.assertWarnsRegex(DeprecationWarning, "value_kind") as caught:
-            ax = GanttChart(schedule(), show_values=GANTT_VALUE.PROGRESS).axes[0]
-        self.assertEqual(caught.filename, __file__)
-        self.assertEqual([t.get_text() for t in ax.texts], ["100%", "50%", "", ""])
-
     def test_duration_and_progress_values(self):
         ax = GanttChart(
             schedule(), show_values=True, value_kind=GANTT_VALUE.DURATION

@@ -64,7 +64,6 @@ from ....constants import (
     VALUE_FORMAT,
 )
 from ....config import config
-from ....themes._base import STYLE_ALIASES
 
 DEFAULT_NUM_BINS = 20
 
@@ -611,15 +610,13 @@ def theme_default(
     chart_type: Optional[str],
     settings: dict,
     name: str,
-    style: Optional[dict] = None,
 ) -> Any:
     """The setting `name`, else the theme's default for it, else None (ADR 0071).
 
     A shared parameter's theme key comes from its `SharedParameter`, so
     `chart_type` may be None for one; a shared parameter without one, or a
     front's own parameter, takes its key from the `theme_defaults` of its
-    row. A renamed key in the chart's `style` still sets the default while
-    its alias lasts.
+    row.
     """
 
     # chart_kinds imports this module, so the descriptor is read at call time
@@ -634,9 +631,6 @@ def theme_default(
         key = chart_kind(chart_type).theme_defaults.get(name)
     if key is None:
         return None
-    for alias, target in STYLE_ALIASES.items():
-        if target == key and style and style.get(alias) is not None:
-            return style[alias]
     return config.get(key)
 
 

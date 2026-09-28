@@ -3,7 +3,6 @@
 import ast
 import inspect
 import unittest
-import warnings
 from typing import List, Union
 
 import datachart.typings as typings
@@ -24,6 +23,8 @@ RETIRED = (
     "TextAttrs",
     "HeatmapColorbarAttrs",
     "ChartCommonAttrs",
+    "LineDataPointAttrs",
+    "LineSingleChartAttrs",
 )
 
 
@@ -33,16 +34,11 @@ class TestRetiredSettingNames(unittest.TestCase):
             with self.subTest(old=old):
                 self.assertFalse(hasattr(typings, old))
 
-    def test_private_chart_attrs_only_back_an_alias(self):
-        backing = {
-            f"_{old}" for old, new in typings._DEPRECATED_ALIASES.items() if new is None
-        }
+    def test_no_private_chart_attrs_remain(self):
         leftovers = [
             name
             for name in vars(typings)
-            if name.startswith("_")
-            and name.endswith(("ChartAttrs", "PlotAttrs"))
-            and name not in backing
+            if name.startswith("_") and name.endswith(("ChartAttrs", "PlotAttrs"))
         ]
         self.assertEqual(leftovers, [])
 
@@ -73,42 +69,13 @@ class TestTypingRoles(unittest.TestCase):
         }
         self.assertEqual(public, SINGLE_CHARTS)
 
-    def test_renamed_record_type_warns_and_resolves(self):
-        with warnings.catch_warnings(record=True) as caught:
-            warnings.simplefilter("always")
-            resolved = typings.LineDataPointAttrs
-        self.assertIs(resolved, typings.LineRecordAttrs)
-        self.assertEqual(len(caught), 1)
-        self.assertIs(caught[0].category, DeprecationWarning)
-        self.assertIn("LineRecordAttrs", str(caught[0].message))
-
-    def test_removed_single_chart_type_warns_and_resolves(self):
-        with warnings.catch_warnings(record=True) as caught:
-            warnings.simplefilter("always")
-            resolved = typings.LineSingleChartAttrs
-        self.assertIs(resolved, typings._LineSingleChartAttrs)
-        self.assertEqual(len(caught), 1)
-        self.assertIn("no replacement", str(caught[0].message))
-
-    def test_every_alias_resolves(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            for old in typings._DEPRECATED_ALIASES:
-                with self.subTest(old=old):
-                    self.assertTrue(hasattr(typings, old))
-
 
 class TestRecordTypings(unittest.TestCase):
     def test_stacked_area_and_bump_records_carry_no_yerr(self):
-        for record, chart in (
-            ("StackedAreaRecordAttrs", "_StackedAreaSingleChartAttrs"),
-            ("BumpRecordAttrs", "_BumpSingleChartAttrs"),
-        ):
+        for record in ("StackedAreaRecordAttrs", "BumpRecordAttrs"):
             with self.subTest(record=record):
                 attrs = getattr(typings, record)
                 self.assertEqual(set(attrs.__annotations__), {"x", "y"})
-                data = getattr(typings, chart).__annotations__["data"]
-                self.assertEqual(data.__args__, (attrs,))
 
 
 class TestThemeConformance(unittest.TestCase):

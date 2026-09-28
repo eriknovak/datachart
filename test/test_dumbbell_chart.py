@@ -118,12 +118,6 @@ class TestDumbbellValidation(unittest.TestCase):
             "value_kind", data=records(), show_values=True, value_kind="ratio"
         )
 
-    def test_kind_in_both_names_raises(self):
-        with self.assertWarns(DeprecationWarning):
-            self.assertRaisesWith(
-                "value_kind", data=records(), show_values="delta", value_kind="delta"
-            )
-
     def test_invalid_marker_pair_raises(self):
         self.assertRaisesWith("`marker`", data=records(), marker="o")
 
@@ -234,15 +228,6 @@ class TestDumbbellMarks(unittest.TestCase):
             records(), show_values=True, value_kind=DUMBBELL_VALUE.ENDPOINTS
         ).axes[0]
         self.assertTrue(texts(ax))
-        self.assertEqual(texts(ax), texts(expected))
-
-    def test_kind_as_show_values_warns_and_maps(self):
-        with self.assertWarnsRegex(DeprecationWarning, "value_kind") as caught:
-            ax = DumbbellChart(records(), show_values=DUMBBELL_VALUE.DELTA).axes[0]
-        self.assertEqual(caught.filename, __file__)
-        expected = DumbbellChart(
-            records(), show_values=True, value_kind=DUMBBELL_VALUE.DELTA
-        ).axes[0]
         self.assertEqual(texts(ax), texts(expected))
 
     def test_coincident_endpoints_draw_one_dot_no_connector(self):

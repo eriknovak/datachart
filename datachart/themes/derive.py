@@ -8,7 +8,7 @@ import matplotlib.colors as mcolors
 
 from pypalettes import load_palette
 
-from ._base import TRAITS, canonical_style, complete_theme, warn_aliases
+from ._base import TRAITS, complete_theme
 from ..constants import TRAIT
 from ..typings import StyleAttrs
 from ..utils._internal.colors import (
@@ -54,7 +54,7 @@ def _is_dark_page(theme: StyleAttrs) -> bool:
 def _resolve_base(base: Union[str, StyleAttrs]) -> StyleAttrs:
     if isinstance(base, dict):
         # `_resolve_base`, `derive_theme`, then the caller
-        return complete_theme(base, stacklevel=3)
+        return complete_theme(base)
     # for a name only: the config module imports this package while loading
     from ..config.configuration import THEMES
 
@@ -108,8 +108,7 @@ def derive_theme(
     Args:
         base: A `THEME` constant, a registered theme name, or a theme dictionary;
             a partial dictionary is completed from the default theme, as
-            `register_theme` completes it: alias keys are renamed and an
-            unknown key raises.
+            `register_theme` completes it: an unknown key raises.
         lead: A `COLORS` constant, a pypalettes palette name, or a list of colors.
             A diverging map is not a lead; it is read as categorical. A name
             that is no palette raises.
@@ -162,8 +161,6 @@ def derive_theme(
         if TRAIT.check(trait, "traits") is not None:
             theme.update(copy.deepcopy(TRAITS[trait]))
 
-    warn_aliases(overrides)
-    overrides = canonical_style(overrides)
     unknown = set(overrides) - set(theme)
     if unknown:
         raise ValueError(f"Unknown theme attributes: {sorted(unknown)}")

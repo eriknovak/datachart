@@ -783,8 +783,8 @@ class TestDeepNesting(unittest.TestCase):
         self.assertAlmostEqual(sizes["East Asia"], subtitle * scale)
         self.assertAlmostEqual(sizes["China"], subtitle * scale**2)
         # values scale the same way
-        self.assertAlmostEqual(sizes["45"], config["plot_bar_value_fontsize"])
-        self.assertAlmostEqual(sizes["224"], config["plot_bar_value_fontsize"] * scale)
+        self.assertAlmostEqual(sizes["45"], config["plot_value_fontsize"])
+        self.assertAlmostEqual(sizes["224"], config["plot_value_fontsize"] * scale)
 
     def test_emphasis_inherits_down_the_subtree(self):
         data = [
