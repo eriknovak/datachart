@@ -50,7 +50,7 @@ jobs:
         with:
           python-version: "3.10"
       - run: uv venv
-      - run: uv pip install --resolution lowest-direct -e .
+      - run: uv pip install --resolution lowest-direct -e ".[interactive]"
       # nbmake: pyproject.toml's `addopts = --nbmake` applies to every pytest
       # invocation, even one scoped to test/ with no notebooks to collect
       - run: uv pip install pytest nbmake

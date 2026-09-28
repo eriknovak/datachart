@@ -29,7 +29,7 @@ classifiers = [
 ]
 dependencies = [
     "numpy>=2.0",
-    "matplotlib>=3.10.1",
+    "matplotlib>=3.10.7",
     "scipy>=1.15",
     "typing-extensions; python_version < '3.11'",
     "pypalettes>=0.2.1",

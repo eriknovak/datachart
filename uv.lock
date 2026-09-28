@@ -802,7 +802,7 @@ test = [
 [package.metadata]
 requires-dist = [
     { name = "ipympl", marker = "extra == 'interactive'" },
-    { name = "matplotlib", specifier = ">=3.10.1" },
+    { name = "matplotlib", specifier = ">=3.10.7" },
     { name = "mplcursors", marker = "extra == 'interactive'" },
     { name = "numpy", specifier = ">=2.0" },
     { name = "pypalettes", specifier = ">=0.2.1" },
