@@ -39,33 +39,38 @@ from .figure import (
     _apply_figure_labels,
 )
 from ._internal.config_helpers import (
-    get_grid_style,
-    get_legend_panel_settings,
-    get_text_style,
+    get_grid_style as _get_grid_style,
+    get_legend_panel_settings as _get_legend_panel_settings,
+    get_text_style as _get_text_style,
 )
-from ._internal.chart_kinds import CHART_KINDS, check_domains
-from ._internal.figures import DatachartFigure, new_figure
+from ._internal.chart_kinds import (
+    CHART_KINDS as _CHART_KINDS,
+    check_domains as _check_domains,
+)
+from ._internal.figures import DatachartFigure, new_figure as _new_figure
 from ._internal.layers import (
     Panel as _PanelSeam,
-    DumbbellLayer,
-    LayerGroup,
-    StackedAreaLayer,
-    TextLayer,
-    DRAW_ZORDER,
-    draw_zorder_key,
-    emphasis_rule_roles,
-    theme_default,
-    value_axis_grid,
+    DumbbellLayer as _DumbbellLayer,
+    LayerGroup as _LayerGroup,
+    StackedAreaLayer as _StackedAreaLayer,
+    TextLayer as _TextLayer,
+    DRAW_ZORDER as _DRAW_ZORDER,
+    draw_zorder_key as _draw_zorder_key,
+    emphasis_rule_roles as _emphasis_rule_roles,
+    theme_default as _theme_default,
+    value_axis_grid as _value_axis_grid,
     _rule_summary,
 )
 from ._internal.validate import (
-    GRID_CHART_KEYS,
-    validate_chart_dict,
-    validate_emphasis_rule,
-    validate_legend_location,
-    validate_max_cols,
-    validate_panel_options,
+    GRID_CHART_KEYS as _GRID_CHART_KEYS,
+    validate_chart_dict as _validate_chart_dict,
+    validate_emphasis_rule as _validate_emphasis_rule,
+    validate_legend_location as _validate_legend_location,
+    validate_max_cols as _validate_max_cols,
+    validate_panel_options as _validate_panel_options,
 )
+
+__all__ = ["Panel", "Grid", "Annotate"]
 
 
 def _extract_groups(figure: plt.Figure, index: int) -> Tuple[_PanelSeam, list]:
@@ -95,7 +100,7 @@ def _extract_groups(figure: plt.Figure, index: int) -> Tuple[_PanelSeam, list]:
             f"Figure at index {index} is a Grid figure; grid figures cannot be overlaid"
         )
     # an overlay figure is no front and has no row; it always overlays
-    kind = CHART_KINDS.get(metadata["type"])
+    kind = _CHART_KINDS.get(metadata["type"])
     if kind is not None and not kind.overlayable:
         raise ValueError(
             f"Figure at index {index} is a {kind.label} figure; "
@@ -111,7 +116,7 @@ def _extract_groups(figure: plt.Figure, index: int) -> Tuple[_PanelSeam, list]:
         skipped = skipped or len(supported) < len(group.layers)
         if supported:
             groups.append(
-                LayerGroup(
+                _LayerGroup(
                     supported,
                     palette=group.palette,
                     max_colors=group.max_colors,
@@ -139,7 +144,7 @@ def _extract_groups(figure: plt.Figure, index: int) -> Tuple[_PanelSeam, list]:
     return panel, groups
 
 
-def _source_scales(source: _PanelSeam, group: LayerGroup) -> Dict[str, Any]:
+def _source_scales(source: _PanelSeam, group: _LayerGroup) -> Dict[str, Any]:
     """The scales a source figure's panel stamps on one of its groups, by role.
 
     A source panel's scale keys are literal, so its own orientation maps them
@@ -170,7 +175,7 @@ def _role_format(source: _PanelSeam, role: str) -> Any:
     return source.settings.get(f"{axis}ticks_format")
 
 
-def _apply_emphasis_rule(groups: List[LayerGroup], rule) -> List[LayerGroup]:
+def _apply_emphasis_rule(groups: List[_LayerGroup], rule) -> List[_LayerGroup]:
     """The groups with the rule's role on each layer that carries none.
 
     One unit per layer that plots raw values, as on a series front; a layer
@@ -178,7 +183,7 @@ def _apply_emphasis_rule(groups: List[LayerGroup], rule) -> List[LayerGroup]:
     layers are copied, so the source figures keep their own roles.
     """
 
-    rule = validate_emphasis_rule(rule, "mean")
+    rule = _validate_emphasis_rule(rule, "mean")
     if rule is None:
         return groups
     groups = [copy.copy(group) for group in groups]
@@ -194,7 +199,7 @@ def _apply_emphasis_rule(groups: List[LayerGroup], rule) -> List[LayerGroup]:
             ):
                 continue
             units.append((group, i, _rule_summary(values, rule[2], "value")))
-    roles = emphasis_rule_roles(rule, [value for _, _, value in units])
+    roles = _emphasis_rule_roles(rule, [value for _, _, value in units])
     for (group, i, _), role in zip(units, roles):
         group.layers[i] = copy.copy(group.layers[i])
         group.layers[i].emphasis = role
@@ -380,15 +385,15 @@ def Panel(
             cannot be overlaid (missing metadata, Grid figure), or the figures
             mix horizontal and vertical orientations.
     """
-    check_domains(locals(), {"scaley_right": AXIS_SCALE})
-    validate_legend_location(legend)
+    _check_domains(locals(), {"scaley_right": AXIS_SCALE})
+    _validate_legend_location(legend)
     items = []
     for i, item in enumerate(charts):
         if isinstance(item, plt.Figure):
             items.append({"figure": item})
         elif isinstance(item, dict):
-            validate_panel_options(item, i)
-            check_domains(item, {})
+            _validate_panel_options(item, i)
+            _check_domains(item, {})
             items.append(item)
         else:
             raise ValueError(f"Item at index {i} is not a matplotlib Figure or a dict")
@@ -399,7 +404,7 @@ def Panel(
     if auto_secondary_axis is None:
         auto_secondary_axis = config.get("overlay_auto_threshold", 3.0)
     theme_grid = show_grid is None
-    show_grid = theme_default(None, {"show_grid": show_grid}, "show_grid")
+    show_grid = _theme_default(None, {"show_grid": show_grid}, "show_grid")
     if figsize is None:
         figsize = FIG_SIZE.DEFAULT
 
@@ -436,8 +441,8 @@ def Panel(
     # them, and the projection (also raising on a mix) picks the axes kind
     probe = _PanelSeam(groups)
     projection = probe.projection
-    if theme_grid and any(isinstance(l, DumbbellLayer) for l in probe.layers):
-        show_grid = value_axis_grid(show_grid, probe.horizontal)
+    if theme_grid and any(isinstance(l, _DumbbellLayer) for l in probe.layers):
+        show_grid = _value_axis_grid(show_grid, probe.horizontal)
     if probe.horizontal:
         xlabel, ylabel_left = ylabel_left, xlabel
         xmin, xmax, ymin, ymax = ymin, ymax, xmin, xmax
@@ -467,19 +472,19 @@ def Panel(
             "surface": 1,
             "contour": 2,
             # an image or basemap takes its position's rung, whatever the order
-            **{draw_zorder_key(p): z for p, z in DRAW_ZORDER.items()},
+            **{_draw_zorder_key(p): z for p, z in _DRAW_ZORDER.items()},
         },
         "show_grid": show_grid,
         # the caller's own value, unresolved: a polar panel draws only the
         # set it names (ADR 0015)
         "show_grid_explicit": not theme_grid,
-        "grid_style": get_grid_style({}),
+        "grid_style": _get_grid_style({}),
         "hatch_cycle": config.get("plot_hatch_cycle"),
         "linestyle_cycle": config.get("plot_linestyle_cycle"),
         "marker_cycle": config.get("plot_marker_cycle"),
         "show_legend": show_legend,
         "legend_mode": "combined",
-        **get_legend_panel_settings(legend),
+        **_get_legend_panel_settings(legend),
         "title": title,
         "xlabel": xlabel,
         "ylabel": ylabel_left,
@@ -512,7 +517,7 @@ def Panel(
             s.get("baseline")
             for s, item in zip(source_settings, items)
             if any(
-                isinstance(l, StackedAreaLayer)
+                isinstance(l, _StackedAreaLayer)
                 for l in item["figure"]._chart_metadata["panel"].layers
             )
         ),
@@ -535,7 +540,7 @@ def Panel(
 
     panel = _PanelSeam(groups, panel_settings)
 
-    fig = new_figure(figsize=figsize)
+    fig = _new_figure(figsize=figsize)
     ax = fig.subplots(
         subplot_kw={"projection": "polar"} if projection == "polar" else None
     )
@@ -544,7 +549,7 @@ def Panel(
     panel.render(ax)
     panel.settings = panel_settings
     if title:
-        fig.suptitle(title, **get_text_style("title"))
+        fig.suptitle(title, **_get_text_style("title"))
 
     fig._chart_metadata = {
         "type": "overlay",
@@ -644,7 +649,7 @@ def Annotate(
     # invariant holds, and the carrier claims no color-cycle slot (ADR 0018)
     new_panel = _with_text_carrier(panel, texts)
 
-    fig = new_figure(figsize=tuple(figure.get_size_inches()))
+    fig = _new_figure(figsize=tuple(figure.get_size_inches()))
     ax = fig.subplots(
         subplot_kw=(
             {"projection": "polar"} if new_panel.projection == "polar" else None
@@ -656,7 +661,7 @@ def Annotate(
     new_panel.render(ax)
     new_panel.settings = panel.settings
     if title:
-        fig.suptitle(title, **get_text_style("title"))
+        fig.suptitle(title, **_get_text_style("title"))
 
     fig._chart_metadata = {
         "type": metadata["type"],
@@ -668,7 +673,7 @@ def Annotate(
 
 def _with_text_carrier(panel: _PanelSeam, texts: List[TextSettingAttrs]) -> _PanelSeam:
     """A new panel: `panel`'s groups plus one carrier group holding `texts`."""
-    carrier = LayerGroup([TextLayer(texts)], max_colors=0)
+    carrier = _LayerGroup([_TextLayer(texts)], max_colors=0)
     return _PanelSeam(panel.groups + [carrier], panel.settings)
 
 
@@ -709,7 +714,7 @@ def _annotate_subplots(
     ]
     shape = metadata["shape"]
 
-    fig = new_figure(figsize=tuple(figure.get_size_inches()))
+    fig = _new_figure(figsize=tuple(figure.get_size_inches()))
     _render_subplot_panels(fig, new_panels, shape, GridSpec(1, 1, figure=fig)[0])
     _apply_figure_labels(
         fig, figure.get_suptitle(), figure.get_supxlabel(), figure.get_supylabel()
@@ -897,9 +902,9 @@ def Grid(
             cannot be composed (missing metadata), or a log scale meets a
             non-positive value.
     """
-    check_domains(locals(), {})
-    validate_max_cols(max_cols)
-    validate_legend_location(legend)
+    _check_domains(locals(), {})
+    _validate_max_cols(max_cols)
+    _validate_legend_location(legend)
     if not charts:
         raise ValueError("At least one chart is required")
     furniture = {
@@ -937,7 +942,7 @@ def Grid(
         if isinstance(item, plt.Figure):
             items.append({"figure": item})
         elif isinstance(item, dict):
-            validate_chart_dict(item, i, GRID_CHART_KEYS)
+            _validate_chart_dict(item, i, _GRID_CHART_KEYS)
             items.append(item)
         else:
             raise ValueError(f"Item at index {i} is not a matplotlib Figure or a dict")

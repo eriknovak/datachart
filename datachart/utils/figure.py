@@ -19,14 +19,23 @@ from matplotlib.gridspec import GridSpec, SubplotSpec
 
 from ..constants import FIG_FORMAT, FIG_SIZE
 from ._internal.config_helpers import (
-    configure_labels,
-    get_legend_style,
-    get_text_style,
-    resolve_font_family,
+    configure_labels as _configure_labels,
+    get_legend_style as _get_legend_style,
+    get_text_style as _get_text_style,
+    resolve_font_family as _resolve_font_family,
 )
-from ._internal.figures import new_figure, parent_cell, subgridspec
-from ._internal.plot_engine import SUBPLOT_FURNITURE_KEYS
-from ._internal.validate import validate_layout_specs, warn_renamed
+from ._internal.figures import (
+    new_figure as _new_figure,
+    parent_cell as _parent_cell,
+    subgridspec as _subgridspec,
+)
+from ._internal.plot_engine import SUBPLOT_FURNITURE_KEYS as _SUBPLOT_FURNITURE_KEYS
+from ._internal.validate import (
+    validate_layout_specs as _validate_layout_specs,
+    warn_renamed as _warn_renamed,
+)
+
+__all__ = ["save_figure"]
 
 # =====================================
 # Helper functions
@@ -110,7 +119,7 @@ def _subplot_node(metadata: Dict[str, Any], panels: List[Any]) -> Dict[str, Any]
         "type": "grid",
         "cells": cells,
         "shape": shape,
-        **{key: metadata.get(key) for key in SUBPLOT_FURNITURE_KEYS},
+        **{key: metadata.get(key) for key in _SUBPLOT_FURNITURE_KEYS},
     }
 
 
@@ -163,7 +172,7 @@ def _render_subplot_panels(
     figure this way, while a `Grid` cell rebuilds it as a grid node.
     """
     nrows, ncols = shape
-    sub_gs = subgridspec(owner, subplot_spec, nrows, ncols)
+    sub_gs = _subgridspec(owner, subplot_spec, nrows, ncols)
     for idx, panel in enumerate(panels):
         ax = owner.add_subplot(
             sub_gs[idx // ncols, idx % ncols],
@@ -181,7 +190,7 @@ def _apply_figure_labels(
 ) -> None:
     """Set the figure-level title and axis labels that are given, themed."""
     labels = {"title": title, "xlabel": xlabel, "ylabel": ylabel}
-    configure_labels(
+    _configure_labels(
         {key: text for key, text in labels.items() if text},
         [
             ("title", figure.suptitle),
@@ -236,7 +245,7 @@ def _render_grid_node(
     sub_gs = (
         GridSpec(len(heights), len(widths), figure=owner, **ratios)
         if subplot_spec is None
-        else subgridspec(owner, subplot_spec, len(heights), len(widths), **ratios)
+        else _subgridspec(owner, subplot_spec, len(heights), len(widths), **ratios)
     )
     row_offset = (1 if title else 0) + (1 if edge == "top" else 0)
     col_offset = (1 if edge == "left" else 0) + (1 if ylabel else 0)
@@ -358,7 +367,7 @@ def _label_axes(
         va=va,
         rotation=rotation,
         transform=ax.transAxes,
-        **get_text_style(text_type),
+        **_get_text_style(text_type),
     )
 
 
@@ -398,14 +407,14 @@ def node_legend(
     """
     resolved = {
         k: v
-        for k, v in get_legend_style(legend).items()
+        for k, v in _get_legend_style(legend).items()
         if k not in ("loc", "bbox_to_anchor")
     }
     return {
         "cell": cell,
         "edge": edge,
         "style": {**resolved, **style},
-        "family": resolve_font_family(),
+        "family": _resolve_font_family(),
     }
 
 
@@ -418,7 +427,7 @@ def _column_window(
     while ss is not None:
         chain.append(ss)
         # None once the outermost gridspec is reached
-        ss = parent_cell(figure, ss.get_gridspec())
+        ss = _parent_cell(figure, ss.get_gridspec())
     x0, x1 = 0.0, 1.0
     for ss in reversed(chain):
         gs = ss.get_gridspec()
@@ -675,7 +684,7 @@ def _figure_grid_layout_impl(
         "overrides": overrides,
     }
 
-    combined_fig = new_figure(figsize=figsize)
+    combined_fig = _new_figure(figsize=figsize)
     # the labels are the figure's; nested, the node renders them in its cell
     _render_grid_node(
         combined_fig,
@@ -748,7 +757,7 @@ def save_figure(
     """
 
     if format is not None:
-        warn_renamed("format", "fmt")
+        _warn_renamed("format", "fmt")
         if fmt is not None:
             raise ValueError("Pass `fmt` only; `format` is its deprecated name.")
         fmt = format
@@ -815,7 +824,7 @@ def _grid_from_dicts(
                 "When using custom layout, all charts must have 'layout_spec'. "
                 "Mix of custom and automatic layout is not supported."
             )
-        validate_layout_specs(layout_specs)
+        _validate_layout_specs(layout_specs)
     else:
         layout_specs = None
 
