@@ -119,33 +119,17 @@ class TestNoneMeansUnset(unittest.TestCase):
                 with self.subTest(cls=cls.__name__):
                     self.assertIsNone(vars(cls)["NONE"])
 
-    def test_renamed_members_warn_and_resolve(self):
-        for cls, old, new in [
-            (LINE_MARKER, "NONE", "NO_MARKER"),
-            (LINE_STYLE, "NONE", "NO_LINE"),
-            (SCATTER_MATRIX_DIAGONAL, "NONE", "BLANK"),
-        ]:
-            with self.subTest(cls=cls.__name__):
-                with self.assertWarns(DeprecationWarning):
-                    value = getattr(cls, old)
-                self.assertEqual(value, getattr(cls, new))
-
-    def test_renamed_classes_warn_and_resolve(self):
-        for old, new in [
-            ("SCALE", "AXIS_SCALE"),
-            ("NORMALIZE", "COLOR_NORM"),
-            ("BUMP_LABEL_POSITION", "LINE_LABEL_POSITION"),
+    def test_renamed_names_are_gone(self):
+        for owner, old in [
+            (LINE_MARKER, "NONE"),
+            (LINE_STYLE, "NONE"),
+            (SCATTER_MATRIX_DIAGONAL, "NONE"),
+            (constants, "SCALE"),
+            (constants, "NORMALIZE"),
+            (constants, "BUMP_LABEL_POSITION"),
         ]:
             with self.subTest(old=old):
-                with self.assertWarns(DeprecationWarning):
-                    cls = getattr(constants, old)
-                self.assertIs(cls, getattr(constants, new))
-
-    def test_a_current_member_does_not_warn(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("error")
-            self.assertEqual(LINE_MARKER.NO_MARKER, "")
-
+                self.assertFalse(hasattr(owner, old))
 
 LINE = [{"x": 1, "y": 2}, {"x": 2, "y": 3}]
 BARS = [{"label": "a", "y": 1}, {"label": "b", "y": 2}]
