@@ -3,7 +3,6 @@
 import os
 import tempfile
 import unittest
-import warnings
 from pathlib import Path
 
 import matplotlib
@@ -76,30 +75,9 @@ class TestSaveFigure(unittest.TestCase):
         paths = save_figure(self.figure, stem, fmt=[FIG_FORMAT.PDF, FIG_FORMAT.PNG])
         self.assertEqual(paths, [self.path("fig1.pdf"), self.path("fig1.png")])
 
-    def test_deprecated_format_warns_once_and_forwards(self):
-        path = self.path("fig1.png")
-        with warnings.catch_warnings(record=True) as caught:
-            warnings.simplefilter("always")
-            self.assertEqual(
-                save_figure(self.figure, path, format=FIG_FORMAT.PNG), [path]
-            )
-        deprecations = [w for w in caught if w.category is DeprecationWarning]
-        self.assertEqual(len(deprecations), 1)
-        self.assertIn("`format`", str(deprecations[0].message))
-        self.assertIn("`fmt`", str(deprecations[0].message))
-        self.assertEqual(deprecations[0].filename, __file__)
-        self.assertTrue(os.path.isfile(path))
-
-    def test_format_and_fmt_together_raise(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
-            with self.assertRaises(ValueError):
-                save_figure(
-                    self.figure,
-                    self.path("fig1.png"),
-                    fmt=FIG_FORMAT.PNG,
-                    format=FIG_FORMAT.PNG,
-                )
+    def test_format_keyword_is_unknown(self):
+        with self.assertRaisesRegex(TypeError, "'format'"):
+            save_figure(self.figure, self.path("fig1.png"), format=FIG_FORMAT.PNG)
 
 
 class TestSaveFigureKeepsTheThemeGround(unittest.TestCase):

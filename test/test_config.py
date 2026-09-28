@@ -3,7 +3,6 @@ import json
 import tempfile
 import typing
 import unittest
-import warnings
 from pathlib import Path
 
 from datachart.config import config
@@ -92,31 +91,10 @@ class TestConfig(unittest.TestCase):
         self.assertEqual(caught.filename, __file__)
         self.assertNotIn("not_a_key", config.config)
 
-    def test_deprecated_names_warn_once_and_forward(self):
-        for old, new, call in (
-            (
-                "update_config",
-                "update",
-                lambda: config.update_config({"font_general_size": 8}),
-            ),
-            ("reset_config", "reset", config.reset_config),
-        ):
+    def test_deprecated_methods_are_gone(self):
+        for old in ("update_config", "reset_config"):
             with self.subTest(old=old):
-                with warnings.catch_warnings(record=True) as caught:
-                    warnings.simplefilter("always")
-                    call()
-                deprecations = [w for w in caught if w.category is DeprecationWarning]
-                self.assertEqual(len(deprecations), 1)
-                self.assertIn(f"`{old}`", str(deprecations[0].message))
-                self.assertIn(f"`{new}`", str(deprecations[0].message))
-                self.assertEqual(deprecations[0].filename, __file__)
-        self.assertEqual(config.config, DEFAULT_THEME)
-
-    def test_deprecated_update_config_forwards(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
-            config.update_config({"font_general_size": 8})
-        self.assertEqual(config["font_general_size"], 8)
+                self.assertFalse(hasattr(config, old))
 
     def test_theme_setters_accept_a_registered_name(self):
         for method in (Config.set_theme, Config.using_theme):

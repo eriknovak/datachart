@@ -17,7 +17,7 @@ import numpy as np
 from matplotlib.mlab import GaussianKDE
 
 from ..constants import BANDWIDTH
-from ._internal.validate import is_missing, validate_bandwidth, warn_renamed
+from ._internal.validate import is_missing, validate_bandwidth
 
 __all__ = [
     "count",
@@ -43,8 +43,6 @@ __all__ = [
     "loess",
     "kde1d",
     "kde2d",
-    # deprecated, removed one release after `pearson` shipped
-    "correlation",
 ]
 
 # ================================================
@@ -366,20 +364,6 @@ def pearson(x: List[Union[int, float]], y: List[Union[int, float]]) -> float:
     if len(xs) == 0:
         raise ValueError("x and y must have at least one value.")
     return float(np.corrcoef(xs, ys)[0, 1])
-
-
-def correlation(x: List[Union[int, float]], y: List[Union[int, float]]) -> float:
-    """Deprecated: use `pearson`, which it forwards to.
-
-    Args:
-        x: The first list of values, numeric or temporal.
-        y: The second list of values.
-
-    Returns:
-        The Pearson correlation coefficient.
-    """
-    warn_renamed("correlation", "pearson")
-    return pearson(x, y)
 
 
 def _is_temporal_column(values: Any, name: str) -> bool:
@@ -890,18 +874,6 @@ def loess(
 # ================================================
 
 
-def _grid_size(grid_size, gridsize, default):
-    """`grid_size`, else its deprecated name `gridsize`, else `default`."""
-
-    if gridsize is None:
-        return default if grid_size is None else grid_size
-    # this function, the kde function, then the caller
-    warn_renamed("gridsize", "grid_size", stacklevel=3)
-    if grid_size is not None:
-        raise ValueError("Pass `grid_size` only; `gridsize` is its deprecated name.")
-    return gridsize
-
-
 def _kde(points: np.ndarray, bandwidth, cut: float) -> Tuple[GaussianKDE, np.ndarray]:
     """The kernel over the (n_dims, n_points) array and its per-axis padding."""
 
@@ -928,7 +900,6 @@ def kde1d(
     grid_size: Optional[int] = None,
     cut: float = 3,
     xlim: Optional[Tuple[float, float]] = None,
-    gridsize: Optional[int] = None,
 ) -> Dict[str, List[float]]:
     """Estimates the density of the values as a curve.
 
@@ -957,7 +928,6 @@ def kde1d(
             default.
         cut: How many bandwidths to extend the grid past the extremes.
         xlim: The `(min, max)` range of the grid; overrides the padded range.
-        gridsize: Deprecated; use `grid_size`. Removed in the next release.
 
     Returns:
         The density curve as `{"x": [...], "y": [...]}`, one `y` per `x`.
@@ -966,7 +936,7 @@ def kde1d(
         ValueError: If the bandwidth is invalid, there are fewer than two
             finite values, or the values are all equal.
     """
-    grid_size = _grid_size(grid_size, gridsize, 100)
+    grid_size = 100 if grid_size is None else grid_size
     points = np.asarray(_present(values), dtype=float).reshape(1, -1)
     kde, (padding,) = _kde(points, bandwidth, cut)
     lo, hi = xlim or (points.min() - padding, points.max() + padding)
@@ -984,7 +954,6 @@ def kde2d(
     cut: float = 3,
     xlim: Optional[Tuple[Any, Any]] = None,
     ylim: Optional[Tuple[float, float]] = None,
-    gridsize: Optional[Union[int, Tuple[int, int]]] = None,
 ) -> Dict[str, List]:
     """Estimates the density of the (x, y) points as a gridded surface.
 
@@ -1016,7 +985,6 @@ def kde2d(
         cut: How many bandwidths to extend the grid past the extremes.
         xlim: The `(min, max)` x range of the grid; overrides the padded range.
         ylim: The `(min, max)` y range of the grid; overrides the padded range.
-        gridsize: Deprecated; use `grid_size`. Removed in the next release.
 
     Returns:
         The `{x, y, z}` chart dict of the density surface.
@@ -1028,7 +996,7 @@ def kde2d(
             there are fewer than two finite points, or the
             points have no spread (all equal, or on one straight line).
     """
-    grid_size = _grid_size(grid_size, gridsize, 100)
+    grid_size = 100 if grid_size is None else grid_size
     if len(x) != len(y):
         raise ValueError("x and y must have the same length.")
     x, y = _present_pairs(x, y)

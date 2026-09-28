@@ -32,7 +32,6 @@ from ._internal.figures import (
 from ._internal.plot_engine import SUBPLOT_FURNITURE_KEYS as _SUBPLOT_FURNITURE_KEYS
 from ._internal.validate import (
     validate_layout_specs as _validate_layout_specs,
-    warn_renamed as _warn_renamed,
 )
 
 __all__ = ["save_figure"]
@@ -709,7 +708,6 @@ def save_figure(
     dpi: int = 300,
     fmt: Optional[Union[FIG_FORMAT, str, List[Union[FIG_FORMAT, str]]]] = None,
     transparent: bool = False,
-    format: Optional[Union[FIG_FORMAT, str, List[Union[FIG_FORMAT, str]]]] = None,
 ) -> List[str]:
     """Save the figure to one or more files.
 
@@ -746,21 +744,13 @@ def save_figure(
         dpi: The DPI of the figure.
         fmt: The format of the figure, or a list of formats to write. If `None`, the format will be determined from the file extension.
         transparent: Whether to make the background transparent.
-        format: Deprecated; use `fmt`.
 
     Returns:
         The paths written, in the order the formats were given.
 
     Raises:
-        ValueError: If `fmt` is an empty list, or both `fmt` and `format`
-            are passed.
+        ValueError: If `fmt` is an empty list.
     """
-
-    if format is not None:
-        _warn_renamed("format", "fmt")
-        if fmt is not None:
-            raise ValueError("Pass `fmt` only; `format` is its deprecated name.")
-        fmt = format
 
     if isinstance(fmt, list):
         if not fmt:

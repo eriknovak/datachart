@@ -174,14 +174,6 @@ class Config:
         self.config = copy.deepcopy(DEFAULT_THEME)
         self.theme = THEME.DEFAULT
 
-    def reset_config(self) -> None:
-        """Deprecated: use `reset`, which it forwards to."""
-
-        from ..utils._internal.validate import warn_renamed
-
-        warn_renamed("reset_config", "reset")
-        self.reset()
-
     def update(self, config: StyleAttrs) -> None:
         """Updates the global configuration.
 
@@ -201,19 +193,6 @@ class Config:
 
         """
 
-        self._update(config, stacklevel=2)
-
-    def update_config(self, config: StyleAttrs) -> None:
-        """Deprecated: use `update`; it applies the attributes the same way.
-
-        Args:
-            config: The configuration attributes to be updated.
-
-        """
-
-        from ..utils._internal.validate import warn_renamed
-
-        warn_renamed("update_config", "update")
         self._update(config, stacklevel=2)
 
     def _update(self, config: StyleAttrs, stacklevel: int) -> None:
