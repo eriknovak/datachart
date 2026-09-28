@@ -193,22 +193,8 @@ You can also connect your AI assistant directly:
 
 ## Contributing
 
-Bug reports, feature requests, and pull requests are welcome — open an
-[issue](https://github.com/eriknovak/datachart/issues) to report a problem or
-propose a chart, theme, or option you are missing.
-
-To work on the package locally:
-
-```bash
-git clone https://github.com/eriknovak/datachart.git
-cd datachart
-uv sync --group dev                  # package + dev dependencies
-python -m unittest discover test     # unit tests
-pytest                               # documentation notebooks
-mkdocs serve                         # docs at http://127.0.0.1:8000
-```
-
-Code is formatted with `black`; the pre-commit hook runs it for you.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for bug reports, feature requests, dev
+setup, tests, ADRs, and commit style.
 
 [python]: https://www.python.org/
 [uv]: https://docs.astral.sh/uv/
