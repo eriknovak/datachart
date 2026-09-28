@@ -1,8 +1,8 @@
 from typing import Union, List, Optional, Tuple
 
-import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render
+from ..utils._internal.figures import DatachartFigure
 from ..utils._internal.chart_builder import dict_datasets
 from ..utils._internal.validate import (
     infer_network_nodes,
@@ -48,7 +48,7 @@ def NetworkChart(
             List[Union[TextSettingAttrs, List[TextSettingAttrs], None]],
         ]
     ] = None,
-) -> plt.Figure:
+) -> DatachartFigure:
     """Creates the network chart.
 
     A network chart draws relational data as a node-link diagram — module

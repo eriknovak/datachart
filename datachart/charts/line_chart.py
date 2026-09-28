@@ -2,9 +2,9 @@ import warnings
 from datetime import datetime
 from typing import Union, List, Optional, Tuple
 
-import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render
+from ..utils._internal.figures import DatachartFigure
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
@@ -133,7 +133,7 @@ def LineChart(
     x: Optional[Union[str, List[Optional[str]]]] = None,
     y: Optional[Union[str, List[Optional[str]]]] = None,
     yerr: Optional[Union[str, List[Optional[str]]]] = None,
-) -> plt.Figure:
+) -> DatachartFigure:
     """Creates the line chart.
 
     Lines connect ordered (x, y) points to show how a value changes along a continuous

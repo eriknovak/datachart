@@ -1,8 +1,8 @@
 from typing import Union, List, Optional, Tuple
 
-import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render
+from ..utils._internal.figures import DatachartFigure
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
@@ -126,7 +126,7 @@ def BoxPlot(
     ] = None,
     label: Optional[Union[str, List[Optional[str]]]] = None,
     value: Optional[Union[str, List[Optional[str]]]] = None,
-) -> plt.Figure:
+) -> DatachartFigure:
     """Creates the box plot.
 
     A box plot summarizes a numeric distribution per group by its median, quartiles,

@@ -1,5 +1,6 @@
 ---
 status: accepted
+amended-by: [0087]
 ---
 
 # Every public typing carries one of four role suffixes, and the theme keys are the style types

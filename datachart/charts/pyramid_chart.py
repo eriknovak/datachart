@@ -1,8 +1,8 @@
 from typing import Union, List, Optional, Tuple
 
-import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render
+from ..utils._internal.figures import DatachartFigure
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
@@ -111,7 +111,7 @@ def PyramidChart(
     label: Optional[Union[str, List[Optional[str]]]] = None,
     y: Optional[Union[str, List[Optional[str]]]] = None,
     yerr: Optional[Union[str, List[Optional[str]]]] = None,
-) -> plt.Figure:
+) -> DatachartFigure:
     """Creates the pyramid chart.
 
     A pyramid chart draws exactly two series as horizontal bars mirrored

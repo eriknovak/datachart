@@ -1,8 +1,8 @@
 from typing import Union, List, Optional, Tuple
 
-import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render
+from ..utils._internal.figures import DatachartFigure
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
@@ -104,7 +104,7 @@ def RadialChart(
     type: Optional[Union[RADIAL_TYPE, str]] = None,
     startangle: Optional[Union[str, int, float]] = None,
     innerradius: Optional[float] = None,
-) -> plt.Figure:
+) -> DatachartFigure:
     """Creates the radial chart.
 
     A radial chart plots series on polar axes: as a line (radar) profile, an

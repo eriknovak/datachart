@@ -1,9 +1,9 @@
 from datetime import date, datetime
 from typing import Union, List, Optional, Tuple
 
-import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render
+from ..utils._internal.figures import DatachartFigure
 from ..utils._internal.validate import (
     validate_gantt_value_kind,
 )
@@ -91,7 +91,7 @@ def GanttChart(
     group: Optional[Union[str, List[Optional[str]]]] = None,
     progress: Optional[Union[str, List[Optional[str]]]] = None,
     depends_on: Optional[Union[str, List[Optional[str]]]] = None,
-) -> plt.Figure:
+) -> DatachartFigure:
     """Creates the gantt chart.
 
     A gantt chart shows a schedule: one horizontal bar per task from its

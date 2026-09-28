@@ -23,7 +23,7 @@ from datachart.charts import (
     ScatterChart,
     SwarmPlot,
 )
-from datachart.utils import Grid, Panel
+from datachart.utils import Annotate, DatachartFigure, Grid, Panel
 from datachart.utils._internal import plot_engine
 from datachart.themes._base import BASE_THEME
 from datachart.utils._internal.chart_kinds import (
@@ -97,6 +97,20 @@ class TestRowKeys(unittest.TestCase):
             first = tree.body[0].body[1]
             with self.subTest(front=front):
                 self.assertEqual(ast.unparse(first), "params = dict(locals())")
+
+
+class TestReturnType(unittest.TestCase):
+    def test_every_front_returns_the_public_figure(self):
+        fronts = [getattr(datachart.charts, name) for name in datachart.charts.__all__]
+        for front in fronts + [Panel, Grid, Annotate]:
+            with self.subTest(front=front.__name__):
+                annotation = inspect.signature(front).return_annotation
+                self.assertIs(annotation, DatachartFigure)
+
+    def test_fronts_return_the_public_figure(self):
+        figure = LineChart([{"x": 0, "y": 1}])
+        for made in (figure, Panel([figure]), Grid([figure]), Annotate(figure, [])):
+            self.assertIsInstance(made, DatachartFigure)
 
 
 class TestSharedParameters(unittest.TestCase):

@@ -1,9 +1,9 @@
 from datetime import datetime
 from typing import Union, List, Optional, Tuple
 
-import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render
+from ..utils._internal.figures import DatachartFigure
 from ..typings import (
     EmphasisRuleAttrs,
     HexbinDataAttrs,
@@ -139,7 +139,7 @@ def HexbinChart(
     show_colorbars: Optional[bool] = None,
     gridsize: Optional[Union[int, List[Optional[int]]]] = None,
     mincnt: Optional[Union[int, List[Optional[int]]]] = None,
-) -> plt.Figure:
+) -> DatachartFigure:
     """Creates the hexbin chart.
 
     A hexbin chart tiles the plane with hexagons and colors each by the number

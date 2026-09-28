@@ -1,8 +1,8 @@
 from typing import Union, List, Optional, Tuple
 
-import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render
+from ..utils._internal.figures import DatachartFigure
 from ..utils._internal.validate import validate_bandwidth
 from ..typings import (
     EmphasisRuleAttrs,
@@ -132,7 +132,7 @@ def RaincloudPlot(
     label: Optional[Union[str, List[Optional[str]]]] = None,
     value: Optional[Union[str, List[Optional[str]]]] = None,
     mode: Optional[Union[SWARM_MODE, str]] = None,
-) -> plt.Figure:
+) -> DatachartFigure:
     """Creates the raincloud plot.
 
     A raincloud plot draws each group as a cloud (a half violin of its

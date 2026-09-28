@@ -1,8 +1,8 @@
 from typing import Union, List, Optional, Tuple
 
-import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render
+from ..utils._internal.figures import DatachartFigure
 from ..utils._internal.validate import (
     validate_dumbbell_value_kind,
     validate_dumbbell_sort_by,
@@ -130,7 +130,7 @@ def DumbbellChart(
     label: Optional[Union[str, List[Optional[str]]]] = None,
     start: Optional[Union[str, List[Optional[str]]]] = None,
     end: Optional[Union[str, List[Optional[str]]]] = None,
-) -> plt.Figure:
+) -> DatachartFigure:
     """Creates the dumbbell chart.
 
     A dumbbell chart shows two values per category: a dot at `start`, a dot

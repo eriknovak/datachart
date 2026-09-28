@@ -1,8 +1,8 @@
 from typing import Union, List, Optional, Tuple, Dict
 
-import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render
+from ..utils._internal.figures import DatachartFigure
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
@@ -44,7 +44,7 @@ def ParallelCoords(
             List[Union[TextSettingAttrs, List[TextSettingAttrs], None]],
         ]
     ] = None,
-) -> plt.Figure:
+) -> DatachartFigure:
     """Creates the parallel coordinates chart.
 
     Parallel coordinates draw each record as a polyline across one vertical

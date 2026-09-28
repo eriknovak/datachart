@@ -57,6 +57,7 @@ adds no tag; one that reverses, narrows, widens or replaces a commitment does.
 - [0041](0041-panel-axis-scales.md) — Panel takes axis scales, and a layer group carries its source figure's scale
 - [0070](0070-composition-furniture-vocabulary.md) — Panel and Grid take the chart fronts' furniture vocabulary; one grid layout path
 - [0080](0080-per-axis-stacking.md) — Each value axis of a Panel stacks only its own layers
+- [0087](0087-py-typed-and-public-figure-type.md) — The package ships `py.typed`, the figure type is public, and composition items are settings
 
 ## Emphasis and category order
 
@@ -73,7 +74,7 @@ adds no tag; one that reverses, narrows, widens or replaces a commitment does.
 - [0048](0048-ink-rendering-attributes-in-themes.md) — Ink rendering attributes in themes
 - [0058](0058-dark-theme.md) — A dark theme inverts the furniture, not the marks
 - [0071](0071-theme-default-naming-and-resolver.md) — A theme default is named for its parameter and read through one resolver (amended by [0081](0081-violin-and-ridge-theme-defaults.md))
-- [0072](0072-typing-roles-and-theme-conformance.md) — Every public typing carries one of four role suffixes, and the theme keys are the style types
+- [0072](0072-typing-roles-and-theme-conformance.md) — Every public typing carries one of four role suffixes, and the theme keys are the style types (amended by [0087](0087-py-typed-and-public-figure-type.md))
 - [0073](0073-palette-score-gate.md) — A palette is scored by one function, and every predefined theme passes its gate (amended by [0078](0078-palette-gate-warns-at-registration.md))
 - [0074](0074-theme-traits-and-palette-leads.md) — A look owns its furniture, a trait composes, a palette is a lead (amended by [0075](0075-furniture-defaults-follow-the-guidelines.md))
 - [0075](0075-furniture-defaults-follow-the-guidelines.md) — Furniture defaults follow the guidelines: no legend title, solid grids, and a warning when series outrun the palette (amended by [0077](0077-own-colored-series-take-no-palette-slot.md))
@@ -90,7 +91,7 @@ theme faces out of the wheel.
 - [0068](0068-constants-self-validating-domains.md) — A constant class is a self-validating domain, checked once at the front
 - [0034](0034-per-figure-legend-settings.md) — The legend is a per-figure setting, and outside locations expand to two matplotlib arguments
 - [0035](0035-colorbar-setting.md) — The colorbar is a per-figure setting located by edge, and its type takes the setting suffix (amended by [0043](0043-setting-payloads-take-the-setting-suffix.md))
-- [0043](0043-setting-payloads-take-the-setting-suffix.md) — Every setting payload takes the `*SettingAttrs` suffix, old names warn for one release (amended by [0067](0067-shared-parameter-table.md), [0072](0072-typing-roles-and-theme-conformance.md))
+- [0043](0043-setting-payloads-take-the-setting-suffix.md) — Every setting payload takes the `*SettingAttrs` suffix, old names warn for one release (amended by [0067](0067-shared-parameter-table.md), [0072](0072-typing-roles-and-theme-conformance.md), [0087](0087-py-typed-and-public-figure-type.md))
 - [0052](0052-chart-prefixed-constants.md) — A constant one chart owns carries that chart's prefix (amended by [0076](0076-line-end-labels.md))
 
 ## Axes, scales, and colormaps

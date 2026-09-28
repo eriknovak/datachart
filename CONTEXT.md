@@ -160,6 +160,16 @@ dicts (data) or the theme's `plot_*` keys (style). Typed by a
 `*SettingAttrs` TypedDict.
 _Avoid_: plot attrs, style (for this)
 
+**Datachart figure**:
+The figure every front returns: `datachart.utils.DatachartFigure`, a
+matplotlib `Figure` the caller owns, never registered with pyplot, shown by
+`show()` (ADR 0008, 0031). Fronts annotate it as their return type; `Panel`
+and `Grid` accept any matplotlib figure carrying the transport. A composition
+item (`PanelItemSettingAttrs`, `GridItemSettingAttrs`, `LayoutSpecSettingAttrs`)
+is a setting payload. A public typing's optional field is `NotRequired`, so a
+partial literal type-checks; only the style types are total (ADR 0087).
+_Avoid_: chart figure, plt figure (for the returned object)
+
 **Typing role**:
 What a public TypedDict in `datachart.typings` describes, said by its suffix:
 `*RecordAttrs` one input record of a record front, `*DataAttrs` one

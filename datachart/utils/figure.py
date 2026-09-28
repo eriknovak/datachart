@@ -698,9 +698,9 @@ def save_figure(
     figure: plt.Figure,
     path: Union[str, os.PathLike],
     dpi: int = 300,
-    fmt: Optional[Union[FIG_FORMAT, List[FIG_FORMAT]]] = None,
+    fmt: Optional[Union[FIG_FORMAT, str, List[Union[FIG_FORMAT, str]]]] = None,
     transparent: bool = False,
-    format: Optional[Union[FIG_FORMAT, List[FIG_FORMAT]]] = None,
+    format: Optional[Union[FIG_FORMAT, str, List[Union[FIG_FORMAT, str]]]] = None,
 ) -> List[str]:
     """Save the figure to one or more files.
 
