@@ -108,7 +108,7 @@ The package is organized into six main modules:
 
 The `_internal` submodule contains implementation details not exposed to users:
 
-- **layers.py**: The single drawing seam (ADR 0001): `Layer` classes per chart type with `draw(ax, ctx)`, `Panel` owning every cross-layer concern (colors, bar slotting, shared bins, scales, limits, legend, twin axes), `LayerGroup`, and the frozen `DrawContext`
+- **layers/**: The single drawing seam (ADR 0001), a package (ADR 0086): `base` holds `Layer`, the frozen `DrawContext`, and the capability mixins; one module per chart family holds its `Layer` classes with `draw(ax, ctx)`; `panel` holds `Panel`, owning every cross-layer concern (colors, bar slotting, shared bins, scales, limits, legend, twin axes), and `LayerGroup`. `__init__.py` re-exports what other modules import. `Panel` never names a concrete layer class: a capability is a mixin from `base`, a group policy a `ChartKind` field copied onto the layer at build (`LAYER_POLICIES`)
 - **chart_kinds.py**: One frozen `ChartKind` row per front in `CHART_KINDS`, read through `chart_kind()` (ADR 0065); the engine, builder, and composition branch on the row, never on the chart-type string. Beside it, `SHARED_PARAMETERS`: one name, annotation and default per parameter the fronts share, which `test/test_front_body.py` checks every signature against (ADR 0067). Also holds its build-time readers `build_layers()` and `build_chart_panel_settings()`
 - **plot_engine.py**: Figure assembly: `render()` splits a front's arguments by its row (ADR 0066); `render_chart()` builds layers, assembles panels, renders them, and stores the metadata transport
 - **chart_builder.py**: The one record-reading seam (ADR 0069): `build_charts_structure()` decides dataset count from the data shape and the row, and copies each record under the row's canonical `record_keys`, raising one `ValueError` for a missing required key
@@ -210,7 +210,7 @@ Styles are applied in this order (later overrides earlier):
 
 ### Chart Hash for Color Assignment
 
-Layers use `get_chart_hash()` (in `layers.py`) to key color assignment, so the same chart data gets the same color even when redrawn.
+Layers use `get_chart_hash()` (in `layers/base.py`) to key color assignment, so the same chart data gets the same color even when redrawn.
 
 ### Axes Configuration
 
