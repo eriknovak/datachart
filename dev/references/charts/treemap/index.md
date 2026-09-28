@@ -37,7 +37,7 @@ Treemap(
         ]
         | None
     ) = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the treemap.
@@ -80,9 +80,9 @@ Examples:
 | `style`         | Style configuration(s) for the chart(s). **TYPE:** \`TreemapStyleAttrs                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | `texts`         | Text annotation(s) to draw. The tiling spans 0–1 in both directions. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 
-| RETURNS      | DESCRIPTION                        |
-| ------------ | ---------------------------------- |
-| `plt.Figure` | The figure containing the treemap. |
+| RETURNS           | DESCRIPTION                        |
+| ----------------- | ---------------------------------- |
+| `DatachartFigure` | The figure containing the treemap. |
 
 | RAISES       | DESCRIPTION                                                                                                                                                                                                      |
 | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

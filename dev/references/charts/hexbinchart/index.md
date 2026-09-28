@@ -146,7 +146,7 @@ HexbinChart(
     show_colorbars: bool | None = None,
     gridsize: int | list[int | None] | None = None,
     mincnt: int | list[int | None] | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the hexbin chart.
@@ -223,9 +223,9 @@ Examples:
 | `gridsize`       | Deprecated; use grid_size. Removed in the next release. **TYPE:** \`int                                                                                                                                                                                                                                                                                                                                                                         |
 | `mincnt`         | Deprecated; use min_count. Removed in the next release. **TYPE:** \`int                                                                                                                                                                                                                                                                                                                                                                         |
 
-| RETURNS      | DESCRIPTION                             |
-| ------------ | --------------------------------------- |
-| `plt.Figure` | The figure containing the hexbin chart. |
+| RETURNS           | DESCRIPTION                             |
+| ----------------- | --------------------------------------- |
+| `DatachartFigure` | The figure containing the hexbin chart. |
 
 ## Data
 

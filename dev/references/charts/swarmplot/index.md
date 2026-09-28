@@ -132,7 +132,7 @@ SwarmPlot(
     label: str | list[str | None] | None = None,
     value: str | list[str | None] | None = None,
     mode: SWARM_MODE | str | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the swarm plot.
@@ -206,9 +206,9 @@ Examples:
 | `value`         | The key name in data for numeric values (default: "value"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                         |
 | `mode`          | Deprecated; use swarm_mode. Removed in the next release. **TYPE:** \`SWARM_MODE                                                                                                                                                                                                                                                                                                                                                     |
 
-| RETURNS      | DESCRIPTION                           |
-| ------------ | ------------------------------------- |
-| `plt.Figure` | The figure containing the swarm plot. |
+| RETURNS           | DESCRIPTION                           |
+| ----------------- | ------------------------------------- |
+| `DatachartFigure` | The figure containing the swarm plot. |
 
 ## Data
 

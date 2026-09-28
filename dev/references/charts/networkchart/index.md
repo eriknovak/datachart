@@ -43,7 +43,7 @@ NetworkChart(
         ]
         | None
     ) = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the network chart.
@@ -91,9 +91,9 @@ Examples:
 | `style`          | Style configuration(s) for the chart(s). The edge geometry, plot_network_edge_style, takes ARROW_STYLE.CURVE (default) or ARROW_STYLE.STRAIGHT; the arrowhead comes from directed. **TYPE:** \`NetworkStyleAttrs                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | `texts`          | Text annotation(s) to draw. Data coordinates are the 0–1 layout space, so under FIXED a text at a node's x/y lands on that node. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 
-| RETURNS      | DESCRIPTION                              |
-| ------------ | ---------------------------------------- |
-| `plt.Figure` | The figure containing the network chart. |
+| RETURNS           | DESCRIPTION                              |
+| ----------------- | ---------------------------------------- |
+| `DatachartFigure` | The figure containing the network chart. |
 
 | RAISES       | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                          |
 | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

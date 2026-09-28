@@ -125,7 +125,7 @@ DumbbellChart(
     label: str | list[str | None] | None = None,
     start: str | list[str | None] | None = None,
     end: str | list[str | None] | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the dumbbell chart.
@@ -199,9 +199,9 @@ Examples:
 | `start`           | The key name in data for the start values (default: "start"). **TYPE:** \`str                                                                                                                                                                                                                                                               |
 | `end`             | The key name in data for the end values (default: "end"). **TYPE:** \`str                                                                                                                                                                                                                                                                   |
 
-| RETURNS      | DESCRIPTION                               |
-| ------------ | ----------------------------------------- |
-| `plt.Figure` | The figure containing the dumbbell chart. |
+| RETURNS           | DESCRIPTION                               |
+| ----------------- | ----------------------------------------- |
+| `DatachartFigure` | The figure containing the dumbbell chart. |
 
 ## Data
 

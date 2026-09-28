@@ -91,7 +91,7 @@ RadialChart(
     type: RADIAL_TYPE | str | None = None,
     startangle: str | int | float | None = None,
     innerradius: float | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the radial chart.
@@ -164,9 +164,9 @@ Examples:
 | `startangle`      | Deprecated; use start_angle. Removed in the next release. **TYPE:** \`str                                                                                                                                                                                                                                                                                                      |
 | `innerradius`     | Deprecated; use inner_radius. Removed in the next release. **TYPE:** \`float                                                                                                                                                                                                                                                                                                   |
 
-| RETURNS      | DESCRIPTION                             |
-| ------------ | --------------------------------------- |
-| `plt.Figure` | The figure containing the radial chart. |
+| RETURNS           | DESCRIPTION                             |
+| ----------------- | --------------------------------------- |
+| `DatachartFigure` | The figure containing the radial chart. |
 
 ## Data
 

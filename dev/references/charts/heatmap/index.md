@@ -77,7 +77,7 @@ Heatmap(
         VALUE_FORMAT | str | list[str | None] | None
     ) = None,
     show_colorbars: bool | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the heatmap.
@@ -148,9 +148,9 @@ Examples:
 | `valfmt`              | Deprecated; use value_format. Removed in the next release. **TYPE:** \`VALUE_FORMAT                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | `show_colorbars`      | Deprecated; use show_colorbar. Removed in the next release. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 
-| RETURNS      | DESCRIPTION                        |
-| ------------ | ---------------------------------- |
-| `plt.Figure` | The figure containing the heatmap. |
+| RETURNS           | DESCRIPTION                        |
+| ----------------- | ---------------------------------- |
+| `DatachartFigure` | The figure containing the heatmap. |
 
 ## Data
 

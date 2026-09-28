@@ -147,7 +147,7 @@ ContourChart(
     ) = None,
     filled: bool | None = None,
     show_colorbars: bool | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the contour chart.
@@ -228,9 +228,9 @@ Examples:
 | `filled`         | Deprecated; use fill. Removed in the next release. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                   |
 | `show_colorbars` | Deprecated; use show_colorbar. Removed in the next release. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                          |
 
-| RETURNS      | DESCRIPTION                              |
-| ------------ | ---------------------------------------- |
-| `plt.Figure` | The figure containing the contour chart. |
+| RETURNS           | DESCRIPTION                              |
+| ----------------- | ---------------------------------------- |
+| `DatachartFigure` | The figure containing the contour chart. |
 
 ## Data
 

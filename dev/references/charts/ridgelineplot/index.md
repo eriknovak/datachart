@@ -135,7 +135,7 @@ RidgelinePlot(
     show_outline: bool | None = None,
     sort: SORT | str | None = SORT.NONE,
     normalize: RIDGELINE_SCALE | str | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the ridgeline plot.
@@ -212,9 +212,9 @@ Examples:
 | `sort`          | The row order: None keeps input order, "ascending" or "descending" orders the rows by their median; ties keep input order. See SORT. **TYPE:** \`SORT                                                                                                                                                                                                                                                                               |
 | `normalize`     | Deprecated; use ridge_scale. Removed in the next release. **TYPE:** \`RIDGELINE_SCALE                                                                                                                                                                                                                                                                                                                                               |
 
-| RETURNS      | DESCRIPTION                               |
-| ------------ | ----------------------------------------- |
-| `plt.Figure` | The figure containing the ridgeline plot. |
+| RETURNS           | DESCRIPTION                               |
+| ----------------- | ----------------------------------------- |
+| `DatachartFigure` | The figure containing the ridgeline plot. |
 
 | RAISES       | DESCRIPTION                                                                            |
 | ------------ | -------------------------------------------------------------------------------------- |

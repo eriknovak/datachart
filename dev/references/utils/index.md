@@ -4,7 +4,7 @@
 
 The module containing the `utils`.
 
-The `utils` module provides a set of public utilities for the package: the composition of finished figures (`Panel`, `Grid`, `Annotate`), saving them (`save_figure`), and the statistics behind the charts (`stats`).
+The `utils` module provides a set of public utilities for the package: the composition of finished figures (`Panel`, `Grid`, `Annotate`), saving them (`save_figure`), the figure type every chart function returns (`DatachartFigure`), and the statistics behind the charts (`stats`).
 
 This module exports only the public API intended for end users. Internal implementation details are located in the `_internal` submodule and should not be imported directly by external code.
 
@@ -12,13 +12,14 @@ This module exports only the public API intended for end users. Internal impleme
 
 Everything here takes or returns the figure a chart function returns: three ways to compose finished figures, one to save them, and the statistics behind them.
 
-| I want to…                                                            | Use                                                                                  | Guide                                                                                                    |
-| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------- |
-| draw several charts in one coordinate space, with a second value axis | [`Panel`](#datachart.utils.Panel)                                                    | [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md)                  |
-| lay charts out side by side or in rows                                | [`Grid`](#datachart.utils.Grid)                                                      | [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md)                    |
-| add notes to a figure that is already drawn                           | [`Annotate`](#datachart.utils.Annotate)                                              | [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md) |
-| write a figure to disk, in one format or several                      | [`save_figure`](#datachart.utils.save_figure)                                        | [Saving Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md)        |
-| compute the number a chart shows                                      | [`stats`](https://eriknovak.github.io/datachart/dev/references/utils/stats/index.md) | [Statistics](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/stats/index.md)             |
+| I want to…                                                            | Use                                                                                  | Guide                                                                                                       |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| draw several charts in one coordinate space, with a second value axis | [`Panel`](#datachart.utils.Panel)                                                    | [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md)                     |
+| lay charts out side by side or in rows                                | [`Grid`](#datachart.utils.Grid)                                                      | [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md)                       |
+| add notes to a figure that is already drawn                           | [`Annotate`](#datachart.utils.Annotate)                                              | [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md)    |
+| write a figure to disk, in one format or several                      | [`save_figure`](#datachart.utils.save_figure)                                        | [Saving Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md)           |
+| compute the number a chart shows                                      | [`stats`](https://eriknovak.github.io/datachart/dev/references/utils/stats/index.md) | [Statistics](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/stats/index.md)                |
+| annotate or check the type of a figure a chart returned               | [`DatachartFigure`](#datachart.utils.DatachartFigure)                                | [Interactive Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/interactive/index.md) |
 
 ## Composition
 
@@ -26,7 +27,7 @@ Everything here takes or returns the figure a chart function returns: three ways
 
 ```
 Panel(
-    charts: list[plt.Figure | dict[str, Any]],
+    charts: list[plt.Figure | PanelItemSettingAttrs],
     *,
     title: str | None = None,
     xlabel: str | None = None,
@@ -49,7 +50,7 @@ Panel(
     bar_mode: BAR_MODE | str | None = None,
     aspect_ratio: ASPECT_RATIO | str | None = None,
     emphasis_rule: EmphasisRuleAttrs | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Overlay rendered chart figures in one coordinate space.
@@ -136,9 +137,9 @@ Examples:
 | `aspect_ratio`        | The aspect ratio of the axes box; "geographic" keeps a map of longitude against latitude at true proportions. Default: "auto". See ASPECT_RATIO. **TYPE:** \`ASPECT_RATIO                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | `emphasis_rule`       | A rule that highlights the composed series matching it and mutes the rest: {"above": v} or {"below": v} (strict), {"between": (lo, hi)} (inclusive), {"top": n} or {"bottom": n}, read against a summary of each series' own value-axis values, chosen by by: "mean" (default), "median", "min", "max", or "sum". A figure's "emphasis" role or a role its records carry wins, and a count ranks across every composed series. See EmphasisRuleAttrs. **TYPE:** \`EmphasisRuleAttrs                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 
-| RETURNS      | DESCRIPTION                                         |
-| ------------ | --------------------------------------------------- |
-| `plt.Figure` | A matplotlib Figure containing the overlaid charts. |
+| RETURNS           | DESCRIPTION                                         |
+| ----------------- | --------------------------------------------------- |
+| `DatachartFigure` | A matplotlib Figure containing the overlaid charts. |
 
 | RAISES       | DESCRIPTION                                                                                                                                                                                                                                                                                               |
 | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -149,7 +150,7 @@ Examples:
 ```
 Grid(
     charts: (
-        list[plt.Figure | dict[str, Any]]
+        list[plt.Figure | GridItemSettingAttrs]
         | list[list[plt.Figure | None]]
     ),
     *,
@@ -170,7 +171,7 @@ Grid(
     aspect_ratio: ASPECT_RATIO | str | None = None,
     scalex: AXIS_SCALE | str | None = None,
     scaley: AXIS_SCALE | str | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Arrange rendered chart figures in a grid.
@@ -238,9 +239,9 @@ Examples:
 | `scalex`       | The x-axis scale of every cell ("linear", "log", "symlog", "asinh"). Default: each cell's own. **TYPE:** \`AXIS_SCALE                                                                                                                                                                                                                                         |
 | `scaley`       | The y-axis scale of every cell. Default: each cell's own. **TYPE:** \`AXIS_SCALE                                                                                                                                                                                                                                                                              |
 
-| RETURNS      | DESCRIPTION                                                     |
-| ------------ | --------------------------------------------------------------- |
-| `plt.Figure` | A new matplotlib Figure containing all charts in a grid layout. |
+| RETURNS           | DESCRIPTION                                                     |
+| ----------------- | --------------------------------------------------------------- |
+| `DatachartFigure` | A new matplotlib Figure containing all charts in a grid layout. |
 
 | RAISES       | DESCRIPTION                                                                                                                                                                                                                                                          |
 | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -252,7 +253,7 @@ Examples:
 Annotate(
     figure: plt.Figure,
     texts: TextSettingAttrs | list[TextSettingAttrs],
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Add text annotations to an already rendered figure.
@@ -291,9 +292,9 @@ Examples:
 | `figure`  | A figure created by a datachart chart function or Panel. **TYPE:** `plt.Figure`                                                                                                                                                                                                                                                    |
 | `texts`   | The text annotation(s) to add. Each annotation places text at (x, y) — data coordinates by default, axes fractions with "coords": "axes" — draws a connector to the optional target data point, and takes a per-text style override. On a multi-subplot figure each one also names its subplot index. **TYPE:** \`TextSettingAttrs |
 
-| RETURNS      | DESCRIPTION                                         |
-| ------------ | --------------------------------------------------- |
-| `plt.Figure` | A new matplotlib Figure with the annotations added. |
+| RETURNS           | DESCRIPTION                                         |
+| ----------------- | --------------------------------------------------- |
+| `DatachartFigure` | A new matplotlib Figure with the annotations added. |
 
 | RAISES       | DESCRIPTION                                                                                                                                                                              |
 | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -308,9 +309,13 @@ save_figure(
     figure: plt.Figure,
     path: str | os.PathLike,
     dpi: int = 300,
-    fmt: FIG_FORMAT | list[FIG_FORMAT] | None = None,
+    fmt: (
+        FIG_FORMAT | str | list[FIG_FORMAT | str] | None
+    ) = None,
     transparent: bool = False,
-    format: FIG_FORMAT | list[FIG_FORMAT] | None = None,
+    format: (
+        FIG_FORMAT | str | list[FIG_FORMAT | str] | None
+    ) = None,
 ) -> list[str]
 ```
 
@@ -358,3 +363,36 @@ Examples:
 | RAISES       | DESCRIPTION                                                 |
 | ------------ | ----------------------------------------------------------- |
 | `ValueError` | If fmt is an empty list, or both fmt and format are passed. |
+
+## The Figure
+
+Every chart function and composition returns a `DatachartFigure`: a matplotlib `Figure` the caller owns, shown by `show()`. Annotate a variable with it, or `isinstance`-check a figure a caller hands you. `Panel` and `Grid` accept any matplotlib figure a chart function returned.
+
+### datachart.utils.DatachartFigure
+
+Bases: `Figure`
+
+A figure owned by the caller, never registered with pyplot.
+
+Creating a chart never displays it and never accumulates global state; call `show()` to display the figure — inline in notebooks, in a GUI window in scripts.
+
+#### show
+
+```
+show(warn=True, interactive=False)
+```
+
+Display the figure.
+
+Showing is the only way a figure appears: in notebooks the figure is displayed inline as a PNG payload; elsewhere it is adopted into pyplot's figure manager and shown via `plt.show()`, so a GUI window opens where a backend supports one.
+
+With `interactive=True` the figure becomes zoomable and pannable and hovering a mark shows its data: in notebooks the figure is displayed on an `ipympl` widget canvas with the matplotlib toolbar, in scripts the GUI window's toolbar already provides zoom and pan. Hovering a mark of any chart type annotates it with the series' legend label and one `name: value` line per field of the mark: its axis coordinates, named after the axis labels when set, or the summary an aggregate mark stands for — a box its quartiles, a histogram bin its range and count, a sankey link its endpoints and flow. The annotation wears the theme's text annotation style. The optional dependencies come with the `interactive` extra: `pip install "datachart[interactive]"`.
+
+| PARAMETER     | DESCRIPTION                                                                                        |
+| ------------- | -------------------------------------------------------------------------------------------------- |
+| `warn`        | If True, warn when the backend cannot open a window. **DEFAULT:** `True`                           |
+| `interactive` | If True, display the figure with zoom, pan, and hover-to-inspect annotations. **DEFAULT:** `False` |
+
+| RAISES        | DESCRIPTION                                                       |
+| ------------- | ----------------------------------------------------------------- |
+| `ImportError` | If interactive is True and ipympl or mplcursors is not installed. |

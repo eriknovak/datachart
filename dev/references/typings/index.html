@@ -4227,6 +4227,39 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#datachart.typings.PanelItemSettingAttrs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;PanelItemSettingAttrs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#datachart.typings.GridItemSettingAttrs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;GridItemSettingAttrs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#datachart.typings.LayoutSpecSettingAttrs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;LayoutSpecSettingAttrs
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -4808,6 +4841,39 @@
     <span class="md-ellipsis">
       
         <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;ColorbarSettingAttrs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#datachart.typings.PanelItemSettingAttrs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;PanelItemSettingAttrs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#datachart.typings.GridItemSettingAttrs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;GridItemSettingAttrs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#datachart.typings.LayoutSpecSettingAttrs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;LayoutSpecSettingAttrs
       
     </span>
   </a>
@@ -5406,6 +5472,16 @@ chart's reference page; the shared ones on the typings page.</p>
 <td style="text-align: left;">highlight the series or marks matching a rule</td>
 <td style="text-align: left;"><code>emphasis_rule</code></td>
 <td style="text-align: left;"><a href="#datachart.typings.EmphasisRuleAttrs"><code>EmphasisRuleAttrs</code></a></td>
+</tr>
+<tr>
+<td style="text-align: left;">pick the value axis of a figure in a <code>Panel</code></td>
+<td style="text-align: left;"><code>charts</code> item</td>
+<td style="text-align: left;"><a href="#datachart.typings.PanelItemSettingAttrs"><code>PanelItemSettingAttrs</code></a></td>
+</tr>
+<tr>
+<td style="text-align: left;">place a figure in a <code>Grid</code> cell</td>
+<td style="text-align: left;"><code>charts</code> item, <code>layout_spec</code></td>
+<td style="text-align: left;"><a href="#datachart.typings.GridItemSettingAttrs"><code>GridItemSettingAttrs</code></a>, <a href="#datachart.typings.LayoutSpecSettingAttrs"><code>LayoutSpecSettingAttrs</code></a></td>
 </tr>
 <tr>
 <td style="text-align: left;">place or format the colorbar</td>
@@ -6627,6 +6703,300 @@ the edge when <code>location</code> is unset.</p>
                   <span class="doc-attribute-annotation">
                     <b>TYPE:</b>
                       <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.ORIENTATION&lt;/span&gt;" href="../constants/#datachart.constants.ORIENTATION">ORIENTATION</a> | <span title="str">str</span> | None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="datachart.typings.PanelItemSettingAttrs" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">datachart.typings.PanelItemSettingAttrs</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="typing.TypedDict">TypedDict</span></code></p>
+
+
+
+        <p>One figure of a <code>Panel</code> with its per-figure options, passed in <code>charts</code>.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">ATTRIBUTE</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.PanelItemSettingAttrs.figure">figure</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The rendered chart figure to overlay.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="matplotlib.figure.Figure">Figure</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.PanelItemSettingAttrs.y_axis">y_axis</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The value axis the figure draws on.
+Defaults to automatic assignment.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Literal">Literal</span>[&#39;left&#39;, &#39;right&#39;]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="datachart.typings.GridItemSettingAttrs" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">datachart.typings.GridItemSettingAttrs</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="typing.TypedDict">TypedDict</span></code></p>
+
+
+
+        <p>One figure of a <code>Grid</code> with its placement, passed in a flat <code>charts</code> list.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">ATTRIBUTE</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.GridItemSettingAttrs.figure">figure</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The rendered chart figure to place.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="matplotlib.figure.Figure">Figure</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.GridItemSettingAttrs.layout_spec">layout_spec</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The cell the figure occupies.
+Defaults to the next free cell of the uniform grid.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.LayoutSpecSettingAttrs&lt;/span&gt;" href="#datachart.typings.LayoutSpecSettingAttrs">LayoutSpecSettingAttrs</a></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="datachart.typings.LayoutSpecSettingAttrs" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">datachart.typings.LayoutSpecSettingAttrs</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="typing.TypedDict">TypedDict</span></code></p>
+
+
+
+        <p>The cell a figure occupies in a <code>Grid</code>, passed in a grid item as <code>layout_spec</code>.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">ATTRIBUTE</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.LayoutSpecSettingAttrs.row">row</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The zero-based row of the cell's top-left corner.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="int">int</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.LayoutSpecSettingAttrs.col">col</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The zero-based column of the cell's top-left corner.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="int">int</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.LayoutSpecSettingAttrs.rowspan">rowspan</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>How many rows the cell spans.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="int">int</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.LayoutSpecSettingAttrs.colspan">colspan</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>How many columns the cell spans.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="int">int</span></code>
                   </span>
               </p>
             </td>

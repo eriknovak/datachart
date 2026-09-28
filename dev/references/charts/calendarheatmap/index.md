@@ -49,7 +49,7 @@ CalendarHeatmap(
         | None
     ) = None,
     show_colorbars: bool | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the calendar heatmap.
@@ -94,9 +94,9 @@ Examples:
 | `texts`               | Text annotation(s) to draw, on every calendar of their dataset. The cells sit at integer positions: the week column along x, the weekday row along y, counted from zero at the top-left cell of the drawn range. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                    |
 | `show_colorbars`      | Deprecated; use show_colorbar. Removed in the next release. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                     |
 
-| RETURNS      | DESCRIPTION                                    |
-| ------------ | ---------------------------------------------- |
-| `plt.Figure` | The figure containing the calendar heatmap(s). |
+| RETURNS           | DESCRIPTION                                    |
+| ----------------- | ---------------------------------------------- |
+| `DatachartFigure` | The figure containing the calendar heatmap(s). |
 
 | RAISES       | DESCRIPTION                                                                                                                                                                                       |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

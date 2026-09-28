@@ -130,7 +130,7 @@ BarChart(
     label: str | list[str | None] | None = None,
     y: str | list[str | None] | None = None,
     yerr: str | list[str | None] | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the bar chart.
@@ -206,9 +206,9 @@ Examples:
 | `y`             | The key name in data for y-axis values (default: "y"). **TYPE:** \`str                                                                                                                                                                                                                                          |
 | `yerr`          | The key name in data for y-axis error values (default: "yerr"). **TYPE:** \`str                                                                                                                                                                                                                                 |
 
-| RETURNS      | DESCRIPTION                          |
-| ------------ | ------------------------------------ |
-| `plt.Figure` | The figure containing the bar chart. |
+| RETURNS           | DESCRIPTION                          |
+| ----------------- | ------------------------------------ |
+| `DatachartFigure` | The figure containing the bar chart. |
 
 ## Data
 

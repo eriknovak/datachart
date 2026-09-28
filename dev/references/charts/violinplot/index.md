@@ -133,7 +133,7 @@ ViolinPlot(
     inner: VIOLIN_INNER | str | None = None,
     bandwidth: BANDWIDTH | str | float | None = None,
     split: str | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the violin plot.
@@ -208,9 +208,9 @@ Examples:
 | `bandwidth`     | The KDE bandwidth: None or "scott" (Scott's rule), "silverman", or a scalar factor. See BANDWIDTH. **TYPE:** \`BANDWIDTH                                                                                                                                                                                                                                                                                                            |
 | `split`         | The key name in data whose exactly two distinct values become the left and right halves of each violin, colored from the multiple palette and listed in the legend. **TYPE:** \`str                                                                                                                                                                                                                                                 |
 
-| RETURNS      | DESCRIPTION                            |
-| ------------ | -------------------------------------- |
-| `plt.Figure` | The figure containing the violin plot. |
+| RETURNS           | DESCRIPTION                            |
+| ----------------- | -------------------------------------- |
+| `DatachartFigure` | The figure containing the violin plot. |
 
 ## Data
 

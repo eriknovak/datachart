@@ -145,7 +145,7 @@ ScatterChart(
     yerr: str | list[str | None] | None = None,
     size_range: tuple[float, float] | None = None,
     label: str | list[str | None] | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates a scatter chart.
@@ -273,9 +273,9 @@ Examples:
 | `size_range`       | Tuple of (min_size, max_size) for bubble charts (default: (20, 200)). **TYPE:** \`tuple[float, float]                                                                                                                                                                                                                                                                                                                        |
 | `label`            | Deprecated; use annotation. Removed in the next release. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                     |
 
-| RETURNS      | DESCRIPTION                              |
-| ------------ | ---------------------------------------- |
-| `plt.Figure` | The figure containing the scatter chart. |
+| RETURNS           | DESCRIPTION                              |
+| ----------------- | ---------------------------------------- |
+| `DatachartFigure` | The figure containing the scatter chart. |
 
 ## Data
 

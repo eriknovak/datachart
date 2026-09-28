@@ -127,7 +127,7 @@ BoxPlot(
     ) = None,
     label: str | list[str | None] | None = None,
     value: str | list[str | None] | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the box plot.
@@ -201,9 +201,9 @@ Examples:
 | `label`         | The key name in data for label/category values (default: "label"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                  |
 | `value`         | The key name in data for numeric values (default: "value"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                         |
 
-| RETURNS      | DESCRIPTION                         |
-| ------------ | ----------------------------------- |
-| `plt.Figure` | The figure containing the box plot. |
+| RETURNS           | DESCRIPTION                         |
+| ----------------- | ----------------------------------- |
+| `DatachartFigure` | The figure containing the box plot. |
 
 ## Data
 

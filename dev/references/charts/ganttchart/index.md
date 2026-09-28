@@ -81,7 +81,7 @@ GanttChart(
     group: str | list[str | None] | None = None,
     progress: str | list[str | None] | None = None,
     depends_on: str | list[str | None] | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the gantt chart.
@@ -150,9 +150,9 @@ Examples:
 | `progress`           | The key name in data for the task progress (default: "progress"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                            |
 | `depends_on`         | The key name in data for the task dependencies (default: "depends_on"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                      |
 
-| RETURNS      | DESCRIPTION                            |
-| ------------ | -------------------------------------- |
-| `plt.Figure` | The figure containing the gantt chart. |
+| RETURNS           | DESCRIPTION                            |
+| ----------------- | -------------------------------------- |
+| `DatachartFigure` | The figure containing the gantt chart. |
 
 ## Data
 

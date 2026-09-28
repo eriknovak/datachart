@@ -65,16 +65,18 @@ The records a chart's `data` takes and the keys its `style` accepts are document
 
 The dictionaries a chart takes beside its data: reference lines and bands, text annotations, the legend, the emphasis rule, and the colorbar. Each is a parameter of the chart function, and a field left out or set to `None` falls back to the theme.
 
-| I want to…                                    | Pass               | As                                                                                                                       |
-| --------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------ |
-| mark a value on the x or y axis               | `vlines`, `hlines` | [`VLineSettingAttrs`](#datachart.typings.VLineSettingAttrs), [`HLineSettingAttrs`](#datachart.typings.HLineSettingAttrs) |
-| draw a line through the data, such as parity  | `dlines`           | [`DLineSettingAttrs`](#datachart.typings.DLineSettingAttrs)                                                              |
-| compare two categories with a bracket         | `brackets`         | [`BracketSettingAttrs`](#datachart.typings.BracketSettingAttrs)                                                          |
-| shade a range of the x or y axis              | `vspans`, `hspans` | [`VSpanSettingAttrs`](#datachart.typings.VSpanSettingAttrs), [`HSpanSettingAttrs`](#datachart.typings.HSpanSettingAttrs) |
-| write a note on the chart                     | `texts`            | [`TextSettingAttrs`](#datachart.typings.TextSettingAttrs)                                                                |
-| title, place, or lay out the legend           | `legend`           | [`LegendSettingAttrs`](#datachart.typings.LegendSettingAttrs)                                                            |
-| highlight the series or marks matching a rule | `emphasis_rule`    | [`EmphasisRuleAttrs`](#datachart.typings.EmphasisRuleAttrs)                                                              |
-| place or format the colorbar                  | `colorbar`         | [`ColorbarSettingAttrs`](#datachart.typings.ColorbarSettingAttrs)                                                        |
+| I want to…                                    | Pass                         | As                                                                                                                                       |
+| --------------------------------------------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| mark a value on the x or y axis               | `vlines`, `hlines`           | [`VLineSettingAttrs`](#datachart.typings.VLineSettingAttrs), [`HLineSettingAttrs`](#datachart.typings.HLineSettingAttrs)                 |
+| draw a line through the data, such as parity  | `dlines`                     | [`DLineSettingAttrs`](#datachart.typings.DLineSettingAttrs)                                                                              |
+| compare two categories with a bracket         | `brackets`                   | [`BracketSettingAttrs`](#datachart.typings.BracketSettingAttrs)                                                                          |
+| shade a range of the x or y axis              | `vspans`, `hspans`           | [`VSpanSettingAttrs`](#datachart.typings.VSpanSettingAttrs), [`HSpanSettingAttrs`](#datachart.typings.HSpanSettingAttrs)                 |
+| write a note on the chart                     | `texts`                      | [`TextSettingAttrs`](#datachart.typings.TextSettingAttrs)                                                                                |
+| title, place, or lay out the legend           | `legend`                     | [`LegendSettingAttrs`](#datachart.typings.LegendSettingAttrs)                                                                            |
+| highlight the series or marks matching a rule | `emphasis_rule`              | [`EmphasisRuleAttrs`](#datachart.typings.EmphasisRuleAttrs)                                                                              |
+| pick the value axis of a figure in a `Panel`  | `charts` item                | [`PanelItemSettingAttrs`](#datachart.typings.PanelItemSettingAttrs)                                                                      |
+| place a figure in a `Grid` cell               | `charts` item, `layout_spec` | [`GridItemSettingAttrs`](#datachart.typings.GridItemSettingAttrs), [`LayoutSpecSettingAttrs`](#datachart.typings.LayoutSpecSettingAttrs) |
+| place or format the colorbar                  | `colorbar`                   | [`ColorbarSettingAttrs`](#datachart.typings.ColorbarSettingAttrs)                                                                        |
 
 ### datachart.typings.VLineSettingAttrs
 
@@ -230,6 +232,41 @@ Every field is optional. `location` is the control: it places the bar on any edg
 | `format`      | The format of the bar's tick labels, with the value named x (e.g. "{x:.0f}"). On a hexbin chart, value_format still applies when this is unset. **TYPE:** \`VALUE_FORMAT |
 | `ticks`       | Explicit tick positions on the bar; positions outside the mapped value range are not drawn. **TYPE:** \`list\[int                                                        |
 | `orientation` | The orientation; derives the edge when location is unset. **TYPE:** \`ORIENTATION                                                                                        |
+
+### datachart.typings.PanelItemSettingAttrs
+
+Bases: `TypedDict`
+
+One figure of a `Panel` with its per-figure options, passed in `charts`.
+
+| ATTRIBUTE | DESCRIPTION                                                                                                |
+| --------- | ---------------------------------------------------------------------------------------------------------- |
+| `figure`  | The rendered chart figure to overlay. **TYPE:** `Figure`                                                   |
+| `y_axis`  | The value axis the figure draws on. Defaults to automatic assignment. **TYPE:** `Literal['left', 'right']` |
+
+### datachart.typings.GridItemSettingAttrs
+
+Bases: `TypedDict`
+
+One figure of a `Grid` with its placement, passed in a flat `charts` list.
+
+| ATTRIBUTE     | DESCRIPTION                                                                                                          |
+| ------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `figure`      | The rendered chart figure to place. **TYPE:** `Figure`                                                               |
+| `layout_spec` | The cell the figure occupies. Defaults to the next free cell of the uniform grid. **TYPE:** `LayoutSpecSettingAttrs` |
+
+### datachart.typings.LayoutSpecSettingAttrs
+
+Bases: `TypedDict`
+
+The cell a figure occupies in a `Grid`, passed in a grid item as `layout_spec`.
+
+| ATTRIBUTE | DESCRIPTION                                                          |
+| --------- | -------------------------------------------------------------------- |
+| `row`     | The zero-based row of the cell's top-left corner. **TYPE:** `int`    |
+| `col`     | The zero-based column of the cell's top-left corner. **TYPE:** `int` |
+| `rowspan` | How many rows the cell spans. **TYPE:** `int`                        |
+| `colspan` | How many columns the cell spans. **TYPE:** `int`                     |
 
 ## Shared Style
 

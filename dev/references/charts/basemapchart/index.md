@@ -30,7 +30,7 @@ BasemapChart(
     features: (
         BASEMAP_FEATURE | str | list[str] | None
     ) = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the basemap chart.
@@ -81,9 +81,9 @@ Examples:
 | `style`        | Style configuration of the map. See BasemapStyleAttrs. **TYPE:** \`BasemapStyleAttrs                                                                                                                                 |
 | `features`     | Deprecated; use data. Removed in the next release. **TYPE:** \`BASEMAP_FEATURE                                                                                                                                       |
 
-| RETURNS      | DESCRIPTION                              |
-| ------------ | ---------------------------------------- |
-| `plt.Figure` | The figure containing the basemap chart. |
+| RETURNS           | DESCRIPTION                              |
+| ----------------- | ---------------------------------------- |
+| `DatachartFigure` | The figure containing the basemap chart. |
 
 | RAISES         | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                 |
 | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

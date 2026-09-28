@@ -36,7 +36,7 @@ SankeyChart(
         ]
         | None
     ) = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the Sankey chart.
@@ -76,9 +76,9 @@ Examples:
 | `style`         | Style configuration(s) for the chart(s). **TYPE:** \`SankeyStyleAttrs                                                                                                                                                                                                            |
 | `texts`         | Text annotation(s) to draw. The columns span 0–1 horizontally and the tallest column 0–1 vertically. **TYPE:** \`TextSettingAttrs                                                                                                                                                |
 
-| RETURNS      | DESCRIPTION                             |
-| ------------ | --------------------------------------- |
-| `plt.Figure` | The figure containing the Sankey chart. |
+| RETURNS           | DESCRIPTION                             |
+| ----------------- | --------------------------------------- |
+| `DatachartFigure` | The figure containing the Sankey chart. |
 
 | RAISES       | DESCRIPTION                                                                                                                                                                                                                     |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

@@ -134,7 +134,7 @@ StackedAreaChart(
     ) = None,
     x: str | list[str | None] | None = None,
     y: str | list[str | None] | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the stacked area chart.
@@ -206,9 +206,9 @@ Examples:
 | `x`              | The key name in data for x-axis values (default: "x"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                       |
 | `y`              | The key name in data for y-axis values (default: "y"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                       |
 
-| RETURNS      | DESCRIPTION                                   |
-| ------------ | --------------------------------------------- |
-| `plt.Figure` | The figure containing the stacked area chart. |
+| RETURNS           | DESCRIPTION                                   |
+| ----------------- | --------------------------------------------- |
+| `DatachartFigure` | The figure containing the stacked area chart. |
 
 | RAISES       | DESCRIPTION                                                                                     |
 | ------------ | ----------------------------------------------------------------------------------------------- |

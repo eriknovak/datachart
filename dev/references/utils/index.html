@@ -4200,6 +4200,51 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#the-figure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Figure
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The Figure">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#datachart.utils.DatachartFigure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;DatachartFigure
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label=" DatachartFigure">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#datachart.utils.DatachartFigure.show" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;show
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -4235,7 +4280,8 @@
         <p>The module containing the <code>utils</code>.</p>
 <p>The <code>utils</code> module provides a set of public utilities for the package: the
 composition of finished figures (<code>Panel</code>, <code>Grid</code>, <code>Annotate</code>), saving them
-(<code>save_figure</code>), and the statistics behind the charts (<code>stats</code>).</p>
+(<code>save_figure</code>), the figure type every chart function returns
+(<code>DatachartFigure</code>), and the statistics behind the charts (<code>stats</code>).</p>
 <p>This module exports only the public API intended for end users. Internal
 implementation details are located in the <code>_internal</code> submodule and should
 not be imported directly by external code.</p>
@@ -4302,6 +4348,11 @@ not be imported directly by external code.</p>
 <td style="text-align: left;"><a href="stats/"><code>stats</code></a></td>
 <td style="text-align: left;"><a href="../../how-to-guides/utility/stats/">Statistics</a></td>
 </tr>
+<tr>
+<td style="text-align: left;">annotate or check the type of a figure a chart returned</td>
+<td style="text-align: left;"><a href="#datachart.utils.DatachartFigure"><code>DatachartFigure</code></a></td>
+<td style="text-align: left;"><a href="../../how-to-guides/utility/interactive/">Interactive Figures</a></td>
+</tr>
 </tbody>
 </table>
 <h2 id="composition">Composition</h2>
@@ -4316,7 +4367,7 @@ not be imported directly by external code.</p>
 
 </h3>
 <div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">Panel</span><span class="p">(</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">charts</span><span class="p">:</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="matplotlib.pyplot">plt</span></span><span class="o">.</span><span class="n"><span title="matplotlib.pyplot.Figure">Figure</span></span> <span class="o">|</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">]],</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">charts</span><span class="p">:</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="matplotlib.pyplot">plt</span></span><span class="o">.</span><span class="n"><span title="matplotlib.pyplot.Figure">Figure</span></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.PanelItemSettingAttrs&lt;/span&gt;" href="../typings/#datachart.typings.PanelItemSettingAttrs">PanelItemSettingAttrs</a></span><span class="p">],</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">*</span><span class="p">,</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">title</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">xlabel</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -4339,7 +4390,7 @@ not be imported directly by external code.</p>
 <a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>    <span class="n">bar_mode</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.BAR_MODE&lt;/span&gt;" href="../constants/#datachart.constants.BAR_MODE">BAR_MODE</a></span> <span class="o">|</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>    <span class="n">aspect_ratio</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.ASPECT_RATIO&lt;/span&gt;" href="../constants/#datachart.constants.ASPECT_RATIO">ASPECT_RATIO</a></span> <span class="o">|</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>    <span class="n">emphasis_rule</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.EmphasisRuleAttrs&lt;/span&gt;" href="../typings/#datachart.typings.EmphasisRuleAttrs">EmphasisRuleAttrs</a></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="matplotlib.pyplot">plt</span></span><span class="o">.</span><span class="n"><span title="matplotlib.pyplot.Figure">Figure</span></span>
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.utils.DatachartFigure&lt;/span&gt; (&lt;code&gt;datachart.utils._internal.figures.DatachartFigure&lt;/code&gt;)" href="#datachart.utils.DatachartFigure">DatachartFigure</a></span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -4460,7 +4511,7 @@ Panel figure, which flattens into this one — or a dict with a
               <p>
                   <span class="doc-param-annotation">
                     <b>TYPE:</b>
-                      <code><span title="list">list</span>[<span title="matplotlib.pyplot">plt</span>.<span title="matplotlib.pyplot.Figure">Figure</span> | <span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>]]</code>
+                      <code><span title="list">list</span>[<span title="matplotlib.pyplot">plt</span>.<span title="matplotlib.pyplot.Figure">Figure</span> | <a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.PanelItemSettingAttrs&lt;/span&gt;" href="../typings/#datachart.typings.PanelItemSettingAttrs">PanelItemSettingAttrs</a>]</code>
                   </span>
               </p>
             </td>
@@ -4922,7 +4973,7 @@ count ranks across every composed series. See
           <tr class="doc-section-item">
             <td>
                 <span class="doc-returns-annotation">
-                    <code><span title="matplotlib.pyplot">plt</span>.<span title="matplotlib.pyplot.Figure">Figure</span></code>
+                    <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.utils.DatachartFigure&lt;/span&gt; (&lt;code&gt;datachart.utils._internal.figures.DatachartFigure&lt;/code&gt;)" href="#datachart.utils.DatachartFigure">DatachartFigure</a></code>
                 </span>
             </td>
             <td class="doc-returns-details">
@@ -4977,7 +5028,7 @@ mix horizontal and vertical orientations.</p>
 </h3>
 <div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">Grid</span><span class="p">(</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">charts</span><span class="p">:</span> <span class="p">(</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>        <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="matplotlib.pyplot">plt</span></span><span class="o">.</span><span class="n"><span title="matplotlib.pyplot.Figure">Figure</span></span> <span class="o">|</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">]]</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>        <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="matplotlib.pyplot">plt</span></span><span class="o">.</span><span class="n"><span title="matplotlib.pyplot.Figure">Figure</span></span> <span class="o">|</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.GridItemSettingAttrs&lt;/span&gt;" href="../typings/#datachart.typings.GridItemSettingAttrs">GridItemSettingAttrs</a></span><span class="p">]</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>        <span class="o">|</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="matplotlib.pyplot">plt</span></span><span class="o">.</span><span class="n"><span title="matplotlib.pyplot.Figure">Figure</span></span> <span class="o">|</span> <span class="kc">None</span><span class="p">]]</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="p">),</span>
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="o">*</span><span class="p">,</span>
@@ -4998,7 +5049,7 @@ mix horizontal and vertical orientations.</p>
 <a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>    <span class="n">aspect_ratio</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.ASPECT_RATIO&lt;/span&gt;" href="../constants/#datachart.constants.ASPECT_RATIO">ASPECT_RATIO</a></span> <span class="o">|</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>    <span class="n">scalex</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.AXIS_SCALE&lt;/span&gt;" href="../constants/#datachart.constants.AXIS_SCALE">AXIS_SCALE</a></span> <span class="o">|</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>    <span class="n">scaley</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.AXIS_SCALE&lt;/span&gt;" href="../constants/#datachart.constants.AXIS_SCALE">AXIS_SCALE</a></span> <span class="o">|</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="matplotlib.pyplot">plt</span></span><span class="o">.</span><span class="n"><span title="matplotlib.pyplot.Figure">Figure</span></span>
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.utils.DatachartFigure&lt;/span&gt; (&lt;code&gt;datachart.utils._internal.figures.DatachartFigure&lt;/code&gt;)" href="#datachart.utils.DatachartFigure">DatachartFigure</a></span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -5079,7 +5130,7 @@ Nested rows and layout_spec cannot be mixed.</p>
               <p>
                   <span class="doc-param-annotation">
                     <b>TYPE:</b>
-                      <code><span title="list">list</span>[<span title="matplotlib.pyplot">plt</span>.<span title="matplotlib.pyplot.Figure">Figure</span> | <span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>]] | <span title="list">list</span>[<span title="list">list</span>[<span title="matplotlib.pyplot">plt</span>.<span title="matplotlib.pyplot.Figure">Figure</span> | None]]</code>
+                      <code><span title="list">list</span>[<span title="matplotlib.pyplot">plt</span>.<span title="matplotlib.pyplot.Figure">Figure</span> | <a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.GridItemSettingAttrs&lt;/span&gt;" href="../typings/#datachart.typings.GridItemSettingAttrs">GridItemSettingAttrs</a>] | <span title="list">list</span>[<span title="list">list</span>[<span title="matplotlib.pyplot">plt</span>.<span title="matplotlib.pyplot.Figure">Figure</span> | None]]</code>
                   </span>
               </p>
             </td>
@@ -5454,7 +5505,7 @@ Default: each cell's own. See
           <tr class="doc-section-item">
             <td>
                 <span class="doc-returns-annotation">
-                    <code><span title="matplotlib.pyplot">plt</span>.<span title="matplotlib.pyplot.Figure">Figure</span></code>
+                    <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.utils.DatachartFigure&lt;/span&gt; (&lt;code&gt;datachart.utils._internal.figures.DatachartFigure&lt;/code&gt;)" href="#datachart.utils.DatachartFigure">DatachartFigure</a></code>
                 </span>
             </td>
             <td class="doc-returns-details">
@@ -5510,7 +5561,7 @@ non-positive value.</p>
 <div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">Annotate</span><span class="p">(</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">figure</span><span class="p">:</span> <span class="n"><span title="matplotlib.pyplot">plt</span></span><span class="o">.</span><span class="n"><span title="matplotlib.pyplot.Figure">Figure</span></span><span class="p">,</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">texts</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.TextSettingAttrs&lt;/span&gt;" href="../typings/#datachart.typings.TextSettingAttrs">TextSettingAttrs</a></span> <span class="o">|</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.TextSettingAttrs&lt;/span&gt;" href="../typings/#datachart.typings.TextSettingAttrs">TextSettingAttrs</a></span><span class="p">],</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="matplotlib.pyplot">plt</span></span><span class="o">.</span><span class="n"><span title="matplotlib.pyplot.Figure">Figure</span></span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.utils.DatachartFigure&lt;/span&gt; (&lt;code&gt;datachart.utils._internal.figures.DatachartFigure&lt;/code&gt;)" href="#datachart.utils.DatachartFigure">DatachartFigure</a></span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -5613,7 +5664,7 @@ multi-subplot figure each one also names its <code>subplot</code> index.</p>
           <tr class="doc-section-item">
             <td>
                 <span class="doc-returns-annotation">
-                    <code><span title="matplotlib.pyplot">plt</span>.<span title="matplotlib.pyplot.Figure">Figure</span></code>
+                    <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.utils.DatachartFigure&lt;/span&gt; (&lt;code&gt;datachart.utils._internal.figures.DatachartFigure&lt;/code&gt;)" href="#datachart.utils.DatachartFigure">DatachartFigure</a></code>
                 </span>
             </td>
             <td class="doc-returns-details">
@@ -5670,10 +5721,14 @@ range.</p>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">figure</span><span class="p">:</span> <span class="n"><span title="matplotlib.pyplot">plt</span></span><span class="o">.</span><span class="n"><span title="matplotlib.pyplot.Figure">Figure</span></span><span class="p">,</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">path</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="n"><span title="os">os</span></span><span class="o">.</span><span class="n"><span title="os.PathLike">PathLike</span></span><span class="p">,</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">dpi</span><span class="p">:</span> <span class="n"><span title="int">int</span></span> <span class="o">=</span> <span class="mi">300</span><span class="p">,</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">fmt</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.FIG_FORMAT&lt;/span&gt;" href="../constants/#datachart.constants.FIG_FORMAT">FIG_FORMAT</a></span> <span class="o">|</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.FIG_FORMAT&lt;/span&gt;" href="../constants/#datachart.constants.FIG_FORMAT">FIG_FORMAT</a></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">transparent</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="nb">format</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.FIG_FORMAT&lt;/span&gt;" href="../constants/#datachart.constants.FIG_FORMAT">FIG_FORMAT</a></span> <span class="o">|</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.FIG_FORMAT&lt;/span&gt;" href="../constants/#datachart.constants.FIG_FORMAT">FIG_FORMAT</a></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">]</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">fmt</span><span class="p">:</span> <span class="p">(</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>        <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.FIG_FORMAT&lt;/span&gt;" href="../constants/#datachart.constants.FIG_FORMAT">FIG_FORMAT</a></span> <span class="o">|</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.FIG_FORMAT&lt;/span&gt;" href="../constants/#datachart.constants.FIG_FORMAT">FIG_FORMAT</a></span> <span class="o">|</span> <span class="n"><span title="str">str</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="p">)</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">transparent</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="nb">format</span><span class="p">:</span> <span class="p">(</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>        <span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.FIG_FORMAT&lt;/span&gt;" href="../constants/#datachart.constants.FIG_FORMAT">FIG_FORMAT</a></span> <span class="o">|</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.FIG_FORMAT&lt;/span&gt;" href="../constants/#datachart.constants.FIG_FORMAT">FIG_FORMAT</a></span> <span class="o">|</span> <span class="n"><span title="str">str</span></span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="p">)</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="list">list</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">]</span>
 </code></pre></div>
 
     <div class="doc doc-contents first">
@@ -5779,7 +5834,7 @@ supported format, and one file per format is written next to it.
               <p>
                   <span class="doc-param-annotation">
                     <b>TYPE:</b>
-                      <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.FIG_FORMAT&lt;/span&gt;" href="../constants/#datachart.constants.FIG_FORMAT">FIG_FORMAT</a> | <span title="list">list</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.FIG_FORMAT&lt;/span&gt;" href="../constants/#datachart.constants.FIG_FORMAT">FIG_FORMAT</a>] | None</code>
+                      <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.FIG_FORMAT&lt;/span&gt;" href="../constants/#datachart.constants.FIG_FORMAT">FIG_FORMAT</a> | <span title="str">str</span> | <span title="list">list</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.FIG_FORMAT&lt;/span&gt;" href="../constants/#datachart.constants.FIG_FORMAT">FIG_FORMAT</a> | <span title="str">str</span>] | None</code>
                   </span>
                   <span class="doc-param-default">
                     <b>DEFAULT:</b>
@@ -5819,7 +5874,7 @@ supported format, and one file per format is written next to it.
               <p>
                   <span class="doc-param-annotation">
                     <b>TYPE:</b>
-                      <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.FIG_FORMAT&lt;/span&gt;" href="../constants/#datachart.constants.FIG_FORMAT">FIG_FORMAT</a> | <span title="list">list</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.FIG_FORMAT&lt;/span&gt;" href="../constants/#datachart.constants.FIG_FORMAT">FIG_FORMAT</a>] | None</code>
+                      <code><a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.FIG_FORMAT&lt;/span&gt;" href="../constants/#datachart.constants.FIG_FORMAT">FIG_FORMAT</a> | <span title="str">str</span> | <span title="list">list</span>[<a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.FIG_FORMAT&lt;/span&gt;" href="../constants/#datachart.constants.FIG_FORMAT">FIG_FORMAT</a> | <span title="str">str</span>] | None</code>
                   </span>
                   <span class="doc-param-default">
                     <b>DEFAULT:</b>
@@ -5880,6 +5935,165 @@ are passed.</p>
       </tbody>
     </table>
 
+
+    </div>
+
+</div><h2 id="the-figure">The Figure</h2>
+<p>Every chart function and composition returns a <code>DatachartFigure</code>: a matplotlib <code>Figure</code> the caller owns, shown by <code>show()</code>. Annotate a variable with it, or <code>isinstance</code>-check a figure a caller hands you. <code>Panel</code> and <code>Grid</code> accept any matplotlib figure a chart function returned.</p>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="datachart.utils.DatachartFigure" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">datachart.utils.DatachartFigure</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="matplotlib.figure.Figure">Figure</span></code></p>
+
+
+
+        <p>A figure owned by the caller, never registered with pyplot.</p>
+<p>Creating a chart never displays it and never accumulates global state;
+call <code>show()</code> to display the figure — inline in notebooks, in a GUI
+window in scripts.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="datachart.utils.DatachartFigure.show" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">show</span>
+
+
+</h4>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">show</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">interactive</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Display the figure.</p>
+<p>Showing is the only way a figure appears: in notebooks the figure is
+displayed inline as a PNG payload; elsewhere it is adopted into
+pyplot's figure manager and shown via <code>plt.show()</code>, so a GUI window
+opens where a backend supports one.</p>
+<p>With <code>interactive=True</code> the figure becomes zoomable and pannable and
+hovering a mark shows its data: in notebooks the figure is displayed
+on an <code>ipympl</code> widget canvas with the matplotlib toolbar, in scripts
+the GUI window's toolbar already provides zoom and pan. Hovering a
+mark of any chart type annotates it with the series' legend label
+and one <code>name: value</code> line per field of the mark: its axis
+coordinates, named after the axis labels when set, or the summary
+an aggregate mark stands for — a box its quartiles, a histogram bin
+its range and count, a sankey link its endpoints and flow. The
+annotation wears the theme's text annotation style. The optional
+dependencies come with the <code>interactive</code> extra:
+<code>pip install "datachart[interactive]"</code>.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>warn</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>If True, warn when the backend cannot open a window.</p>
+              </div>
+              <p>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>True</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>interactive</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>If True, display the figure with zoom, pan, and
+hover-to-inspect annotations.</p>
+              </div>
+              <p>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>False</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RAISES</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+              <span class="doc-raises-annotation">
+                  <code><span title="ImportError">ImportError</span></code>
+              </span>
+            </td>
+            <td class="doc-raises-details">
+              <div class="doc-md-description">
+                <p>If <code>interactive</code> is True and <code>ipympl</code> or
+<code>mplcursors</code> is not installed.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
 
     </div>
 

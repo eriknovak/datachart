@@ -42,7 +42,7 @@ ParallelCoords(
         ]
         | None
     ) = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the parallel coordinates chart.
@@ -86,9 +86,9 @@ Examples:
 | `category_orders` | Dictionary mapping dimension names to lists of category values in the desired order. Example: {"rating": ["Low", "Medium", "High"]}. Categories not in the list will be appended at the end (sorted). **TYPE:** \`dict\[str, list[str]\]                                                                                                                                                                                  |
 | `texts`           | Text annotation(s) to draw. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                                                                                                                                                                                                  |
 
-| RETURNS      | DESCRIPTION                                           |
-| ------------ | ----------------------------------------------------- |
-| `plt.Figure` | The figure containing the parallel coordinates chart. |
+| RETURNS           | DESCRIPTION                                           |
+| ----------------- | ----------------------------------------------------- |
+| `DatachartFigure` | The figure containing the parallel coordinates chart. |
 
 ## Data
 

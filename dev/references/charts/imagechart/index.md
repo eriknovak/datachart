@@ -33,7 +33,7 @@ ImageChart(
         | list[ImageStyleAttrs | None]
         | None
     ) = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the image chart.
@@ -81,9 +81,9 @@ Examples:
 | `sharey`       | Whether the subplots share the y-axis. **TYPE:** \`bool                                                                                                                                               |
 | `style`        | Style configuration(s) for each chart. See ImageStyleAttrs. **TYPE:** \`ImageStyleAttrs                                                                                                               |
 
-| RETURNS      | DESCRIPTION                            |
-| ------------ | -------------------------------------- |
-| `plt.Figure` | The figure containing the image chart. |
+| RETURNS           | DESCRIPTION                            |
+| ----------------- | -------------------------------------- |
+| `DatachartFigure` | The figure containing the image chart. |
 
 | RAISES       | DESCRIPTION                                                                                                                                                     |
 | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |

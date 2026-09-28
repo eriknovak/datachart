@@ -114,7 +114,7 @@ PyramidChart(
     label: str | list[str | None] | None = None,
     y: str | list[str | None] | None = None,
     yerr: str | list[str | None] | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the pyramid chart.
@@ -185,9 +185,9 @@ Examples:
 | `y`             | The key name in data for the bar values (default: "y"). **TYPE:** \`str                                                                                                                                                                                                                       |
 | `yerr`          | The key name in data for the bar error values (default: "yerr"). **TYPE:** \`str                                                                                                                                                                                                              |
 
-| RETURNS      | DESCRIPTION                              |
-| ------------ | ---------------------------------------- |
-| `plt.Figure` | The figure containing the pyramid chart. |
+| RETURNS           | DESCRIPTION                              |
+| ----------------- | ---------------------------------------- |
+| `DatachartFigure` | The figure containing the pyramid chart. |
 
 ## Data
 

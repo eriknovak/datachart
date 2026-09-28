@@ -22099,7 +22099,7 @@ LineChart(
     x: str | list[str | None] | None = None,
     y: str | list[str | None] | None = None,
     yerr: str | list[str | None] | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the line chart.
@@ -22175,9 +22175,9 @@ Examples:
 | `y`              | The key name in data for y-axis values (default: "y"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                  |
 | `yerr`           | The key name in data for y-axis error values (default: "yerr"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                         |
 
-| RETURNS      | DESCRIPTION                           |
-| ------------ | ------------------------------------- |
-| `plt.Figure` | The figure containing the line chart. |
+| RETURNS           | DESCRIPTION                           |
+| ----------------- | ------------------------------------- |
+| `DatachartFigure` | The figure containing the line chart. |
 
 ## Data
 
@@ -22378,7 +22378,7 @@ StackedAreaChart(
     ) = None,
     x: str | list[str | None] | None = None,
     y: str | list[str | None] | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the stacked area chart.
@@ -22450,9 +22450,9 @@ Examples:
 | `x`              | The key name in data for x-axis values (default: "x"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                       |
 | `y`              | The key name in data for y-axis values (default: "y"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                       |
 
-| RETURNS      | DESCRIPTION                                   |
-| ------------ | --------------------------------------------- |
-| `plt.Figure` | The figure containing the stacked area chart. |
+| RETURNS           | DESCRIPTION                                   |
+| ----------------- | --------------------------------------------- |
+| `DatachartFigure` | The figure containing the stacked area chart. |
 
 | RAISES       | DESCRIPTION                                                                                     |
 | ------------ | ----------------------------------------------------------------------------------------------- |
@@ -22647,7 +22647,7 @@ BumpChart(
     ) = None,
     x: str | list[str | None] | None = None,
     y: str | list[str | None] | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the bump chart.
@@ -22717,9 +22717,9 @@ Examples:
 | `x`              | The key name in data for x-axis values (default: "x"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                           |
 | `y`              | The key name in data for the ranked values (default: "y"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                       |
 
-| RETURNS      | DESCRIPTION                           |
-| ------------ | ------------------------------------- |
-| `plt.Figure` | The figure containing the bump chart. |
+| RETURNS           | DESCRIPTION                           |
+| ----------------- | ------------------------------------- |
+| `DatachartFigure` | The figure containing the bump chart. |
 
 ## Data
 
@@ -22913,7 +22913,7 @@ BarChart(
     label: str | list[str | None] | None = None,
     y: str | list[str | None] | None = None,
     yerr: str | list[str | None] | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the bar chart.
@@ -22989,9 +22989,9 @@ Examples:
 | `y`             | The key name in data for y-axis values (default: "y"). **TYPE:** \`str                                                                                                                                                                                                                                          |
 | `yerr`          | The key name in data for y-axis error values (default: "yerr"). **TYPE:** \`str                                                                                                                                                                                                                                 |
 
-| RETURNS      | DESCRIPTION                          |
-| ------------ | ------------------------------------ |
-| `plt.Figure` | The figure containing the bar chart. |
+| RETURNS           | DESCRIPTION                          |
+| ----------------- | ------------------------------------ |
+| `DatachartFigure` | The figure containing the bar chart. |
 
 ## Data
 
@@ -23176,7 +23176,7 @@ PyramidChart(
     label: str | list[str | None] | None = None,
     y: str | list[str | None] | None = None,
     yerr: str | list[str | None] | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the pyramid chart.
@@ -23247,9 +23247,9 @@ Examples:
 | `y`             | The key name in data for the bar values (default: "y"). **TYPE:** \`str                                                                                                                                                                                                                       |
 | `yerr`          | The key name in data for the bar error values (default: "yerr"). **TYPE:** \`str                                                                                                                                                                                                              |
 
-| RETURNS      | DESCRIPTION                              |
-| ------------ | ---------------------------------------- |
-| `plt.Figure` | The figure containing the pyramid chart. |
+| RETURNS           | DESCRIPTION                              |
+| ----------------- | ---------------------------------------- |
+| `DatachartFigure` | The figure containing the pyramid chart. |
 
 ## Data
 
@@ -23375,7 +23375,7 @@ RadialChart(
     type: RADIAL_TYPE | str | None = None,
     startangle: str | int | float | None = None,
     innerradius: float | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the radial chart.
@@ -23448,9 +23448,9 @@ Examples:
 | `startangle`      | Deprecated; use start_angle. Removed in the next release. **TYPE:** \`str                                                                                                                                                                                                                                                                                                      |
 | `innerradius`     | Deprecated; use inner_radius. Removed in the next release. **TYPE:** \`float                                                                                                                                                                                                                                                                                                   |
 
-| RETURNS      | DESCRIPTION                             |
-| ------------ | --------------------------------------- |
-| `plt.Figure` | The figure containing the radial chart. |
+| RETURNS           | DESCRIPTION                             |
+| ----------------- | --------------------------------------- |
+| `DatachartFigure` | The figure containing the radial chart. |
 
 ## Data
 
@@ -23553,7 +23553,7 @@ CalendarHeatmap(
         | None
     ) = None,
     show_colorbars: bool | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the calendar heatmap.
@@ -23598,9 +23598,9 @@ Examples:
 | `texts`               | Text annotation(s) to draw, on every calendar of their dataset. The cells sit at integer positions: the week column along x, the weekday row along y, counted from zero at the top-left cell of the drawn range. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                    |
 | `show_colorbars`      | Deprecated; use show_colorbar. Removed in the next release. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                     |
 
-| RETURNS      | DESCRIPTION                                    |
-| ------------ | ---------------------------------------------- |
-| `plt.Figure` | The figure containing the calendar heatmap(s). |
+| RETURNS           | DESCRIPTION                                    |
+| ----------------- | ---------------------------------------------- |
+| `DatachartFigure` | The figure containing the calendar heatmap(s). |
 
 | RAISES       | DESCRIPTION                                                                                                                                                                                       |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -23750,7 +23750,7 @@ GanttChart(
     group: str | list[str | None] | None = None,
     progress: str | list[str | None] | None = None,
     depends_on: str | list[str | None] | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the gantt chart.
@@ -23819,9 +23819,9 @@ Examples:
 | `progress`           | The key name in data for the task progress (default: "progress"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                            |
 | `depends_on`         | The key name in data for the task dependencies (default: "depends_on"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                      |
 
-| RETURNS      | DESCRIPTION                            |
-| ------------ | -------------------------------------- |
-| `plt.Figure` | The figure containing the gantt chart. |
+| RETURNS           | DESCRIPTION                            |
+| ----------------- | -------------------------------------- |
+| `DatachartFigure` | The figure containing the gantt chart. |
 
 ## Data
 
@@ -24030,7 +24030,7 @@ DumbbellChart(
     label: str | list[str | None] | None = None,
     start: str | list[str | None] | None = None,
     end: str | list[str | None] | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the dumbbell chart.
@@ -24104,9 +24104,9 @@ Examples:
 | `start`           | The key name in data for the start values (default: "start"). **TYPE:** \`str                                                                                                                                                                                                                                                               |
 | `end`             | The key name in data for the end values (default: "end"). **TYPE:** \`str                                                                                                                                                                                                                                                                   |
 
-| RETURNS      | DESCRIPTION                               |
-| ------------ | ----------------------------------------- |
-| `plt.Figure` | The figure containing the dumbbell chart. |
+| RETURNS           | DESCRIPTION                               |
+| ----------------- | ----------------------------------------- |
+| `DatachartFigure` | The figure containing the dumbbell chart. |
 
 ## Data
 
@@ -24312,7 +24312,7 @@ Histogram(
         | None
     ) = None,
     x: str | list[str | None] | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the histogram.
@@ -24384,9 +24384,9 @@ Examples:
 | `texts`           | Text annotation(s) to draw. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                                                                                                                                                                                                               |
 | `x`               | The key name in data for x-axis values (default: "x"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                                 |
 
-| RETURNS      | DESCRIPTION                          |
-| ------------ | ------------------------------------ |
-| `plt.Figure` | The figure containing the histogram. |
+| RETURNS           | DESCRIPTION                          |
+| ----------------- | ------------------------------------ |
+| `DatachartFigure` | The figure containing the histogram. |
 
 ## Data
 
@@ -24580,7 +24580,7 @@ BoxPlot(
     ) = None,
     label: str | list[str | None] | None = None,
     value: str | list[str | None] | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the box plot.
@@ -24654,9 +24654,9 @@ Examples:
 | `label`         | The key name in data for label/category values (default: "label"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                  |
 | `value`         | The key name in data for numeric values (default: "value"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                         |
 
-| RETURNS      | DESCRIPTION                         |
-| ------------ | ----------------------------------- |
-| `plt.Figure` | The figure containing the box plot. |
+| RETURNS           | DESCRIPTION                         |
+| ----------------- | ----------------------------------- |
+| `DatachartFigure` | The figure containing the box plot. |
 
 ## Data
 
@@ -24863,7 +24863,7 @@ ViolinPlot(
     inner: VIOLIN_INNER | str | None = None,
     bandwidth: BANDWIDTH | str | float | None = None,
     split: str | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the violin plot.
@@ -24938,9 +24938,9 @@ Examples:
 | `bandwidth`     | The KDE bandwidth: None or "scott" (Scott's rule), "silverman", or a scalar factor. See BANDWIDTH. **TYPE:** \`BANDWIDTH                                                                                                                                                                                                                                                                                                            |
 | `split`         | The key name in data whose exactly two distinct values become the left and right halves of each violin, colored from the multiple palette and listed in the legend. **TYPE:** \`str                                                                                                                                                                                                                                                 |
 
-| RETURNS      | DESCRIPTION                            |
-| ------------ | -------------------------------------- |
-| `plt.Figure` | The figure containing the violin plot. |
+| RETURNS           | DESCRIPTION                            |
+| ----------------- | -------------------------------------- |
+| `DatachartFigure` | The figure containing the violin plot. |
 
 ## Data
 
@@ -25143,7 +25143,7 @@ SwarmPlot(
     label: str | list[str | None] | None = None,
     value: str | list[str | None] | None = None,
     mode: SWARM_MODE | str | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the swarm plot.
@@ -25217,9 +25217,9 @@ Examples:
 | `value`         | The key name in data for numeric values (default: "value"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                         |
 | `mode`          | Deprecated; use swarm_mode. Removed in the next release. **TYPE:** \`SWARM_MODE                                                                                                                                                                                                                                                                                                                                                     |
 
-| RETURNS      | DESCRIPTION                           |
-| ------------ | ------------------------------------- |
-| `plt.Figure` | The figure containing the swarm plot. |
+| RETURNS           | DESCRIPTION                           |
+| ----------------- | ------------------------------------- |
+| `DatachartFigure` | The figure containing the swarm plot. |
 
 ## Data
 
@@ -25420,7 +25420,7 @@ RaincloudPlot(
     label: str | list[str | None] | None = None,
     value: str | list[str | None] | None = None,
     mode: SWARM_MODE | str | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the raincloud plot.
@@ -25496,9 +25496,9 @@ Examples:
 | `value`         | The key name in data for numeric values (default: "value"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                         |
 | `mode`          | Deprecated; use swarm_mode. Removed in the next release. **TYPE:** \`SWARM_MODE                                                                                                                                                                                                                                                                                                                                                     |
 
-| RETURNS      | DESCRIPTION                               |
-| ------------ | ----------------------------------------- |
-| `plt.Figure` | The figure containing the raincloud plot. |
+| RETURNS           | DESCRIPTION                               |
+| ----------------- | ----------------------------------------- |
+| `DatachartFigure` | The figure containing the raincloud plot. |
 
 ## Data
 
@@ -25692,7 +25692,7 @@ RidgelinePlot(
     show_outline: bool | None = None,
     sort: SORT | str | None = SORT.NONE,
     normalize: RIDGELINE_SCALE | str | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the ridgeline plot.
@@ -25769,9 +25769,9 @@ Examples:
 | `sort`          | The row order: None keeps input order, "ascending" or "descending" orders the rows by their median; ties keep input order. See SORT. **TYPE:** \`SORT                                                                                                                                                                                                                                                                               |
 | `normalize`     | Deprecated; use ridge_scale. Removed in the next release. **TYPE:** \`RIDGELINE_SCALE                                                                                                                                                                                                                                                                                                                                               |
 
-| RETURNS      | DESCRIPTION                               |
-| ------------ | ----------------------------------------- |
-| `plt.Figure` | The figure containing the ridgeline plot. |
+| RETURNS           | DESCRIPTION                               |
+| ----------------- | ----------------------------------------- |
+| `DatachartFigure` | The figure containing the ridgeline plot. |
 
 | RAISES       | DESCRIPTION                                                                            |
 | ------------ | -------------------------------------------------------------------------------------- |
@@ -25988,7 +25988,7 @@ ScatterChart(
     yerr: str | list[str | None] | None = None,
     size_range: tuple[float, float] | None = None,
     label: str | list[str | None] | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates a scatter chart.
@@ -26116,9 +26116,9 @@ Examples:
 | `size_range`       | Tuple of (min_size, max_size) for bubble charts (default: (20, 200)). **TYPE:** \`tuple[float, float]                                                                                                                                                                                                                                                                                                                        |
 | `label`            | Deprecated; use annotation. Removed in the next release. **TYPE:** \`str                                                                                                                                                                                                                                                                                                                                                     |
 
-| RETURNS      | DESCRIPTION                              |
-| ------------ | ---------------------------------------- |
-| `plt.Figure` | The figure containing the scatter chart. |
+| RETURNS           | DESCRIPTION                              |
+| ----------------- | ---------------------------------------- |
+| `DatachartFigure` | The figure containing the scatter chart. |
 
 ## Data
 
@@ -26269,7 +26269,7 @@ Heatmap(
         VALUE_FORMAT | str | list[str | None] | None
     ) = None,
     show_colorbars: bool | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the heatmap.
@@ -26340,9 +26340,9 @@ Examples:
 | `valfmt`              | Deprecated; use value_format. Removed in the next release. **TYPE:** \`VALUE_FORMAT                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | `show_colorbars`      | Deprecated; use show_colorbar. Removed in the next release. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 
-| RETURNS      | DESCRIPTION                        |
-| ------------ | ---------------------------------- |
-| `plt.Figure` | The figure containing the heatmap. |
+| RETURNS           | DESCRIPTION                        |
+| ----------------- | ---------------------------------- |
+| `DatachartFigure` | The figure containing the heatmap. |
 
 ## Data
 
@@ -26558,7 +26558,7 @@ ContourChart(
     ) = None,
     filled: bool | None = None,
     show_colorbars: bool | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the contour chart.
@@ -26639,9 +26639,9 @@ Examples:
 | `filled`         | Deprecated; use fill. Removed in the next release. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                   |
 | `show_colorbars` | Deprecated; use show_colorbar. Removed in the next release. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                          |
 
-| RETURNS      | DESCRIPTION                              |
-| ------------ | ---------------------------------------- |
-| `plt.Figure` | The figure containing the contour chart. |
+| RETURNS           | DESCRIPTION                              |
+| ----------------- | ---------------------------------------- |
+| `DatachartFigure` | The figure containing the contour chart. |
 
 ## Data
 
@@ -26857,7 +26857,7 @@ HexbinChart(
     show_colorbars: bool | None = None,
     gridsize: int | list[int | None] | None = None,
     mincnt: int | list[int | None] | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the hexbin chart.
@@ -26934,9 +26934,9 @@ Examples:
 | `gridsize`       | Deprecated; use grid_size. Removed in the next release. **TYPE:** \`int                                                                                                                                                                                                                                                                                                                                                                         |
 | `mincnt`         | Deprecated; use min_count. Removed in the next release. **TYPE:** \`int                                                                                                                                                                                                                                                                                                                                                                         |
 
-| RETURNS      | DESCRIPTION                             |
-| ------------ | --------------------------------------- |
-| `plt.Figure` | The figure containing the hexbin chart. |
+| RETURNS           | DESCRIPTION                             |
+| ----------------- | --------------------------------------- |
+| `DatachartFigure` | The figure containing the hexbin chart. |
 
 ## Data
 
@@ -27044,7 +27044,7 @@ ParallelCoords(
         ]
         | None
     ) = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the parallel coordinates chart.
@@ -27088,9 +27088,9 @@ Examples:
 | `category_orders` | Dictionary mapping dimension names to lists of category values in the desired order. Example: {"rating": ["Low", "Medium", "High"]}. Categories not in the list will be appended at the end (sorted). **TYPE:** \`dict\[str, list[str]\]                                                                                                                                                                                  |
 | `texts`           | Text annotation(s) to draw. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                                                                                                                                                                                                  |
 
-| RETURNS      | DESCRIPTION                                           |
-| ------------ | ----------------------------------------------------- |
-| `plt.Figure` | The figure containing the parallel coordinates chart. |
+| RETURNS           | DESCRIPTION                                           |
+| ----------------- | ----------------------------------------------------- |
+| `DatachartFigure` | The figure containing the parallel coordinates chart. |
 
 ## Data
 
@@ -27207,7 +27207,7 @@ NetworkChart(
         ]
         | None
     ) = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the network chart.
@@ -27255,9 +27255,9 @@ Examples:
 | `style`          | Style configuration(s) for the chart(s). The edge geometry, plot_network_edge_style, takes ARROW_STYLE.CURVE (default) or ARROW_STYLE.STRAIGHT; the arrowhead comes from directed. **TYPE:** \`NetworkStyleAttrs                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | `texts`          | Text annotation(s) to draw. Data coordinates are the 0–1 layout space, so under FIXED a text at a node's x/y lands on that node. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 
-| RETURNS      | DESCRIPTION                              |
-| ------------ | ---------------------------------------- |
-| `plt.Figure` | The figure containing the network chart. |
+| RETURNS           | DESCRIPTION                              |
+| ----------------- | ---------------------------------------- |
+| `DatachartFigure` | The figure containing the network chart. |
 
 | RAISES       | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                          |
 | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -27392,7 +27392,7 @@ ScatterMatrix(
     legend: LegendSettingAttrs | None = None,
     show_grid: SHOW_GRID | str | bool | None = None,
     style: StyleAttrs | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates a scatter matrix.
@@ -27447,9 +27447,9 @@ Examples:
 | `show_grid`        | Which grid lines to show in the cells (e.g., "both", "x", "y"); False draws none. **TYPE:** \`SHOW_GRID                                                                                                                                                                                                                                               |
 | `style`            | Style attributes for every cell: the scatter, histogram, plot text and plot_scatter_matrix\_\* keys. See ScatterMatrixStyleAttrs. **TYPE:** \`StyleAttrs                                                                                                                                                                                              |
 
-| RETURNS      | DESCRIPTION                               |
-| ------------ | ----------------------------------------- |
-| `plt.Figure` | The figure containing the scatter matrix. |
+| RETURNS           | DESCRIPTION                               |
+| ----------------- | ----------------------------------------- |
+| `DatachartFigure` | The figure containing the scatter matrix. |
 
 | RAISES       | DESCRIPTION                                                                                                                                                                                |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -27550,7 +27550,7 @@ ImageChart(
         | list[ImageStyleAttrs | None]
         | None
     ) = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the image chart.
@@ -27598,9 +27598,9 @@ Examples:
 | `sharey`       | Whether the subplots share the y-axis. **TYPE:** \`bool                                                                                                                                               |
 | `style`        | Style configuration(s) for each chart. See ImageStyleAttrs. **TYPE:** \`ImageStyleAttrs                                                                                                               |
 
-| RETURNS      | DESCRIPTION                            |
-| ------------ | -------------------------------------- |
-| `plt.Figure` | The figure containing the image chart. |
+| RETURNS           | DESCRIPTION                            |
+| ----------------- | -------------------------------------- |
+| `DatachartFigure` | The figure containing the image chart. |
 
 | RAISES       | DESCRIPTION                                                                                                                                                     |
 | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -27690,7 +27690,7 @@ BasemapChart(
     features: (
         BASEMAP_FEATURE | str | list[str] | None
     ) = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the basemap chart.
@@ -27741,9 +27741,9 @@ Examples:
 | `style`        | Style configuration of the map. See BasemapStyleAttrs. **TYPE:** \`BasemapStyleAttrs                                                                                                                                 |
 | `features`     | Deprecated; use data. Removed in the next release. **TYPE:** \`BASEMAP_FEATURE                                                                                                                                       |
 
-| RETURNS      | DESCRIPTION                              |
-| ------------ | ---------------------------------------- |
-| `plt.Figure` | The figure containing the basemap chart. |
+| RETURNS           | DESCRIPTION                              |
+| ----------------- | ---------------------------------------- |
+| `DatachartFigure` | The figure containing the basemap chart. |
 
 | RAISES         | DESCRIPTION                                                                                                                                                                                                                                                                                                                                                                                                 |
 | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -27853,7 +27853,7 @@ SankeyChart(
         ]
         | None
     ) = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the Sankey chart.
@@ -27893,9 +27893,9 @@ Examples:
 | `style`         | Style configuration(s) for the chart(s). **TYPE:** \`SankeyStyleAttrs                                                                                                                                                                                                            |
 | `texts`         | Text annotation(s) to draw. The columns span 0–1 horizontally and the tallest column 0–1 vertically. **TYPE:** \`TextSettingAttrs                                                                                                                                                |
 
-| RETURNS      | DESCRIPTION                             |
-| ------------ | --------------------------------------- |
-| `plt.Figure` | The figure containing the Sankey chart. |
+| RETURNS           | DESCRIPTION                             |
+| ----------------- | --------------------------------------- |
+| `DatachartFigure` | The figure containing the Sankey chart. |
 
 | RAISES       | DESCRIPTION                                                                                                                                                                                                                     |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -28008,7 +28008,7 @@ Treemap(
         ]
         | None
     ) = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the treemap.
@@ -28051,9 +28051,9 @@ Examples:
 | `style`         | Style configuration(s) for the chart(s). **TYPE:** \`TreemapStyleAttrs                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | `texts`         | Text annotation(s) to draw. The tiling spans 0–1 in both directions. **TYPE:** \`TextSettingAttrs                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 
-| RETURNS      | DESCRIPTION                        |
-| ------------ | ---------------------------------- |
-| `plt.Figure` | The figure containing the treemap. |
+| RETURNS           | DESCRIPTION                        |
+| ----------------- | ---------------------------------- |
+| `DatachartFigure` | The figure containing the treemap. |
 
 | RAISES       | DESCRIPTION                                                                                                                                                                                                      |
 | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -28137,7 +28137,7 @@ Whether the figure composes with each composition function.
 
 The module containing the `utils`.
 
-The `utils` module provides a set of public utilities for the package: the composition of finished figures (`Panel`, `Grid`, `Annotate`), saving them (`save_figure`), and the statistics behind the charts (`stats`).
+The `utils` module provides a set of public utilities for the package: the composition of finished figures (`Panel`, `Grid`, `Annotate`), saving them (`save_figure`), the figure type every chart function returns (`DatachartFigure`), and the statistics behind the charts (`stats`).
 
 This module exports only the public API intended for end users. Internal implementation details are located in the `_internal` submodule and should not be imported directly by external code.
 
@@ -28145,13 +28145,14 @@ This module exports only the public API intended for end users. Internal impleme
 
 Everything here takes or returns the figure a chart function returns: three ways to compose finished figures, one to save them, and the statistics behind them.
 
-| I want to…                                                            | Use                                                                                  | Guide                                                                                                    |
-| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------- |
-| draw several charts in one coordinate space, with a second value axis | [`Panel`](#datachart.utils.Panel)                                                    | [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md)                  |
-| lay charts out side by side or in rows                                | [`Grid`](#datachart.utils.Grid)                                                      | [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md)                    |
-| add notes to a figure that is already drawn                           | [`Annotate`](#datachart.utils.Annotate)                                              | [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md) |
-| write a figure to disk, in one format or several                      | [`save_figure`](#datachart.utils.save_figure)                                        | [Saving Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md)        |
-| compute the number a chart shows                                      | [`stats`](https://eriknovak.github.io/datachart/dev/references/utils/stats/index.md) | [Statistics](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/stats/index.md)             |
+| I want to…                                                            | Use                                                                                  | Guide                                                                                                       |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| draw several charts in one coordinate space, with a second value axis | [`Panel`](#datachart.utils.Panel)                                                    | [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md)                     |
+| lay charts out side by side or in rows                                | [`Grid`](#datachart.utils.Grid)                                                      | [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md)                       |
+| add notes to a figure that is already drawn                           | [`Annotate`](#datachart.utils.Annotate)                                              | [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md)    |
+| write a figure to disk, in one format or several                      | [`save_figure`](#datachart.utils.save_figure)                                        | [Saving Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md)           |
+| compute the number a chart shows                                      | [`stats`](https://eriknovak.github.io/datachart/dev/references/utils/stats/index.md) | [Statistics](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/stats/index.md)                |
+| annotate or check the type of a figure a chart returned               | [`DatachartFigure`](#datachart.utils.DatachartFigure)                                | [Interactive Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/interactive/index.md) |
 
 ## Composition
 
@@ -28159,7 +28160,7 @@ Everything here takes or returns the figure a chart function returns: three ways
 
 ```
 Panel(
-    charts: list[plt.Figure | dict[str, Any]],
+    charts: list[plt.Figure | PanelItemSettingAttrs],
     *,
     title: str | None = None,
     xlabel: str | None = None,
@@ -28182,7 +28183,7 @@ Panel(
     bar_mode: BAR_MODE | str | None = None,
     aspect_ratio: ASPECT_RATIO | str | None = None,
     emphasis_rule: EmphasisRuleAttrs | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Overlay rendered chart figures in one coordinate space.
@@ -28269,9 +28270,9 @@ Examples:
 | `aspect_ratio`        | The aspect ratio of the axes box; "geographic" keeps a map of longitude against latitude at true proportions. Default: "auto". See ASPECT_RATIO. **TYPE:** \`ASPECT_RATIO                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | `emphasis_rule`       | A rule that highlights the composed series matching it and mutes the rest: {"above": v} or {"below": v} (strict), {"between": (lo, hi)} (inclusive), {"top": n} or {"bottom": n}, read against a summary of each series' own value-axis values, chosen by by: "mean" (default), "median", "min", "max", or "sum". A figure's "emphasis" role or a role its records carry wins, and a count ranks across every composed series. See EmphasisRuleAttrs. **TYPE:** \`EmphasisRuleAttrs                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 
-| RETURNS      | DESCRIPTION                                         |
-| ------------ | --------------------------------------------------- |
-| `plt.Figure` | A matplotlib Figure containing the overlaid charts. |
+| RETURNS           | DESCRIPTION                                         |
+| ----------------- | --------------------------------------------------- |
+| `DatachartFigure` | A matplotlib Figure containing the overlaid charts. |
 
 | RAISES       | DESCRIPTION                                                                                                                                                                                                                                                                                               |
 | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -28282,7 +28283,7 @@ Examples:
 ```
 Grid(
     charts: (
-        list[plt.Figure | dict[str, Any]]
+        list[plt.Figure | GridItemSettingAttrs]
         | list[list[plt.Figure | None]]
     ),
     *,
@@ -28303,7 +28304,7 @@ Grid(
     aspect_ratio: ASPECT_RATIO | str | None = None,
     scalex: AXIS_SCALE | str | None = None,
     scaley: AXIS_SCALE | str | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Arrange rendered chart figures in a grid.
@@ -28371,9 +28372,9 @@ Examples:
 | `scalex`       | The x-axis scale of every cell ("linear", "log", "symlog", "asinh"). Default: each cell's own. **TYPE:** \`AXIS_SCALE                                                                                                                                                                                                                                         |
 | `scaley`       | The y-axis scale of every cell. Default: each cell's own. **TYPE:** \`AXIS_SCALE                                                                                                                                                                                                                                                                              |
 
-| RETURNS      | DESCRIPTION                                                     |
-| ------------ | --------------------------------------------------------------- |
-| `plt.Figure` | A new matplotlib Figure containing all charts in a grid layout. |
+| RETURNS           | DESCRIPTION                                                     |
+| ----------------- | --------------------------------------------------------------- |
+| `DatachartFigure` | A new matplotlib Figure containing all charts in a grid layout. |
 
 | RAISES       | DESCRIPTION                                                                                                                                                                                                                                                          |
 | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -28385,7 +28386,7 @@ Examples:
 Annotate(
     figure: plt.Figure,
     texts: TextSettingAttrs | list[TextSettingAttrs],
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Add text annotations to an already rendered figure.
@@ -28424,9 +28425,9 @@ Examples:
 | `figure`  | A figure created by a datachart chart function or Panel. **TYPE:** `plt.Figure`                                                                                                                                                                                                                                                    |
 | `texts`   | The text annotation(s) to add. Each annotation places text at (x, y) — data coordinates by default, axes fractions with "coords": "axes" — draws a connector to the optional target data point, and takes a per-text style override. On a multi-subplot figure each one also names its subplot index. **TYPE:** \`TextSettingAttrs |
 
-| RETURNS      | DESCRIPTION                                         |
-| ------------ | --------------------------------------------------- |
-| `plt.Figure` | A new matplotlib Figure with the annotations added. |
+| RETURNS           | DESCRIPTION                                         |
+| ----------------- | --------------------------------------------------- |
+| `DatachartFigure` | A new matplotlib Figure with the annotations added. |
 
 | RAISES       | DESCRIPTION                                                                                                                                                                              |
 | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -28441,9 +28442,13 @@ save_figure(
     figure: plt.Figure,
     path: str | os.PathLike,
     dpi: int = 300,
-    fmt: FIG_FORMAT | list[FIG_FORMAT] | None = None,
+    fmt: (
+        FIG_FORMAT | str | list[FIG_FORMAT | str] | None
+    ) = None,
     transparent: bool = False,
-    format: FIG_FORMAT | list[FIG_FORMAT] | None = None,
+    format: (
+        FIG_FORMAT | str | list[FIG_FORMAT | str] | None
+    ) = None,
 ) -> list[str]
 ```
 
@@ -28491,6 +28496,39 @@ Examples:
 | RAISES       | DESCRIPTION                                                 |
 | ------------ | ----------------------------------------------------------- |
 | `ValueError` | If fmt is an empty list, or both fmt and format are passed. |
+
+## The Figure
+
+Every chart function and composition returns a `DatachartFigure`: a matplotlib `Figure` the caller owns, shown by `show()`. Annotate a variable with it, or `isinstance`-check a figure a caller hands you. `Panel` and `Grid` accept any matplotlib figure a chart function returned.
+
+### datachart.utils.DatachartFigure
+
+Bases: `Figure`
+
+A figure owned by the caller, never registered with pyplot.
+
+Creating a chart never displays it and never accumulates global state; call `show()` to display the figure — inline in notebooks, in a GUI window in scripts.
+
+#### show
+
+```
+show(warn=True, interactive=False)
+```
+
+Display the figure.
+
+Showing is the only way a figure appears: in notebooks the figure is displayed inline as a PNG payload; elsewhere it is adopted into pyplot's figure manager and shown via `plt.show()`, so a GUI window opens where a backend supports one.
+
+With `interactive=True` the figure becomes zoomable and pannable and hovering a mark shows its data: in notebooks the figure is displayed on an `ipympl` widget canvas with the matplotlib toolbar, in scripts the GUI window's toolbar already provides zoom and pan. Hovering a mark of any chart type annotates it with the series' legend label and one `name: value` line per field of the mark: its axis coordinates, named after the axis labels when set, or the summary an aggregate mark stands for — a box its quartiles, a histogram bin its range and count, a sankey link its endpoints and flow. The annotation wears the theme's text annotation style. The optional dependencies come with the `interactive` extra: `pip install "datachart[interactive]"`.
+
+| PARAMETER     | DESCRIPTION                                                                                        |
+| ------------- | -------------------------------------------------------------------------------------------------- |
+| `warn`        | If True, warn when the backend cannot open a window. **DEFAULT:** `True`                           |
+| `interactive` | If True, display the figure with zoom, pan, and hover-to-inspect annotations. **DEFAULT:** `False` |
+
+| RAISES        | DESCRIPTION                                                       |
+| ------------- | ----------------------------------------------------------------- |
+| `ImportError` | If interactive is True and ipympl or mplcursors is not installed. |
 
 # Stats Module
 
@@ -32130,16 +32168,18 @@ The records a chart's `data` takes and the keys its `style` accepts are document
 
 The dictionaries a chart takes beside its data: reference lines and bands, text annotations, the legend, the emphasis rule, and the colorbar. Each is a parameter of the chart function, and a field left out or set to `None` falls back to the theme.
 
-| I want to…                                    | Pass               | As                                                                                                                       |
-| --------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------ |
-| mark a value on the x or y axis               | `vlines`, `hlines` | [`VLineSettingAttrs`](#datachart.typings.VLineSettingAttrs), [`HLineSettingAttrs`](#datachart.typings.HLineSettingAttrs) |
-| draw a line through the data, such as parity  | `dlines`           | [`DLineSettingAttrs`](#datachart.typings.DLineSettingAttrs)                                                              |
-| compare two categories with a bracket         | `brackets`         | [`BracketSettingAttrs`](#datachart.typings.BracketSettingAttrs)                                                          |
-| shade a range of the x or y axis              | `vspans`, `hspans` | [`VSpanSettingAttrs`](#datachart.typings.VSpanSettingAttrs), [`HSpanSettingAttrs`](#datachart.typings.HSpanSettingAttrs) |
-| write a note on the chart                     | `texts`            | [`TextSettingAttrs`](#datachart.typings.TextSettingAttrs)                                                                |
-| title, place, or lay out the legend           | `legend`           | [`LegendSettingAttrs`](#datachart.typings.LegendSettingAttrs)                                                            |
-| highlight the series or marks matching a rule | `emphasis_rule`    | [`EmphasisRuleAttrs`](#datachart.typings.EmphasisRuleAttrs)                                                              |
-| place or format the colorbar                  | `colorbar`         | [`ColorbarSettingAttrs`](#datachart.typings.ColorbarSettingAttrs)                                                        |
+| I want to…                                    | Pass                         | As                                                                                                                                       |
+| --------------------------------------------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| mark a value on the x or y axis               | `vlines`, `hlines`           | [`VLineSettingAttrs`](#datachart.typings.VLineSettingAttrs), [`HLineSettingAttrs`](#datachart.typings.HLineSettingAttrs)                 |
+| draw a line through the data, such as parity  | `dlines`                     | [`DLineSettingAttrs`](#datachart.typings.DLineSettingAttrs)                                                                              |
+| compare two categories with a bracket         | `brackets`                   | [`BracketSettingAttrs`](#datachart.typings.BracketSettingAttrs)                                                                          |
+| shade a range of the x or y axis              | `vspans`, `hspans`           | [`VSpanSettingAttrs`](#datachart.typings.VSpanSettingAttrs), [`HSpanSettingAttrs`](#datachart.typings.HSpanSettingAttrs)                 |
+| write a note on the chart                     | `texts`                      | [`TextSettingAttrs`](#datachart.typings.TextSettingAttrs)                                                                                |
+| title, place, or lay out the legend           | `legend`                     | [`LegendSettingAttrs`](#datachart.typings.LegendSettingAttrs)                                                                            |
+| highlight the series or marks matching a rule | `emphasis_rule`              | [`EmphasisRuleAttrs`](#datachart.typings.EmphasisRuleAttrs)                                                                              |
+| pick the value axis of a figure in a `Panel`  | `charts` item                | [`PanelItemSettingAttrs`](#datachart.typings.PanelItemSettingAttrs)                                                                      |
+| place a figure in a `Grid` cell               | `charts` item, `layout_spec` | [`GridItemSettingAttrs`](#datachart.typings.GridItemSettingAttrs), [`LayoutSpecSettingAttrs`](#datachart.typings.LayoutSpecSettingAttrs) |
+| place or format the colorbar                  | `colorbar`                   | [`ColorbarSettingAttrs`](#datachart.typings.ColorbarSettingAttrs)                                                                        |
 
 ### datachart.typings.VLineSettingAttrs
 
@@ -32295,6 +32335,41 @@ Every field is optional. `location` is the control: it places the bar on any edg
 | `format`      | The format of the bar's tick labels, with the value named x (e.g. "{x:.0f}"). On a hexbin chart, value_format still applies when this is unset. **TYPE:** \`VALUE_FORMAT |
 | `ticks`       | Explicit tick positions on the bar; positions outside the mapped value range are not drawn. **TYPE:** \`list\[int                                                        |
 | `orientation` | The orientation; derives the edge when location is unset. **TYPE:** \`ORIENTATION                                                                                        |
+
+### datachart.typings.PanelItemSettingAttrs
+
+Bases: `TypedDict`
+
+One figure of a `Panel` with its per-figure options, passed in `charts`.
+
+| ATTRIBUTE | DESCRIPTION                                                                                                |
+| --------- | ---------------------------------------------------------------------------------------------------------- |
+| `figure`  | The rendered chart figure to overlay. **TYPE:** `Figure`                                                   |
+| `y_axis`  | The value axis the figure draws on. Defaults to automatic assignment. **TYPE:** `Literal['left', 'right']` |
+
+### datachart.typings.GridItemSettingAttrs
+
+Bases: `TypedDict`
+
+One figure of a `Grid` with its placement, passed in a flat `charts` list.
+
+| ATTRIBUTE     | DESCRIPTION                                                                                                          |
+| ------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `figure`      | The rendered chart figure to place. **TYPE:** `Figure`                                                               |
+| `layout_spec` | The cell the figure occupies. Defaults to the next free cell of the uniform grid. **TYPE:** `LayoutSpecSettingAttrs` |
+
+### datachart.typings.LayoutSpecSettingAttrs
+
+Bases: `TypedDict`
+
+The cell a figure occupies in a `Grid`, passed in a grid item as `layout_spec`.
+
+| ATTRIBUTE | DESCRIPTION                                                          |
+| --------- | -------------------------------------------------------------------- |
+| `row`     | The zero-based row of the cell's top-left corner. **TYPE:** `int`    |
+| `col`     | The zero-based column of the cell's top-left corner. **TYPE:** `int` |
+| `rowspan` | How many rows the cell spans. **TYPE:** `int`                        |
+| `colspan` | How many columns the cell spans. **TYPE:** `int`                     |
 
 ## Shared Style
 

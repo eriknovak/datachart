@@ -27,7 +27,7 @@ ScatterMatrix(
     legend: LegendSettingAttrs | None = None,
     show_grid: SHOW_GRID | str | bool | None = None,
     style: StyleAttrs | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates a scatter matrix.
@@ -82,9 +82,9 @@ Examples:
 | `show_grid`        | Which grid lines to show in the cells (e.g., "both", "x", "y"); False draws none. **TYPE:** \`SHOW_GRID                                                                                                                                                                                                                                               |
 | `style`            | Style attributes for every cell: the scatter, histogram, plot text and plot_scatter_matrix\_\* keys. See ScatterMatrixStyleAttrs. **TYPE:** \`StyleAttrs                                                                                                                                                                                              |
 
-| RETURNS      | DESCRIPTION                               |
-| ------------ | ----------------------------------------- |
-| `plt.Figure` | The figure containing the scatter matrix. |
+| RETURNS           | DESCRIPTION                               |
+| ----------------- | ----------------------------------------- |
+| `DatachartFigure` | The figure containing the scatter matrix. |
 
 | RAISES       | DESCRIPTION                                                                                                                                                                                |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |

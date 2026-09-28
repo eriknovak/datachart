@@ -125,7 +125,7 @@ BumpChart(
     ) = None,
     x: str | list[str | None] | None = None,
     y: str | list[str | None] | None = None
-) -> plt.Figure
+) -> DatachartFigure
 ```
 
 Creates the bump chart.
@@ -195,9 +195,9 @@ Examples:
 | `x`              | The key name in data for x-axis values (default: "x"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                           |
 | `y`              | The key name in data for the ranked values (default: "y"). **TYPE:** \`str                                                                                                                                                                                                                                                                                                                       |
 
-| RETURNS      | DESCRIPTION                           |
-| ------------ | ------------------------------------- |
-| `plt.Figure` | The figure containing the bump chart. |
+| RETURNS           | DESCRIPTION                           |
+| ----------------- | ------------------------------------- |
+| `DatachartFigure` | The figure containing the bump chart. |
 
 ## Data
 
