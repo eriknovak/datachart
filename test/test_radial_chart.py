@@ -12,6 +12,7 @@ import pytest
 from datachart.charts import RadialChart
 from datachart.constants import RADIAL_DIRECTION, RADIAL_TYPE
 from datachart.utils import Grid
+from datachart.utils._internal.layers.base import _TextHalo
 
 WIND = [
     {"label": d, "y": v}
@@ -43,8 +44,8 @@ class TestFrontValidation:
         with pytest.raises(ValueError, match="hlines"):
             RadialChart(data=WIND, hlines={"y": 1})
 
-    def test_unknown_type_raises(self):
-        with pytest.raises(ValueError, match="type"):
+    def test_unknown_mark_raises(self):
+        with pytest.raises(ValueError, match="mark"):
             RadialChart(data=WIND, mark="pie")
 
     def test_bad_direction_raises(self):
@@ -317,14 +318,20 @@ class TestTipTexts:
         value_texts = [t for t in ax.texts if t.get_text() in expected]
         assert {t.get_text() for t in value_texts} == expected
         # the halo backs every tip text, like the axis value labels
-        assert all(t.get_bbox_patch() is not None for t in value_texts)
+        assert all(
+            any(isinstance(e, _TextHalo) for e in t.get_path_effects())
+            for t in value_texts
+        )
 
     def test_tip_labels_carry_a_halo(self):
         ax = RadialChart(data=WIND, mark=RADIAL_TYPE.BAR, show_tip_labels=True).axes[0]
         labels = {d["label"] for d in WIND}
         tip_texts = [t for t in ax.texts if t.get_text() in labels]
         assert tip_texts
-        assert all(t.get_bbox_patch() is not None for t in tip_texts)
+        assert all(
+            any(isinstance(e, _TextHalo) for e in t.get_path_effects())
+            for t in tip_texts
+        )
 
     def test_show_values_on_line_points(self):
         ax = RadialChart(data=WIND, show_values=True).axes[0]
