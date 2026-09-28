@@ -1,7 +1,5 @@
 """Point annotations sit beside their markers and steer clear of the other marks."""
 
-import warnings
-
 import matplotlib
 
 matplotlib.use("Agg")
@@ -146,21 +144,6 @@ def test_log_scale_places_labels():
     assert len(_labels(fig.axes[0])) == 3
 
 
-def test_label_parameter_warns_and_names_the_key():
-    data = [{"x": p["x"], "y": p["y"], "name": p["annotation"]} for p in POINTS]
-    with pytest.warns(DeprecationWarning, match="`annotation`"):
-        fig = ScatterChart(data=data, label="name")
-    assert [t.get_text() for t in _labels(fig.axes[0])] == ["a", "b", "c"]
-
-
-def test_label_record_key_warns_and_annotates():
-    data = [{"x": p["x"], "y": p["y"], "label": p["annotation"]} for p in POINTS]
-    with pytest.warns(DeprecationWarning, match="`label` record key") as caught:
-        fig = ScatterChart(data=data)
-    assert caught[0].filename == __file__
-    assert [t.get_text() for t in _labels(fig.axes[0])] == ["a", "b", "c"]
-
-
 LABELLED = [
     {"x": 1, "y": 1, "label": "a"},
     {"x": 5, "y": 5, "label": "b"},
@@ -169,9 +152,7 @@ LABELLED = [
 
 
 def test_claimed_label_key_is_not_read_as_annotation():
-    with warnings.catch_warnings():
-        warnings.simplefilter("error", DeprecationWarning)
-        fig = ScatterChart(data=LABELLED, hue="label")
+    fig = ScatterChart(data=LABELLED, hue="label")
     assert _labels(fig.axes[0]) == []
     colors = {
         tuple(c)
@@ -181,13 +162,6 @@ def test_claimed_label_key_is_not_read_as_annotation():
     assert len(colors) == 2
 
 
-def test_label_key_still_reads_as_annotation():
-    with pytest.warns(DeprecationWarning, match="`label` record key"):
-        fig = ScatterChart(data=LABELLED)
-    assert [t.get_text() for t in _labels(fig.axes[0])] == ["a", "b", "a"]
-
-
-def test_shimmed_annotation_is_validated():
-    with pytest.warns(DeprecationWarning):
-        with pytest.raises(ValueError, match="cannot be combined"):
-            ScatterChart(data=LABELLED, show_values=True)
+def test_label_record_key_is_not_an_annotation():
+    fig = ScatterChart(data=LABELLED)
+    assert _labels(fig.axes[0]) == []

@@ -126,10 +126,9 @@ class Config:
     def register_theme(self, name: str, theme: StyleAttrs) -> None:
         """Registers a custom theme so it can be applied with `set_theme`.
 
-        Missing attributes are filled from the default theme, alias keys
-        resolve to their canonical name, and unknown keys are rejected. A
-        custom theme of the same name is replaced; the predefined theme names
-        are reserved.
+        Missing attributes are filled from the default theme and unknown keys
+        are rejected. A custom theme of the same name is replaced; the
+        predefined theme names are reserved.
 
         Examples:
             >>> from datachart.config import config
@@ -350,8 +349,7 @@ class Config:
 
         The file is read as written by `save_theme` and registered through
         `register_theme`, so missing attributes are filled from the default
-        theme, alias keys resolve to their canonical name, and unknown keys
-        are rejected. The name is, in order of precedence, the `name`
+        theme and unknown keys are rejected. The name is, in order of precedence, the `name`
         argument, the name in the file, or the file's stem; an existing custom
         theme of that name is replaced, while a predefined theme's name is
         rejected, so a file saved from one loads only with a new `name`.
