@@ -11,10 +11,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Testing
 ```bash
 # Run all unit tests
-python -m unittest discover test
+pytest test --ignore=test/golden
 
 # Run tests for a specific file
-python -m unittest test.test_colors
+pytest test/test_colors.py
 
 # Test documentation notebooks
 pytest

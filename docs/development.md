@@ -52,7 +52,7 @@ githooks
 To run the unit tests, run:
 
 ```bash
-python -m unittest discover test
+pytest test --ignore=test/golden
 ```
 
 To execute the documentation notebooks as tests, run:

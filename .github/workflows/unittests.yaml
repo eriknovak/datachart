@@ -32,7 +32,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - run: uv sync --group test
       - uses: ./.github/actions/prewarm-cache
-      - run: uv run python -m unittest discover test
+      - run: uv run pytest test --ignore=test/golden
       # the public annotations stay usable by an installed copy (ADR 0087)
       - if: matrix.python-version == '3.12'
         run: uv run pyright test/typecheck/usage.py
@@ -51,11 +51,15 @@ jobs:
           python-version: "3.10"
       - run: uv venv
       - run: uv pip install --resolution lowest-direct -e .
-      - run: uv pip install pytest
+      # nbmake: pyproject.toml's `addopts = --nbmake` applies to every pytest
+      # invocation, even one scoped to test/ with no notebooks to collect
+      - run: uv pip install pytest nbmake
       - uses: ./.github/actions/prewarm-cache
         with:
           no-sync: "true"
-      - run: uv run --no-sync python -m unittest discover test
+      # the `interactive` extra has no version floor of its own; its tests
+      # aren't run against these floored dependencies
+      - run: uv run --no-sync pytest test --ignore=test/golden --ignore=test/test_interactive.py
 
   # early warning on the private matplotlib touchpoint; never blocks (ADR 0085)
   matplotlib-pre:
@@ -74,7 +78,7 @@ jobs:
         with:
           no-sync: "true"
       - run: uv run --no-sync python -c "import matplotlib; print(matplotlib.__version__)"
-      - run: uv run --no-sync python -m unittest discover test
+      - run: uv run --no-sync pytest test --ignore=test/golden
 
   notebooks:
     needs: unit

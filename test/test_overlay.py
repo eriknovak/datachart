@@ -236,7 +236,7 @@ class TestPanel:
     def test_legend_gets_headroom_when_marks_fill_the_axes(self):
         """A legend with no clear slot moves to the top and both value axes extend."""
         bars = BarChart(
-            data=[{"label": str(i), "y": 150 + 5 * (i % 2)} for i in range(12)],
+            data=[{"label": str(i), "y": 195 + 5 * (i % 2)} for i in range(12)],
             subtitle="A",
         )
         line = LineChart(

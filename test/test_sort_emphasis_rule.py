@@ -428,12 +428,13 @@ class TestEmphasisRuleBars:
         assert muted(sorted_.containers[0]) == [True, False]
         assert muted(sorted_.containers[1]) == [False, True]
 
-    def test_columnar_data_rejected_with_a_clear_message(self):
-        columns = {"label": list("ABC"), "y": [1.0, 2.0, 3.0]}
-        with pytest.raises(ValueError, match="list of"):
-            BarChart(data=columns, sort="ascending")
-        with pytest.raises(ValueError, match="list of"):
-            BarChart(data=columns, emphasis_rule={"top": 1})
+    def test_columnar_data_is_read_as_records(self):
+        columns = {"label": list("ABC"), "y": [3.0, 1.0, 2.0]}
+        sorted_ax = BarChart(data=columns, sort="ascending").axes[0]
+        labels = [t.get_text() for t in sorted_ax.get_xticklabels()]
+        assert labels == ["B", "C", "A"]
+        emphasis_ax = BarChart(data=columns, emphasis_rule={"top": 1}).axes[0]
+        assert muted(emphasis_ax.containers[0]) == [False, True, True]
 
     def test_columnar_radial_data_keeps_its_tip_values(self):
         columns = {"label": list("ABC"), "y": [1.0, 2.0, 3.0]}

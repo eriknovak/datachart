@@ -31,6 +31,11 @@ def render(fig):
     return fig.axes
 
 
+def find_legend(ax):
+    """The legend among `ax`'s figure's axes, wherever it landed (host or twin)."""
+    return next(a.get_legend() for a in ax.figure.axes if a.get_legend())
+
+
 @pytest.fixture(autouse=True)
 def close_figures():
     yield
@@ -252,7 +257,7 @@ class TestLegend:
             show_legend=True,
         )
         ax = render(fig)[0]
-        labels = [t.get_text() for t in ax.get_legend().get_texts()]
+        labels = [t.get_text() for t in find_legend(ax).get_texts()]
         assert labels == ["bars (B)", "line (T)"]
 
     def test_vertical_suffixes_unchanged(self):
@@ -267,7 +272,7 @@ class TestLegend:
             show_legend=True,
         )
         ax = render(fig)[0]
-        labels = [t.get_text() for t in ax.get_legend().get_texts()]
+        labels = [t.get_text() for t in find_legend(ax).get_texts()]
         assert labels == ["bars (L)", "line (R)"]
 
 
