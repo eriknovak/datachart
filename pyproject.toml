@@ -31,7 +31,7 @@ dependencies = [
     "numpy>=2.0",
     "matplotlib>=3.10.7",
     "scipy>=1.15",
-    "typing-extensions>=4.0.0; python_version < '3.11'",
+    "typing-extensions>=4.4.0; python_version < '3.11'",
     "pypalettes>=0.2.1",
 ]
 

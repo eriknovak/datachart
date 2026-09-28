@@ -807,7 +807,7 @@ requires-dist = [
     { name = "numpy", specifier = ">=2.0" },
     { name = "pypalettes", specifier = ">=0.2.1" },
     { name = "scipy", specifier = ">=1.15" },
-    { name = "typing-extensions", marker = "python_full_version < '3.11'", specifier = ">=4.0.0" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11'", specifier = ">=4.4.0" },
 ]
 provides-extras = ["interactive"]
 
