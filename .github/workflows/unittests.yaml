@@ -50,14 +50,16 @@ jobs:
         with:
           python-version: "3.10"
       - run: uv venv
-      - run: uv pip install --resolution lowest-direct -e ".[interactive]"
+      - run: uv pip install --resolution lowest-direct -e .
       # nbmake: pyproject.toml's `addopts = --nbmake` applies to every pytest
       # invocation, even one scoped to test/ with no notebooks to collect
       - run: uv pip install pytest nbmake
       - uses: ./.github/actions/prewarm-cache
         with:
           no-sync: "true"
-      - run: uv run --no-sync pytest test --ignore=test/golden
+      # the `interactive` extra has no version floor of its own; its tests
+      # aren't run against these floored dependencies
+      - run: uv run --no-sync pytest test --ignore=test/golden --ignore=test/test_interactive.py
 
   # early warning on the private matplotlib touchpoint; never blocks (ADR 0085)
   matplotlib-pre:

@@ -31,13 +31,13 @@ dependencies = [
     "numpy>=2.0",
     "matplotlib>=3.10.7",
     "scipy>=1.15",
-    "typing-extensions>=4.4.0; python_version < '3.11'",
+    "typing-extensions>=4.6.0; python_version < '3.11'",
     "pypalettes>=0.2.1",
 ]
 
 # zoom, pan, and hover via `figure.show(interactive=True)`
 [project.optional-dependencies]
-interactive = ["ipympl>=0.7.0", "mplcursors>=0.5.2"]
+interactive = ["ipympl", "mplcursors"]
 
 [project.urls]
 Homepage = "https://eriknovak.github.io/datachart"
