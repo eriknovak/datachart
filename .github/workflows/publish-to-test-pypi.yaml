@@ -28,7 +28,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: uv sync --group test
-      - run: uv run python -m unittest discover test
+      - run: uv run pytest test --ignore=test/golden
 
   build-n-publish:
     name: Build and publish

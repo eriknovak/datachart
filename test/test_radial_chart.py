@@ -31,6 +31,13 @@ def close_figures():
     plt.close("all")
 
 
+def all_haloed(texts):
+    """Whether every text in `texts` carries the `_TextHalo` path effect."""
+    return all(
+        any(isinstance(e, _TextHalo) for e in t.get_path_effects()) for t in texts
+    )
+
+
 class TestFrontValidation:
     def test_scalex_raises(self):
         with pytest.raises(ValueError, match="scalex"):
@@ -318,20 +325,14 @@ class TestTipTexts:
         value_texts = [t for t in ax.texts if t.get_text() in expected]
         assert {t.get_text() for t in value_texts} == expected
         # the halo backs every tip text, like the axis value labels
-        assert all(
-            any(isinstance(e, _TextHalo) for e in t.get_path_effects())
-            for t in value_texts
-        )
+        assert all_haloed(value_texts)
 
     def test_tip_labels_carry_a_halo(self):
         ax = RadialChart(data=WIND, mark=RADIAL_TYPE.BAR, show_tip_labels=True).axes[0]
         labels = {d["label"] for d in WIND}
         tip_texts = [t for t in ax.texts if t.get_text() in labels]
         assert tip_texts
-        assert all(
-            any(isinstance(e, _TextHalo) for e in t.get_path_effects())
-            for t in tip_texts
-        )
+        assert all_haloed(tip_texts)
 
     def test_show_values_on_line_points(self):
         ax = RadialChart(data=WIND, show_values=True).axes[0]
