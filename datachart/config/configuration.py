@@ -11,10 +11,7 @@ from datachart.constants import THEME
 
 # import the themes
 from ..themes._base import (
-    STYLE_ALIASES as _STYLE_ALIASES,
-    canonical_style as _canonical_style,
     complete_theme as _complete_theme,
-    warn_aliases as _warn_aliases,
 )
 from ..themes.score import warn_failing_palette as _warn_failing_palette
 from ..themes import (
@@ -156,7 +153,7 @@ class Config:
                 f"{name!r} is a predefined theme and cannot be replaced; "
                 "register the theme under another name."
             )
-        THEMES[name] = _complete_theme(theme, stacklevel=2)
+        THEMES[name] = _complete_theme(theme)
         _warn_failing_palette(THEMES[name])
 
     def reset(self) -> None:
@@ -222,8 +219,7 @@ class Config:
     def _update(self, config: StyleAttrs, stacklevel: int) -> None:
         """`update`, warning at `stacklevel` counted from the caller."""
 
-        _warn_aliases(config, stacklevel=stacklevel + 1)
-        for key, val in _canonical_style(config).items():
+        for key, val in config.items():
             if key not in self.config:
                 warnings.warn(
                     f"Attribute {key!r} is not valid. Skipping attribute...",
@@ -361,9 +357,7 @@ class Config:
         # diffed against what register_theme fills missing keys from, so a
         # file loads back to exactly the style it was saved from
         attributes = {
-            key: val
-            for key, val in _canonical_style(style).items()
-            if val != DEFAULT_THEME.get(key)
+            key: val for key, val in style.items() if val != DEFAULT_THEME.get(key)
         }
         data = {
             "name": file_name,
@@ -435,7 +429,6 @@ class Config:
             The attribute value if present. Otherwise, `None`.
 
         """
-        attr = _STYLE_ALIASES.get(attr, attr)
         return self.config[attr] if attr in self.config else None
 
     def get(self, attr: str, default: Any = None) -> Any:
@@ -458,7 +451,7 @@ class Config:
             The attribute value if present. Otherwise, returns the `default` value.
 
         """
-        return self.config.get(_STYLE_ALIASES.get(attr, attr), default)
+        return self.config.get(attr, default)
 
     def __repr__(self):
         """Represents the configuration as a json string."""

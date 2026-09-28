@@ -533,7 +533,7 @@ class BarStyleAttrs(TypedDict):
 class ValueLabelStyleAttrs(TypedDict):
     """The typing for the value labels: the numbers a chart prints beside its
     marks when `show_values` is on. One style serves every chart that takes
-    `show_values`; the `plot_bar_value_*` style keys are aliases of these.
+    `show_values`.
 
     Attributes:
         plot_value_fontsize (Union[int, float, None]): The font size of the value labels.

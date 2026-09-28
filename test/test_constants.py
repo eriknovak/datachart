@@ -131,6 +131,7 @@ class TestNoneMeansUnset(unittest.TestCase):
             with self.subTest(old=old):
                 self.assertFalse(hasattr(owner, old))
 
+
 LINE = [{"x": 1, "y": 2}, {"x": 2, "y": 3}]
 BARS = [{"label": "a", "y": 1}, {"label": "b", "y": 2}]
 GROUPS = [{"label": "a", "value": v} for v in (1.0, 2.0, 3.0)]

@@ -1981,7 +1981,7 @@ def pyramid_values_xmax():
         data=[pyr_bands(PYR1), pyr_bands(PYR2)],
         show_values=True,
         value_format="%.0f",
-        style={"plot_bar_value_fontsize": 6},
+        style={"plot_value_fontsize": 6},
         xmax=2600,
         show_grid="x",
         figsize=(10, 8),

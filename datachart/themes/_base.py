@@ -5,8 +5,7 @@ overriding just the attributes that define its identity via `make_theme`.
 """
 
 import copy
-import warnings
-from typing import Dict, Optional
+from typing import Dict
 
 from ..typings import StyleAttrs
 from ..constants import (
@@ -22,55 +21,6 @@ from ..constants import (
     TRAIT,
     VIOLIN_INNER,
 )
-
-# renamed style keys, each kept for one release (ADRs 0033, 0071, 0072)
-STYLE_ALIASES = {
-    "plot_bar_value_fontsize": "plot_value_fontsize",
-    "plot_bar_value_color": "plot_value_color",
-    "plot_bar_value_padding": "plot_value_padding",
-    "plot_calendar_heatmap_week_start": "chart_default_calendar_heatmap_week_start",
-    "plot_ridgeline_overlap": "chart_default_ridgeline_overlap",
-    "chart_default_node_label_position": "chart_default_network_label_position",
-    "plot_xticks_label_rotate": "axes_xticks_label_rotate",
-    "plot_yticks_label_rotate": "axes_yticks_label_rotate",
-}
-
-
-def warn_aliases(
-    style: dict, stacklevel: int = 2, parameters: Optional[Dict[str, str]] = None
-) -> None:
-    """Warn with `DeprecationWarning` for each alias key in `style`.
-
-    `stacklevel` counts from the caller of this function, as in `warnings.warn`.
-    `parameters` maps a canonical key to the chart parameter that replaces it
-    in a chart's `style`, where the canonical key itself is ignored (ADR 0071).
-    """
-
-    parameters = parameters or {}
-    for alias, key in STYLE_ALIASES.items():
-        if alias in style:
-            use = f"`{parameters[key]}=`" if key in parameters else repr(key)
-            warnings.warn(
-                f"Style key {alias!r} is deprecated; use {use}.",
-                DeprecationWarning,
-                stacklevel=stacklevel + 1,
-            )
-
-
-def canonical_style(style: dict) -> dict:
-    """`style` with every alias key renamed.
-
-    An alias present in `style` wins over the canonical key: the alias was
-    written by hand, while the canonical key usually arrives by spreading a
-    predefined theme underneath it.
-    """
-
-    resolved = {k: v for k, v in style.items() if k not in STYLE_ALIASES}
-    for alias, key in STYLE_ALIASES.items():
-        if alias in style:
-            resolved[key] = style[alias]
-    return resolved
-
 
 BASE_THEME: StyleAttrs = {
     # general color style
@@ -580,15 +530,12 @@ def make_theme(overrides: StyleAttrs) -> StyleAttrs:
     return theme
 
 
-def complete_theme(theme: dict, stacklevel: int = 2) -> StyleAttrs:
+def complete_theme(theme: dict) -> StyleAttrs:
     """A complete theme from a partial one, filled from the default theme.
 
-    Alias keys warn and are renamed; an unknown key raises `ValueError`.
-    `stacklevel` counts from the caller of this function, as in `warnings.warn`.
+    An unknown key raises `ValueError`.
     """
 
-    warn_aliases(theme, stacklevel=stacklevel + 1)
-    theme = canonical_style(theme)
     unknown = set(theme) - set(BASE_THEME)
     if unknown:
         raise ValueError(f"Unknown theme attributes: {sorted(unknown)}")

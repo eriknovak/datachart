@@ -226,11 +226,6 @@ class TestTickLabelRotation(unittest.TestCase):
         figure = BarChart(data=BAR, xtickrotate=10)
         self.assertEqual(self.rotations(figure)[0], {10.0})
 
-    def test_old_key_warns_and_applies(self):
-        with self.assertWarns(DeprecationWarning):
-            config.update({"plot_xticks_label_rotate": 60})
-        self.assertEqual(self.rotations(BarChart(data=BAR))[0], {60.0})
-
 
 class TestHatchCycle(unittest.TestCase):
     def tearDown(self):
@@ -604,8 +599,8 @@ class TestDivergingColormapDefaults(unittest.TestCase):
         self.assertIsNone(config["plot_calendar_heatmap_cmap_diverging"])
 
 
-class TestThemeDefaultAliases(unittest.TestCase):
-    """The renamed theme-default keys still work for one release, with a warning."""
+class TestRetiredThemeDefaultKeys(unittest.TestCase):
+    """The pre-1.0 names of the theme-default keys are unknown keys."""
 
     RENAMED = {
         "plot_calendar_heatmap_week_start": "chart_default_calendar_heatmap_week_start",
@@ -626,78 +621,12 @@ class TestThemeDefaultAliases(unittest.TestCase):
         for theme in THEMES.values():
             self.assertFalse(set(self.RENAMED) & set(theme))
 
-    def test_write_warns_and_the_value_round_trips(self):
-        with self.assertWarns(DeprecationWarning) as caught:
-            config.update({"plot_ridgeline_overlap": 0.3})
-        self.assertIn("chart_default_ridgeline_overlap", str(caught.warning))
-        self.assertEqual(config.get("chart_default_ridgeline_overlap"), 0.3)
-        with warnings.catch_warnings():
-            warnings.simplefilter("error")
-            self.assertEqual(config.get("plot_ridgeline_overlap"), 0.3)
-            self.assertEqual(config["plot_ridgeline_overlap"], 0.3)
-
-    def test_old_key_in_a_chart_style_still_sets_the_default(self):
-        data = [{"label": "a", "value": float(v)} for v in range(10)]
-        with warnings.catch_warnings(record=True) as caught:
-            warnings.simplefilter("always")
-            figure = RidgelinePlot(data, style={"plot_ridgeline_overlap": 0.0})
-        self.assertEqual(
-            [str(w.message) for w in caught if w.category is DeprecationWarning],
-            ["Style key 'plot_ridgeline_overlap' is deprecated; use `overlap=`."],
-        )
-        self.assertEqual(caught[0].filename, __file__)
-        layer = figure._chart_metadata["panel"].groups[0].layers[0]
-        self.assertEqual(layer.overlap, 0.0)
-
-    def test_chart_style_alias_warning_names_the_parameter(self):
-        cases = [
-            (RidgelinePlot, RIDGE, "plot_ridgeline_overlap", 0.2, "overlap"),
-            (
-                CalendarHeatmap,
-                CALENDAR,
-                "plot_calendar_heatmap_week_start",
-                "sunday",
-                "week_start",
-            ),
-            (
-                NetworkChart,
-                NETWORK,
-                "chart_default_node_label_position",
-                "above",
-                "label_position",
-            ),
-        ]
-        for front, data, alias, value, parameter in cases:
-            with self.subTest(alias=alias):
-                with self.assertWarns(DeprecationWarning) as caught:
-                    front(data, style={alias: value})
-                self.assertEqual(
-                    str(caught.warning),
-                    f"Style key {alias!r} is deprecated; use `{parameter}=`.",
-                )
-                plt.close("all")
-
-    def test_other_chart_style_aliases_name_the_style_key(self):
-        with self.assertWarns(DeprecationWarning) as caught:
-            BarChart(BAR, style={"plot_bar_value_fontsize": 12})
-        self.assertIn("'plot_value_fontsize'", str(caught.warning))
-        plt.close("all")
-
-    def test_old_key_in_a_network_style_sets_the_label_position(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", DeprecationWarning)
-            figure = NetworkChart(
-                NETWORK, style={"chart_default_node_label_position": "above"}
-            )
-        layer = figure._chart_metadata["panel"].groups[0].layers[0]
-        self.assertEqual(layer.label_position, "above")
-        plt.close("all")
-
-    def test_every_alias_warns_naming_its_replacement(self):
+    def test_old_key_is_skipped_as_unknown(self):
         for alias, key in self.RENAMED.items():
             with self.subTest(alias=alias):
-                with self.assertWarnsRegex(DeprecationWarning, key):
+                with self.assertWarnsRegex(UserWarning, "not valid"):
                     config.update({alias: config.get(key)})
+                self.assertIsNone(config.get(alias))
 
 
 if __name__ == "__main__":

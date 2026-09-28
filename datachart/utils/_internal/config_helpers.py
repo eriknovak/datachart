@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 
 from ...config import config, Config
 from ...constants import ARROW_STYLE, COLORBAR_LOCATION, LEGEND_LOCATION, ORIENTATION
-from ...themes._base import canonical_style
 from .fonts import FACES, ensure_face, font_available
 
 # ================================================
@@ -332,8 +331,7 @@ def get_value_label_style(chart_style: dict) -> dict:
     """Get the value label style shared by every chart that prints values.
 
     Args:
-        chart_style: The chart style dictionary; `plot_bar_value_*` keys
-            resolve as aliases of the `plot_value_*` family.
+        chart_style: The chart style dictionary.
 
     Returns:
         The value label style setting: `fontsize`, `color`, `padding`, and
@@ -349,7 +347,7 @@ def get_value_label_style(chart_style: dict) -> dict:
         ("tab", "plot_value_tab"),
     ]
 
-    return create_config_dict(canonical_style(chart_style), config_attrs)
+    return create_config_dict(chart_style, config_attrs)
 
 
 # -------------------------------------

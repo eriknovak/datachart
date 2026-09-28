@@ -1468,7 +1468,7 @@ class RidgelineLayer(GroupLayer):
         validate_ridge_marks(self.fill, self.show_outline)
         self.ridge_style = get_ridgeline_style(self.style)
         self.overlap = validate_overlap(
-            theme_default("ridgelineplot", self.settings, "overlap", self.style)
+            theme_default("ridgelineplot", self.settings, "overlap")
         )
         self.show_values = False
         # subplots share one value range, set once every layer is built

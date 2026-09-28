@@ -618,7 +618,7 @@ class CalendarHeatmapLayer(HeatmapLayer):
 
     def _resolve_style(self):
         self.week_start = (
-            theme_default("calendarheatmap", self.settings, "week_start", self.style)
+            theme_default("calendarheatmap", self.settings, "week_start")
             or CALENDAR_WEEKDAY.DEFAULT
         )
         self.month_line_style = get_calendar_month_line_style(self.style)

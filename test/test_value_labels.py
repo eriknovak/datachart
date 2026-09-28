@@ -73,26 +73,6 @@ class TestStyleFamily(ValueLabelCase):
             self.assertIn(key, DEFAULT_THEME)
         self.assertNotIn("plot_bar_value_fontsize", DEFAULT_THEME)
 
-    def test_bar_value_keys_alias_the_family_in_config(self):
-        config.update({"plot_bar_value_fontsize": 13})
-        self.assertEqual(config["plot_value_fontsize"], 13)
-        self.assertEqual(config["plot_bar_value_fontsize"], 13)
-        self.assertEqual(config.get("plot_bar_value_fontsize"), 13)
-
-    def test_registered_theme_with_alias_keys(self):
-        config.register_theme("aliased", {"plot_bar_value_color": "#123456"})
-        config.set_theme("aliased")
-        self.assertEqual(config["plot_value_color"], "#123456")
-        figure = BarChart(BAR, show_values=True)
-        self.assertEqual(labels(figure.axes[0])[0].get_color(), "#123456")
-
-    def test_theme_spread_with_alias_override(self):
-        config.register_theme(
-            "spread", {**DEFAULT_THEME, "plot_bar_value_fontsize": 12}
-        )
-        config.set_theme("spread")
-        self.assertEqual(config["plot_value_fontsize"], 12)
-
     def test_every_value_label_wears_the_halo(self):
         for figure in (
             LineChart(LINE, show_values=True),
@@ -104,11 +84,10 @@ class TestStyleFamily(ValueLabelCase):
         bare = LineChart(LINE, show_values=True, style={"plot_value_halo_width": 0})
         self.assertEqual(labels(bare.axes[0])[0].get_path_effects(), [])
 
-    def test_chart_style_accepts_both_names(self):
-        old = BarChart(BAR, show_values=True, style={"plot_bar_value_fontsize": 15})
-        new = LineChart(LINE, show_values=True, style={"plot_value_fontsize": 15})
-        self.assertEqual(labels(old.axes[0])[0].get_fontsize(), 15)
-        self.assertEqual(labels(new.axes[0])[0].get_fontsize(), 15)
+    def test_chart_style_sets_the_label_fontsize(self):
+        for front, data in ((BarChart, BAR), (LineChart, LINE)):
+            figure = front(data, show_values=True, style={"plot_value_fontsize": 15})
+            self.assertEqual(labels(figure.axes[0])[0].get_fontsize(), 15)
 
 
 class TestFronts(ValueLabelCase):

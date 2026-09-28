@@ -145,20 +145,6 @@ class TestScopes(unittest.TestCase):
             config["font_general_size"], DEFAULT_THEME["font_general_size"]
         )
 
-    def test_override_alias_warning_points_at_the_caller(self):
-        with warnings.catch_warnings(record=True) as caught:
-            warnings.simplefilter("always")
-            with config.override(plot_bar_value_fontsize=12):
-                self.assertEqual(config["plot_value_fontsize"], 12)
-        deprecations = [w for w in caught if w.category is DeprecationWarning]
-        self.assertEqual(len(deprecations), 1)
-        self.assertEqual(deprecations[0].filename, __file__)
-
-    def test_update_alias_warning_points_at_the_caller(self):
-        with self.assertWarns(DeprecationWarning) as caught:
-            config.update({"plot_bar_value_fontsize": 12})
-        self.assertEqual(caught.filename, __file__)
-
     def test_override_restores_after_exception(self):
         before = copy.deepcopy(config.config)
         with self.assertRaises(RuntimeError):
@@ -307,17 +293,6 @@ class TestThemeFiles(unittest.TestCase):
         path.write_text(json.dumps({"font_general_size": 8}))
         with self.assertRaises(ValueError):
             config.load_theme(path)
-
-    def test_load_canonicalises_alias_keys(self):
-        path = self.dir / "alias.json"
-        path.write_text(
-            json.dumps(
-                {"format_version": 1, "attributes": {"plot_bar_value_fontsize": 3}}
-            )
-        )
-        config.set_theme(config.load_theme(path))
-        self.assertEqual(config["plot_value_fontsize"], 3)
-        self.assertNotIn("plot_bar_value_fontsize", config.config)
 
 
 if __name__ == "__main__":

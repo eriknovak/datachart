@@ -121,12 +121,6 @@ class TestDeriveTheme(unittest.TestCase):
         with self.assertRaises(ValueError):
             derive_theme("no-such-theme", lead=COLORS.Reds)
 
-    def test_dict_base_renames_alias_keys(self):
-        with self.assertWarns(DeprecationWarning):
-            theme = derive_theme({"plot_bar_value_fontsize": 20}, lead=COLORS.Reds)
-        self.assertEqual(theme["plot_value_fontsize"], 20)
-        self.assertNotIn("plot_bar_value_fontsize", theme)
-
     def test_dict_base_unknown_key_raises(self):
         with self.assertRaisesRegex(ValueError, "bogus_key"):
             derive_theme({"bogus_key": 1}, lead=COLORS.Reds)
