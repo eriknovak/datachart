@@ -19,6 +19,34 @@ from matplotlib.mlab import GaussianKDE
 from ..constants import BANDWIDTH
 from ._internal.validate import is_missing, validate_bandwidth, warn_renamed
 
+__all__ = [
+    "count",
+    "sum_values",
+    "mean",
+    "median",
+    "mode",
+    "stdev",
+    "variance",
+    "quantile",
+    "iqr",
+    "minimum",
+    "maximum",
+    "skewness",
+    "kurtosis",
+    "pearson",
+    "spearman",
+    "linear_fit",
+    "bootstrap_ci",
+    "histogram",
+    "rolling_mean",
+    "ewma",
+    "loess",
+    "kde1d",
+    "kde2d",
+    # deprecated, removed one release after `pearson` shipped
+    "correlation",
+]
+
 # ================================================
 # Missing values
 # ================================================
