@@ -1,9 +1,9 @@
 from datetime import datetime
 from typing import Union, List, Optional, Tuple
 
-import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render
+from ..utils._internal.figures import DatachartFigure
 from ..typings import (
     BumpStyleAttrs,
     EmphasisRuleAttrs,
@@ -126,7 +126,7 @@ def BumpChart(
     ] = None,
     x: Optional[Union[str, List[Optional[str]]]] = None,
     y: Optional[Union[str, List[Optional[str]]]] = None,
-) -> plt.Figure:
+) -> DatachartFigure:
     """Creates the bump chart.
 
     A bump chart shows rank over time: one line per series, rank 1 at the top,

@@ -1,8 +1,8 @@
 from typing import Union, List, Optional, Tuple
 
-import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render
+from ..utils._internal.figures import DatachartFigure
 from ..typings import BasemapDataAttrs, BasemapStyleAttrs
 from ..constants import (
     ASPECT_RATIO,
@@ -37,7 +37,7 @@ def BasemapChart(
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     style: Optional[BasemapStyleAttrs] = None,
     features: Optional[Union[BASEMAP_FEATURE, str, List[str]]] = None,
-) -> plt.Figure:
+) -> DatachartFigure:
     """Creates the basemap chart.
 
     A basemap chart draws the land under a geographic chart: coastlines, a

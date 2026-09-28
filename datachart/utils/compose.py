@@ -25,7 +25,13 @@ from matplotlib.gridspec import GridSpec
 
 from ..config import config
 from ..constants import ASPECT_RATIO, BAR_MODE, FIG_SIZE, AXIS_SCALE, SHOW_GRID
-from ..typings import EmphasisRuleAttrs, LegendSettingAttrs, TextSettingAttrs
+from ..typings import (
+    EmphasisRuleAttrs,
+    GridItemSettingAttrs,
+    LegendSettingAttrs,
+    PanelItemSettingAttrs,
+    TextSettingAttrs,
+)
 from .figure import (
     _grid_from_dicts,
     _figure_grid_layout_impl,
@@ -38,7 +44,7 @@ from ._internal.config_helpers import (
     get_text_style,
 )
 from ._internal.chart_kinds import CHART_KINDS, check_domains
-from ._internal.figures import new_figure
+from ._internal.figures import DatachartFigure, new_figure
 from ._internal.layers import (
     Panel as _PanelSeam,
     DumbbellLayer,
@@ -196,7 +202,7 @@ def _apply_emphasis_rule(groups: List[LayerGroup], rule) -> List[LayerGroup]:
 
 
 def Panel(
-    charts: List[Union[plt.Figure, Dict[str, Any]]],
+    charts: List[Union[plt.Figure, PanelItemSettingAttrs]],
     *,
     title: Optional[str] = None,
     xlabel: Optional[str] = None,
@@ -219,7 +225,7 @@ def Panel(
     bar_mode: Optional[Union[BAR_MODE, str]] = None,
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     emphasis_rule: Optional[EmphasisRuleAttrs] = None,
-) -> plt.Figure:
+) -> DatachartFigure:
     """Overlay rendered chart figures in one coordinate space.
 
     Combines different chart types (LineChart, BarChart, ScatterChart,
@@ -551,7 +557,7 @@ def Panel(
 def Annotate(
     figure: plt.Figure,
     texts: Union[TextSettingAttrs, List[TextSettingAttrs]],
-) -> plt.Figure:
+) -> DatachartFigure:
     """Add text annotations to an already rendered figure.
 
     Returns a new figure with the annotations riding the figure's chart
@@ -767,7 +773,7 @@ def _grid_from_rows(
 
 def Grid(
     charts: Union[
-        List[Union[plt.Figure, Dict[str, Any]]],
+        List[Union[plt.Figure, GridItemSettingAttrs]],
         List[List[Optional[plt.Figure]]],
     ],
     *,
@@ -788,7 +794,7 @@ def Grid(
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     scalex: Optional[Union[AXIS_SCALE, str]] = None,
     scaley: Optional[Union[AXIS_SCALE, str]] = None,
-) -> plt.Figure:
+) -> DatachartFigure:
     """Arrange rendered chart figures in a grid.
 
     Each figure's chart is redrawn into its grid cell. Nested rows define the

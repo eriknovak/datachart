@@ -1,8 +1,8 @@
 from typing import Union, List, Optional, Tuple
 
-import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render
+from ..utils._internal.figures import DatachartFigure
 from ..utils._internal.chart_builder import dict_datasets
 from ..utils._internal.validate import validate_sankey_links, validate_sankey_nodes
 from ..typings import SankeySingleChartAttrs, SankeyStyleAttrs, TextSettingAttrs
@@ -34,7 +34,7 @@ def SankeyChart(
             List[Union[TextSettingAttrs, List[TextSettingAttrs], None]],
         ]
     ] = None,
-) -> plt.Figure:
+) -> DatachartFigure:
     """Creates the Sankey chart.
 
     A Sankey diagram draws weighted flows between categories: nodes are bars

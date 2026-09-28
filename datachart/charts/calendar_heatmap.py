@@ -1,8 +1,8 @@
 from typing import Union, List, Optional, Tuple
 
-import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render
+from ..utils._internal.figures import DatachartFigure
 from ..typings import (
     CalendarHeatmapDataAttrs,
     CalendarHeatmapStyleAttrs,
@@ -56,7 +56,7 @@ def CalendarHeatmap(
         ]
     ] = None,
     show_colorbars: Optional[bool] = None,
-) -> plt.Figure:
+) -> DatachartFigure:
     """Creates the calendar heatmap.
 
     A calendar heatmap draws one cell per day, the weeks as columns and the

@@ -1,8 +1,8 @@
 from typing import Union, List, Optional, Tuple
 
-import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render
+from ..utils._internal.figures import DatachartFigure
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
@@ -80,7 +80,7 @@ def Heatmap(
     show_heatmap_values: Optional[bool] = None,
     valfmt: Optional[Union[VALUE_FORMAT, str, List[Optional[str]]]] = None,
     show_colorbars: Optional[bool] = None,
-) -> plt.Figure:
+) -> DatachartFigure:
     """Creates the heatmap.
 
     A heatmap maps every cell of a 2-D matrix to a color, so structure in a

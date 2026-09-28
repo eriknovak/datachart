@@ -1,9 +1,9 @@
 from datetime import datetime
 from typing import Union, List, Optional, Tuple
 
-import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render
+from ..utils._internal.figures import DatachartFigure
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
@@ -133,7 +133,7 @@ def StackedAreaChart(
     ] = None,
     x: Optional[Union[str, List[Optional[str]]]] = None,
     y: Optional[Union[str, List[Optional[str]]]] = None,
-) -> plt.Figure:
+) -> DatachartFigure:
     """Creates the stacked area chart.
 
     Stacked areas fill each series on top of the previous one along an ordered

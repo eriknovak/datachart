@@ -11,10 +11,17 @@ chart's reference page; the shared ones on the typings page.
 import os
 import warnings
 from datetime import date, datetime
+import sys
 from typing import TypedDict, Union, Tuple, List, Optional, Dict, Literal
+
+if sys.version_info >= (3, 11):
+    from typing import NotRequired
+else:
+    from typing_extensions import NotRequired
 
 import numpy as np
 import matplotlib.colors as colors
+from matplotlib.figure import Figure
 from PIL.Image import Image as PILImage
 from .constants import (
     ARROW_STYLE,
@@ -1382,10 +1389,10 @@ class VLineSettingAttrs(TypedDict):
     """
 
     x: Union[int, float]
-    ymin: Union[int, float, None]
-    ymax: Union[int, float, None]
-    style: Union[VLineStyleAttrs, None]
-    label: Union[str, None]
+    ymin: NotRequired[Union[int, float, None]]
+    ymax: NotRequired[Union[int, float, None]]
+    style: NotRequired[Union[VLineStyleAttrs, None]]
+    label: NotRequired[Union[str, None]]
 
 
 class HLineSettingAttrs(TypedDict):
@@ -1401,10 +1408,10 @@ class HLineSettingAttrs(TypedDict):
     """
 
     y: Union[int, float]
-    xmin: Union[int, float, None]
-    xmax: Union[int, float, None]
-    style: Union[HLineStyleAttrs, None]
-    label: Union[str, None]
+    xmin: NotRequired[Union[int, float, None]]
+    xmax: NotRequired[Union[int, float, None]]
+    style: NotRequired[Union[HLineStyleAttrs, None]]
+    label: NotRequired[Union[str, None]]
 
 
 class DLineSettingAttrs(TypedDict):
@@ -1424,12 +1431,12 @@ class DLineSettingAttrs(TypedDict):
 
     """
 
-    slope: Union[int, float, None]
-    intercept: Union[int, float, None]
-    xmin: Union[int, float, None]
-    xmax: Union[int, float, None]
-    style: Union[DLineStyleAttrs, None]
-    label: Union[str, None]
+    slope: NotRequired[Union[int, float, None]]
+    intercept: NotRequired[Union[int, float, None]]
+    xmin: NotRequired[Union[int, float, None]]
+    xmax: NotRequired[Union[int, float, None]]
+    style: NotRequired[Union[DLineStyleAttrs, None]]
+    label: NotRequired[Union[str, None]]
 
 
 # `from` is a keyword, so the bracket setting is declared functionally
@@ -1484,10 +1491,10 @@ class VSpanSettingAttrs(TypedDict):
 
     """
 
-    xmin: Union[int, float, None]
-    xmax: Union[int, float, None]
-    style: Union[VSpanStyleAttrs, None]
-    label: Union[str, None]
+    xmin: NotRequired[Union[int, float, None]]
+    xmax: NotRequired[Union[int, float, None]]
+    style: NotRequired[Union[VSpanStyleAttrs, None]]
+    label: NotRequired[Union[str, None]]
 
 
 class HSpanSettingAttrs(TypedDict):
@@ -1505,10 +1512,10 @@ class HSpanSettingAttrs(TypedDict):
 
     """
 
-    ymin: Union[int, float, None]
-    ymax: Union[int, float, None]
-    style: Union[HSpanStyleAttrs, None]
-    label: Union[str, None]
+    ymin: NotRequired[Union[int, float, None]]
+    ymax: NotRequired[Union[int, float, None]]
+    style: NotRequired[Union[HSpanStyleAttrs, None]]
+    label: NotRequired[Union[str, None]]
 
 
 # ================================================
@@ -1531,13 +1538,13 @@ class LegendSettingAttrs(TypedDict):
 
     """
 
-    title: Union[str, None]
-    location: Union[LEGEND_LOCATION, str, None]
-    ncols: Union[int, None]
-    alignment: Union[LEGEND_ALIGN, str, None]
+    title: NotRequired[Union[str, None]]
+    location: NotRequired[Union[LEGEND_LOCATION, str, None]]
+    ncols: NotRequired[Union[int, None]]
+    alignment: NotRequired[Union[LEGEND_ALIGN, str, None]]
 
 
-class EmphasisRuleAttrs(TypedDict):
+class EmphasisRuleAttrs(TypedDict, total=False):
     """The emphasis rule setting, passed to a chart front as `emphasis_rule`.
 
     Exactly one comparison key: a unit matching it is highlighted and every
@@ -1588,10 +1595,10 @@ class TextSettingAttrs(TypedDict):
     text: str
     x: Union[int, float]
     y: Union[int, float]
-    coords: Union[str, None]
-    target: Union[Tuple[Union[int, float], Union[int, float]], None]
-    style: Union[TextStyleAttrs, None]
-    subplot: Union[int, None]
+    coords: NotRequired[Union[str, None]]
+    target: NotRequired[Union[Tuple[Union[int, float], Union[int, float]], None]]
+    style: NotRequired[Union[TextStyleAttrs, None]]
+    subplot: NotRequired[Union[int, None]]
 
 
 # ================================================
@@ -1612,7 +1619,7 @@ class LineRecordAttrs(TypedDict):
     # the default attributes, could be anything
     x: Union[int, float]
     y: Union[int, float]
-    yerr: Optional[Union[int, float]]
+    yerr: NotRequired[Optional[Union[int, float]]]
 
 
 class _LineSingleChartAttrs(TypedDict):
@@ -1644,29 +1651,35 @@ class _LineSingleChartAttrs(TypedDict):
     """
 
     data: List[LineRecordAttrs]
-    subtitle: Union[str, None]
-    xlabel: Union[str, None]
-    ylabel: Union[str, None]
-    style: Union[LineStyleAttrs, None]
+    subtitle: NotRequired[Union[str, None]]
+    xlabel: NotRequired[Union[str, None]]
+    ylabel: NotRequired[Union[str, None]]
+    style: NotRequired[Union[LineStyleAttrs, None]]
 
-    xticks: Union[int, float, None]
-    xticklabels: Union[List[str], None]
-    xtickrotate: Union[int, None]
-    yticks: Union[int, float, None]
-    yticklabels: Union[List[str], None]
-    ytickrotate: Union[int, None]
+    xticks: NotRequired[Union[int, float, None]]
+    xticklabels: NotRequired[Union[List[str], None]]
+    xtickrotate: NotRequired[Union[int, None]]
+    yticks: NotRequired[Union[int, float, None]]
+    yticklabels: NotRequired[Union[List[str], None]]
+    ytickrotate: NotRequired[Union[int, None]]
 
-    vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
-    hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
-    dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
-    brackets: Union[BracketSettingAttrs, List[BracketSettingAttrs]]
-    vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
-    hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
-    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
+    vlines: NotRequired[Union[VLineSettingAttrs, List[VLineSettingAttrs]]]
+    hlines: NotRequired[Union[HLineSettingAttrs, List[HLineSettingAttrs]]]
+    dlines: NotRequired[Union[DLineSettingAttrs, List[DLineSettingAttrs]]]
+    brackets: NotRequired[Union[BracketSettingAttrs, List[BracketSettingAttrs]]]
+    vspans: NotRequired[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]]
+    hspans: NotRequired[Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]]
+    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
 
-    x: Union[str, None]  # the name of the x attribute in data (default: "x")
-    y: Union[str, None]  # the name of the y attribute in data (default: "y")
-    yerr: Union[str, None]  # the name of the yerr attribute in data (default: "yerr")
+    x: NotRequired[
+        Union[str, None]
+    ]  # the name of the x attribute in data (default: "x")
+    y: NotRequired[
+        Union[str, None]
+    ]  # the name of the y attribute in data (default: "y")
+    yerr: NotRequired[
+        Union[str, None]
+    ]  # the name of the yerr attribute in data (default: "yerr")
 
 
 # ================================================
@@ -1715,28 +1728,28 @@ class _StackedAreaSingleChartAttrs(TypedDict):
     """
 
     data: List[StackedAreaRecordAttrs]
-    subtitle: Union[str, None]
-    xlabel: Union[str, None]
-    ylabel: Union[str, None]
-    style: Union[StackedAreaStyleAttrs, None]
+    subtitle: NotRequired[Union[str, None]]
+    xlabel: NotRequired[Union[str, None]]
+    ylabel: NotRequired[Union[str, None]]
+    style: NotRequired[Union[StackedAreaStyleAttrs, None]]
 
-    xticks: Union[int, float, None]
-    xticklabels: Union[List[str], None]
-    xtickrotate: Union[int, None]
-    yticks: Union[int, float, None]
-    yticklabels: Union[List[str], None]
-    ytickrotate: Union[int, None]
+    xticks: NotRequired[Union[int, float, None]]
+    xticklabels: NotRequired[Union[List[str], None]]
+    xtickrotate: NotRequired[Union[int, None]]
+    yticks: NotRequired[Union[int, float, None]]
+    yticklabels: NotRequired[Union[List[str], None]]
+    ytickrotate: NotRequired[Union[int, None]]
 
-    vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
-    hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
-    dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
-    brackets: Union[BracketSettingAttrs, List[BracketSettingAttrs]]
-    vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
-    hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
-    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
+    vlines: NotRequired[Union[VLineSettingAttrs, List[VLineSettingAttrs]]]
+    hlines: NotRequired[Union[HLineSettingAttrs, List[HLineSettingAttrs]]]
+    dlines: NotRequired[Union[DLineSettingAttrs, List[DLineSettingAttrs]]]
+    brackets: NotRequired[Union[BracketSettingAttrs, List[BracketSettingAttrs]]]
+    vspans: NotRequired[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]]
+    hspans: NotRequired[Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]]
+    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
 
-    x: Union[str, None]
-    y: Union[str, None]
+    x: NotRequired[Union[str, None]]
+    y: NotRequired[Union[str, None]]
 
 
 # ================================================
@@ -1782,25 +1795,25 @@ class _BumpSingleChartAttrs(TypedDict):
     """
 
     data: List[BumpRecordAttrs]
-    subtitle: Union[str, None]
-    xlabel: Union[str, None]
-    ylabel: Union[str, None]
-    style: Union[BumpStyleAttrs, None]
+    subtitle: NotRequired[Union[str, None]]
+    xlabel: NotRequired[Union[str, None]]
+    ylabel: NotRequired[Union[str, None]]
+    style: NotRequired[Union[BumpStyleAttrs, None]]
 
-    xticks: Union[int, float, None]
-    xticklabels: Union[List[str], None]
-    xtickrotate: Union[int, None]
+    xticks: NotRequired[Union[int, float, None]]
+    xticklabels: NotRequired[Union[List[str], None]]
+    xtickrotate: NotRequired[Union[int, None]]
 
-    vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
-    hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
-    dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
-    brackets: Union[BracketSettingAttrs, List[BracketSettingAttrs]]
-    vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
-    hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
-    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
+    vlines: NotRequired[Union[VLineSettingAttrs, List[VLineSettingAttrs]]]
+    hlines: NotRequired[Union[HLineSettingAttrs, List[HLineSettingAttrs]]]
+    dlines: NotRequired[Union[DLineSettingAttrs, List[DLineSettingAttrs]]]
+    brackets: NotRequired[Union[BracketSettingAttrs, List[BracketSettingAttrs]]]
+    vspans: NotRequired[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]]
+    hspans: NotRequired[Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]]
+    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
 
-    x: Union[str, None]
-    y: Union[str, None]
+    x: NotRequired[Union[str, None]]
+    y: NotRequired[Union[str, None]]
 
 
 # ================================================
@@ -1835,9 +1848,9 @@ class SankeySingleChartAttrs(TypedDict):
     """
 
     links: List[SankeyLinkRecordAttrs]
-    subtitle: Union[str, None]
-    style: Union[SankeyStyleAttrs, None]
-    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
+    subtitle: NotRequired[Union[str, None]]
+    style: NotRequired[Union[SankeyStyleAttrs, None]]
+    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
 
 
 # ================================================
@@ -1857,9 +1870,9 @@ class TreemapRecordAttrs(TypedDict):
     """
 
     label: str
-    value: Union[int, float, None]
-    children: Union[List["TreemapRecordAttrs"], None]
-    emphasis: Union[EMPHASIS, str, None]
+    value: NotRequired[Union[int, float, None]]
+    children: NotRequired[Union[List["TreemapRecordAttrs"], None]]
+    emphasis: NotRequired[Union[EMPHASIS, str, None]]
 
 
 class TreemapSingleChartAttrs(TypedDict):
@@ -1874,9 +1887,9 @@ class TreemapSingleChartAttrs(TypedDict):
     """
 
     data: List[TreemapRecordAttrs]
-    subtitle: Union[str, None]
-    style: Union[TreemapStyleAttrs, None]
-    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
+    subtitle: NotRequired[Union[str, None]]
+    style: NotRequired[Union[TreemapStyleAttrs, None]]
+    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
 
 
 # ================================================
@@ -1899,12 +1912,12 @@ class NetworkNodeRecordAttrs(TypedDict):
     """
 
     id: str
-    label: Union[str, None]
-    size: Union[int, float, None]
-    group: Union[str, None]
-    emphasis: Union[EMPHASIS, str, None]
-    x: Union[float, None]
-    y: Union[float, None]
+    label: NotRequired[Union[str, None]]
+    size: NotRequired[Union[int, float, None]]
+    group: NotRequired[Union[str, None]]
+    emphasis: NotRequired[Union[EMPHASIS, str, None]]
+    x: NotRequired[Union[float, None]]
+    y: NotRequired[Union[float, None]]
 
 
 class NetworkEdgeRecordAttrs(TypedDict):
@@ -1919,7 +1932,7 @@ class NetworkEdgeRecordAttrs(TypedDict):
 
     source: str
     target: str
-    weight: Union[int, float, None]
+    weight: NotRequired[Union[int, float, None]]
 
 
 class NetworkSingleChartAttrs(TypedDict):
@@ -1934,11 +1947,11 @@ class NetworkSingleChartAttrs(TypedDict):
 
     """
 
-    nodes: Union[List[NetworkNodeRecordAttrs], None]
+    nodes: NotRequired[Union[List[NetworkNodeRecordAttrs], None]]
     edges: List[NetworkEdgeRecordAttrs]
-    subtitle: Union[str, None]
-    style: Union[NetworkStyleAttrs, None]
-    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
+    subtitle: NotRequired[Union[str, None]]
+    style: NotRequired[Union[NetworkStyleAttrs, None]]
+    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
 
 
 # ================================================
@@ -1961,8 +1974,8 @@ class BarRecordAttrs(TypedDict):
     # the default attributes, could be anything
     label: str
     y: Union[int, float]
-    yerr: Optional[Union[int, float]]
-    emphasis: Optional[Union[EMPHASIS, str]]
+    yerr: NotRequired[Optional[Union[int, float]]]
+    emphasis: NotRequired[Optional[Union[EMPHASIS, str]]]
 
 
 class _BarSingleChartAttrs(TypedDict):
@@ -1994,29 +2007,29 @@ class _BarSingleChartAttrs(TypedDict):
     """
 
     data: List[BarRecordAttrs]
-    subtitle: Union[str, None]
-    xlabel: Union[str, None]
-    ylabel: Union[str, None]
-    style: Union[BarStyleAttrs, None]
+    subtitle: NotRequired[Union[str, None]]
+    xlabel: NotRequired[Union[str, None]]
+    ylabel: NotRequired[Union[str, None]]
+    style: NotRequired[Union[BarStyleAttrs, None]]
 
-    xticks: Union[int, float, None]
-    xticklabels: Union[List[str], None]
-    xtickrotate: Union[int, None]
-    yticks: Union[int, float, None]
-    yticklabels: Union[List[str], None]
-    ytickrotate: Union[int, None]
+    xticks: NotRequired[Union[int, float, None]]
+    xticklabels: NotRequired[Union[List[str], None]]
+    xtickrotate: NotRequired[Union[int, None]]
+    yticks: NotRequired[Union[int, float, None]]
+    yticklabels: NotRequired[Union[List[str], None]]
+    ytickrotate: NotRequired[Union[int, None]]
 
-    vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
-    hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
-    dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
-    brackets: Union[BracketSettingAttrs, List[BracketSettingAttrs]]
-    vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
-    hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
-    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
+    vlines: NotRequired[Union[VLineSettingAttrs, List[VLineSettingAttrs]]]
+    hlines: NotRequired[Union[HLineSettingAttrs, List[HLineSettingAttrs]]]
+    dlines: NotRequired[Union[DLineSettingAttrs, List[DLineSettingAttrs]]]
+    brackets: NotRequired[Union[BracketSettingAttrs, List[BracketSettingAttrs]]]
+    vspans: NotRequired[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]]
+    hspans: NotRequired[Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]]
+    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
 
-    label: Union[str, None]  # the name of the label attribute in data
-    y: Union[str, None]  # the name of the y attribute in data
-    yerr: Union[str, None]  # the name of the yerr attribute in data
+    label: NotRequired[Union[str, None]]  # the name of the label attribute in data
+    y: NotRequired[Union[str, None]]  # the name of the y attribute in data
+    yerr: NotRequired[Union[str, None]]  # the name of the yerr attribute in data
 
 
 # ================================================
@@ -2063,27 +2076,27 @@ class _HistogramSingleChartAttrs(TypedDict):
     """
 
     data: List[HistRecordAttrs]
-    subtitle: Union[str, None]
-    xlabel: Union[str, None]
-    ylabel: Union[str, None]
-    style: Union[HistStyleAttrs, None]
+    subtitle: NotRequired[Union[str, None]]
+    xlabel: NotRequired[Union[str, None]]
+    ylabel: NotRequired[Union[str, None]]
+    style: NotRequired[Union[HistStyleAttrs, None]]
 
-    xticks: Union[int, float, None]
-    xticklabels: Union[List[str], None]
-    xtickrotate: Union[int, None]
-    yticks: Union[int, float, None]
-    yticklabels: Union[List[str], None]
-    ytickrotate: Union[int, None]
+    xticks: NotRequired[Union[int, float, None]]
+    xticklabels: NotRequired[Union[List[str], None]]
+    xtickrotate: NotRequired[Union[int, None]]
+    yticks: NotRequired[Union[int, float, None]]
+    yticklabels: NotRequired[Union[List[str], None]]
+    ytickrotate: NotRequired[Union[int, None]]
 
-    vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
-    hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
-    dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
-    brackets: Union[BracketSettingAttrs, List[BracketSettingAttrs]]
-    vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
-    hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
-    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
+    vlines: NotRequired[Union[VLineSettingAttrs, List[VLineSettingAttrs]]]
+    hlines: NotRequired[Union[HLineSettingAttrs, List[HLineSettingAttrs]]]
+    dlines: NotRequired[Union[DLineSettingAttrs, List[DLineSettingAttrs]]]
+    brackets: NotRequired[Union[BracketSettingAttrs, List[BracketSettingAttrs]]]
+    vspans: NotRequired[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]]
+    hspans: NotRequired[Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]]
+    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
 
-    x: Union[str, None]  # the name of the x attribute in data
+    x: NotRequired[Union[str, None]]  # the name of the x attribute in data
 
 
 # ================================================
@@ -2114,11 +2127,56 @@ class ColorbarSettingAttrs(TypedDict):
 
     """
 
-    label: Union[str, None]
-    location: Union[COLORBAR_LOCATION, str, None]
-    format: Union[VALUE_FORMAT, str, None]
-    ticks: Union[List[Union[int, float]], None]
-    orientation: Union[ORIENTATION, str, None]
+    label: NotRequired[Union[str, None]]
+    location: NotRequired[Union[COLORBAR_LOCATION, str, None]]
+    format: NotRequired[Union[VALUE_FORMAT, str, None]]
+    ticks: NotRequired[Union[List[Union[int, float]], None]]
+    orientation: NotRequired[Union[ORIENTATION, str, None]]
+
+
+class LayoutSpecSettingAttrs(TypedDict):
+    """The cell a figure occupies in a `Grid`, passed in a grid item as `layout_spec`.
+
+    Attributes:
+        row (int): The zero-based row of the cell's top-left corner.
+        col (int): The zero-based column of the cell's top-left corner.
+        rowspan (int): How many rows the cell spans.
+        colspan (int): How many columns the cell spans.
+
+    """
+
+    row: int
+    col: int
+    rowspan: int
+    colspan: int
+
+
+class PanelItemSettingAttrs(TypedDict):
+    """One figure of a `Panel` with its per-figure options, passed in `charts`.
+
+    Attributes:
+        figure (Figure): The rendered chart figure to overlay.
+        y_axis (Literal["left", "right"]): The value axis the figure draws on.
+            Defaults to automatic assignment.
+
+    """
+
+    figure: Figure
+    y_axis: NotRequired[Literal["left", "right", "auto"]]
+
+
+class GridItemSettingAttrs(TypedDict):
+    """One figure of a `Grid` with its placement, passed in a flat `charts` list.
+
+    Attributes:
+        figure (Figure): The rendered chart figure to place.
+        layout_spec (LayoutSpecSettingAttrs): The cell the figure occupies.
+            Defaults to the next free cell of the uniform grid.
+
+    """
+
+    figure: Figure
+    layout_spec: NotRequired[LayoutSpecSettingAttrs]
 
 
 class HeatmapDataAttrs(TypedDict):
@@ -2132,10 +2190,10 @@ class HeatmapDataAttrs(TypedDict):
 
     """
 
-    x: Union[List[Union[str, int, float]], None]
-    y: Union[List[Union[str, int, float]], None]
+    x: NotRequired[Union[List[Union[str, int, float]], None]]
+    y: NotRequired[Union[List[Union[str, int, float]], None]]
     z: List[List[Union[int, float, None]]]
-    emphasis: Union[List[List[Union[EMPHASIS, str, None]]], None]
+    emphasis: NotRequired[Union[List[List[Union[EMPHASIS, str, None]]], None]]
 
 
 class _HeatmapSingleChartAttrs(TypedDict):
@@ -2165,24 +2223,24 @@ class _HeatmapSingleChartAttrs(TypedDict):
     """
 
     data: HeatmapDataAttrs
-    subtitle: Union[str, None]
-    xlabel: Union[str, None]
-    ylabel: Union[str, None]
-    style: Union[HeatmapStyleAttrs, None]
+    subtitle: NotRequired[Union[str, None]]
+    xlabel: NotRequired[Union[str, None]]
+    ylabel: NotRequired[Union[str, None]]
+    style: NotRequired[Union[HeatmapStyleAttrs, None]]
 
-    norm: Union[str, None]
-    vmin: Union[float, None]
-    vmax: Union[float, None]
+    norm: NotRequired[Union[str, None]]
+    vmin: NotRequired[Union[float, None]]
+    vmax: NotRequired[Union[float, None]]
 
-    xticks: Union[int, float, None]
-    xticklabels: Union[List[str], None]
-    xtickrotate: Union[int, None]
-    yticks: Union[int, float, None]
-    yticklabels: Union[List[str], None]
-    ytickrotate: Union[int, None]
+    xticks: NotRequired[Union[int, float, None]]
+    xticklabels: NotRequired[Union[List[str], None]]
+    xtickrotate: NotRequired[Union[int, None]]
+    yticks: NotRequired[Union[int, float, None]]
+    yticklabels: NotRequired[Union[List[str], None]]
+    ytickrotate: NotRequired[Union[int, None]]
 
-    colorbar: Union[ColorbarSettingAttrs, None]
-    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
+    colorbar: NotRequired[Union[ColorbarSettingAttrs, None]]
+    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
 
 
 # ================================================
@@ -2221,15 +2279,15 @@ class _CalendarHeatmapSingleChartAttrs(TypedDict):
     """
 
     data: CalendarHeatmapDataAttrs
-    subtitle: Union[str, None]
-    style: Union[CalendarHeatmapStyleAttrs, None]
+    subtitle: NotRequired[Union[str, None]]
+    style: NotRequired[Union[CalendarHeatmapStyleAttrs, None]]
 
-    norm: Union[str, None]
-    vmin: Union[float, None]
-    vmax: Union[float, None]
+    norm: NotRequired[Union[str, None]]
+    vmin: NotRequired[Union[float, None]]
+    vmax: NotRequired[Union[float, None]]
 
-    colorbar: Union[ColorbarSettingAttrs, None]
-    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
+    colorbar: NotRequired[Union[ColorbarSettingAttrs, None]]
+    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
 
 
 # ================================================
@@ -2254,10 +2312,10 @@ class GanttTaskRecordAttrs(TypedDict):
     task: str
     start: Union[date, datetime]
     end: Union[date, datetime]
-    group: Optional[str]
-    progress: Optional[Union[int, float]]
-    depends_on: Optional[List[str]]
-    emphasis: Optional[Union[EMPHASIS, str]]
+    group: NotRequired[Optional[str]]
+    progress: NotRequired[Optional[Union[int, float]]]
+    depends_on: NotRequired[Optional[List[str]]]
+    emphasis: NotRequired[Optional[Union[EMPHASIS, str]]]
 
 
 class _GanttSingleChartAttrs(TypedDict):
@@ -2276,15 +2334,15 @@ class _GanttSingleChartAttrs(TypedDict):
     """
 
     data: List[GanttTaskRecordAttrs]
-    subtitle: Union[str, None]
-    style: Union[GanttStyleAttrs, None]
+    subtitle: NotRequired[Union[str, None]]
+    style: NotRequired[Union[GanttStyleAttrs, None]]
 
-    xtickrotate: Union[int, None]
-    ytickrotate: Union[int, None]
+    xtickrotate: NotRequired[Union[int, None]]
+    ytickrotate: NotRequired[Union[int, None]]
 
-    vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
-    vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
-    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
+    vlines: NotRequired[Union[VLineSettingAttrs, List[VLineSettingAttrs]]]
+    vspans: NotRequired[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]]
+    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
 
 
 # ================================================
@@ -2306,7 +2364,7 @@ class DumbbellRecordAttrs(TypedDict):
     label: str
     start: Union[int, float]
     end: Union[int, float]
-    emphasis: Optional[Union[EMPHASIS, str]]
+    emphasis: NotRequired[Optional[Union[EMPHASIS, str]]]
 
 
 class _DumbbellSingleChartAttrs(TypedDict):
@@ -2329,19 +2387,19 @@ class _DumbbellSingleChartAttrs(TypedDict):
     """
 
     data: List[DumbbellRecordAttrs]
-    subtitle: Union[str, None]
-    style: Union[DumbbellStyleAttrs, None]
+    subtitle: NotRequired[Union[str, None]]
+    style: NotRequired[Union[DumbbellStyleAttrs, None]]
 
-    xtickrotate: Union[int, None]
-    ytickrotate: Union[int, None]
+    xtickrotate: NotRequired[Union[int, None]]
+    ytickrotate: NotRequired[Union[int, None]]
 
-    vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
-    hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
-    dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
-    brackets: Union[BracketSettingAttrs, List[BracketSettingAttrs]]
-    vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
-    hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
-    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
+    vlines: NotRequired[Union[VLineSettingAttrs, List[VLineSettingAttrs]]]
+    hlines: NotRequired[Union[HLineSettingAttrs, List[HLineSettingAttrs]]]
+    dlines: NotRequired[Union[DLineSettingAttrs, List[DLineSettingAttrs]]]
+    brackets: NotRequired[Union[BracketSettingAttrs, List[BracketSettingAttrs]]]
+    vspans: NotRequired[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]]
+    hspans: NotRequired[Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]]
+    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
 
 
 # ================================================
@@ -2359,8 +2417,8 @@ class ContourDataAttrs(TypedDict):
 
     """
 
-    x: Union[List[Union[int, float]], None]
-    y: Union[List[Union[int, float]], None]
+    x: NotRequired[Union[List[Union[int, float]], None]]
+    y: NotRequired[Union[List[Union[int, float]], None]]
     z: List[List[Union[int, float]]]
 
 
@@ -2399,32 +2457,32 @@ class _ContourSingleChartAttrs(TypedDict):
     """
 
     data: ContourDataAttrs
-    subtitle: Union[str, None]
-    xlabel: Union[str, None]
-    ylabel: Union[str, None]
-    style: Union[ContourStyleAttrs, None]
+    subtitle: NotRequired[Union[str, None]]
+    xlabel: NotRequired[Union[str, None]]
+    ylabel: NotRequired[Union[str, None]]
+    style: NotRequired[Union[ContourStyleAttrs, None]]
 
-    norm: Union[str, None]
-    vmin: Union[float, None]
-    vmax: Union[float, None]
-    vcenter: Union[float, None]
-    value_format: Union[str, None]
+    norm: NotRequired[Union[str, None]]
+    vmin: NotRequired[Union[float, None]]
+    vmax: NotRequired[Union[float, None]]
+    vcenter: NotRequired[Union[float, None]]
+    value_format: NotRequired[Union[str, None]]
 
-    xticks: Union[int, float, None]
-    xticklabels: Union[List[str], None]
-    xtickrotate: Union[int, None]
-    yticks: Union[int, float, None]
-    yticklabels: Union[List[str], None]
-    ytickrotate: Union[int, None]
+    xticks: NotRequired[Union[int, float, None]]
+    xticklabels: NotRequired[Union[List[str], None]]
+    xtickrotate: NotRequired[Union[int, None]]
+    yticks: NotRequired[Union[int, float, None]]
+    yticklabels: NotRequired[Union[List[str], None]]
+    ytickrotate: NotRequired[Union[int, None]]
 
-    vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
-    hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
-    dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
-    brackets: Union[BracketSettingAttrs, List[BracketSettingAttrs]]
-    vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
-    hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
-    colorbar: Union[ColorbarSettingAttrs, None]
-    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
+    vlines: NotRequired[Union[VLineSettingAttrs, List[VLineSettingAttrs]]]
+    hlines: NotRequired[Union[HLineSettingAttrs, List[HLineSettingAttrs]]]
+    dlines: NotRequired[Union[DLineSettingAttrs, List[DLineSettingAttrs]]]
+    brackets: NotRequired[Union[BracketSettingAttrs, List[BracketSettingAttrs]]]
+    vspans: NotRequired[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]]
+    hspans: NotRequired[Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]]
+    colorbar: NotRequired[Union[ColorbarSettingAttrs, None]]
+    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
 
 
 # ================================================
@@ -2444,7 +2502,7 @@ class HexbinDataAttrs(TypedDict):
 
     x: List[Union[int, float]]
     y: List[Union[int, float]]
-    c: Union[List[Union[int, float]], None]
+    c: NotRequired[Union[List[Union[int, float]], None]]
 
 
 class _HexbinSingleChartAttrs(TypedDict):
@@ -2485,35 +2543,35 @@ class _HexbinSingleChartAttrs(TypedDict):
     """
 
     data: HexbinDataAttrs
-    subtitle: Union[str, None]
-    xlabel: Union[str, None]
-    ylabel: Union[str, None]
-    style: Union[HexbinStyleAttrs, None]
+    subtitle: NotRequired[Union[str, None]]
+    xlabel: NotRequired[Union[str, None]]
+    ylabel: NotRequired[Union[str, None]]
+    style: NotRequired[Union[HexbinStyleAttrs, None]]
 
-    grid_size: Union[int, None]
-    reduce: Union[HEXBIN_REDUCE, str, None]
-    min_count: Union[int, None]
-    norm: Union[str, None]
-    vmin: Union[float, None]
-    vmax: Union[float, None]
-    vcenter: Union[float, None]
-    value_format: Union[str, None]
+    grid_size: NotRequired[Union[int, None]]
+    reduce: NotRequired[Union[HEXBIN_REDUCE, str, None]]
+    min_count: NotRequired[Union[int, None]]
+    norm: NotRequired[Union[str, None]]
+    vmin: NotRequired[Union[float, None]]
+    vmax: NotRequired[Union[float, None]]
+    vcenter: NotRequired[Union[float, None]]
+    value_format: NotRequired[Union[str, None]]
 
-    xticks: Union[int, float, None]
-    xticklabels: Union[List[str], None]
-    xtickrotate: Union[int, None]
-    yticks: Union[int, float, None]
-    yticklabels: Union[List[str], None]
-    ytickrotate: Union[int, None]
+    xticks: NotRequired[Union[int, float, None]]
+    xticklabels: NotRequired[Union[List[str], None]]
+    xtickrotate: NotRequired[Union[int, None]]
+    yticks: NotRequired[Union[int, float, None]]
+    yticklabels: NotRequired[Union[List[str], None]]
+    ytickrotate: NotRequired[Union[int, None]]
 
-    vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
-    hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
-    dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
-    brackets: Union[BracketSettingAttrs, List[BracketSettingAttrs]]
-    vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
-    hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
-    colorbar: Union[ColorbarSettingAttrs, None]
-    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
+    vlines: NotRequired[Union[VLineSettingAttrs, List[VLineSettingAttrs]]]
+    hlines: NotRequired[Union[HLineSettingAttrs, List[HLineSettingAttrs]]]
+    dlines: NotRequired[Union[DLineSettingAttrs, List[DLineSettingAttrs]]]
+    brackets: NotRequired[Union[BracketSettingAttrs, List[BracketSettingAttrs]]]
+    vspans: NotRequired[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]]
+    hspans: NotRequired[Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]]
+    colorbar: NotRequired[Union[ColorbarSettingAttrs, None]]
+    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
 
 
 # ================================================
@@ -2551,7 +2609,7 @@ class BasemapDataAttrs(TypedDict):
 
     lon: List[float]
     lat: List[float]
-    feature: Optional[Union[BASEMAP_FEATURE, str]]
+    feature: NotRequired[Optional[Union[BASEMAP_FEATURE, str]]]
 
 
 # ================================================
@@ -2581,12 +2639,12 @@ class ScatterRecordAttrs(TypedDict):
 
     x: Union[int, float]
     y: Union[int, float]
-    size: Optional[Union[int, float]]
-    hue: Optional[str]
-    annotation: Optional[str]
-    emphasis: Optional[Union[EMPHASIS, str]]
-    xerr: Optional[Union[float, Tuple[float, float]]]
-    yerr: Optional[Union[float, Tuple[float, float]]]
+    size: NotRequired[Optional[Union[int, float]]]
+    hue: NotRequired[Optional[str]]
+    annotation: NotRequired[Optional[str]]
+    emphasis: NotRequired[Optional[Union[EMPHASIS, str]]]
+    xerr: NotRequired[Optional[Union[float, Tuple[float, float]]]]
+    yerr: NotRequired[Optional[Union[float, Tuple[float, float]]]]
 
 
 class _ScatterSingleChartAttrs(TypedDict):
@@ -2622,33 +2680,33 @@ class _ScatterSingleChartAttrs(TypedDict):
     """
 
     data: List[ScatterRecordAttrs]
-    subtitle: Union[str, None]
-    xlabel: Union[str, None]
-    ylabel: Union[str, None]
-    style: Union[ScatterStyleAttrs, None]
+    subtitle: NotRequired[Union[str, None]]
+    xlabel: NotRequired[Union[str, None]]
+    ylabel: NotRequired[Union[str, None]]
+    style: NotRequired[Union[ScatterStyleAttrs, None]]
 
-    xticks: Union[int, float, None]
-    xticklabels: Union[List[str], None]
-    xtickrotate: Union[int, None]
-    yticks: Union[int, float, None]
-    yticklabels: Union[List[str], None]
-    ytickrotate: Union[int, None]
+    xticks: NotRequired[Union[int, float, None]]
+    xticklabels: NotRequired[Union[List[str], None]]
+    xtickrotate: NotRequired[Union[int, None]]
+    yticks: NotRequired[Union[int, float, None]]
+    yticklabels: NotRequired[Union[List[str], None]]
+    ytickrotate: NotRequired[Union[int, None]]
 
-    vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
-    hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
-    dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
-    brackets: Union[BracketSettingAttrs, List[BracketSettingAttrs]]
-    vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
-    hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
-    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
+    vlines: NotRequired[Union[VLineSettingAttrs, List[VLineSettingAttrs]]]
+    hlines: NotRequired[Union[HLineSettingAttrs, List[HLineSettingAttrs]]]
+    dlines: NotRequired[Union[DLineSettingAttrs, List[DLineSettingAttrs]]]
+    brackets: NotRequired[Union[BracketSettingAttrs, List[BracketSettingAttrs]]]
+    vspans: NotRequired[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]]
+    hspans: NotRequired[Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]]
+    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
 
-    x: Union[str, None]
-    y: Union[str, None]
-    size: Union[str, None]
-    hue: Union[str, None]
-    annotation: Union[str, None]
-    xerr: Union[str, None]
-    yerr: Union[str, None]
+    x: NotRequired[Union[str, None]]
+    y: NotRequired[Union[str, None]]
+    size: NotRequired[Union[str, None]]
+    hue: NotRequired[Union[str, None]]
+    annotation: NotRequired[Union[str, None]]
+    xerr: NotRequired[Union[str, None]]
+    yerr: NotRequired[Union[str, None]]
 
 
 # ================================================
@@ -2697,28 +2755,28 @@ class _BoxSingleChartAttrs(TypedDict):
     """
 
     data: List[BoxRecordAttrs]
-    subtitle: Union[str, None]
-    xlabel: Union[str, None]
-    ylabel: Union[str, None]
-    style: Union[BoxStyleAttrs, None]
+    subtitle: NotRequired[Union[str, None]]
+    xlabel: NotRequired[Union[str, None]]
+    ylabel: NotRequired[Union[str, None]]
+    style: NotRequired[Union[BoxStyleAttrs, None]]
 
-    xticks: Union[int, float, None]
-    xticklabels: Union[List[str], None]
-    xtickrotate: Union[int, None]
-    yticks: Union[int, float, None]
-    yticklabels: Union[List[str], None]
-    ytickrotate: Union[int, None]
+    xticks: NotRequired[Union[int, float, None]]
+    xticklabels: NotRequired[Union[List[str], None]]
+    xtickrotate: NotRequired[Union[int, None]]
+    yticks: NotRequired[Union[int, float, None]]
+    yticklabels: NotRequired[Union[List[str], None]]
+    ytickrotate: NotRequired[Union[int, None]]
 
-    vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
-    hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
-    dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
-    brackets: Union[BracketSettingAttrs, List[BracketSettingAttrs]]
-    vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
-    hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
-    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
+    vlines: NotRequired[Union[VLineSettingAttrs, List[VLineSettingAttrs]]]
+    hlines: NotRequired[Union[HLineSettingAttrs, List[HLineSettingAttrs]]]
+    dlines: NotRequired[Union[DLineSettingAttrs, List[DLineSettingAttrs]]]
+    brackets: NotRequired[Union[BracketSettingAttrs, List[BracketSettingAttrs]]]
+    vspans: NotRequired[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]]
+    hspans: NotRequired[Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]]
+    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
 
-    label: Union[str, None]  # the name of the label attribute in data
-    value: Union[str, None]  # the name of the value attribute in data
+    label: NotRequired[Union[str, None]]  # the name of the label attribute in data
+    value: NotRequired[Union[str, None]]  # the name of the value attribute in data
 
 
 # ================================================
@@ -2740,7 +2798,7 @@ class SwarmRecordAttrs(TypedDict):
 
     label: str
     value: Union[int, float]
-    emphasis: Optional[Union[EMPHASIS, str]]
+    emphasis: NotRequired[Optional[Union[EMPHASIS, str]]]
 
 
 class _SwarmSingleChartAttrs(TypedDict):
@@ -2771,28 +2829,28 @@ class _SwarmSingleChartAttrs(TypedDict):
     """
 
     data: List[SwarmRecordAttrs]
-    subtitle: Union[str, None]
-    xlabel: Union[str, None]
-    ylabel: Union[str, None]
-    style: Union[SwarmStyleAttrs, None]
+    subtitle: NotRequired[Union[str, None]]
+    xlabel: NotRequired[Union[str, None]]
+    ylabel: NotRequired[Union[str, None]]
+    style: NotRequired[Union[SwarmStyleAttrs, None]]
 
-    xticks: Union[int, float, None]
-    xticklabels: Union[List[str], None]
-    xtickrotate: Union[int, None]
-    yticks: Union[int, float, None]
-    yticklabels: Union[List[str], None]
-    ytickrotate: Union[int, None]
+    xticks: NotRequired[Union[int, float, None]]
+    xticklabels: NotRequired[Union[List[str], None]]
+    xtickrotate: NotRequired[Union[int, None]]
+    yticks: NotRequired[Union[int, float, None]]
+    yticklabels: NotRequired[Union[List[str], None]]
+    ytickrotate: NotRequired[Union[int, None]]
 
-    vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
-    hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
-    dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
-    brackets: Union[BracketSettingAttrs, List[BracketSettingAttrs]]
-    vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
-    hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
-    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
+    vlines: NotRequired[Union[VLineSettingAttrs, List[VLineSettingAttrs]]]
+    hlines: NotRequired[Union[HLineSettingAttrs, List[HLineSettingAttrs]]]
+    dlines: NotRequired[Union[DLineSettingAttrs, List[DLineSettingAttrs]]]
+    brackets: NotRequired[Union[BracketSettingAttrs, List[BracketSettingAttrs]]]
+    vspans: NotRequired[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]]
+    hspans: NotRequired[Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]]
+    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
 
-    label: Union[str, None]  # the name of the label attribute in data
-    value: Union[str, None]  # the name of the value attribute in data
+    label: NotRequired[Union[str, None]]  # the name of the label attribute in data
+    value: NotRequired[Union[str, None]]  # the name of the value attribute in data
 
 
 # Violin Plot Attributes
@@ -2840,28 +2898,28 @@ class _ViolinSingleChartAttrs(TypedDict):
     """
 
     data: List[ViolinRecordAttrs]
-    subtitle: Union[str, None]
-    xlabel: Union[str, None]
-    ylabel: Union[str, None]
-    style: Union[ViolinStyleAttrs, None]
+    subtitle: NotRequired[Union[str, None]]
+    xlabel: NotRequired[Union[str, None]]
+    ylabel: NotRequired[Union[str, None]]
+    style: NotRequired[Union[ViolinStyleAttrs, None]]
 
-    xticks: Union[int, float, None]
-    xticklabels: Union[List[str], None]
-    xtickrotate: Union[int, None]
-    yticks: Union[int, float, None]
-    yticklabels: Union[List[str], None]
-    ytickrotate: Union[int, None]
+    xticks: NotRequired[Union[int, float, None]]
+    xticklabels: NotRequired[Union[List[str], None]]
+    xtickrotate: NotRequired[Union[int, None]]
+    yticks: NotRequired[Union[int, float, None]]
+    yticklabels: NotRequired[Union[List[str], None]]
+    ytickrotate: NotRequired[Union[int, None]]
 
-    vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
-    hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
-    dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
-    brackets: Union[BracketSettingAttrs, List[BracketSettingAttrs]]
-    vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
-    hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
-    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
+    vlines: NotRequired[Union[VLineSettingAttrs, List[VLineSettingAttrs]]]
+    hlines: NotRequired[Union[HLineSettingAttrs, List[HLineSettingAttrs]]]
+    dlines: NotRequired[Union[DLineSettingAttrs, List[DLineSettingAttrs]]]
+    brackets: NotRequired[Union[BracketSettingAttrs, List[BracketSettingAttrs]]]
+    vspans: NotRequired[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]]
+    hspans: NotRequired[Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]]
+    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
 
-    label: Union[str, None]  # the name of the label attribute in data
-    value: Union[str, None]  # the name of the value attribute in data
+    label: NotRequired[Union[str, None]]  # the name of the label attribute in data
+    value: NotRequired[Union[str, None]]  # the name of the value attribute in data
 
 
 # ================================================
@@ -2910,28 +2968,28 @@ class _RidgelineSingleChartAttrs(TypedDict):
     """
 
     data: List[RidgelineRecordAttrs]
-    subtitle: Union[str, None]
-    xlabel: Union[str, None]
-    ylabel: Union[str, None]
-    style: Union[RidgelineStyleAttrs, None]
+    subtitle: NotRequired[Union[str, None]]
+    xlabel: NotRequired[Union[str, None]]
+    ylabel: NotRequired[Union[str, None]]
+    style: NotRequired[Union[RidgelineStyleAttrs, None]]
 
-    xticks: Union[int, float, None]
-    xticklabels: Union[List[str], None]
-    xtickrotate: Union[int, None]
-    yticks: Union[int, float, None]
-    yticklabels: Union[List[str], None]
-    ytickrotate: Union[int, None]
+    xticks: NotRequired[Union[int, float, None]]
+    xticklabels: NotRequired[Union[List[str], None]]
+    xtickrotate: NotRequired[Union[int, None]]
+    yticks: NotRequired[Union[int, float, None]]
+    yticklabels: NotRequired[Union[List[str], None]]
+    ytickrotate: NotRequired[Union[int, None]]
 
-    vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
-    hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
-    dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
-    brackets: Union[BracketSettingAttrs, List[BracketSettingAttrs]]
-    vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
-    hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
-    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
+    vlines: NotRequired[Union[VLineSettingAttrs, List[VLineSettingAttrs]]]
+    hlines: NotRequired[Union[HLineSettingAttrs, List[HLineSettingAttrs]]]
+    dlines: NotRequired[Union[DLineSettingAttrs, List[DLineSettingAttrs]]]
+    brackets: NotRequired[Union[BracketSettingAttrs, List[BracketSettingAttrs]]]
+    vspans: NotRequired[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]]
+    hspans: NotRequired[Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]]
+    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
 
-    label: Union[str, None]  # the name of the label attribute in data
-    value: Union[str, None]  # the name of the value attribute in data
+    label: NotRequired[Union[str, None]]  # the name of the label attribute in data
+    value: NotRequired[Union[str, None]]  # the name of the value attribute in data
 
 
 # ================================================
@@ -2980,28 +3038,28 @@ class _RaincloudSingleChartAttrs(TypedDict):
     """
 
     data: List[RaincloudRecordAttrs]
-    subtitle: Union[str, None]
-    xlabel: Union[str, None]
-    ylabel: Union[str, None]
-    style: Union[RaincloudStyleAttrs, None]
+    subtitle: NotRequired[Union[str, None]]
+    xlabel: NotRequired[Union[str, None]]
+    ylabel: NotRequired[Union[str, None]]
+    style: NotRequired[Union[RaincloudStyleAttrs, None]]
 
-    xticks: Union[int, float, None]
-    xticklabels: Union[List[str], None]
-    xtickrotate: Union[int, None]
-    yticks: Union[int, float, None]
-    yticklabels: Union[List[str], None]
-    ytickrotate: Union[int, None]
+    xticks: NotRequired[Union[int, float, None]]
+    xticklabels: NotRequired[Union[List[str], None]]
+    xtickrotate: NotRequired[Union[int, None]]
+    yticks: NotRequired[Union[int, float, None]]
+    yticklabels: NotRequired[Union[List[str], None]]
+    ytickrotate: NotRequired[Union[int, None]]
 
-    vlines: Union[VLineSettingAttrs, List[VLineSettingAttrs]]
-    hlines: Union[HLineSettingAttrs, List[HLineSettingAttrs]]
-    dlines: Union[DLineSettingAttrs, List[DLineSettingAttrs]]
-    brackets: Union[BracketSettingAttrs, List[BracketSettingAttrs]]
-    vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
-    hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
-    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
+    vlines: NotRequired[Union[VLineSettingAttrs, List[VLineSettingAttrs]]]
+    hlines: NotRequired[Union[HLineSettingAttrs, List[HLineSettingAttrs]]]
+    dlines: NotRequired[Union[DLineSettingAttrs, List[DLineSettingAttrs]]]
+    brackets: NotRequired[Union[BracketSettingAttrs, List[BracketSettingAttrs]]]
+    vspans: NotRequired[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]]
+    hspans: NotRequired[Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]]
+    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
 
-    label: Union[str, None]  # the name of the label attribute in data
-    value: Union[str, None]  # the name of the value attribute in data
+    label: NotRequired[Union[str, None]]  # the name of the label attribute in data
+    value: NotRequired[Union[str, None]]  # the name of the value attribute in data
 
 
 # ================================================
@@ -3020,7 +3078,7 @@ class ParallelCoordsRecordAttrs(TypedDict):
 
     """
 
-    hue: Optional[str]
+    hue: NotRequired[Optional[str]]
 
 
 class _ParallelCoordsSingleChartAttrs(TypedDict):
@@ -3040,14 +3098,14 @@ class _ParallelCoordsSingleChartAttrs(TypedDict):
     """
 
     data: List[ParallelCoordsRecordAttrs]
-    subtitle: Union[str, None]
-    xlabel: Union[str, None]
-    ylabel: Union[str, None]
-    style: Union[ParallelCoordsStyleAttrs, None]
-    dimensions: Union[List[str], None]
-    hue: Union[str, None]
-    category_orders: Union[Dict[str, List[str]], None]
-    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
+    subtitle: NotRequired[Union[str, None]]
+    xlabel: NotRequired[Union[str, None]]
+    ylabel: NotRequired[Union[str, None]]
+    style: NotRequired[Union[ParallelCoordsStyleAttrs, None]]
+    dimensions: NotRequired[Union[List[str], None]]
+    hue: NotRequired[Union[str, None]]
+    category_orders: NotRequired[Union[Dict[str, List[str]], None]]
+    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
 
 
 # ================================================
@@ -3068,7 +3126,7 @@ class ScatterMatrixRecordAttrs(TypedDict):
 
     """
 
-    hue: Optional[str]
+    hue: NotRequired[Optional[str]]
 
 
 # ================================================
@@ -3096,8 +3154,8 @@ class RadialRecordAttrs(TypedDict):
 
     label: str
     y: Union[int, float]
-    yerr: Optional[Union[int, float]]
-    x: Optional[Union[int, float]]
+    yerr: NotRequired[Optional[Union[int, float]]]
+    x: NotRequired[Optional[Union[int, float]]]
 
 
 class _RadialSingleChartAttrs(TypedDict):
@@ -3118,16 +3176,18 @@ class _RadialSingleChartAttrs(TypedDict):
     """
 
     data: List[RadialRecordAttrs]
-    subtitle: Union[str, None]
-    style: Union[LineStyleAttrs, BarStyleAttrs, HistStyleAttrs, ScatterStyleAttrs, None]
-    texts: Union[TextSettingAttrs, List[TextSettingAttrs]]
-    vspans: Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]
-    hspans: Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]
+    subtitle: NotRequired[Union[str, None]]
+    style: NotRequired[
+        Union[LineStyleAttrs, BarStyleAttrs, HistStyleAttrs, ScatterStyleAttrs, None]
+    ]
+    texts: NotRequired[Union[TextSettingAttrs, List[TextSettingAttrs]]]
+    vspans: NotRequired[Union[VSpanSettingAttrs, List[VSpanSettingAttrs]]]
+    hspans: NotRequired[Union[HSpanSettingAttrs, List[HSpanSettingAttrs]]]
 
-    label: Union[str, None]
-    x: Union[str, None]
-    y: Union[str, None]
-    yerr: Union[str, None]
+    label: NotRequired[Union[str, None]]
+    x: NotRequired[Union[str, None]]
+    y: NotRequired[Union[str, None]]
+    yerr: NotRequired[Union[str, None]]
 
 
 # ================================================

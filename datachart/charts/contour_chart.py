@@ -1,9 +1,9 @@
 from datetime import datetime
 from typing import Union, List, Optional, Tuple
 
-import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render
+from ..utils._internal.figures import DatachartFigure
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
@@ -139,7 +139,7 @@ def ContourChart(
     valfmt: Optional[Union[VALUE_FORMAT, str, List[Optional[str]]]] = None,
     filled: Optional[bool] = None,
     show_colorbars: Optional[bool] = None,
-) -> plt.Figure:
+) -> DatachartFigure:
     """Creates the contour chart.
 
     A contour chart draws a surface sampled on a grid — a loss landscape, a

@@ -1,8 +1,8 @@
 from typing import Union, List, Optional, Tuple
 
-import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render
+from ..utils._internal.figures import DatachartFigure
 from ..utils._internal.validate import validate_bandwidth, validate_ridgeline_inner
 from ..typings import (
     EmphasisRuleAttrs,
@@ -135,7 +135,7 @@ def RidgelinePlot(
     show_outline: Optional[bool] = None,
     sort: Optional[Union[SORT, str]] = SORT.NONE,
     normalize: Optional[Union[RIDGELINE_SCALE, str]] = None,
-) -> plt.Figure:
+) -> DatachartFigure:
     """Creates the ridgeline plot.
 
     A ridgeline plot (joy plot) draws the kernel density estimate of each

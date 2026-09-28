@@ -1,8 +1,8 @@
 from typing import Union, List, Optional, Tuple
 
-import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render
+from ..utils._internal.figures import DatachartFigure
 from ..utils._internal.validate import validate_bandwidth
 from ..typings import (
     EmphasisRuleAttrs,
@@ -130,7 +130,7 @@ def ViolinPlot(
     inner: Optional[Union[VIOLIN_INNER, str]] = None,
     bandwidth: Optional[Union[BANDWIDTH, str, float]] = None,
     split: Optional[str] = None,
-) -> plt.Figure:
+) -> DatachartFigure:
     """Creates the violin plot.
 
     A violin plot draws the kernel density estimate of each group's numeric

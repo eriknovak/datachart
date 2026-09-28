@@ -1,8 +1,8 @@
 from typing import Union, List, Optional, Tuple
 
-import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render
+from ..utils._internal.figures import DatachartFigure
 from ..typings import ImageDataAttrs, ImageStyleAttrs
 from ..constants import ASPECT_RATIO, FIG_SIZE, DRAW_POSITION, SHOW_GRID
 
@@ -33,7 +33,7 @@ def ImageChart(
     sharex: Optional[bool] = None,
     sharey: Optional[bool] = None,
     style: Optional[Union[ImageStyleAttrs, List[Optional[ImageStyleAttrs]]]] = None,
-) -> plt.Figure:
+) -> DatachartFigure:
     """Creates the image chart.
 
     An image chart places a picture in data coordinates: its pixels stretch

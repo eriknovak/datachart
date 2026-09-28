@@ -38,6 +38,9 @@ jobs:
           key: datachart-cache-${{ hashFiles('datachart/utils/_internal/cache.py', 'datachart/utils/_internal/basemap.py', 'datachart/utils/_internal/fonts.py') }}-fonts-110m-50m
       - run: uv run python datachart/utils/_internal/prewarm.py fonts 110m 50m
       - run: uv run python -m unittest discover test
+      # the public annotations stay usable by an installed copy (ADR 0087)
+      - if: matrix.python-version == '3.12'
+        run: uv run pyright test/typecheck/usage.py
 
   # early warning on the private matplotlib touchpoint; never blocks (ADR 0085)
   matplotlib-pre:

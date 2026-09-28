@@ -31,6 +31,7 @@ dependencies = [
     "numpy>=1.24",
     "matplotlib>=3.8",
     "scipy>=1.10",
+    "typing-extensions; python_version < '3.11'",
     "pypalettes>=0.1",
 ]
 
@@ -47,7 +48,7 @@ Changelog = "https://github.com/eriknovak/datachart/blob/main/CHANGELOG.md"
 
 # PEP 735 groups: contributor tooling, never shipped to users.
 [dependency-groups]
-test = ["coverage", "nbmake", "pytest", "datachart[interactive]"]
+test = ["coverage", "nbmake", "pyright", "pytest", "datachart[interactive]"]
 docs = [
     "mike",
     "mkdocs-material",
@@ -65,6 +66,7 @@ include = ["datachart*"]
 
 [tool.setuptools.package-data]
 datachart = [
+    "py.typed",
     "charts/_basemap/NATURAL_EARTH.txt",
     "utils/_internal/FONTS.txt",
 ]

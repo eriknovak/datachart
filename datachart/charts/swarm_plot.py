@@ -1,8 +1,8 @@
 from typing import Union, List, Optional, Tuple
 
-import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render
+from ..utils._internal.figures import DatachartFigure
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
@@ -126,7 +126,7 @@ def SwarmPlot(
     label: Optional[Union[str, List[Optional[str]]]] = None,
     value: Optional[Union[str, List[Optional[str]]]] = None,
     mode: Optional[Union[SWARM_MODE, str]] = None,
-) -> plt.Figure:
+) -> DatachartFigure:
     """Creates the swarm plot.
 
     A swarm plot draws every observation as a point at its group's category

@@ -78,6 +78,8 @@ The dictionaries a chart takes beside its data: reference lines and bands, text 
 | write a note on the chart                   | `texts`               | [`TextSettingAttrs`](#datachart.typings.TextSettingAttrs) |
 | title, place, or lay out the legend         | `legend`              | [`LegendSettingAttrs`](#datachart.typings.LegendSettingAttrs) |
 | highlight the series or marks matching a rule | `emphasis_rule`     | [`EmphasisRuleAttrs`](#datachart.typings.EmphasisRuleAttrs) |
+| pick the value axis of a figure in a `Panel` | `charts` item       | [`PanelItemSettingAttrs`](#datachart.typings.PanelItemSettingAttrs) |
+| place a figure in a `Grid` cell              | `charts` item, `layout_spec` | [`GridItemSettingAttrs`](#datachart.typings.GridItemSettingAttrs), [`LayoutSpecSettingAttrs`](#datachart.typings.LayoutSpecSettingAttrs) |
 | place or format the colorbar                | `colorbar`            | [`ColorbarSettingAttrs`](#datachart.typings.ColorbarSettingAttrs) |
 
 ::: datachart.typings.VLineSettingAttrs
@@ -117,6 +119,18 @@ The dictionaries a chart takes beside its data: reference lines and bands, text 
         heading_level: 3
 
 ::: datachart.typings.ColorbarSettingAttrs
+    options:
+        heading_level: 3
+
+::: datachart.typings.PanelItemSettingAttrs
+    options:
+        heading_level: 3
+
+::: datachart.typings.GridItemSettingAttrs
+    options:
+        heading_level: 3
+
+::: datachart.typings.LayoutSpecSettingAttrs
     options:
         heading_level: 3
 

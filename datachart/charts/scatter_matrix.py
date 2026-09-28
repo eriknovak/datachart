@@ -2,7 +2,6 @@ import numbers
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
-import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 
 from ..config import config
@@ -14,6 +13,7 @@ from ..utils.figure import (
 )
 from ..utils.stats import pearson
 from ..utils._internal.chart_builder import build_charts_structure
+from ..utils._internal.figures import DatachartFigure
 from ..utils._internal.colors import create_color_cycle
 from ..utils._internal.config_helpers import get_scatter_matrix_style
 from ..utils._internal.figures import new_figure
@@ -261,7 +261,7 @@ def ScatterMatrix(
     legend: Optional[LegendSettingAttrs] = None,
     show_grid: Optional[Union[SHOW_GRID, str, bool]] = None,
     style: Optional[StyleAttrs] = None,
-) -> plt.Figure:
+) -> DatachartFigure:
     """Creates a scatter matrix.
 
     Every pair of numeric dimensions gets a scatter chart, and each

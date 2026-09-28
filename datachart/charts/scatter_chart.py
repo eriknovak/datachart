@@ -1,9 +1,9 @@
 from datetime import datetime
 from typing import Union, List, Optional, Tuple
 
-import matplotlib.pyplot as plt
 
 from ..utils._internal.plot_engine import render
+from ..utils._internal.figures import DatachartFigure
 from ..utils._internal.validate import validate_annotation
 from ..typings import (
     EmphasisRuleAttrs,
@@ -140,7 +140,7 @@ def ScatterChart(
     yerr: Optional[Union[str, List[Optional[str]]]] = None,
     size_range: Optional[Tuple[float, float]] = None,
     label: Optional[Union[str, List[Optional[str]]]] = None,
-) -> plt.Figure:
+) -> DatachartFigure:
     """Creates a scatter chart.
 
     Each point is one observation placed by two numeric variables, optionally
