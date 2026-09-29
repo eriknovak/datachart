@@ -84,7 +84,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#datachart-0102-2026-09-18" class="md-skip">
+        <a href="#datachart-100-2026-09-29" class="md-skip">
           Skip to content
         </a>
       
@@ -4095,6 +4095,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#datachart-100-2026-09-29" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        datachart-1.0.0 (2026-09-29)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#datachart-0102-2026-09-18" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4423,6 +4434,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#datachart-100-2026-09-29" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        datachart-1.0.0 (2026-09-29)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#datachart-0102-2026-09-18" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4683,6 +4705,50 @@
 
   <h1>Changelog</h1>
 
+<h3 id="datachart-100-2026-09-29">datachart-1.0.0 (2026-09-29)</h3>
+<p><strong>Breaking Changes</strong></p>
+<ul>
+<li>Removed every remaining pre-1.0 deprecation shim and alias; starting at 1.0.0 datachart follows SemVer for its programmatic API (not visual output), with future removals going through a one-release deprecation cycle (see <code>docs/versioning.md</code>)</li>
+<li>Renamed shared front parameters: <code>show_heatmap_values</code>→<code>show_values</code>, <code>valfmt</code>→<code>value_format</code>, <code>normalize</code>→<code>ridge_scale</code> (RidgelinePlot), <code>features</code>→<code>data</code> (BasemapChart), <code>type</code>→<code>mark</code> (RadialChart), <code>startangle</code>→<code>start_angle</code>, <code>innerradius</code>→<code>inner_radius</code>, <code>filled</code>→<code>fill</code>, <code>mode</code>→<code>swarm_mode</code>, <code>mincnt</code>→<code>min_count</code>, <code>gridsize</code>→<code>grid_size</code> (HexbinChart; <code>kde1d</code>/<code>kde2d</code>'s own <code>gridsize</code> is also now <code>grid_size</code>), <code>show_colorbars</code>→<code>show_colorbar</code></li>
+<li><code>ScatterChart</code>'s per-point <code>label</code> parameter and <code>"label"</code> record key are renamed to <code>annotation</code></li>
+<li>Renamed constants: <code>SCALE</code>→<code>AXIS_SCALE</code>, <code>NORMALIZE</code>→<code>COLOR_NORM</code>, <code>LINE_MARKER.NONE</code>→<code>NO_MARKER</code>, <code>LINE_STYLE.NONE</code>→<code>NO_LINE</code>, <code>SCATTER_MATRIX_DIAGONAL.NONE</code>→<code>BLANK</code>; every constant now validates itself once at the front, and an unrecognised <code>bar_mode</code> raises <code>ValueError</code> instead of silently falling back to <code>"group"</code></li>
+<li>Renamed theme default keys to one naming rule: <code>plot_calendar_heatmap_week_start</code>→<code>chart_default_calendar_heatmap_week_start</code>, <code>plot_ridgeline_overlap</code>→<code>chart_default_ridgeline_overlap</code>, plus a renamed node-label-position key; tick-label rotation keys are unified to <code>axes_x/yticks_label_rotate</code></li>
+<li>Typing renames: record types now end in <code>RecordAttrs</code> (<code>LineRecordAttrs</code>, <code>GanttTaskRecordAttrs</code>, ...); removed 19 unused <code>*SingleChartAttrs</code>; added <code>OverlayStyleAttrs</code></li>
+<li><code>stats.correlation</code> is renamed to <code>stats.pearson</code>; <code>kde1d</code>/<code>kde2d</code> return named columns; <code>Config.update</code>/<code>Config.reset</code> replace <code>update_config</code>/<code>reset_config</code>; <code>save_figure(fmt=...)</code> replaces <code>format=</code></li>
+<li>Every record front now reads its data through the builder's canonical keys; <code>GanttChart</code> and <code>DumbbellChart</code> gain named keys (<code>task</code>/<code>start</code>/<code>end</code>/<code>group</code>/<code>progress</code>/<code>depends_on</code>, <code>label</code>/<code>start</code>/<code>end</code>) in place of positional dict shapes</li>
+<li><code>Panel.show_legend</code> now defaults to <code>None</code> (was <code>False</code>); <code>Panel</code> gains <code>emphasis_rule</code>; <code>Grid</code> gains <code>show_legend</code>, <code>legend</code>, <code>show_grid</code>, <code>xmin</code>/<code>xmax</code>, <code>ymin</code>/<code>ymax</code>, and <code>aspect_ratio</code></li>
+<li>Bump-chart end labels print in the text colour instead of the series colour, matching the new <code>show_labels</code>/<code>label_position</code> on <code>LineChart</code>/<code>StackedAreaChart</code>; the <code>BUMP_LABEL_POSITION</code> alias is gone in favour of <code>LINE_LABEL_POSITION</code></li>
+<li>No predefined theme titles its legend by default (<code>plot_legend_title</code> is <code>None</code> on the base theme); <code>MUTED</code>, <code>MUTEDHATCH</code>, <code>HATCH</code>, and <code>SLATEHATCH</code> draw the base theme's solid grid</li>
+<li>Greyscale, hatch, ink, sketch, material, and minimal themes are re-stepped to pass a colour-blindness scoring gate (<code>score_palette</code>), changing some of their colours; <code>register_theme</code>/<code>derive_theme</code> warn when a custom palette fails it</li>
+<li>Malformed record/column data now raises one <code>ValueError</code> naming the front, the expected shape, and the offending index, instead of drawing garbage or crashing inside matplotlib/numpy</li>
+<li><code>None</code>, <code>NaN</code>, and <code>inf</code> values are now uniformly dropped rather than raising or drawing garbage, across <code>utils.stats</code> and the bar/histogram/scatter/group/contour layers</li>
+<li>Added validation at previously-silent entry points: <code>bandwidth</code>, <code>Panel</code>/<code>Grid</code> dict keys, legend location, <code>RadialChart</code>'s required keys, and <code>stats.histogram</code> NaN input</li>
+<li><code>__all__</code> now defines each module's public surface, hiding internal helpers previously visible on <code>constants</code>, <code>typings</code>, <code>config</code>, <code>utils.stats</code>, <code>utils.compose</code>, and <code>utils.figure</code></li>
+<li>Theme faces (fonts) and the basemap outlines download and cache on first use instead of shipping in the wheel; a smaller install now needs network access the first time those features are used</li>
+</ul>
+<p><strong>New Features</strong></p>
+<ul>
+<li>Added <code>BasemapChart</code>: coastlines, land, borders, lakes, rivers, roads, and country highlighting (<code>highlight=</code>) from Natural Earth, downloaded and cached rather than bundled; added the <code>GEOGRAPHIC</code> aspect ratio</li>
+<li>Added <code>ImageChart</code> for pictures anchored to a data extent</li>
+<li>Added pairwise comparison <code>brackets</code>, a fourth reference-mark family alongside <code>vlines</code>/<code>hlines</code>/<code>vspans</code></li>
+<li>Added diagonal reference lines (<code>dlines</code>), a third reference-line family defaulting to the parity line <code>y = x</code></li>
+<li>Added a centred/diverging heatmap norm (<code>norm="centered"</code>/<code>"twoslope"</code>, <code>vcenter</code>) with a diverging colormap on every theme</li>
+<li>Added scatter point error bars (<code>xerr</code>/<code>yerr</code>, symmetric or <code>[low, high]</code>), reported in interactive hover</li>
+<li>Added end labels (<code>show_labels</code>, <code>label_position</code>) on <code>LineChart</code> and <code>StackedAreaChart</code></li>
+<li>Added the <code>DARK</code>, <code>MUTEDHATCH</code>, and <code>SLATEHATCH</code> themes, and <code>derive_theme</code> to build a theme variant from a colormap, the basis the six bundled themes are now built from</li>
+<li>Shipped <code>py.typed</code>; every front returns the public <code>DatachartFigure</code> type; <code>PanelItem</code>/<code>GridItem</code>/<code>LayoutSpec</code> are typed composition settings</li>
+<li>Documentation: a Use Cases section (seven pages walking a real dataset end to end per field), and a stated versioning/deprecation policy with a new CONTRIBUTING.md</li>
+</ul>
+<p><strong>Bug Fixes</strong></p>
+<ul>
+<li>Raised dependency floors (matplotlib, numpy, scipy, pypalettes, typing-extensions) to versions the code actually needs, and test them in CI at <code>--resolution lowest-direct</code></li>
+<li>Removed the package's private-matplotlib touchpoints bar one, which is guarded by an import-time signature check with a graceful, warned fallback</li>
+<li>Bars, radial marks, and stacks are placed against one shared category index per panel, so series with mismatched label sets or order no longer misplace bars or crash</li>
+<li>Bars, histograms, and areas on twin axes stack per value axis instead of pooling heights across axes</li>
+<li>Fixed six silently-wrong renders: bars/labels drawn at the true value on a log axis, flat mark lists (<code>vlines</code>/<code>hlines</code>/etc.) applying to every chart instead of scattering across datasets, pypalettes' padded repeats no longer duplicating colors, <code>hue="label"</code> no longer force-annotating every scatter point, honest placement of one-value/missing parallel-coordinate cells, and Panel tick formats mapping to the correct axis role</li>
+<li>Previously-crashing valid inputs now render or raise a clear <code>ValueError</code>: NaN in groups/histograms/scatter fits, degenerate spread in violin/ridge/KDE, single-dataset per-chart settings, empty dict data, and <code>CalendarHeatmap</code>'s flat record lists</li>
+<li><code>create_color_cycle</code> warns once when series, hue levels, groups, or nodes outrun the palette size, instead of silently repeating colors</li>
+</ul>
 <h3 id="datachart-0102-2026-09-18">datachart-0.10.2 (2026-09-18)</h3>
 <p><strong>Breaking Changes</strong></p>
 <ul>

@@ -28462,7 +28462,7 @@ Creating a chart never displays it and never accumulates global state; call `sho
 #### show
 
 ```
-show(warn=True, interactive=False)
+show(warn: bool = True, interactive: bool = False)
 ```
 
 Display the figure.
@@ -28471,10 +28471,10 @@ Showing is the only way a figure appears: in notebooks the figure is displayed i
 
 With `interactive=True` the figure becomes zoomable and pannable and hovering a mark shows its data: in notebooks the figure is displayed on an `ipympl` widget canvas with the matplotlib toolbar, in scripts the GUI window's toolbar already provides zoom and pan. Hovering a mark of any chart type annotates it with the series' legend label and one `name: value` line per field of the mark: its axis coordinates, named after the axis labels when set, or the summary an aggregate mark stands for — a box its quartiles, a histogram bin its range and count, a sankey link its endpoints and flow. The annotation wears the theme's text annotation style. The optional dependencies come with the `interactive` extra: `pip install "datachart[interactive]"`.
 
-| PARAMETER     | DESCRIPTION                                                                                        |
-| ------------- | -------------------------------------------------------------------------------------------------- |
-| `warn`        | If True, warn when the backend cannot open a window. **DEFAULT:** `True`                           |
-| `interactive` | If True, display the figure with zoom, pan, and hover-to-inspect annotations. **DEFAULT:** `False` |
+| PARAMETER     | DESCRIPTION                                                                                                         |
+| ------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `warn`        | If True, warn when the backend cannot open a window. **TYPE:** `bool` **DEFAULT:** `True`                           |
+| `interactive` | If True, display the figure with zoom, pan, and hover-to-inspect annotations. **TYPE:** `bool` **DEFAULT:** `False` |
 
 | RAISES        | DESCRIPTION                                                       |
 | ------------- | ----------------------------------------------------------------- |
