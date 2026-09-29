@@ -200,7 +200,7 @@ class DatachartFigure(Figure):
                 fit(renderer)
         super().draw(renderer)
 
-    def show(self, warn=True, interactive=False):
+    def show(self, warn: bool = True, interactive: bool = False):
         """Display the figure.
 
         Showing is the only way a figure appears: in notebooks the figure is

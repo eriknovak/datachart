@@ -1,3 +1,48 @@
+### datachart-1.0.0 (2026-09-29)
+
+**Breaking Changes**
+
+- Removed every remaining pre-1.0 deprecation shim and alias; starting at 1.0.0 datachart follows SemVer for its programmatic API (not visual output), with future removals going through a one-release deprecation cycle (see `docs/versioning.md`)
+- Renamed shared front parameters: `show_heatmap_values`→`show_values`, `valfmt`→`value_format`, `normalize`→`ridge_scale` (RidgelinePlot), `features`→`data` (BasemapChart), `type`→`mark` (RadialChart), `startangle`→`start_angle`, `innerradius`→`inner_radius`, `filled`→`fill`, `mode`→`swarm_mode`, `mincnt`→`min_count`, `gridsize`→`grid_size` (HexbinChart; `kde1d`/`kde2d`'s own `gridsize` is also now `grid_size`), `show_colorbars`→`show_colorbar`
+- `ScatterChart`'s per-point `label` parameter and `"label"` record key are renamed to `annotation`
+- Renamed constants: `SCALE`→`AXIS_SCALE`, `NORMALIZE`→`COLOR_NORM`, `LINE_MARKER.NONE`→`NO_MARKER`, `LINE_STYLE.NONE`→`NO_LINE`, `SCATTER_MATRIX_DIAGONAL.NONE`→`BLANK`; every constant now validates itself once at the front, and an unrecognised `bar_mode` raises `ValueError` instead of silently falling back to `"group"`
+- Renamed theme default keys to one naming rule: `plot_calendar_heatmap_week_start`→`chart_default_calendar_heatmap_week_start`, `plot_ridgeline_overlap`→`chart_default_ridgeline_overlap`, plus a renamed node-label-position key; tick-label rotation keys are unified to `axes_x/yticks_label_rotate`
+- Typing renames: record types now end in `RecordAttrs` (`LineRecordAttrs`, `GanttTaskRecordAttrs`, ...); removed 19 unused `*SingleChartAttrs`; added `OverlayStyleAttrs`
+- `stats.correlation` is renamed to `stats.pearson`; `kde1d`/`kde2d` return named columns; `Config.update`/`Config.reset` replace `update_config`/`reset_config`; `save_figure(fmt=...)` replaces `format=`
+- Every record front now reads its data through the builder's canonical keys; `GanttChart` and `DumbbellChart` gain named keys (`task`/`start`/`end`/`group`/`progress`/`depends_on`, `label`/`start`/`end`) in place of positional dict shapes
+- `Panel.show_legend` now defaults to `None` (was `False`); `Panel` gains `emphasis_rule`; `Grid` gains `show_legend`, `legend`, `show_grid`, `xmin`/`xmax`, `ymin`/`ymax`, and `aspect_ratio`
+- Bump-chart end labels print in the text colour instead of the series colour, matching the new `show_labels`/`label_position` on `LineChart`/`StackedAreaChart`; the `BUMP_LABEL_POSITION` alias is gone in favour of `LINE_LABEL_POSITION`
+- No predefined theme titles its legend by default (`plot_legend_title` is `None` on the base theme); `MUTED`, `MUTEDHATCH`, `HATCH`, and `SLATEHATCH` draw the base theme's solid grid
+- Greyscale, hatch, ink, sketch, material, and minimal themes are re-stepped to pass a colour-blindness scoring gate (`score_palette`), changing some of their colours; `register_theme`/`derive_theme` warn when a custom palette fails it
+- Malformed record/column data now raises one `ValueError` naming the front, the expected shape, and the offending index, instead of drawing garbage or crashing inside matplotlib/numpy
+- `None`, `NaN`, and `inf` values are now uniformly dropped rather than raising or drawing garbage, across `utils.stats` and the bar/histogram/scatter/group/contour layers
+- Added validation at previously-silent entry points: `bandwidth`, `Panel`/`Grid` dict keys, legend location, `RadialChart`'s required keys, and `stats.histogram` NaN input
+- `__all__` now defines each module's public surface, hiding internal helpers previously visible on `constants`, `typings`, `config`, `utils.stats`, `utils.compose`, and `utils.figure`
+- Theme faces (fonts) and the basemap outlines download and cache on first use instead of shipping in the wheel; a smaller install now needs network access the first time those features are used
+
+**New Features**
+
+- Added `BasemapChart`: coastlines, land, borders, lakes, rivers, roads, and country highlighting (`highlight=`) from Natural Earth, downloaded and cached rather than bundled; added the `GEOGRAPHIC` aspect ratio
+- Added `ImageChart` for pictures anchored to a data extent
+- Added pairwise comparison `brackets`, a fourth reference-mark family alongside `vlines`/`hlines`/`vspans`
+- Added diagonal reference lines (`dlines`), a third reference-line family defaulting to the parity line `y = x`
+- Added a centred/diverging heatmap norm (`norm="centered"`/`"twoslope"`, `vcenter`) with a diverging colormap on every theme
+- Added scatter point error bars (`xerr`/`yerr`, symmetric or `[low, high]`), reported in interactive hover
+- Added end labels (`show_labels`, `label_position`) on `LineChart` and `StackedAreaChart`
+- Added the `DARK`, `MUTEDHATCH`, and `SLATEHATCH` themes, and `derive_theme` to build a theme variant from a colormap, the basis the six bundled themes are now built from
+- Shipped `py.typed`; every front returns the public `DatachartFigure` type; `PanelItem`/`GridItem`/`LayoutSpec` are typed composition settings
+- Documentation: a Use Cases section (seven pages walking a real dataset end to end per field), and a stated versioning/deprecation policy with a new CONTRIBUTING.md
+
+**Bug Fixes**
+
+- Raised dependency floors (matplotlib, numpy, scipy, pypalettes, typing-extensions) to versions the code actually needs, and test them in CI at `--resolution lowest-direct`
+- Removed the package's private-matplotlib touchpoints bar one, which is guarded by an import-time signature check with a graceful, warned fallback
+- Bars, radial marks, and stacks are placed against one shared category index per panel, so series with mismatched label sets or order no longer misplace bars or crash
+- Bars, histograms, and areas on twin axes stack per value axis instead of pooling heights across axes
+- Fixed six silently-wrong renders: bars/labels drawn at the true value on a log axis, flat mark lists (`vlines`/`hlines`/etc.) applying to every chart instead of scattering across datasets, pypalettes' padded repeats no longer duplicating colors, `hue="label"` no longer force-annotating every scatter point, honest placement of one-value/missing parallel-coordinate cells, and Panel tick formats mapping to the correct axis role
+- Previously-crashing valid inputs now render or raise a clear `ValueError`: NaN in groups/histograms/scatter fits, degenerate spread in violin/ridge/KDE, single-dataset per-chart settings, empty dict data, and `CalendarHeatmap`'s flat record lists
+- `create_color_cycle` warns once when series, hue levels, groups, or nodes outrun the palette size, instead of silently repeating colors
+
 ### datachart-0.10.2 (2026-09-18)
 
 **Breaking Changes**

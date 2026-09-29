@@ -761,7 +761,7 @@ def scatter_labels():
         for i in range(15)
     ]
     return ScatterChart(
-        data=data, label="name", show_regression=True, show_correlation=True
+        data=data, annotation="name", show_regression=True, show_correlation=True
     )
 
 
