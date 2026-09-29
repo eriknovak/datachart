@@ -1,0 +1,167 @@
+/* style modifications for jupyter-wrapper */
+
+.jp-Notebook {
+    padding: 0px !important;
+}
+
+.jupyter-wrapper .jp-Collapser,
+.jupyter-wrapper .jp-CodeCell .jp-Cell-inputWrapper .jp-InputPrompt,
+.jupyter-wrapper .jp-Notebook .jp-Cell:not(.jp-mod-active) .jp-OutputPrompt,
+.jupyter-wrapper .jp-OutputArea-prompt:empty {
+    display: none !important;
+}
+
+.jupyter-wrapper .highlight {
+    font-size: smaller;
+}
+
+/* restore Material's negative margin that mkdocs-jupyter resets, so
+   tables in notebooks align flush with the text like on .md pages */
+.jupyter-wrapper .md-typeset__scrollwrap {
+    margin: 0 -0.8rem !important;
+}
+
+/* tables span the content width; Material's wrapper and table are
+   inline-blocks that shrink to the content, which leaves narrow tables
+   with row borders that stop short of the table border */
+.md-typeset .md-typeset__table {
+    display: block;
+}
+
+.md-typeset table:not([class]) {
+    display: table;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.jupyter-wrapper .jp-InputArea-editor {
+    border: 0px !important;
+}
+
+.jupyter-wrapper .zeroclipboard-container {
+    top: .5em !important;
+    right: .5em !important;
+    cursor: pointer;
+}
+
+.jupyter-wrapper .highlight-ipynb {
+    background-color: var(--md-code-bg-color) !important;
+    padding: .7720588235em 1.1764705882em !important;
+}
+
+.jupyter-wrapper .jp-Cell {
+    padding: var(--jp-cell-padding) 0px !important;
+}
+
+[data-md-color-scheme=slate] .highlight pre {
+    background-color: var(--md-code-bg-color) !important;
+}
+
+/* card galleries on the guide indexes: three cards per row, two on a tablet,
+   one on a phone; the image sits below the description */
+.md-typeset .grid.cards.card-gallery {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.md-typeset .grid.cards.card-gallery.two-up {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media screen and (max-width: 44.984375em) {
+    .md-typeset .grid.cards.card-gallery {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media screen and (max-width: 29.984375em) {
+    .md-typeset .grid.cards.card-gallery {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+.md-typeset .grid.cards.card-gallery > ul > li {
+    display: flex;
+    flex-direction: column;
+    font-size: .7rem;
+}
+
+.md-typeset .grid.cards.card-gallery > ul > li > p:first-child {
+    margin-bottom: 0;
+    font-size: .8rem;
+    font-weight: 700;
+}
+
+.md-typeset .grid.cards.card-gallery > ul > li > p:nth-child(2) {
+    margin-top: .2em;
+}
+
+.md-typeset .grid.cards.card-gallery > ul > li > p:last-child {
+    margin-top: auto;
+}
+
+.md-typeset .grid.cards.card-gallery .card-icon {
+    margin-top: auto;
+    font-size: 2.4rem;
+    line-height: 1;
+    text-align: center;
+    color: var(--md-default-fg-color--lighter);
+}
+
+.md-typeset .grid.cards.card-gallery img {
+    display: block;
+    width: 100%;
+    border-radius: .1rem;
+}
+
+/* composition chips on the gallery cards: a check for a supported utility,
+   a cross for one the chart cannot take part in */
+.md-typeset .chip {
+    display: inline-block;
+    padding: 0 .5em;
+    border-radius: 1em;
+    font-size: .6rem;
+    font-weight: 400;
+    line-height: 1.7;
+    color: var(--md-default-fg-color--light);
+    background-color: var(--md-default-fg-color--lightest);
+    text-decoration: none;
+}
+
+.md-typeset a.chip:hover {
+    color: var(--md-accent-fg-color);
+}
+
+.md-typeset .chip::before {
+    content: "\2713\00a0";
+    color: var(--md-accent-fg-color);
+}
+
+.md-typeset .chip-no {
+    color: var(--md-default-fg-color--lighter);
+}
+
+.md-typeset .chip-no::before {
+    content: "\2715\00a0";
+    color: inherit;
+}
+
+/* sidebar groups nested under a section (the chart families) read as static
+   headings: always open, no toggle, not clickable */
+@media screen and (min-width: 76.25em) {
+    .md-nav--primary .md-nav[data-md-level="2"] > .md-nav__list > .md-nav__item--nested > label.md-nav__link {
+        margin-top: .6em;
+        pointer-events: none;
+        font-weight: 700;
+        color: var(--md-default-fg-color--light);
+    }
+
+    .md-nav--primary .md-nav[data-md-level="2"] > .md-nav__list > .md-nav__item--nested > label.md-nav__link .md-nav__icon {
+        display: none;
+    }
+
+    .md-nav--primary .md-nav[data-md-level="2"] > .md-nav__list > .md-nav__item--nested > .md-nav[data-md-level="3"] {
+        grid-template-rows: 1fr;
+        opacity: 1;
+        visibility: visible;
+    }
+}
