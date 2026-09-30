@@ -1,0 +1,58 @@
+name: Bug report
+description: Report a problem with a chart, API, or output
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: What did you expect instead?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction code
+      description: Minimal code snippet that reproduces the issue.
+      render: python
+    validations:
+      required: true
+  - type: textarea
+    id: chart-output
+    attributes:
+      label: Chart output
+      description: If the bug affects rendered output, drag and drop the resulting chart image here.
+    validations:
+      required: false
+  - type: input
+    id: version
+    attributes:
+      label: datachart version
+      placeholder: e.g. 1.0.0
+    validations:
+      required: true
+  - type: input
+    id: python-version
+    attributes:
+      label: Python version
+      placeholder: e.g. 3.11
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - macOS
+        - Linux
+        - Windows
+        - Other
+    validations:
+      required: false
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+    validations:
+      required: false

@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Question or usage help
+    url: https://eriknovak.github.io/datachart
+    about: Check the docs (guides and API reference) before opening an issue.
