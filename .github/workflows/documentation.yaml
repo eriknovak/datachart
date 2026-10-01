@@ -33,7 +33,7 @@ jobs:
       - run: sudo apt-get install -y --no-install-recommends fonts-liberation
       - run: uv sync --group docs
       # the outlines and faces download on first use; fetched once per key (ADR 0062, 0063)
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: ~/.cache/datachart
           key: datachart-cache-${{ hashFiles('datachart/utils/_internal/cache.py', 'datachart/utils/_internal/basemap.py', 'datachart/utils/_internal/fonts.py') }}-fonts-110m-50m
