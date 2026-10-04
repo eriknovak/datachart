@@ -6,8 +6,15 @@
   "excludeFolders": ["docs/adr", "docs/agents", "docs/hooks", "docs/assets", "docs/css"],
   "excludeFiles": ["changelog.md", "development.md"],
   "rules": [
-    "Every chart function returns a matplotlib Figure; save it with datachart.utils.save_figure",
-    "Set global style with config.set_theme or config.update; per-chart overrides go in the chart's style parameter",
-    "Combine rendered figures with Panel (overlay on shared axes, optional dual y-axes) and Grid (grid layout, grids nest)"
+    "Target datachart 1.x. Pre-1.0 names were removed, not deprecated: use AXIS_SCALE (not SCALE), COLOR_NORM (not NORMALIZE), value_format (not valfmt), show_values (not show_heatmap_values), stats.pearson (not stats.correlation), config.update/config.reset (not update_config/reset_config), and save_figure(fmt=...) (not format=)",
+    "Import chart functions from datachart.charts; Panel, Grid, Annotate, save_figure and stats from datachart.utils; config from datachart.config; constants (THEME, FIG_SIZE, SHOW_GRID, LEGEND_LOCATION, ...) from datachart.constants",
+    "Chart data is a list of dicts, one per record, and each chart expects its own keys: LineChart x/y, BarChart label/y, ScatterChart x/y (optional size, hue, annotation), Histogram x, BoxPlot/ViolinPlot/SwarmPlot label/value. Check the chart's guide for the keys of other charts",
+    "A list of record lists draws several series. Name them with a list of subtitles; subplots=True gives each series its own axes",
+    "There is no pandas DataFrame input. Pass df.to_dict(\"records\") with the columns renamed to the chart's keys",
+    "Every argument after data is keyword-only. An unknown parameter or constant value raises an error rather than being ignored",
+    "Set global style with config.set_theme(THEME.X), config.update(...) or `with config.using_theme(...)`. Per-chart overrides go in style={...} with theme keys such as plot_line_color. Prefer these over editing the matplotlib axes",
+    "Every chart returns a DatachartFigure, which is a matplotlib Figure. Panel overlays finished figures on shared axes; {\"figure\": fig, \"y_axis\": \"right\"} puts one on a second y-axis. Grid arranges figures in cells, with nested lists as rows. A Grid can sit inside another Grid but not inside a Panel",
+    "Save with save_figure(fig, path, fmt=[...]). fig.show(interactive=True) needs the datachart[interactive] extra",
+    "Docs index: https://eriknovak.github.io/datachart/latest/llms.txt. Append index.md to any page URL to get it as markdown"
   ]
 }
