@@ -499,7 +499,7 @@ Panel(
         ViolinPlot(data=penguins, inner="none", style={"plot_violin_alpha": 0.4}),
         BoxPlot(
             data=penguins,
-            style={"plot_box_color": "#ffffff", "plot_box_alpha": 0.9, "plot_box_width": 0.15},
+            style={"plot_box_color": "#ffffff", "plot_box_alpha": 0.9},
         ),
     ],
     title="Body mass of Palmer penguins",
