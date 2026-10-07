@@ -18,16 +18,17 @@ The `config` module contains the configuration objects, enabling the users to gl
 
 One `config` instance holds the style every chart is drawn with. Its methods change that style for the rest of the session, for one block of code, or from a file; the [Themes guide](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/index.md) walks through them on a chart.
 
-| I want to…                                  | Call                                                         | See                                                                                                  |
-| ------------------------------------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
-| switch the look of every chart              | `config.set_theme(THEME.INK)`                                | [set_theme](#datachart.config.Config.set_theme)                                                      |
-| change a few attributes on top of the theme | `config.update({"font_general_size": 12})`                   | [update](#datachart.config.Config.update)                                                            |
-| change the look for one block of code       | `with config.override(...)`, `with config.using_theme(...)`  | [override](#datachart.config.Config.override), [using_theme](#datachart.config.Config.using_theme)   |
-| go back to the default theme                | `config.reset()`                                             | [reset](#datachart.config.Config.reset)                                                              |
-| add a theme of my own                       | `config.register_theme(name, theme)`, then `set_theme(name)` | [register_theme](#datachart.config.Config.register_theme)                                            |
-| see which names `set_theme` accepts         | `config.list_themes()`                                       | [list_themes](#datachart.config.Config.list_themes)                                                  |
-| share a theme as a file                     | `config.save_theme(path)`, `config.load_theme(path)`         | [save_theme](#datachart.config.Config.save_theme), [load_theme](#datachart.config.Config.load_theme) |
-| read one attribute                          | `config.get("font_general_size")`                            | [get](#datachart.config.Config.get)                                                                  |
+| I want to…                                  | Call                                                          | See                                                                                                                     |
+| ------------------------------------------- | ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| switch the look of every chart              | `config.set_theme(THEME.INK)`                                 | [set_theme](#datachart.config.Config.set_theme)                                                                         |
+| change a few attributes on top of the theme | `config.update({"font_general_size": 12})`                    | [update](#datachart.config.Config.update)                                                                               |
+| change the look for one block of code       | `with config.override(...)`, `with config.using_theme(...)`   | [override](#datachart.config.Config.override), [using_theme](#datachart.config.Config.using_theme)                      |
+| go back to the default theme                | `config.reset()`                                              | [reset](#datachart.config.Config.reset)                                                                                 |
+| add a theme of my own                       | `config.register_theme(name, theme)`, then `set_theme(name)`  | [register_theme](#datachart.config.Config.register_theme)                                                               |
+| see which names `set_theme` accepts         | `config.list_themes()`                                        | [list_themes](#datachart.config.Config.list_themes)                                                                     |
+| share a theme as a file                     | `config.save_theme(path)`, `config.load_theme(path)`          | [save_theme](#datachart.config.Config.save_theme), [load_theme](#datachart.config.Config.load_theme)                    |
+| ship a theme as an installable package      | `datachart.themes` and `datachart.default_theme` entry points | [Themes guide](https://eriknovak.github.io/datachart/dev/how-to-guides/styling/themes/#installing-a-theme-as-a-package) |
+| read one attribute                          | `config.get("font_general_size")`                             | [get](#datachart.config.Config.get)                                                                                     |
 
 The attribute names are the keys of [`StyleAttrs`](https://eriknovak.github.io/datachart/dev/references/typings/#datachart.typings.StyleAttrs): the theme-level keys on the [typings](https://eriknovak.github.io/datachart/dev/references/typings/#theme-style) page and each chart's own keys on its [reference page](https://eriknovak.github.io/datachart/dev/references/charts/index.md). The theme names are the members of [`THEME`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.THEME).
 
@@ -64,6 +65,26 @@ The class representing the configuration options.
 | `save_theme`     | Writes a theme file.                                          |
 | `load_theme`     | Registers the theme in a theme file.                          |
 | `get`            | Gets the associated configuration attribute.                  |
+
+#### \_register_installed_themes
+
+```
+_register_installed_themes() -> None
+```
+
+Registers every theme an installed package advertises.
+
+A package lists its themes as entry points in the `datachart.themes` group, one per theme, the entry point name being the theme name and its object a theme dictionary or a callable returning one. A theme that fails to load or register is skipped with a warning, so a broken package never breaks `datachart`.
+
+#### \_apply_installed_default
+
+```
+_apply_installed_default() -> None
+```
+
+Starts the session in the theme an installed package names.
+
+A package names the theme in the `datachart.default_theme` group; the entry point name is the theme name, its object is never loaded. With several packages the first name in sorted order wins, with a warning. An unknown name is skipped with a warning.
 
 #### set_theme
 

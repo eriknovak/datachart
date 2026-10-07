@@ -4032,6 +4032,28 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#datachart.config.Config._register_installed_themes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;_register_installed_themes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#datachart.config.Config._apply_installed_default" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;_apply_installed_default
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#datachart.config.Config.set_theme" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4493,6 +4515,28 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#datachart.config.Config._register_installed_themes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;_register_installed_themes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#datachart.config.Config._apply_installed_default" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;_apply_installed_default
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#datachart.config.Config.set_theme" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4800,6 +4844,11 @@ to globally customize the chart and plot styles.</p>
 <td style="text-align: left;"><a href="#datachart.config.Config.save_theme">save_theme</a>, <a href="#datachart.config.Config.load_theme">load_theme</a></td>
 </tr>
 <tr>
+<td style="text-align: left;">ship a theme as an installable package</td>
+<td style="text-align: left;"><code>datachart.themes</code> and <code>datachart.default_theme</code> entry points</td>
+<td style="text-align: left;"><a href="../../how-to-guides/styling/themes/#installing-a-theme-as-a-package">Themes guide</a></td>
+</tr>
+<tr>
 <td style="text-align: left;">read one attribute</td>
 <td style="text-align: left;"><code>config.get("font_general_size")</code></td>
 <td style="text-align: left;"><a href="#datachart.config.Config.get">get</a></td>
@@ -5000,6 +5049,55 @@ to globally customize the chart and plot styles.</p>
 
 
 
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="datachart.config.Config._register_installed_themes" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">_register_installed_themes</span>
+
+
+</h4>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">_register_installed_themes</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Registers every theme an installed package advertises.</p>
+<p>A package lists its themes as entry points in the
+<code>datachart.themes</code> group, one per theme, the entry point name being
+the theme name and its object a theme dictionary or a callable
+returning one. A theme that fails to load or register is skipped with
+a warning, so a broken package never breaks <code>datachart</code>.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="datachart.config.Config._apply_installed_default" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">_apply_installed_default</span>
+
+
+</h4>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">_apply_installed_default</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Starts the session in the theme an installed package names.</p>
+<p>A package names the theme in the <code>datachart.default_theme</code> group;
+the entry point name is the theme name, its object is never loaded.
+With several packages the first name in sorted order wins, with a
+warning. An unknown name is skipped with a warning.</p>
+
+
+    </div>
+
+</div>
 
 <div class="doc doc-object doc-function">
 

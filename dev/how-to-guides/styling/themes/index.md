@@ -248,7 +248,30 @@ config.set_theme(name)
 config.theme
 ```
 
-A companion package ships its themes the same way: it registers or loads them on import, and its users apply them with `config.set_theme("<name>")`.
+## Installing a Theme as a Package
+
+A team look belongs in one place. Put the theme in a small package that depends on `datachart` and advertise it through entry points, and every project that installs the package gets the theme by name, with no copy of the dictionary anywhere else. The `datachart.themes` group registers themes: the entry point name is the theme name, and its object is a theme dictionary or a zero-argument callable returning one, so a variant built with `derive_theme` is computed only when `datachart` is imported. The `datachart.default_theme` group names the theme the session starts in, so charts take the look without a call to `set_theme`:
+
+```
+[project.entry-points."datachart.themes"]
+acme = "acme_datachart:THEME"
+
+[project.entry-points."datachart.default_theme"]
+acme = "acme_datachart:THEME"
+```
+
+```
+# acme_datachart/__init__.py
+from datachart.constants import THEME as BASE
+
+from datachart.themes import derive_theme
+
+
+def THEME():
+    return derive_theme(BASE.MINIMAL, lead=["#003f5c", "#ffa600", "#bc5090"])
+```
+
+The themes are registered when the `config` singleton is created, before any theme name is looked up, and a package that fails to load is skipped with a warning. The default theme is applied once at that moment: `reset` still returns to the predefined default theme, and `set_theme` switches away and back by name.
 
 Finally, reset the configuration back to the default theme:
 
