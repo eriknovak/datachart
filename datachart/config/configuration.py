@@ -2,6 +2,7 @@ import copy
 import json
 import warnings
 from contextlib import contextmanager
+from importlib.metadata import entry_points
 from pathlib import Path
 from typing import Any, Iterator, List, Optional, Union
 
@@ -55,6 +56,11 @@ BUILTIN_THEMES = frozenset(THEMES)
 # bumped only when a reader of the current shape could misread an older file
 THEME_FILE_VERSION = 1
 
+# an installed package registers themes under the first group and names the
+# one to start the session in under the second (ADR 0088)
+THEMES_ENTRY_POINT_GROUP = "datachart.themes"
+DEFAULT_THEME_ENTRY_POINT_GROUP = "datachart.default_theme"
+
 
 class Config:
     """The class representing the configuration options.
@@ -94,6 +100,61 @@ class Config:
 
         self.config = copy.deepcopy(DEFAULT_THEME)
         self.theme = THEME.DEFAULT
+        self._register_installed_themes()
+        self._apply_installed_default()
+
+    def _register_installed_themes(self) -> None:
+        """Registers every theme an installed package advertises.
+
+        A package lists its themes as entry points in the
+        `datachart.themes` group, one per theme, the entry point name being
+        the theme name and its object a theme dictionary or a callable
+        returning one. A theme that fails to load or register is skipped with
+        a warning, so a broken package never breaks `datachart`.
+        """
+
+        for entry in sorted(
+            entry_points(group=THEMES_ENTRY_POINT_GROUP), key=lambda e: e.name
+        ):
+            try:
+                theme = entry.load()
+                if callable(theme):
+                    theme = theme()
+                self.register_theme(entry.name, theme)
+            except Exception as error:
+                warnings.warn(
+                    f"Warning: skipping installed theme {entry.name!r}: {error}"
+                )
+
+    def _apply_installed_default(self) -> None:
+        """Starts the session in the theme an installed package names.
+
+        A package names the theme in the `datachart.default_theme` group;
+        the entry point name is the theme name, its object is never loaded.
+        With several packages the first name in sorted order wins, with a
+        warning. An unknown name is skipped with a warning.
+        """
+
+        names = sorted(
+            {
+                entry.name
+                for entry in entry_points(group=DEFAULT_THEME_ENTRY_POINT_GROUP)
+            }
+        )
+        if not names:
+            return
+        if len(names) > 1:
+            warnings.warn(
+                f"Warning: several installed packages name a default theme {names}; "
+                f"starting in {names[0]!r}."
+            )
+        if names[0] not in THEMES:
+            warnings.warn(
+                f"Warning: installed default theme {names[0]!r} is not a registered theme; "
+                "starting in the default theme."
+            )
+            return
+        self.set_theme(names[0])
 
     def set_theme(self, theme: Union[THEME, str]) -> None:
         """Sets the global configuration to match the theme.

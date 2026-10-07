@@ -4,11 +4,12 @@ import tempfile
 import typing
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from datachart.config import config
 from datachart.config.configuration import THEMES, Config
 from datachart.constants import THEME
-from datachart.themes import DEFAULT_THEME
+from datachart.themes import DEFAULT_THEME, INK_THEME
 
 # =====================================
 # Test Config
@@ -275,3 +276,103 @@ class TestThemeFiles(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+# =====================================
+# Test installed themes
+# =====================================
+
+
+PLUGIN_THEME = {"font_general_size": 33}
+
+
+def plugin_theme_factory():
+    return {"font_general_size": 34}
+
+
+class _FakeEntryPoint:
+    def __init__(self, name, obj):
+        self.name = name
+        self._obj = obj
+
+    def load(self):
+        if isinstance(self._obj, Exception):
+            raise self._obj
+        return self._obj
+
+
+def _with_entry_points(themes=(), defaults=()):
+    from datachart.config import configuration
+
+    groups = {
+        configuration.THEMES_ENTRY_POINT_GROUP: list(themes),
+        configuration.DEFAULT_THEME_ENTRY_POINT_GROUP: list(defaults),
+    }
+    return mock.patch.object(
+        configuration, "entry_points", lambda group: groups.get(group, [])
+    )
+
+
+class TestInstalledThemes(unittest.TestCase):
+    def tearDown(self):
+        THEMES.pop("acme", None)
+        THEMES.pop("acme-factory", None)
+        config.reset()
+
+    def test_entry_point_theme_is_registered(self):
+        with _with_entry_points(themes=[_FakeEntryPoint("acme", PLUGIN_THEME)]):
+            fresh = Config()
+        self.assertIn("acme", fresh.list_themes())
+        self.assertEqual(THEMES["acme"]["font_general_size"], 33)
+        self.assertEqual(fresh.theme, THEME.DEFAULT)
+
+    def test_entry_point_callable_is_called(self):
+        entry = _FakeEntryPoint("acme-factory", plugin_theme_factory)
+        with _with_entry_points(themes=[entry]):
+            Config()
+        self.assertEqual(THEMES["acme-factory"]["font_general_size"], 34)
+
+    def test_default_entry_point_starts_the_session_in_that_theme(self):
+        themes = [_FakeEntryPoint("acme", PLUGIN_THEME)]
+        defaults = [_FakeEntryPoint("acme", None)]
+        with _with_entry_points(themes=themes, defaults=defaults):
+            fresh = Config()
+        self.assertEqual(fresh.theme, "acme")
+        self.assertEqual(fresh.get("font_general_size"), 33)
+        fresh.reset()
+        self.assertEqual(fresh.theme, THEME.DEFAULT)
+
+    def test_default_entry_point_accepts_a_builtin_name(self):
+        with _with_entry_points(defaults=[_FakeEntryPoint("ink", None)]):
+            fresh = Config()
+        self.assertEqual(fresh.theme, THEME.INK)
+
+    def test_broken_entry_point_warns_and_is_skipped(self):
+        entries = [
+            _FakeEntryPoint("acme", RuntimeError("boom")),
+            _FakeEntryPoint("ink", PLUGIN_THEME),
+            _FakeEntryPoint("acme-factory", {"not_a_key": 1}),
+        ]
+        with _with_entry_points(themes=entries):
+            with self.assertWarns(UserWarning) as caught:
+                fresh = Config()
+        messages = [str(w.message) for w in caught.warnings]
+        self.assertEqual(len(messages), 3)
+        self.assertNotIn("acme", fresh.list_themes())
+        self.assertNotIn("acme-factory", fresh.list_themes())
+        self.assertEqual(
+            THEMES[THEME.INK]["font_general_size"], INK_THEME["font_general_size"]
+        )
+
+    def test_unknown_default_warns_and_keeps_default(self):
+        with _with_entry_points(defaults=[_FakeEntryPoint("missing", None)]):
+            with self.assertWarns(UserWarning):
+                fresh = Config()
+        self.assertEqual(fresh.theme, THEME.DEFAULT)
+
+    def test_several_defaults_warn_and_take_the_first_name(self):
+        defaults = [_FakeEntryPoint("minimal", None), _FakeEntryPoint("ink", None)]
+        with _with_entry_points(defaults=defaults):
+            with self.assertWarns(UserWarning):
+                fresh = Config()
+        self.assertEqual(fresh.theme, THEME.INK)

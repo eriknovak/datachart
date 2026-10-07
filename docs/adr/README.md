@@ -81,6 +81,7 @@ adds no tag; one that reverses, narrows, widens or replaces a commitment does.
 - [0077](0077-own-colored-series-take-no-palette-slot.md) — A series with its own colour draws none from the palette
 - [0078](0078-palette-gate-warns-at-registration.md) — The palette gate warns when a theme is registered, not when one is derived
 - [0081](0081-violin-and-ridge-theme-defaults.md) — Themes set the violin inner, the strip jitter and the ridge marks
+- [0088](0088-installed-themes-through-entry-points.md) — An installed package registers its themes and names the startup theme through entry points
 
 See also 0009, which names the themes for their look, and 0063, which moves the
 theme faces out of the wheel.

@@ -22,6 +22,7 @@ One `config` instance holds the style every chart is drawn with. Its methods cha
 | add a theme of my own                             | `config.register_theme(name, theme)`, then `set_theme(name)` | [register_theme](#datachart.config.Config.register_theme) |
 | see which names `set_theme` accepts               | `config.list_themes()`                                    | [list_themes](#datachart.config.Config.list_themes) |
 | share a theme as a file                           | `config.save_theme(path)`, `config.load_theme(path)`      | [save_theme](#datachart.config.Config.save_theme), [load_theme](#datachart.config.Config.load_theme) |
+| ship a theme as an installable package            | `datachart.themes` and `datachart.default_theme` entry points | [Themes guide](../how-to-guides/styling/themes.ipynb#installing-a-theme-as-a-package) |
 | read one attribute                                | `config.get("font_general_size")`                         | [get](#datachart.config.Config.get) |
 
 The attribute names are the keys of [`StyleAttrs`](typings.md#datachart.typings.StyleAttrs): the theme-level keys on the [typings](typings.md#theme-style) page and each chart's own keys on its [reference page](charts/index.md). The theme names are the members of [`THEME`](constants.md#datachart.constants.THEME).
