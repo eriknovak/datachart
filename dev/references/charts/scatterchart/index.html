@@ -5776,7 +5776,17 @@ read like <code>xerr</code>.</p>
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>Tuple of (min_size, max_size) for bubble charts (default: (20, 200)).</p>
+                <p>Tuple of (min_size, max_size) for bubble charts (default:
+(20, 200)). Marker area is proportional to the <code>size</code> value: the
+largest value, pooled across hue groups and composed figures on one
+axes, draws at <code>max_size</code>, and a value half as large draws at half
+the area. A value whose area would fall below <code>min_size</code> draws at
+<code>min_size</code>, so small values stay visible. A constant <code>size</code> column
+draws every marker midway between the two. A point whose size is
+missing (no key, <code>None</code> or NaN) draws no marker, and a negative
+value raises <code>ValueError</code>. Within each hue group or series,
+bubbles draw largest first, so a small one stays on top of a
+larger one of its group.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">

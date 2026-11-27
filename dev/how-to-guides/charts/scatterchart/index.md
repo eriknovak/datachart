@@ -179,9 +179,9 @@ ScatterChart(
 
 ### Bubble chart
 
-A point for China and a point for Slovenia look the same, though one stands for 700 times as many people. `size` names the key whose value scales the marker, here `population`, which turns the chart into a bubble chart. The values map linearly onto the marker areas in `size_range` (the default is `(20, 200)`): the smallest value gets the smallest marker, the largest the largest. With populations from 1.7 million to 1.4 billion, a wide range keeps the difference visible, and a low alpha with an edge keeps overlapping bubbles readable. The two largest bubbles, China and India, show that most of the people in this chart live in the middle of the income range.
+A point for China and a point for Slovenia look the same, though one stands for 700 times as many people. `size` names the key whose value scales the marker, here `population`, which turns the chart into a bubble chart. The marker area, not its width, is proportional to the value, so a country with half the people gets half the area. The largest value draws at the top of `size_range` (the default is `(20, 200)`), and a value whose area would fall below the bottom of the range draws at the bottom, so small values stay visible. With populations from 1.7 million to 1.4 billion, a wide range keeps the difference visible; here the countries under about 10 million people all draw at the floor of 10. A low alpha with an edge keeps overlapping bubbles readable, and within a group the larger bubbles draw first, so a small bubble stays on top of a large one. The two largest bubbles, China and India, show that most of the people in this chart live in the middle of the income range.
 
-`hue` and `size` combine, but the sizes are scaled within each hue group, so the largest country of every region would get the largest bubble; for sizes that compare across the whole chart, keep the points in one group.
+`hue` and `size` combine. The sizes share one scale across all the hue groups, and across figures overlaid on the same axes with `Panel`, so a bubble means the same number of people whatever its color.
 
 ```
 ScatterChart(
