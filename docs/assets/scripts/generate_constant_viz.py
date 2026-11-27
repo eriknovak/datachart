@@ -758,10 +758,14 @@ def histogram_type():
 
 def histogram_bins():
     members = [
+        ("DEFAULT", HISTOGRAM_BINS.DEFAULT),
         ("AUTO", HISTOGRAM_BINS.AUTO),
-        ("STURGES", HISTOGRAM_BINS.STURGES),
         ("FD", HISTOGRAM_BINS.FD),
+        ("STURGES", HISTOGRAM_BINS.STURGES),
+        ("SCOTT", HISTOGRAM_BINS.SCOTT),
+        ("RICE", HISTOGRAM_BINS.RICE),
         ("SQRT", HISTOGRAM_BINS.SQRT),
+        ("DOANE", HISTOGRAM_BINS.DOANE),
     ]
     # a skewed sample: one tight mode and a long right tail
     values = np.random.default_rng(7).lognormal(0, 0.6, 600)
@@ -776,10 +780,10 @@ def histogram_bins():
     chart_grid(
         figs,
         "const-histogram-bins.svg",
-        3.8,
+        7.6,
         cols=2,
-        footnote="The same 600 skewed values; AUTO is NumPy's choice "
-        "between STURGES and FD, here FD.",
+        footnote="The same 600 skewed values; DEFAULT is a fixed 20 bins, and "
+        "AUTO is NumPy's choice between STURGES and FD, here FD.",
     )
 
 
