@@ -37,7 +37,7 @@ RadialChart(
     sort: SORT | str | None = None,
     sort_by: str | None = None,
     emphasis_rule: EmphasisRuleAttrs | None = None,
-    num_bins: int | None = None,
+    num_bins: HISTOGRAM_BINS | str | int | None = None,
     start_angle: str | int | float | None = None,
     direction: RADIAL_DIRECTION | str | None = None,
     inner_radius: float | None = None,
@@ -135,7 +135,7 @@ Examples:
 | `sort`            | The order the categories are drawn in around the circle: None (input order), "ascending", or "descending" by value (bar visual). One order serves every series, keyed by the total across them; ties keep input order. See SORT. **TYPE:** \`SORT                                                                                                                              |
 | `sort_by`         | The subtitle of the one series whose values key the sort instead of the total (bar visual). A category that series lacks sorts last. **TYPE:** \`str                                                                                                                                                                                                                           |
 | `emphasis_rule`   | A one-key dict that highlights the bars matching it and mutes the rest (bar visual): {"above": v} or {"below": v} (strict), {"between": (lo, hi)} (inclusive), {"top": n} or {"bottom": n}. Reads each bar's own value; a record's own emphasis key wins over the rule. **TYPE:** \`EmphasisRuleAttrs                                                                          |
-| `num_bins`        | The number of angular bins over \[0, 360) (histogram visual). **TYPE:** \`int                                                                                                                                                                                                                                                                                                  |
+| `num_bins`        | The number of equal-width angular bins over \[0, 360), or a HISTOGRAM_BINS rule that picks the edges from the data (histogram visual). Defaults to 20. **TYPE:** \`HISTOGRAM_BINS                                                                                                                                                                                              |
 | `start_angle`     | Where the first point sits: a compass location ("N", "NE", "E", "SE", "S", "SW", "W", "NW") or a numeric compass bearing in degrees clockwise from north. Defaults to "N". **TYPE:** \`str                                                                                                                                                                                     |
 | `direction`       | Which way the angles increase: "clockwise" (default) or "counterclockwise". See RADIAL_DIRECTION. **TYPE:** \`RADIAL_DIRECTION                                                                                                                                                                                                                                                 |
 | `inner_radius`    | The donut hole, as a fraction (0 \<= f < 1) of the radial extent. Defaults to 0. **TYPE:** \`float                                                                                                                                                                                                                                                                             |
@@ -201,6 +201,7 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `value_format`                               | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                           |
 | `bar_mode`                                   | [`BAR_MODE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BAR_MODE)                                                                                                                                   |
 | `sort`                                       | [`SORT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT)                                                                                                                                           |
+| `num_bins`                                   | [`HISTOGRAM_BINS`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.HISTOGRAM_BINS)                                                                                                                       |
 | `scaley`                                     | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                               |
 
 ## Composition

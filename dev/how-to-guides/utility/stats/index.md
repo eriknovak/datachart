@@ -262,7 +262,7 @@ counts, edges = stats.histogram(flipper, bins="fd")
 len(counts), [round(e) for e in edges[:4]]
 ```
 
-The [Histogram](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/histogram/index.md) front takes a fixed `num_bins`, so the rule is how to let the data choose it. The counts and edges also draw directly as a [Bar Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/barchart/index.md), which is the way to plot bins that were computed elsewhere or to label them by hand:
+The [Histogram](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/histogram/index.md) front takes the same rule names in `num_bins`, through [HISTOGRAM_BINS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.HISTOGRAM_BINS), so the data can choose its bins there too. The counts and edges also draw directly as a [Bar Chart](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/barchart/index.md), which is the way to plot bins that were computed elsewhere or to label them by hand:
 
 ```
 Histogram(

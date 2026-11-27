@@ -39,7 +39,7 @@ Every customization is either a keyword argument of `Histogram` or a `plot_hist_
 | resize the figure                            | `figsize`                                                     | [Figure size and grid](#figure-size-and-grid)                                                           |
 | show grid lines                              | `show_grid`                                                   | [Figure size and grid](#figure-size-and-grid)                                                           |
 | fix the aspect ratio of the axes             | `aspect_ratio`                                                | [Figure size and grid](#figure-size-and-grid)                                                           |
-| change how finely the values are binned      | `num_bins`                                                    | [Number of bins](#number-of-bins)                                                                       |
+| change how finely the values are binned      | `num_bins`, `HISTOGRAM_BINS`                                  | [Number of bins](#number-of-bins)                                                                       |
 | draw the bins as bars or a step outline      | `style={"plot_hist_type": ...}`                               | [Histogram style](#histogram-style)                                                                     |
 | change the color, hatch, or edge of the bins | `style={"plot_hist_color": ..., "plot_hist_hatch": ...}`      | [Histogram style](#histogram-style)                                                                     |
 | draw the bars horizontally                   | `orientation`                                                 | [Orientation](#orientation)                                                                             |
@@ -72,6 +72,7 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `aspect_ratio`                               | [`ASPECT_RATIO`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ASPECT_RATIO)                                                                                                                           |
 | `orientation`                                | [`ORIENTATION`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.ORIENTATION)                                                                                                                             |
 | `bar_mode`                                   | [`BAR_MODE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BAR_MODE)                                                                                                                                   |
+| `num_bins`                                   | [`HISTOGRAM_BINS`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.HISTOGRAM_BINS)                                                                                                                       |
 | `scalex`                                     | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                               |
 | `scaley`                                     | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                               |
 
@@ -135,6 +136,37 @@ for num_bins in [4, 20, 120]:
         show_grid=SHOW_GRID.Y,
         # the number of equal-width bins
         num_bins=num_bins,
+    ).show()
+```
+
+How do you choose a bin count without trying a dozen of them? A bin rule picks it from the data. `num_bins` takes a rule from [HISTOGRAM_BINS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.HISTOGRAM_BINS) as well as an integer, and the chart then draws the count the rule gives.
+
+The rules differ in what they trust. `STURGES` grows with the logarithm of the sample size, so it gives few bins and assumes a roughly bell-shaped distribution. `SQRT` grows with the square root of the sample size, so it gives more bins and keeps more of the detail. `FD` (Freedman–Diaconis) sizes the bins from the spread of the middle half of the values, so a few extreme values cannot stretch them. The other rules in the constant are listed in the reference.
+
+On the 342 flipper lengths, Sturges gives 10 bins and the square root gives 19. The first draws two broad humps, the second shows how sharply the count drops between the peaks and how uneven the right peak is. The cell prints each rule's count before it draws:
+
+```
+import numpy as np
+
+from datachart.constants import HISTOGRAM_BINS
+
+flipper_lengths = [penguin["x"] for penguin in penguins]
+
+for rule in [HISTOGRAM_BINS.STURGES, HISTOGRAM_BINS.SQRT]:
+    # count the bins the rule gives on this data
+    edges = np.histogram_bin_edges(flipper_lengths, bins=rule)
+    print(f"{rule}: {len(edges) - 1} bins")
+
+    Histogram(
+        data=penguins,
+        title=f"Flipper length with the {rule} rule",
+        xlabel="Flipper length (mm)",
+        ylabel="Number of penguins",
+        xticks=FLIPPER_TICKS,
+        figsize=FIG_SIZE.FULL_SHORT,
+        show_grid=SHOW_GRID.Y,
+        # a bin rule instead of a count
+        num_bins=rule,
     ).show()
 ```
 

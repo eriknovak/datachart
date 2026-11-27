@@ -33,7 +33,7 @@ Every customization is either a keyword argument of `RadialChart` or an attribut
 
 | I want to…                                | Use                                                     | See                                                                                                     |
 | ----------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| pick the visual                           | `mark`, `num_bins`                                      | [The radial visuals](#the-radial-visuals)                                                               |
+| pick the visual                           | `mark`, `num_bins`, `HISTOGRAM_BINS`                    | [The radial visuals](#the-radial-visuals)                                                               |
 | add a title and axis labels               | `title`, `xlabel`, `ylabel`                             | [Title, axis labels and radial range](#title-axis-labels-and-radial-range)                              |
 | fix the radial range                      | `ymin`, `ymax`                                          | [Title, axis labels and radial range](#title-axis-labels-and-radial-range)                              |
 | resize the figure                         | `figsize`                                               | [Figure size and grid](#figure-size-and-grid)                                                           |
@@ -72,6 +72,7 @@ The parameters that accept a constant, with the class in [datachart.constants](h
 | `value_format`                               | [`VALUE_FORMAT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT)                                                                                                                           |
 | `bar_mode`                                   | [`BAR_MODE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.BAR_MODE)                                                                                                                                   |
 | `sort`                                       | [`SORT`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT)                                                                                                                                           |
+| `num_bins`                                   | [`HISTOGRAM_BINS`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.HISTOGRAM_BINS)                                                                                                                       |
 | `scaley`                                     | [`AXIS_SCALE`](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.AXIS_SCALE)                                                                                                                               |
 
 The full lists of style attributes are in the [datachart.typings.LineStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/linechart/#datachart.typings.LineStyleAttrs), [BarStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/barchart/#datachart.typings.BarStyleAttrs), [ScatterStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/scatterchart/#datachart.typings.ScatterStyleAttrs) and [HistStyleAttrs](https://eriknovak.github.io/datachart/dev/references/charts/histogram/#datachart.typings.HistStyleAttrs) types; the full list of parameters is in the [datachart.charts.RadialChart](https://eriknovak.github.io/datachart/dev/references/charts/radialchart/#datachart.charts.RadialChart) reference.
@@ -107,6 +108,20 @@ RadialChart(
     # count the readings in 16 sectors around the full circle
     num_bins=16,
     title="Wind direction frequency",
+).show()
+```
+
+Sixteen sectors is a choice made by hand. `num_bins` also takes a rule from [HISTOGRAM_BINS](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.HISTOGRAM_BINS), which picks the sector count from the readings over the full circle. `HISTOGRAM_BINS.FD` (Freedman–Diaconis) sizes the sectors from the spread of the middle half of the readings, so the few scattered ones cannot stretch them. Here it settles on 15 sectors, close to the 16 picked by hand, and the two lobes keep their shape:
+
+```
+from datachart.constants import HISTOGRAM_BINS
+
+RadialChart(
+    data=wind_directions,
+    mark=RADIAL_TYPE.HISTOGRAM,
+    # let the readings choose the number of sectors
+    num_bins=HISTOGRAM_BINS.FD,
+    title="Wind direction frequency, Freedman–Diaconis sectors",
 ).show()
 ```
 
