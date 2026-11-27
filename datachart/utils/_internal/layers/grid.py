@@ -556,7 +556,7 @@ class HeatmapLayer(Layer):
         return {
             "facecolor": self.missing_style.get("color", "none"),
             # the hatch takes the edge colour; a zero width draws no outline
-            "edgecolor": self.frame_color,
+            "edgecolor": self.edge_style.get("color") or self.frame_color,
             "linewidth": 0,
             "hatch": self.missing_style.get("hatch"),
         }

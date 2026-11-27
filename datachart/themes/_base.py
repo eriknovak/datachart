@@ -316,7 +316,8 @@ BASE_THEME: StyleAttrs = {
     "plot_heatmap_frame_color": "#333333",
     "plot_heatmap_edge_width": 0,
     "plot_heatmap_edge_color": "#FFFFFF",
-    "plot_heatmap_missing_color": "#BDBDBD",
+    # the muted grey; the hatch draws in the cell border color
+    "plot_heatmap_missing_color": "#CFCFCF",
     "plot_heatmap_missing_hatch": "//",
     # plot calendar heatmap style (ADR 0044); a None cmap derives from the
     # heatmap cmap, a None month line color from the heatmap frame color

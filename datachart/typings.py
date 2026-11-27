@@ -743,7 +743,7 @@ class HeatmapStyleAttrs(TypedDict):
         plot_heatmap_edge_width (Union[int, float, None]): The width of the borders drawn between the cells (0 draws none).
         plot_heatmap_edge_color (Union[str, None]): The color of the borders drawn between the cells.
         plot_heatmap_missing_color (Union[str, None]): The face color of the cells with no data (`None`, NaN or inf values); `None` leaves the face transparent.
-        plot_heatmap_missing_hatch (Union[str, None]): The hatch pattern of the cells with no data (an empty string counts as `None`); both missing keys `None` draw no such cells.
+        plot_heatmap_missing_hatch (Union[str, None]): The hatch pattern of the cells with no data (an empty string counts as `None`), drawn in the cell border color (`plot_heatmap_edge_color`); both missing keys `None` draw no such cells.
 
     """
 

@@ -152,6 +152,7 @@ QUILL_THEME: StyleAttrs = make_theme(
         "plot_heatmap_edge_color": INK,
         # the value steps etch "", ".", "..", "//" and "xx", so no data takes "\\"
         "plot_heatmap_missing_hatch": "\\\\",
+        "plot_heatmap_missing_color": "#C9B892",
         "plot_calendar_heatmap_edge_color": PAPER,
         "plot_calendar_heatmap_month_line_color": INK,
         "plot_contour_color": INK,
