@@ -25,13 +25,19 @@ that look means.
   `plot_heatmap_missing_hatch`, named for their look (ADR 0071) and typed
   in `HeatmapStyleAttrs` (ADR 0072). The base value reaches every
   predefined theme through `make_theme` and `derive_theme` (ADR 0074):
-  colour `#BDBDBD`, measured at OKLab ΔE 15 or more from both ends of both
-  default colormaps; hatch `"//"`. The dark theme overrides the colour to
-  stay above WCAG contrast 3 on its axes face. Quill overrides the hatch,
-  because its etched value steps already use `"//"`. The hatch lines take
-  `plot_heatmap_frame_color`. A key in the chart's own `style` wins over
-  the theme. On the `Greys` themes any grey sits inside the colormap, so
-  the hatch carries the distinction.
+  hatch `"//"`, and a colour that is each theme's own `muted_color`, so
+  the no-data cell takes the grey the theme already uses for faded marks
+  (`#CFCFCF`; the dark and quill themes set theirs to match). The hatch
+  lines take the cell border colour, `plot_heatmap_edge_color`, or the
+  frame colour when a theme sets none, so the cell reads as part of the
+  grid rather than as a heavy mark on it. Quill also overrides the hatch,
+  because its etched value steps already use `"//"`. A key in the chart's
+  own `style` wins over the theme. The default face sits at OKLab ΔE 13
+  from the light end of `Blues`, under the normal floor of 15; the hatch
+  carries the rest of the difference, as it does on the `Greys` themes,
+  where any grey sits inside the colormap. A first draft used `#BDBDBD`
+  with hatch lines in the frame colour; it cleared the floor but drew the
+  heaviest mark in the chart, out of step with the colour scheme.
 - **A swatch names it beside the colorbar.** With a colorbar and at
   least one missing cell, a frameless one-entry legend reading "No data"
   sits on the colorbar axes, placed outward from the heatmap by edge. It

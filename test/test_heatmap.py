@@ -331,7 +331,7 @@ class TestMissingCells(unittest.TestCase):
         )
         self.assertEqual(cells.get_hatch(), config["plot_heatmap_missing_hatch"])
         self.assertEqual(
-            _hatch_color(cells), colors.to_hex(config["plot_heatmap_frame_color"])
+            _hatch_color(cells), colors.to_hex(config["plot_heatmap_edge_color"])
         )
         self.assertLess(cells.get_zorder(), figure.axes[0].images[0].get_zorder())
 
