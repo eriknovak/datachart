@@ -67,6 +67,7 @@ from datachart.constants import (
     GANTT_VALUE,
     HATCH_STYLE,
     HEXBIN_REDUCE,
+    HISTOGRAM_BINS,
     HISTOGRAM_TYPE,
     DRAW_POSITION,
     BASEMAP_FEATURE,
@@ -752,6 +753,33 @@ def histogram_type():
         cols=2,
         footnote="The type renders one series; how several series share the "
         "axis is bar_mode's job.",
+    )
+
+
+def histogram_bins():
+    members = [
+        ("AUTO", HISTOGRAM_BINS.AUTO),
+        ("STURGES", HISTOGRAM_BINS.STURGES),
+        ("FD", HISTOGRAM_BINS.FD),
+        ("SQRT", HISTOGRAM_BINS.SQRT),
+    ]
+    # a skewed sample: one tight mode and a long right tail
+    values = np.random.default_rng(7).lognormal(0, 0.6, 600)
+    figs = [
+        Histogram(
+            data=[{"x": x} for x in values],
+            num_bins=value,
+            title=f"HISTOGRAM_BINS.{label}",
+        )
+        for label, value in members
+    ]
+    chart_grid(
+        figs,
+        "const-histogram-bins.svg",
+        3.8,
+        cols=2,
+        footnote="The same 600 skewed values; AUTO is NumPy's choice "
+        "between STURGES and FD, here FD.",
     )
 
 
@@ -1666,6 +1694,7 @@ def main():
     bar_mode()
     baseline()
     histogram_type()
+    histogram_bins()
     orientation()
     weekday()
     violin_inner()

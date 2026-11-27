@@ -26,6 +26,7 @@ from ...constants import (
     DUMBBELL_SORT_KEY,
     DUMBBELL_VALUE,
     EMPHASIS,
+    HISTOGRAM_BINS,
     LEGEND_LOCATION,
     GANTT_ARROW_ENTRY,
     GANTT_SORT_KEY,
@@ -84,6 +85,24 @@ def validate_bandwidth(bandwidth) -> None:
             f"Invalid `bandwidth` value {bandwidth!r}. "
             f"Must be None, one of {BANDWIDTH.members()}, or a finite number "
             "greater than 0."
+        )
+
+
+def validate_num_bins(num_bins) -> None:
+    """Raise unless `num_bins` is None, a rule name, or an integer >= 1.
+
+    A rule name is checked against `HISTOGRAM_BINS` where the value is read.
+    """
+
+    if not (
+        num_bins is None
+        or isinstance(num_bins, str)
+        or (is_integer(num_bins) and num_bins >= 1)
+    ):
+        members = tuple(m for m in HISTOGRAM_BINS.members() if isinstance(m, str))
+        raise ValueError(
+            f"Invalid `num_bins` value {num_bins!r}. "
+            f"Must be None, one of {members}, or a positive integer."
         )
 
 

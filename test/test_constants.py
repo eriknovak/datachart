@@ -21,6 +21,7 @@ from datachart.charts import (
     DumbbellChart,
     GanttChart,
     Heatmap,
+    Histogram,
     HexbinChart,
     ImageChart,
     LineChart,
@@ -143,6 +144,7 @@ RANGES = [{"label": "a", "start": 1, "end": 2}]
 EDGES = {"edges": [{"source": "A", "target": "B"}]}
 CALENDAR = {"date": [date(2024, 1, 1), date(2024, 1, 2)], "value": [1, 2]}
 IMAGE = {"image": np.zeros((2, 2)), "extent": (0.0, 1.0, 0.0, 1.0)}
+HIST = [{"x": v} for v in (1.0, 2.0, 2.0, 3.0, 5.0)]
 COLUMNS = {"a": [1.0, 2.0, 3.0], "b": [2.0, 1.0, 3.0]}
 
 # one front per shared constant-typed parameter, and every front-own one
@@ -159,6 +161,7 @@ CASES = [
     ("show_grid", LineChart, LINE),
     ("position", ImageChart, IMAGE),
     ("bandwidth", ViolinPlot, GROUPS),
+    ("num_bins", Histogram, HIST),
     ("figsize", LineChart, LINE),
     ("norm", Heatmap, GRID),
     ("yticks_format", LineChart, LINE),

@@ -3,6 +3,7 @@ from typing import Union, List, Optional, Tuple
 
 from ..utils._internal.plot_engine import render
 from ..utils._internal.figures import DatachartFigure
+from ..utils._internal.validate import validate_num_bins
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
@@ -22,6 +23,7 @@ from ..constants import (
     BAR_MODE,
     EMPHASIS,
     FIG_SIZE,
+    HISTOGRAM_BINS,
     SHOW_GRID,
     ORIENTATION,
     AXIS_SCALE,
@@ -56,7 +58,7 @@ def Histogram(
     aspect_ratio: Optional[Union[ASPECT_RATIO, str]] = None,
     orientation: Optional[Union[ORIENTATION, str]] = None,
     bar_mode: Optional[Union[BAR_MODE, str]] = None,
-    num_bins: Optional[int] = None,
+    num_bins: Optional[Union[HISTOGRAM_BINS, str, int]] = None,
     scalex: Optional[Union[AXIS_SCALE, str]] = None,
     scaley: Optional[Union[AXIS_SCALE, str]] = None,
     subplots: Optional[bool] = None,
@@ -192,7 +194,9 @@ def Histogram(
             shared bins, the default) or "overlay" (each series drawn individually over
             the others). "group" has no histogram meaning and behaves like "overlay".
             See [`BAR_MODE`][datachart.constants.BAR_MODE].
-        num_bins: The number of bins to split the data into.
+        num_bins: The number of equal-width bins, or a
+            [`HISTOGRAM_BINS`][datachart.constants.HISTOGRAM_BINS] rule that picks
+            the edges from the data. Defaults to 20.
         scalex: The x-axis scale (e.g., "log", "linear"). Useful for log-distributed data.
         scaley: The y-axis scale (e.g., "log", "linear").
         subplots: Whether to create separate subplots for each chart.
@@ -221,4 +225,6 @@ def Histogram(
 
     """
     params = dict(locals())
+
+    validate_num_bins(num_bins)
     return render("histogram", params)

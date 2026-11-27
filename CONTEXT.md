@@ -628,7 +628,8 @@ A named rule that picks histogram bin edges from the data — `stats.histogram`
 passes `bins` straight to `numpy.histogram_bin_edges`, so `"auto"`, `"fd"`,
 `"rice"`, an integer, and an explicit edge list all work. Unrelated to the
 `CONTOUR_LEVELS` rules of the same name, which count contour levels from grid
-resolution; and the `Histogram` front still takes an integer `num_bins`.
+resolution. `num_bins` of `Histogram` and `RadialChart` takes a `HISTOGRAM_BINS`
+rule or an integer, and a rule that gives more than 1000 bins raises.
 _Avoid_: binning strategy, bin count (for the rule)
 
 **Level**:
