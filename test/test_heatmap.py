@@ -12,6 +12,7 @@ from matplotlib import colors
 from datachart.charts import Heatmap
 from datachart.config import config
 from datachart.constants import COLOR_NORM, THEME
+from datachart.utils import Grid
 
 Z = [[1, 2, 3], [4, 5, 6]]
 SIGNED = [[-3, -1, 0], [1, 2, 3]]
@@ -290,6 +291,84 @@ class TestCenteredValueSteps(unittest.TestCase):
     def test_even_steps_stay_even_without_a_centre(self):
         ranges = self._step_ranges()
         self.assertFalse(any(r.startswith("0 ") for r in ranges[1:]), ranges)
+
+
+GAPPED = [[1, None, 3], [4, 5, float("nan")]]
+
+
+def _missing_cells(figure):
+    """The figure's missing-cell collections, over all its axes."""
+
+    return [
+        collection
+        for ax in figure.axes
+        for collection in ax.collections
+        if collection.get_gid() == "missing-cells"
+    ]
+
+
+def _hatch_color(collection):
+    # matplotlib < 3.11 has no hatch colour getter: the hatch takes the edge
+    getter = getattr(collection, "get_hatchcolor", collection.get_edgecolor)
+    return colors.to_hex(getter()[0])
+
+
+class TestMissingCells(unittest.TestCase):
+    def tearDown(self):
+        plt.close("all")
+        config.reset()
+
+    def test_missing_cells_draw_as_one_hatched_layer_under_the_image(self):
+        figure = Heatmap({"z": GAPPED})
+        (cells,) = _missing_cells(figure)
+        centres = sorted(
+            tuple(path.vertices[:4].mean(axis=0)) for path in cells.get_paths()
+        )
+        self.assertEqual(centres, [(1.0, 0.0), (2.0, 1.0)])
+        self.assertEqual(
+            colors.to_hex(cells.get_facecolor()[0]),
+            colors.to_hex(config["plot_heatmap_missing_color"]),
+        )
+        self.assertEqual(cells.get_hatch(), config["plot_heatmap_missing_hatch"])
+        self.assertEqual(
+            _hatch_color(cells), colors.to_hex(config["plot_heatmap_frame_color"])
+        )
+        self.assertLess(cells.get_zorder(), figure.axes[0].images[0].get_zorder())
+
+    def test_no_missing_cell_draws_no_layer(self):
+        self.assertEqual(_missing_cells(Heatmap({"z": Z})), [])
+
+    def test_the_chart_style_wins_over_the_theme(self):
+        style = {
+            "plot_heatmap_missing_color": "#FF0000",
+            "plot_heatmap_missing_hatch": "xx",
+        }
+        (cells,) = _missing_cells(Heatmap({"z": GAPPED}, style=style))
+        self.assertEqual(colors.to_hex(cells.get_facecolor()[0]), "#ff0000")
+        self.assertEqual(cells.get_hatch(), "xx")
+
+    def test_both_keys_none_draw_no_layer(self):
+        style = {"plot_heatmap_missing_color": None, "plot_heatmap_missing_hatch": None}
+        self.assertEqual(_missing_cells(Heatmap({"z": GAPPED}, style=style)), [])
+
+    def test_a_none_colour_with_a_hatch_draws_a_clear_face(self):
+        style = {"plot_heatmap_missing_color": None}
+        (cells,) = _missing_cells(Heatmap({"z": GAPPED}, style=style))
+        self.assertFalse(cells.get_facecolor()[:, 3].any())
+        self.assertEqual(cells.get_hatch(), config["plot_heatmap_missing_hatch"])
+
+    def test_emphasis_fades_the_missing_cells_and_never_outlines_them(self):
+        figure = Heatmap({"z": GAPPED}, emphasis_rule={"top": 2})
+        ax = figure.axes[0]
+        (cells,) = _missing_cells(figure)
+        outlined = {(patch.get_x() + 0.5, patch.get_y() + 0.5) for patch in ax.patches}
+        self.assertEqual(outlined, {(0.0, 1.0), (1.0, 1.0)})
+        self.assertAlmostEqual(cells.get_alpha(), ax.images[0].get_alpha().min())
+
+    def test_a_grid_cell_redraws_the_missing_cells(self):
+        grid = Grid([Heatmap({"z": GAPPED})])
+        (cells,) = _missing_cells(grid)
+        self.assertEqual(len(cells.get_paths()), 2)
 
 
 if __name__ == "__main__":

@@ -453,6 +453,15 @@ never changes cell size; that is the contour's job. A bare figure: rejected
 in `Panel`, a cell in `Grid`.
 _Avoid_: matrix plot, image plot, colormesh
 
+**No-data cell**:
+A heatmap cell whose value is missing (`None`, `NaN` or `±inf`), drawn as a
+neutral hatched square under the value image so it cannot be read as a low
+value (`plot_heatmap_missing_color`, `plot_heatmap_missing_hatch`). With a
+colorbar, a "No data" swatch beside it names the style. Both keys `None` turn
+the cell and the swatch off, for a matrix whose blank half is redundant. The
+calendar heatmap draws none (ADR 0089).
+_Avoid_: blank cell, empty cell, NaN cell
+
 **Calendar heatmap**:
 A daily series (`CalendarHeatmap`: a `{date, value}` dict per dataset,
 temporal dates only, each once) drawn as one cell per day, weeks as

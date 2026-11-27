@@ -44,7 +44,7 @@ adds no tag; one that reverses, narrows, widens or replaces a commitment does.
 - [0083](0083-front-parameter-naming-rule.md) — A front parameter is snake_case, a mode is named for what it modes, and a toggle is `show_<singular>`
 - [0084](0084-public-names-outside-the-fronts.md) — Public names outside the fronts follow the front rule, and a stats helper returns columns
 - [0069](0069-record-reading-seam.md) — The builder is the one record-reading seam; the row declares the record shape and the dataset policy (amended by [0082](0082-missing-values-not-drawn.md))
-- [0082](0082-missing-values-not-drawn.md) — A missing value is not drawn; the builder normalises it once
+- [0082](0082-missing-values-not-drawn.md) — A missing value is not drawn; the builder normalises it once (amended by [0089](0089-heatmap-missing-cells-drawn-as-no-data.md))
 
 ## Composition: Panel and Grid
 
@@ -137,6 +137,7 @@ theme faces out of the wheel.
 - [0060](0060-image-chart.md) — An image is a chart front anchored by an extent, not a setting on other charts (amended by [0062](0062-basemap.md))
 - [0062](0062-basemap.md) — The basemap draws unprojected outlines fetched into a cache (amended by [0063](0063-downloaded-theme-fonts.md))
 - [0076](0076-line-end-labels.md) — End labels are the line family's direct-label mode
+- [0089](0089-heatmap-missing-cells-drawn-as-no-data.md) — A missing heatmap cell is drawn as a hatched "No data" cell, named beside the colorbar
 
 ## Distribution and packaging
 

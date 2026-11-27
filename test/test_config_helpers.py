@@ -4,6 +4,7 @@ from datachart.config import config as _config
 from datachart.constants import ARROW_STYLE
 from datachart.utils._internal.config_helpers import (
     get_attr_value,
+    get_heatmap_missing_style,
     create_config_dict,
     get_subplot_config,
     get_text_style,
@@ -210,6 +211,31 @@ class TestAttrs(unittest.TestCase):
         self.assertEqual(config["alignment"], _config["plot_legend_alignment"])
         self.assertEqual(config["title_fontsize"], _config["plot_legend_title_size"])
         self.assertEqual(config["labelcolor"], _config["plot_legend_label_color"])
+
+
+# =====================================
+# Test Heatmap Missing-Cell Style
+# =====================================
+
+
+class TestHeatmapMissingStyle(unittest.TestCase):
+    def test_reads_the_theme_values(self):
+        style = get_heatmap_missing_style({})
+        self.assertEqual(style["color"], _config["plot_heatmap_missing_color"])
+        self.assertEqual(style["hatch"], _config["plot_heatmap_missing_hatch"])
+
+    def test_chart_style_wins_over_the_theme(self):
+        style = get_heatmap_missing_style(
+            {
+                "plot_heatmap_missing_color": "#112233",
+                "plot_heatmap_missing_hatch": "xx",
+            }
+        )
+        self.assertEqual(style, {"color": "#112233", "hatch": "xx"})
+
+    def test_empty_hatch_counts_as_none(self):
+        style = get_heatmap_missing_style({"plot_heatmap_missing_hatch": ""})
+        self.assertNotIn("hatch", style)
 
 
 if __name__ == "__main__":

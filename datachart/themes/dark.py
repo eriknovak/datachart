@@ -99,6 +99,7 @@ DARK_THEME: StyleAttrs = make_theme(
         # dark text; only the frame and the separators invert (ADR 0058)
         "plot_heatmap_frame_color": TEXT,
         "plot_heatmap_edge_color": PAGE,
+        "plot_heatmap_missing_color": "#6E7681",
         "plot_calendar_heatmap_edge_color": PAGE,
         "plot_calendar_heatmap_month_line_color": TEXT,
         "plot_parallel_axis_color": TEXT,
