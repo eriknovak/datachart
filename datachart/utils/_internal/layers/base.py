@@ -59,13 +59,18 @@ from ...stats import minimum, maximum
 from ....constants import (
     LINE_LABEL_POSITION,
     EMPHASIS,
+    HISTOGRAM_BINS,
     LEGEND_LOCATION,
     ORIENTATION,
     VALUE_FORMAT,
 )
 from ....config import config
 
-DEFAULT_NUM_BINS = 20
+DEFAULT_NUM_BINS = HISTOGRAM_BINS.DEFAULT
+
+
+# a bin rule past this many bins raises: the bars would be under a pixel wide
+MAX_RULE_BINS = 1000
 
 
 DEFAULT_ORIENTATION = ORIENTATION.VERTICAL
@@ -263,6 +268,34 @@ def get_chart_observations(attr: str, chart: dict) -> Optional[np.ndarray]:
         return observations
     finite = observations[~np.isnan(observations)]
     return finite if len(finite) else None
+
+
+def resolve_bins(
+    values: np.ndarray,
+    num_bins: Union[str, int],
+    value_range: Optional[tuple] = None,
+) -> Union[int, np.ndarray]:
+    """The `bins` argument of `numpy.histogram` for a `num_bins` setting.
+
+    An integer comes back unchanged. A `HISTOGRAM_BINS` rule name becomes
+    the edges NumPy's rule picks for `values` over `value_range`.
+
+    Raises:
+        ValueError: When the rule gives more than `MAX_RULE_BINS` bins.
+    """
+
+    if not isinstance(num_bins, str):
+        return num_bins
+
+    edges = np.histogram_bin_edges(values, bins=num_bins, range=value_range)
+    count = len(edges) - 1
+    if count > MAX_RULE_BINS:
+        raise ValueError(
+            f"`num_bins` rule {num_bins!r} gives {count} bins, more than the "
+            f"{MAX_RULE_BINS} allowed. Try num_bins=HISTOGRAM_BINS.STURGES "
+            "or an integer."
+        )
+    return edges
 
 
 class NumpyEncoder(json.JSONEncoder):

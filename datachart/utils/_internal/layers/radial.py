@@ -31,6 +31,7 @@ from .base import (
     _span_text,
     get_chart_data,
     get_chart_observations,
+    resolve_bins,
 )
 
 # ================================================
@@ -308,11 +309,12 @@ class RadialHistogramLayer(BinnedMarksMixin, RadialLayer):
         x = self.x_values()
         if x is None or len(x) == 0:
             return None
-        # observations are degrees; the fixed [0, 360) domain keeps bin edges
-        # shared across every radial histogram in a panel
-        return np.histogram(
-            np.asarray(x, dtype=float) % 360.0, bins=self.num_bins, range=(0.0, 360.0)
-        )
+        # observations are degrees; the fixed [0, 360) domain keeps a bin count's
+        # edges shared across a panel, while a rule resolves per series
+        full_circle = (0.0, 360.0)
+        angles = np.asarray(x, dtype=float) % 360.0
+        bins = resolve_bins(angles, self.num_bins, full_circle)
+        return np.histogram(angles, bins=bins, range=full_circle)
 
     def y_range(self):
         binned = self._counts()

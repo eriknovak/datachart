@@ -86,6 +86,7 @@ from .base import (
     _text_size,
     axis_kind,
     get_chart_data,
+    resolve_bins,
 )
 from .ticks import (
     PeriodTicks,
@@ -1220,7 +1221,7 @@ class LayerGroup:
         *,
         palette: Union[str, List[str], None] = None,
         max_colors: Optional[int] = None,
-        num_bins: Optional[int] = None,
+        num_bins: Union[str, int, None] = None,
         y_axis: str = "auto",
         z_order: Optional[float] = None,
         legend_label: Optional[str] = None,
@@ -1296,7 +1297,8 @@ class LayerGroup:
         xall = [x for x in xall if x is not None]
         if not xall:
             return None
-        return np.histogram(np.hstack(tuple(xall)), bins=self.num_bins)[1]
+        pooled = np.hstack(tuple(xall))
+        return np.histogram_bin_edges(pooled, bins=resolve_bins(pooled, self.num_bins))
 
 
 def group_from_chart(layers: List[Layer], settings: dict) -> LayerGroup:
@@ -1842,10 +1844,10 @@ class Panel:
             stack_bins = s.get("hist_bins_override")
             if stack_bins is None:
                 # panel-shared edges, pooled across every stacked layer
-                stack_bins = np.histogram(
-                    np.hstack(tuple(l.x_values() for _, l in hist_pairs)),
-                    bins=hist_pairs[0][0].num_bins,
-                )[1]
+                pooled = np.hstack(tuple(l.x_values() for _, l in hist_pairs))
+                stack_bins = np.histogram_bin_edges(
+                    pooled, bins=resolve_bins(pooled, hist_pairs[0][0].num_bins)
+                )
             for stack in by_axis(l for _, l in hist_pairs):
                 hist_slots.update(_hist_stack_slots(stack, stack_bins))
 

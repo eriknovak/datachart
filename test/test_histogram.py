@@ -8,7 +8,12 @@ import numpy as np
 
 from datachart.charts import Histogram
 from datachart.config import config
-from datachart.constants import HISTOGRAM_TYPE, ORIENTATION, AXIS_SCALE
+from datachart.constants import (
+    AXIS_SCALE,
+    HISTOGRAM_BINS,
+    HISTOGRAM_TYPE,
+    ORIENTATION,
+)
 from datachart.utils import Panel
 from datachart.utils._internal.chart_kinds import build_chart_panel_settings
 
@@ -18,6 +23,10 @@ HIST_A = [{"x": v} for v in [0.5] * 4 + [1.5] * 2]
 HIST_B = [{"x": v} for v in [0.5] * 1 + [2.5] * 3]
 # num_bins=3 leaves the middle bin empty: counts [100, 0, 2] over two decades
 HIST_GAP = [{"x": v} for v in [0.5] * 100 + [2.5] * 2]
+# a skewed sample and a shifted one, so the rules give distinct bin counts
+RULE_VALUES = np.random.default_rng(0).gamma(2.0, 1.5, 500)
+RULE_SHIFTED = np.random.default_rng(1).normal(6.0, 1.0, 300)
+RULE_NAMES = [m for m in HISTOGRAM_BINS.members() if isinstance(m, str)]
 
 
 def container_bottoms(figure, index):
@@ -354,3 +363,43 @@ class TestListValuedPoints(unittest.TestCase):
     def test_a_mixed_series_keeps_its_own_bins(self):
         figure = Histogram([[{"x": [v["x"] for v in HIST_A]}], HIST_B], num_bins=3)
         self.assertEqual(len(figure.axes[0].containers), 2)
+
+
+class TestBinRules(unittest.TestCase):
+    """`num_bins` takes a NumPy bin rule name (issue #357)."""
+
+    def tearDown(self):
+        plt.close("all")
+
+    def bar_centres(self, figure, index=0):
+        patches = figure.axes[0].containers[index].patches
+        return np.array([p.get_x() + p.get_width() / 2 for p in patches])
+
+    def test_each_rule_draws_its_numpy_bins(self):
+        for rule in RULE_NAMES:
+            with self.subTest(rule=rule):
+                edges = np.histogram_bin_edges(RULE_VALUES, bins=rule)
+                figure = Histogram([{"x": v} for v in RULE_VALUES], num_bins=rule)
+                np.testing.assert_allclose(
+                    self.bar_centres(figure), (edges[:-1] + edges[1:]) / 2
+                )
+
+    def test_stacked_series_share_the_rule_on_pooled_values(self):
+        pooled = np.concatenate([RULE_VALUES, RULE_SHIFTED])
+        edges = np.histogram_bin_edges(pooled, bins=HISTOGRAM_BINS.FD)
+        figure = Histogram(
+            [[{"x": v} for v in RULE_VALUES], [{"x": v} for v in RULE_SHIFTED]],
+            num_bins=HISTOGRAM_BINS.FD,
+        )
+        centres = (edges[:-1] + edges[1:]) / 2
+        np.testing.assert_allclose(self.bar_centres(figure, 0), centres)
+        np.testing.assert_allclose(self.bar_centres(figure, 1), centres)
+
+    def test_default_still_draws_twenty_bins(self):
+        figure = Histogram([{"x": v} for v in RULE_VALUES])
+        self.assertEqual(len(figure.axes[0].containers[0].patches), 20)
+
+    def test_a_rule_past_the_cap_raises(self):
+        cauchy = np.random.default_rng(0).standard_cauchy(10_000)
+        with self.assertRaisesRegex(ValueError, r"'fd' gives \d+ bins.*STURGES"):
+            Histogram([{"x": v} for v in cauchy], num_bins="fd")

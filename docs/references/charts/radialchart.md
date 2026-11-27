@@ -39,6 +39,7 @@ The parameters that accept a constant, with the class in [datachart.constants](.
 | `value_format` | [`VALUE_FORMAT`](../constants.md#datachart.constants.VALUE_FORMAT) |
 | `bar_mode` | [`BAR_MODE`](../constants.md#datachart.constants.BAR_MODE) |
 | `sort` | [`SORT`](../constants.md#datachart.constants.SORT) |
+| `num_bins` | [`HISTOGRAM_BINS`](../constants.md#datachart.constants.HISTOGRAM_BINS) |
 | `scaley` | [`AXIS_SCALE`](../constants.md#datachart.constants.AXIS_SCALE) |
 
 ## Composition

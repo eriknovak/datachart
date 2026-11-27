@@ -10,7 +10,7 @@ import numpy as np
 import pytest
 
 from datachart.charts import RadialChart
-from datachart.constants import RADIAL_DIRECTION, RADIAL_TYPE
+from datachart.constants import HISTOGRAM_BINS, RADIAL_DIRECTION, RADIAL_TYPE
 from datachart.utils import Grid
 from datachart.utils._internal.layers.base import _TextHalo
 
@@ -168,6 +168,16 @@ class TestAngularPlacement:
         # observations fall in their degree quadrants: [10,20]-> q1, [100,110]-> q2, ...
         counts = [p.get_height() for p in sorted(patches, key=lambda p: p.get_x())]
         assert counts == [2, 2, 1, 3]
+
+    def test_histogram_rule_bins_the_angles_over_the_full_circle(self):
+        angles = np.array([p["x"] for p in ANGLES]) % 360.0
+        edges = np.histogram_bin_edges(
+            angles, bins=HISTOGRAM_BINS.STURGES, range=(0.0, 360.0)
+        )
+        ax = RadialChart(
+            data=ANGLES, mark=RADIAL_TYPE.HISTOGRAM, num_bins=HISTOGRAM_BINS.STURGES
+        ).axes[0]
+        assert len(ax.patches) == len(edges) - 1
 
 
 def gridlines(ax) -> tuple:
