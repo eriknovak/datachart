@@ -306,6 +306,22 @@ def validate_error_distances(values: list, key: str) -> List[Optional[tuple]]:
     return distances
 
 
+def validate_size_values(values, chart_name: str) -> None:
+    """Raise on the first negative bubble size, naming the chart and the value.
+
+    A missing size is skipped: its point draws no marker.
+    """
+
+    for index, value in enumerate(values):
+        if is_missing(value) or value >= 0:
+            continue
+        raise ValueError(
+            f"Invalid `size` value {value} for point {index} in {chart_name!r}. "
+            "Must be a non-negative number, as a bubble's area is proportional "
+            "to it."
+        )
+
+
 def validate_value_step(step):
     """Validate a value-label step: None or a positive whole number."""
 

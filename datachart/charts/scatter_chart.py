@@ -300,7 +300,17 @@ def ScatterChart(
             which `plot_scatter_error_color` overrides.
         yerr: The key name in data for the y-axis error values (default: "yerr"),
             read like `xerr`.
-        size_range: Tuple of (min_size, max_size) for bubble charts (default: (20, 200)).
+        size_range: Tuple of (min_size, max_size) for bubble charts (default:
+            (20, 200)). Marker area is proportional to the `size` value: the
+            largest value, pooled across hue groups and composed figures on one
+            axes, draws at `max_size`, and a value half as large draws at half
+            the area. A value whose area would fall below `min_size` draws at
+            `min_size`, so small values stay visible. A constant `size` column
+            draws every marker midway between the two. A point whose size is
+            missing (no key, `None` or NaN) draws no marker, and a negative
+            value raises `ValueError`. Within each hue group or series,
+            bubbles draw largest first, so a small one stays on top of a
+            larger one of its group.
 
     Returns:
         The figure containing the scatter chart.

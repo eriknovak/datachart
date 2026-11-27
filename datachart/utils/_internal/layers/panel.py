@@ -368,15 +368,18 @@ def _size_extents(layers_on_axes) -> dict:
     """The (min, max) of every scatter layer's size data, pooled per axes.
 
     One bubble scale per axes, so an equal size draws equal in every hue
-    group and every composed figure.
+    group and every composed figure. A missing size is left out, and a
+    layer with no size present adds nothing.
     """
 
     extents = {}
     for layer, owner_ax in layers_on_axes:
         sizes = layer.size_values()
-        if sizes is None or len(sizes) == 0:
+        if sizes is None:
             continue
-        lo, hi = float(np.min(sizes)), float(np.max(sizes))
+        if np.isnan(sizes).all():
+            continue
+        lo, hi = float(np.nanmin(sizes)), float(np.nanmax(sizes))
         if owner_ax in extents:
             lo, hi = min(lo, extents[owner_ax][0]), max(hi, extents[owner_ax][1])
         extents[owner_ax] = (lo, hi)

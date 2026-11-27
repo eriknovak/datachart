@@ -135,7 +135,7 @@ EXPECTED_CHANGES = {
     "line_multi",
     "bar_multi_grouped",
     "hist_multi_stacked",
-    "scatter_hue_size",
+    "scatter_hue_size",  # bubble area proportional to value (#353)
     "overlay_zorder_grid",
     # theme renames: PUBLICATION -> INK (same style, new case name)
     "theme_ink_line",

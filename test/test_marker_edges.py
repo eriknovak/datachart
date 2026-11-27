@@ -56,9 +56,12 @@ class TestMarkerEdgeWidths(unittest.TestCase):
     def test_bubble_sizes_drop_the_edge_per_point(self):
         data = [dict(p, size=p["x"]) for p in POINTS]
         fig = ScatterChart(data, size="size", size_range=(TINY, 400))
-        widths = _points(fig.axes[0])[0].get_linewidths()
-        self.assertEqual(widths[0], 0.0)
-        self.assertEqual(widths[-1], EDGE)
+        collection = _points(fig.axes[0])[0]
+        widths = dict(
+            zip(collection.get_offsets()[:, 0].tolist(), collection.get_linewidths())
+        )
+        self.assertEqual(widths[0.0], 0.0)
+        self.assertEqual(widths[3.0], EDGE)
 
     def test_tiny_swarm_drops_its_edge(self):
         fig = SwarmPlot(GROUPS, style={"plot_swarm_size": TINY})
