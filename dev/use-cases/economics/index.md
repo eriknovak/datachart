@@ -152,7 +152,7 @@ inflation_figure = Heatmap(
 inflation_figure.show()
 ```
 
-The 2022 column is the darkest for almost every row: the post-pandemic surge took Germany to 7% and Italy to 8%, the United Kingdom to 8% and the United States to 8%, and 2023 is already paler. Two rows are dark in every column, Argentina and Türkiye, where inflation is a condition rather than an episode, and two are pale in every column, China and Japan, which never saw the surge. Saudi Arabia is pale throughout too, with a pegged currency and subsidised prices. The heatmap separates the episode from the condition.
+The 2022 column is the darkest for almost every row: the post-pandemic surge took Germany to 7% and Italy to 8%, the United Kingdom to 8% and the United States to 8%, and 2023 is already paler. Two rows are dark in every column, Argentina and Türkiye, where inflation is a condition rather than an episode, and two are pale in every column, China and Japan, which never saw the surge. Saudi Arabia is pale throughout too, with a pegged currency and subsidised prices. The three hatched cells are Argentina's 2015 to 2017, years with no national price index; the colorbar's "No data" entry names them so they do not read as low inflation. The heatmap separates the episode from the condition.
 
 ### How much did the pandemic year cost?
 

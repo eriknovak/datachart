@@ -248,7 +248,7 @@ figure.show()
 
 ### Cells and Bins
 
-A heatmap cell fades to the theme's `muted_alpha` when muted, so it still reads on the colormap, and a highlighted cell is outlined; a blank cell never matches. Cells also take explicit roles through an `emphasis` grid aligned with `z`, which wins over the rule. A hexbin's bins exist only once they are drawn, so `HexbinChart` takes the rule alone, read against each bin's count (or its reduced `c` value).
+A heatmap cell fades to the theme's `muted_alpha` when muted, so it still reads on the colormap, and a highlighted cell is outlined; a missing cell never matches. Cells also take explicit roles through an `emphasis` grid aligned with `z`, which wins over the rule. A hexbin's bins exist only once they are drawn, so `HexbinChart` takes the rule alone, read against each bin's count (or its reduced `c` value).
 
 ```
 rng = np.random.RandomState(21)

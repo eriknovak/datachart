@@ -4551,7 +4551,7 @@ are all configurable.</p>
                 <p>The labelled grid(s) for the heatmap(s): one <code>{x, y, z}</code> dict,
 or a list of them for multiple heatmaps/subplots. <code>z</code> is the 2-D
 matrix of cell values (rows along <code>y</code>, columns along <code>x</code>; <code>None</code>
-cells stay blank); <code>x</code> and <code>y</code> are optional tick labels for its
+cells draw as no-data cells); <code>x</code> and <code>y</code> are optional tick labels for its
 columns and rows (any values, the indices by default). An
 explicit <code>xticks</code>/<code>xticklabels</code> (<code>yticks</code>/<code>yticklabels</code>)
 overrides them. An optional <code>emphasis</code> grid aligned with <code>z</code>
@@ -4677,7 +4677,7 @@ highlight; set per-cell roles through the <code>emphasis</code> grid of
                 <p>A rule that highlights the cells matching it and mutes the rest:
 <code>{"above": v}</code> or <code>{"below": v}</code> (strict), <code>{"between": (lo, hi)}</code>
 (inclusive), <code>{"top": n}</code> or <code>{"bottom": n}</code>, read against each cell's
-value; a blank cell never matches. A cell's role in the <code>emphasis</code> grid of
+value; a missing cell never matches. A cell's role in the <code>emphasis</code> grid of
 <code>data</code> wins. The rule takes no <code>by</code>. See
 <a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.typings.EmphasisRuleAttrs&lt;/span&gt;" href="../../typings/#datachart.typings.EmphasisRuleAttrs"><code>EmphasisRuleAttrs</code></a>.</p>
               </div>
@@ -5638,6 +5638,34 @@ positions. See
             <td class="doc-attribute-details">
               <div class="doc-md-description">
                 <p>The color of the borders drawn between the cells.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span> | None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.HeatmapStyleAttrs.plot_heatmap_missing_color">plot_heatmap_missing_color</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The face color of the cells with no data (<code>None</code>, NaN or inf values); <code>None</code> leaves the face transparent.</p>
+              </div>
+              <p>
+                  <span class="doc-attribute-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span> | None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="datachart.typings.HeatmapStyleAttrs.plot_heatmap_missing_hatch">plot_heatmap_missing_hatch</span></code></td>
+            <td class="doc-attribute-details">
+              <div class="doc-md-description">
+                <p>The hatch pattern of the cells with no data (an empty string counts as <code>None</code>), drawn in the cell border color (<code>plot_heatmap_edge_color</code>); both missing keys <code>None</code> draw no such cells.</p>
               </div>
               <p>
                   <span class="doc-attribute-annotation">

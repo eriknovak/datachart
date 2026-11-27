@@ -31,29 +31,30 @@ Heatmap(
 
 Every customization is either a keyword argument of `Heatmap` or a `plot_heatmap_*` attribute of its `style` dictionary. The table maps common tasks to the one you need and links to the subsection that shows it.
 
-| I want to…                                 | Use                                                                          | See                                                                                                     |
-| ------------------------------------------ | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| add a title and axis labels                | `title`, `xlabel`, `ylabel`                                                  | [Title and axis labels](#title-and-axis-labels)                                                         |
-| tick only some rows or columns             | `xticks`, `xticklabels`, `yticks`, `yticklabels`                             | [Ticks and labels](#ticks-and-labels)                                                                   |
-| rotate the tick labels                     | `xtickrotate`, `ytickrotate`                                                 | [Ticks and labels](#ticks-and-labels)                                                                   |
-| resize the figure or keep the cells square | `figsize`, `aspect_ratio`                                                    | [Figure size and aspect ratio](#figure-size-and-aspect-ratio)                                           |
-| show the colorbar                          | `show_colorbar`                                                              | [Colorbar and cell values](#colorbar-and-cell-values)                                                   |
-| write the values into the cells            | `show_values`, `value_format`                                                | [Colorbar and cell values](#colorbar-and-cell-values)                                                   |
-| caption, move, or format the colorbar      | `colorbar={"label": ..., "location": ..., "format": ..., "ticks": ...}`      | [Colorbar placement](#colorbar-placement)                                                               |
-| change the colormap or transparency        | `style={"plot_heatmap_cmap": ..., "plot_heatmap_alpha": ...}`                | [Heatmap style](#heatmap-style)                                                                         |
-| change the colormap a centred norm uses    | `style={"plot_heatmap_cmap_diverging": ...}`                                 | [Normalization](#normalization)                                                                         |
-| style the cell values                      | `style={"plot_heatmap_font_size": ..., "plot_heatmap_font_color": ..., ...}` | [Heatmap style](#heatmap-style)                                                                         |
-| draw borders between the cells             | `style={"plot_heatmap_edge_width": ..., "plot_heatmap_edge_color": ...}`     | [Heatmap style](#heatmap-style)                                                                         |
-| center a diverging colormap on a value     | `norm="centered"`, `vcenter`                                                 | [Normalization](#normalization)                                                                         |
-| spread skewed values over the colormap     | `norm`                                                                       | [Normalization](#normalization)                                                                         |
-| highlight some cells, mute the rest        | `emphasis_rule`, an `emphasis` grid in `data`                                | [Emphasis](#emphasis)                                                                                   |
-| put a note on a cell                       | `texts`                                                                      | [Text annotations](#text-annotations)                                                                   |
-| compare several tables side by side        | `data` as a list of dicts, `subtitle`                                        | [Multiple Heatmaps](#multiple-heatmaps)                                                                 |
-| arrange the subplots                       | `max_cols`, `sharex`, `sharey`                                               | [Subplot layout and shared axes](#subplot-layout-and-shared-axes)                                       |
-| leave cells without data empty             | `None` in `z`                                                                | [Blank cells](#blank-cells)                                                                             |
-| show only part of the table                | `xmin`, `xmax`, `ymin`, `ymax`                                               | [Axis range](#axis-range)                                                                               |
-| use dates as row or column labels          | `date` objects as `x` or `y`, `xticks_format`, `yticks_format`               | [Date labels](#date-labels)                                                                             |
-| save the chart to a file                   | `save_figure`                                                                | [Saving Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md) guide |
+| I want to…                                 | Use                                                                            | See                                                                                                     |
+| ------------------------------------------ | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
+| add a title and axis labels                | `title`, `xlabel`, `ylabel`                                                    | [Title and axis labels](#title-and-axis-labels)                                                         |
+| tick only some rows or columns             | `xticks`, `xticklabels`, `yticks`, `yticklabels`                               | [Ticks and labels](#ticks-and-labels)                                                                   |
+| rotate the tick labels                     | `xtickrotate`, `ytickrotate`                                                   | [Ticks and labels](#ticks-and-labels)                                                                   |
+| resize the figure or keep the cells square | `figsize`, `aspect_ratio`                                                      | [Figure size and aspect ratio](#figure-size-and-aspect-ratio)                                           |
+| show the colorbar                          | `show_colorbar`                                                                | [Colorbar and cell values](#colorbar-and-cell-values)                                                   |
+| write the values into the cells            | `show_values`, `value_format`                                                  | [Colorbar and cell values](#colorbar-and-cell-values)                                                   |
+| caption, move, or format the colorbar      | `colorbar={"label": ..., "location": ..., "format": ..., "ticks": ...}`        | [Colorbar placement](#colorbar-placement)                                                               |
+| change the colormap or transparency        | `style={"plot_heatmap_cmap": ..., "plot_heatmap_alpha": ...}`                  | [Heatmap style](#heatmap-style)                                                                         |
+| change the colormap a centred norm uses    | `style={"plot_heatmap_cmap_diverging": ...}`                                   | [Normalization](#normalization)                                                                         |
+| style the cell values                      | `style={"plot_heatmap_font_size": ..., "plot_heatmap_font_color": ..., ...}`   | [Heatmap style](#heatmap-style)                                                                         |
+| draw borders between the cells             | `style={"plot_heatmap_edge_width": ..., "plot_heatmap_edge_color": ...}`       | [Heatmap style](#heatmap-style)                                                                         |
+| center a diverging colormap on a value     | `norm="centered"`, `vcenter`                                                   | [Normalization](#normalization)                                                                         |
+| spread skewed values over the colormap     | `norm`                                                                         | [Normalization](#normalization)                                                                         |
+| highlight some cells, mute the rest        | `emphasis_rule`, an `emphasis` grid in `data`                                  | [Emphasis](#emphasis)                                                                                   |
+| put a note on a cell                       | `texts`                                                                        | [Text annotations](#text-annotations)                                                                   |
+| compare several tables side by side        | `data` as a list of dicts, `subtitle`                                          | [Multiple Heatmaps](#multiple-heatmaps)                                                                 |
+| arrange the subplots                       | `max_cols`, `sharex`, `sharey`                                                 | [Subplot layout and shared axes](#subplot-layout-and-shared-axes)                                       |
+| mark cells without data                    | `None` in `z`                                                                  | [Missing cells](#missing-cells)                                                                         |
+| restyle or hide the no-data cells          | `style={"plot_heatmap_missing_color": ..., "plot_heatmap_missing_hatch": ...}` | [Missing cells](#missing-cells)                                                                         |
+| show only part of the table                | `xmin`, `xmax`, `ymin`, `ymax`                                                 | [Axis range](#axis-range)                                                                               |
+| use dates as row or column labels          | `date` objects as `x` or `y`, `xticks_format`, `yticks_format`                 | [Date labels](#date-labels)                                                                             |
+| save the chart to a file                   | `save_figure`                                                                  | [Saving Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md) guide |
 
 The parameters that accept a constant, with the class in [datachart.constants](https://eriknovak.github.io/datachart/dev/references/constants/index.md) that lists its values:
 
@@ -270,7 +271,7 @@ for centre, label in [(0, "freezing"), (18, "room temperature")]:
 
 ### Emphasis
 
-A heatmap shows every cell with the same weight, but a question is usually about a few of them. A heatmap has no series to mute, so the `emphasis` parameter of the series charts raises a `ValueError`; emphasis works per cell instead. `emphasis_rule` picks the cells from their values with a one-key rule: `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}` (inclusive), `{"top": n}` or `{"bottom": n}`. The matching cells are outlined, the rest fade to the theme's muted alpha and still read on the colormap, and a blank cell never matches. Asking which months average below freezing picks out Moscow's long winter and a single Reykjavik month:
+A heatmap shows every cell with the same weight, but a question is usually about a few of them. A heatmap has no series to mute, so the `emphasis` parameter of the series charts raises a `ValueError`; emphasis works per cell instead. `emphasis_rule` picks the cells from their values with a one-key rule: `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}` (inclusive), `{"top": n}` or `{"bottom": n}`. The matching cells are outlined, the rest fade to the theme's muted alpha and still read on the colormap, and a missing cell never matches. Asking which months average below freezing picks out Moscow's long winter and a single Reykjavik month:
 
 ```
 Heatmap(
@@ -379,18 +380,37 @@ Heatmap(
 
 ## Additional Features
 
-### Blank cells
+### Missing cells
 
-Real tables have holes: a station that was not yet running, a pair of variables never measured together. A `None` in `z` leaves its cell blank, which is honest, where a zero would claim a value. `monthly_2024`, defined in a hidden cell, holds illustrative monthly temperatures of three weather stations in 2024; the newest station started recording in April, so its first three months are `None`.
+Real tables have holes: a station that was not yet running, a pair of variables never measured together. A `None` in `z` marks its cell as missing, which is honest, where a zero would claim a value. A blank cell would still mislead, because the light end of a sequential colormap such as `Blues` is near white too, and a reader takes an empty cell for a low value. So a missing cell is drawn in the theme's muted grey with a hatch, a look no colormap value takes, and the colorbar gains a "No data" entry that names it. NaN and infinite values count as missing as well. `monthly_2024`, defined in a hidden cell, holds illustrative monthly temperatures of three weather stations in 2024; the newest station started recording in April, so its first three months are `None`.
 
 ```
 Heatmap(
-    # None cells stay blank
+    # None cells draw hatched grey, and the colorbar names them
     data=monthly_2024,
     title="Monthly mean temperature in 2024 (°C)",
     figsize=FIG_SIZE.FULL_SHORT,
+    show_colorbar=True,
     show_values=True,
     value_format=VALUE_FORMAT.DECIMAL,
+).show()
+```
+
+The look comes from two style attributes: `plot_heatmap_missing_color` fills the cell and `plot_heatmap_missing_hatch` draws its pattern, in the color of the cell borders (`plot_heatmap_edge_color`). Each theme sets the color to its own muted grey, the one faded marks take, and the chart's `style` overrides both. A grey cross-hatch on white reads as "not measured" on a print that may lose the grey fill; as the hatch follows the border color, the example sets that too. Setting both to `None` turns the marking off and leaves the cells blank, which suits cells left empty on purpose, as in [Example 1](#example-1-how-do-penguin-measurements-move-together-centered-norm-half-a-matrix-and-a-note).
+
+```
+Heatmap(
+    data=monthly_2024,
+    # white cells with a grey cross-hatch instead of the theme's grey
+    style={
+        "plot_heatmap_missing_color": "#FFFFFF",
+        "plot_heatmap_missing_hatch": "xx",
+        # the hatch draws in the cell border color
+        "plot_heatmap_edge_color": "#9E9E9E",
+    },
+    title="Monthly mean temperature in 2024 (°C)",
+    figsize=FIG_SIZE.FULL_SHORT,
+    show_colorbar=True,
 ).show()
 ```
 
@@ -442,7 +462,7 @@ The examples below put the features above to work, each one answering a question
 
 ### Example 1: How Do Penguin Measurements Move Together? (Centered Norm, Half a Matrix, and a Note)
 
-`correlations` holds the Pearson correlation between four body measurements (bill length, bill depth, flipper length and body mass) of the 342 penguins in the [Palmer penguins](https://allisonhorst.github.io/palmerpenguins/) dataset (CC0). A correlation matrix is symmetric, so the upper triangle repeats the lower one and the diagonal is 1.00 by definition: both are left `None`, which draws them blank and leaves six cells that each say something. A correlation is also signed, so `norm=COLOR_NORM.CENTERED` puts zero in the middle of the theme's diverging colormap and gives equally strong correlations of either sign equally dark shades, without naming a colormap or a range by hand. The variables label both axes, square cells keep the matrix square, and the cells carry the coefficients. One cell is a known trap: bill length and depth correlate negatively across all penguins but positively within each species, a case of Simpson's paradox, and a note says so.
+`correlations` holds the Pearson correlation between four body measurements (bill length, bill depth, flipper length and body mass) of the 342 penguins in the [Palmer penguins](https://allisonhorst.github.io/palmerpenguins/) dataset (CC0). A correlation matrix is symmetric, so the upper triangle repeats the lower one and the diagonal is 1.00 by definition: both are left `None`, which leaves six cells that each say something. These cells are redundant, not missing, so the two missing-cell style attributes are set to `None`: the cells stay blank instead of carrying the hatched "No data" look, and the colorbar lists no "No data" entry. A correlation is also signed, so `norm=COLOR_NORM.CENTERED` puts zero in the middle of the theme's diverging colormap and gives equally strong correlations of either sign equally dark shades, without naming a colormap or a range by hand. The variables label both axes, square cells keep the matrix square, and the cells carry the coefficients. One cell is a known trap: bill length and depth correlate negatively across all penguins but positively within each species, a case of Simpson's paradox, and a note says so.
 
 ```
 Heatmap(
@@ -454,6 +474,9 @@ Heatmap(
     style={
         "plot_heatmap_edge_width": 1,
         "plot_heatmap_edge_color": "#FFFFFF",
+        # the empty half is redundant, not missing: keep it blank
+        "plot_heatmap_missing_color": None,
+        "plot_heatmap_missing_hatch": None,
     },
     # a note on the bill length and depth cell
     texts={

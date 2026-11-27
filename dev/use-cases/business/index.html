@@ -5776,7 +5776,7 @@ signups_figure.show()</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="do-the-customers-who-pay-stay">Do the customers who pay stay?<a class="anchor-link" href="#do-the-customers-who-pay-stay">¶</a></h3><p>Revenue can grow while every cohort leaks, as long as new customers arrive faster than old ones leave; the check is to follow each month's new paying customers on their own and count how many are still paying one, two, three months later. Twelve cohorts by twelve months is a triangle (the January cohort has eleven months of history, the December cohort none), and a <a href="../../how-to-guides/charts/heatmap/">heatmap</a> draws it with <code>None</code> for the cells that have not happened yet, <code>show_values</code> printing the retained share in each cell, and <code>value_format</code> giving it a percent sign. Reading down a column compares cohorts at the same age, which is how an onboarding change shows up.</p>
+<h3 id="do-the-customers-who-pay-stay">Do the customers who pay stay?<a class="anchor-link" href="#do-the-customers-who-pay-stay">¶</a></h3><p>Revenue can grow while every cohort leaks, as long as new customers arrive faster than old ones leave; the check is to follow each month's new paying customers on their own and count how many are still paying one, two, three months later. Twelve cohorts by twelve months is a triangle (the January cohort has eleven months of history, the December cohort none), and a <a href="../../how-to-guides/charts/heatmap/">heatmap</a> draws it with <code>None</code> for the cells that have not happened yet (they are not missing data, so the two missing-cell style attributes set to <code>None</code> keep them blank instead of hatched), <code>show_values</code> printing the retained share in each cell, and <code>value_format</code> giving it a percent sign. Reading down a column compares cohorts at the same age, which is how an onboarding change shows up.</p>
 </div>
 </div>
 </div>
@@ -5812,6 +5812,8 @@ signups_figure.show()</div>
     <span class="n">value_format</span><span class="o">=</span><span class="s2">"</span><span class="si">{x:.0f}</span><span class="s2">%"</span><span class="p">,</span>
     <span class="n">vmin</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
     <span class="n">vmax</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="c1"># months that have not happened yet are not missing data: keep them blank</span>
+    <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">"plot_heatmap_missing_color"</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">"plot_heatmap_missing_hatch"</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
     <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">8.0</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">),</span>
 <span class="p">)</span>
 <span class="n">cohort_figure</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
@@ -5829,6 +5831,8 @@ signups_figure.show()</div>
     value_format="{x:.0f}%",
     vmin=40,
     vmax=100,
+    # months that have not happened yet are not missing data: keep them blank
+    style={"plot_heatmap_missing_color": None, "plot_heatmap_missing_hatch": None},
     figsize=(8.0, 5.5),
 )
 cohort_figure.show()</div>
