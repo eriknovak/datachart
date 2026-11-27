@@ -174,7 +174,7 @@ plugins:
         Composition:
           - how-to-guides/composition/index.md: Map of Panel, Grid, and text annotations with Annotate.
           - how-to-guides/utility/panel.ipynb: "Overlaying charts in one coordinate space with Panel: two value axes, legend, drawing order, emphasis, limits and scales, bar mode, nesting, horizontal panels, configuration, and worked examples."
-          - how-to-guides/utility/grid.ipynb: Grid basics on the climate of Ljubljana and eight European cities, titles and shared axis labels, figure size, automatic layout, nested rows, blank cells, shared axes, irregular layouts, nested grids and panels, subplot figures, annotations, and worked examples on real data.
+          - how-to-guides/utility/grid.ipynb: Grid basics on the climate of Ljubljana and eight European cities, titles and shared axis labels, figure size, automatic layout, nested rows, blank cells, shared axes, shared series colours, irregular layouts, nested grids and panels, subplot figures, annotations, and worked examples on real data.
           - how-to-guides/utility/annotations.ipynb: Text annotation basics on Ljubljana's climate normals, data and axes coordinates, targets and connectors, connector looks, text and box style, per-subplot notes, annotating finished figures, panels and subplots with Annotate, the text configuration, and worked examples on real data.
         Styling:
           - how-to-guides/styling/index.md: Map of themes, the theme gallery, and colormaps.

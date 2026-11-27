@@ -2,14 +2,16 @@
 
 import copy
 import io
+import warnings
 
 import pytest
 import matplotlib.pyplot as plt
+from matplotlib.colors import to_hex
 from matplotlib.gridspec import GridSpecFromSubplotSpec
 
 from datachart.charts import Histogram, LineChart, BarChart
 from datachart.config import config
-from datachart.constants import BAR_MODE, THEME, VALUE_FORMAT
+from datachart.constants import BAR_MODE, EMPHASIS, THEME, VALUE_FORMAT
 from datachart.utils import (
     Panel,
     Grid,
@@ -684,3 +686,129 @@ class TestSubplotFigureInGrid:
         assert multi._chart_metadata["panel"].settings["title"] is None
         single = BarChart(data=bars[0], subtitle="only")
         assert single._chart_metadata["panel"].settings["title"] == "only"
+
+
+class TestGridSeriesColors:
+    """One series label draws one color across every grid cell (#362)."""
+
+    def teardown_method(self):
+        plt.close("all")
+
+    @staticmethod
+    def _lines(n, labels=None, **kwargs):
+        series = [[{"x": i, "y": i * (k + 1)} for i in range(4)] for k in range(n)]
+        return LineChart(data=series, subtitle=labels, **kwargs)
+
+    @staticmethod
+    def _cell_colors(figure):
+        """Each data axes' line colors, as hex, keyed by label, in cell order."""
+        return [
+            [(line.get_label(), to_hex(line.get_color())) for line in ax.get_lines()]
+            for ax in figure.axes
+            if ax.get_lines()
+        ]
+
+    def test_a_label_draws_one_color_in_every_cell(self):
+        figure = Grid([self._lines(3, ["A", "B", "C"]), self._lines(2, ["C", "A"])])
+        first, second = (dict(cell) for cell in self._cell_colors(figure))
+        assert second["A"] == first["A"]
+        assert second["C"] == first["C"]
+
+    def test_a_new_label_takes_the_next_palette_color(self):
+        figure = Grid([self._lines(2, ["A", "B"]), self._lines(1, ["C"])])
+        alone = dict(self._cell_colors(self._lines(3, ["A", "B", "C"]))[0])
+        assert dict(self._cell_colors(figure)[1])["C"] == alone["C"]
+
+    def test_unlabelled_cells_keep_their_own_colors(self):
+        alone = self._cell_colors(self._lines(2))[0]
+        figure = Grid([self._lines(2), self._lines(2)])
+        assert self._cell_colors(figure) == [alone, alone]
+
+    def test_an_own_color_on_first_appearance_colors_the_label(self):
+        own = {"style": [{"plot_line_color": "#123456"}, {}]}
+        figure = Grid([self._lines(2, ["A", "B"], **own), self._lines(2, ["A", "C"])])
+        alone = self._cell_colors(self._lines(2, ["A", "B"], **own))[0]
+        first, second = self._cell_colors(figure)
+        assert first == alone
+        assert dict(second)["A"] == "#123456"
+
+    def test_an_own_color_on_later_appearance_claims_no_slot(self):
+        own = {"style": [{"plot_line_color": "#123456"}, {}]}
+        figure = Grid([self._lines(1, ["A"]), self._lines(2, ["A", "B"], **own)])
+        alone = dict(self._cell_colors(self._lines(2, ["A", "B"]))[0])
+        assert dict(self._cell_colors(figure)[1]) == {"A": "#123456", "B": alone["B"]}
+
+    def test_a_muted_series_claims_no_label_color(self):
+        muted = {"emphasis": [EMPHASIS.BACKGROUND, None]}
+        alone = self._cell_colors(self._lines(2, ["A", "B"], **muted))[0]
+        figure = Grid(
+            [self._lines(2, ["A", "B"], **muted), self._lines(2, ["A", "B"], **muted)]
+        )
+        assert self._cell_colors(figure) == [alone, alone]
+
+    @staticmethod
+    def _grid_warnings(cells):
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            Grid(cells)
+        return [w for w in caught if issubclass(w.category, UserWarning)]
+
+    def test_distinct_labels_past_the_palette_warn_once(self):
+        n = len(config["color_general_multiple"])
+        labels = [f"S{k}" for k in range(n + 1)]
+        half = (n + 1) // 2
+        cells = [
+            self._lines(half, labels[:half]),
+            self._lines(n + 1 - half, labels[half:]),
+        ]
+        (warning,) = self._grid_warnings(cells)
+        assert f"{n + 1} series" in str(warning.message)
+
+    def test_repeated_labels_within_the_palette_stay_silent(self):
+        n = len(config["color_general_multiple"])
+        labels = [f"S{k}" for k in range(n)]
+        cells = [self._lines(n, labels), self._lines(n, labels[::-1])]
+        assert self._grid_warnings(cells) == []
+
+    @staticmethod
+    def _label_colors(figure):
+        """Every color each label draws in, across the whole figure."""
+        colors = {}
+        for cell in TestGridSeriesColors._cell_colors(figure):
+            for label, color in cell:
+                colors.setdefault(label, set()).add(color)
+        return colors
+
+    def test_a_nested_grid_shares_the_outer_grid_colors(self):
+        cells = [self._lines(2, ["A", "B"]), self._lines(1, ["C"])]
+        flat = Grid([*cells, self._lines(2, ["C", "A"])])
+        nested = Grid([Grid(cells), self._lines(2, ["C", "A"])])
+        assert self._label_colors(nested) == self._label_colors(flat)
+
+    def test_labelled_subplots_draw_distinct_colors_in_a_grid(self):
+        subplots = self._lines(2, ["A", "B"], subplots=True)
+        figure = Grid([subplots, self._lines(1, ["C"])])
+        colors = self._label_colors(figure)
+        assert colors["A"] != colors["B"]
+
+    def test_a_panel_label_over_several_series_keeps_their_colors(self):
+        labelled = Panel([{"figure": self._lines(3), "legend_label": "Temps"}])
+        alone = [to_hex(line.get_color()) for line in labelled.axes[0].get_lines()]
+        grid = Grid([labelled])
+        in_grid = [to_hex(line.get_color()) for line in grid.axes[0].get_lines()]
+        assert in_grid == alone
+        assert len(set(in_grid)) == 3
+
+    def test_a_panel_label_over_one_unmuted_series_names_it(self):
+        muted = self._lines(2, emphasis=[EMPHASIS.BACKGROUND, None])
+        labelled = Panel([{"figure": muted, "legend_label": "X"}])
+        grid = Grid([labelled, self._lines(2, ["Y", "X"])])
+        drawn = to_hex(grid.axes[0].get_lines()[1].get_color())
+        colors = dict(self._cell_colors(grid)[1])
+        assert drawn == colors["X"]
+
+    def test_the_grid_legend_lists_each_label_once_in_first_order(self):
+        cells = [self._lines(2, ["A", "B"]), self._lines(2, ["C", "A"])]
+        figure = Grid(cells, show_legend=True)
+        (legend,) = [ax.get_legend() for ax in figure.axes if ax.get_legend()]
+        assert [text.get_text() for text in legend.get_texts()] == ["A", "B", "C"]

@@ -23,7 +23,7 @@ from matplotlib.legend_handler import (
     HandlerPathCollection,
     HandlerPolyCollection,
 )
-from ..colors import create_color_cycle
+from ..colors import create_color_cycle, get_discrete_colors, warn_palette_overflow
 from ..validate import (
     AXIS_NUMERIC,
     AXIS_TEMPORAL,
@@ -1305,8 +1305,8 @@ def group_from_chart(layers: List[Layer], settings: dict) -> LayerGroup:
     """Build a chart front's layer group; palettes are resolved here.
 
     Every group draws from the multiple palette, a subplot's single dataset
-    included, so a series looks the same alone, in a subplot and in a grid
-    cell (issue #183).
+    included, so an unlabelled series looks the same alone, in a subplot and
+    in a grid cell (issue #183). A grid recolors labelled series by label.
     """
 
     # one color per dataset (a raincloud's three layers share one chart);
@@ -1461,6 +1461,35 @@ def _style_assignments(entries: Optional[list]) -> Optional[defaultdict]:
     return defaultdict(lambda: next(entry_iter))
 
 
+def palette_key(palette: Union[str, List[str]]) -> Union[str, tuple]:
+    """A palette as a dict key: a color list becomes a tuple."""
+
+    return tuple(palette) if isinstance(palette, list) else palette
+
+
+def series_label(group: LayerGroup, layer: Layer) -> Optional[str]:
+    """The label that names a layer's series; None when no label does.
+
+    The group's legend label wins over the layer's subtitle when the group
+    holds one colored dataset, one that takes a color and is not drawn all
+    muted; over several it names the figure, not each series. A label with a
+    leading underscore draws no legend entry, so it names no series.
+    """
+
+    n_colored = sum(
+        any(
+            l.takes_color and not l.draws_all_muted(group.layer_role(l), group.emphasis)
+            for l in chart
+        )
+        for chart in layers_per_chart(group.layers)
+    )
+    names_series = group.legend_label is not None and n_colored == 1
+    label = group.legend_label if names_series else layer.subtitle
+    if not isinstance(label, str) or not label or label.startswith("_"):
+        return None
+    return label
+
+
 class Panel:
     """A group of layers sharing one coordinate space; owns all cross-layer concerns."""
 
@@ -1482,6 +1511,36 @@ class Panel:
     @property
     def layers(self) -> List[Layer]:
         return [layer for group in self.groups for layer in group.layers]
+
+    def labelled_series(self) -> List[tuple]:
+        """The panel's labelled colored series, in draw order.
+
+        Returns:
+            One (palette key, palette, label, own color) tuple per labelled
+            dataset, read from its first layer that takes a color and is not
+            drawn all muted; a dataset drawn as several layers counts once.
+        """
+
+        series, seen = [], set()
+        for group in self.groups:
+            for layer in group.layers:
+                if (
+                    id(layer.chart) in seen
+                    or not layer.takes_color
+                    or layer.draws_all_muted(group.layer_role(layer), group.emphasis)
+                    or (label := series_label(group, layer)) is None
+                ):
+                    continue
+                seen.add(id(layer.chart))
+                series.append(
+                    (
+                        palette_key(group.palette),
+                        group.palette,
+                        label,
+                        layer.own_color(),
+                    )
+                )
+        return series
 
     def _temporal_axis(self) -> Optional[str]:
         """The drawn axis ("x" or "y") that holds time; None when neither does."""
@@ -1881,17 +1940,9 @@ class Panel:
             [_marker_entry(entry) for entry in s.get("marker_cycle") or []]
         )
 
-        # draw the layers group by group, in order
         # one color cycle per palette, pooled across the panel's groups, so
-        # composed single-series figures draw in distinct colors
-        def palette_key(group):
-            return (
-                tuple(group.palette)
-                if isinstance(group.palette, list)
-                else group.palette
-            )
-
-        # background and own-colored layers do not consume a color-cycle slot
+        # composed single-series figures draw in distinct colors; background
+        # and own-colored layers do not consume a color-cycle slot
         pooled_colors = defaultdict(int)
         for group in self.groups:
             n_slotless = sum(
@@ -1900,13 +1951,25 @@ class Panel:
                 if l.draws_all_muted(group.layer_role(l), group.emphasis)
                 or l.own_color() is not None
             )
-            pooled_colors[palette_key(group)] += max(group.max_colors - n_slotless, 0)
+            pooled_colors[palette_key(group.palette)] += max(
+                group.max_colors - n_slotless, 0
+            )
+        # a grid's label colors replace slot colors, so the cell's overflow
+        # warning counts only the slots they leave (ADR 0090)
+        label_color_map = s.get("label_colors", {})
+        label_colored = defaultdict(int)
+        for key, _, label, own_color in self.labelled_series():
+            if own_color is None and label in label_color_map.get(key, {}):
+                label_colored[key] += 1
         cycles = {}
         for group in self.groups:
-            key = palette_key(group)
+            key = palette_key(group.palette)
             if key not in cycles:
                 cycles[key] = create_color_cycle(
-                    group.palette, max(pooled_colors[key], 1), "series"
+                    group.palette, max(pooled_colors[key], 1)
+                )
+                warn_palette_overflow(
+                    group.palette, pooled_colors[key] - label_colored[key], "series"
                 )
 
         # panel-owned parallel normalization (ADR 0009); furniture draws once
@@ -1930,10 +1993,13 @@ class Panel:
         scales = self._resolve_scales(ax_right, group_axes)
         self._validate_log_scales(scales, group_axes, ax_right)
         scalex, scaley, scale_right = scales
+        # draw the layers group by group, in order
         # user limits name the host axes, so only host marks are hidden past them
         limit_marks = []
         for group, target_ax in zip(self.groups, group_axes):
-            cycle = cycles[palette_key(group)]
+            cycle = cycles[palette_key(group.palette)]
+            # a grid's colors by series label, across its cells (ADR 0090)
+            label_colors = label_color_map.get(palette_key(group.palette), {})
             on_twin = ax_right is not None and target_ax is ax_right
             value_scale = scale_right if on_twin else (scalex if horizontal else scaley)
             category_scale = scaley if horizontal else scalex
@@ -1949,19 +2015,18 @@ class Panel:
                 role = group.layer_role(layer)
                 muted = layer.draws_all_muted(role, group.emphasis)
 
-                own_color = layer.own_color()
+                # a colorless lookup would advance the pooled cycle and
+                # shift the colors of later composed figures
+                color = None
+                if layer.takes_color and not muted:
+                    color = layer.own_color()
+                    if color is None:
+                        # the lookup still advances the cycle, so an unlabelled
+                        # series keeps the color it draws outside a grid
+                        color = cycle[layer.chart_hash]["color"]
+                        color = label_colors.get(series_label(group, layer), color)
                 ctx = DrawContext(
-                    # a colorless lookup would advance the pooled cycle and
-                    # shift the colors of later composed figures
-                    color=(
-                        None
-                        if muted or not layer.takes_color
-                        else (
-                            own_color
-                            if own_color is not None
-                            else cycle[layer.chart_hash]["color"]
-                        )
-                    ),
+                    color=color,
                     z_order=z_order,
                     legend_label=NO_LEGEND if muted else group.legend_label,
                     alpha=(
@@ -3325,3 +3390,47 @@ class Panel:
         labels_left = [f"{label} ({primary})" for label in labels_left]
         labels_right = [f"{label} ({secondary})" for label in labels_right]
         return handles_left + handles_right, labels_left + labels_right
+
+
+# ================================================
+# Grid Label Colors
+# ================================================
+
+
+def grid_label_colors(panels: List[Panel]) -> dict:
+    """One color per series label across a grid's cells (ADR 0090).
+
+    The first appearance of a label, in grid order, decides its color: an
+    own color maps the label to it and takes no palette slot; otherwise the
+    label takes the next color of its palette. So the same label draws the
+    same color in every cell.
+
+    Args:
+        panels: The grid's cell panels, in grid order.
+
+    Returns:
+        A {palette key: {label: color}} mapping; empty without labels.
+    """
+
+    # the first appearance of each label, per palette: its own color or None
+    palettes, firsts = {}, {}
+    for panel in panels:
+        for key, palette, label, own_color in panel.labelled_series():
+            palettes.setdefault(key, palette)
+            firsts.setdefault(key, {}).setdefault(label, own_color)
+
+    # own colors keep theirs; the other labels take the palette's colors in order
+    label_colors = {}
+    for key, first in firsts.items():
+        slotted = [label for label, own_color in first.items() if own_color is None]
+        # a palette whose labels all carry own colors takes no slot
+        palette_colors = iter(
+            get_discrete_colors(palettes[key], len(slotted)) if slotted else []
+        )
+        label_colors[key] = {
+            label: own_color if own_color is not None else next(palette_colors)
+            for label, own_color in first.items()
+        }
+        # the grid warns once over its distinct labels, not once per cell
+        warn_palette_overflow(palettes[key], len(slotted), "series")
+    return label_colors

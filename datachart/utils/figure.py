@@ -29,6 +29,7 @@ from ._internal.figures import (
     parent_cell as _parent_cell,
     subgridspec as _subgridspec,
 )
+from ._internal.layers import grid_label_colors as _grid_label_colors
 from ._internal.plot_engine import SUBPLOT_FURNITURE_KEYS as _SUBPLOT_FURNITURE_KEYS
 from ._internal.validate import (
     validate_layout_specs as _validate_layout_specs,
@@ -120,6 +121,17 @@ def _subplot_node(metadata: Dict[str, Any], panels: List[Any]) -> Dict[str, Any]
         "shape": shape,
         **{key: metadata.get(key) for key in _SUBPLOT_FURNITURE_KEYS},
     }
+
+
+def _cell_panels(cells: List[Dict[str, Any]]) -> List[Any]:
+    """The panels of a cell tree, depth first: nested grids and subplot figures."""
+    panels = []
+    for cell in cells:
+        if "grid" in cell:
+            panels.extend(_cell_panels(cell["grid"]["cells"]))
+        else:
+            panels.append(cell["panel"])
+    return panels
 
 
 def _render_cell(
@@ -215,9 +227,10 @@ def _render_grid_node(
     the axis labels a footer row and a left column; sharing stays local to
     the node, anchored on its first shareable axes — or, for a `"col"` x or
     `"row"` y share, on the first one in the cell's column or row. A node
-    `legend` — the entries of one cell's axes, for the whole grid — takes the
-    outermost column or row on its `edge` (default right), inside the title;
-    with no `cell`, the first cell whose axes carry entries lends them. The
+    `legend` — one legend for the whole grid — takes the outermost column or
+    row on its `edge` (default right), inside the title; its `cell` lends that
+    cell's entries, and with no `cell` every drawn cell lends its entries, each
+    label once. The
     node's `overrides` — and, over them, an enclosing grid's — are laid over
     every cell's panel settings, to any depth.
     """
@@ -334,8 +347,12 @@ def _render_grid_node(
         drawn = cell_axes.get(legend["cell"])
         entries = drawn[1].legend_entries(drawn[0]) if drawn else None
     elif legend:
-        found = (panel.legend_entries(ax) for ax, panel in cell_axes.values())
-        entries = next((e for e in found if e[1]), None)
+        # each label once, with the handle of its first appearance (ADR 0090)
+        first = {}
+        for ax, panel in cell_axes.values():
+            for handle, label in zip(*panel.legend_entries(ax)):
+                first.setdefault(label, handle)
+        entries = (list(first.values()), list(first)) if first else None
     if entries is not None:
         spec = {
             "right": sub_gs[body_rows, -1],
@@ -402,7 +419,7 @@ def node_legend(
     """A grid node's `legend`: the themed legend style on one `edge`.
 
     `style` entries override the resolved legend style; `cell` names the cell
-    lending its entries, or None for the first cell that has any.
+    lending its entries, or None to gather every drawn cell's, each label once.
     """
     resolved = {
         k: v
@@ -683,12 +700,17 @@ def _figure_grid_layout_impl(
         "overrides": overrides,
     }
 
+    # one color per series label across the whole cell tree, for this draw
+    # only: a grid nested later gets its outer grid's map (ADR 0090)
+    label_colors = _grid_label_colors(_cell_panels(cells))
+
     combined_fig = _new_figure(figsize=figsize)
     # the labels are the figure's; nested, the node renders them in its cell
     _render_grid_node(
         combined_fig,
         {**node, "title": None, "xlabel": None, "ylabel": None},
         None,
+        {"label_colors": label_colors} if label_colors else None,
     )
     _apply_figure_labels(combined_fig, title, xlabel, ylabel)
     _align_axes_columns(combined_fig)

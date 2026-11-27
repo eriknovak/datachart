@@ -1,6 +1,6 @@
 ---
 status: accepted
-amended-by: [0086]
+amended-by: [0086, 0090]
 ---
 
 # One Layer/Panel drawing seam; style resolved at construction

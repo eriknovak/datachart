@@ -32,7 +32,7 @@ adds no tag; one that reverses, narrows, widens or replaces a commitment does.
 
 ## Drawing seam and figure lifecycle
 
-- [0001](0001-layer-panel-drawing-seam.md) — One Layer/Panel drawing seam; style resolved at construction (amended by [0086](0086-layers-package-and-two-check-mechanisms.md))
+- [0001](0001-layer-panel-drawing-seam.md) — One Layer/Panel drawing seam; style resolved at construction (amended by [0086](0086-layers-package-and-two-check-mechanisms.md), [0090](0090-grid-series-label-colours.md))
 - [0086](0086-layers-package-and-two-check-mechanisms.md) — The drawing seam is a package; a capability is a mixin, a group policy is a row field
 - [0003](0003-explicit-settings-seam.md) — Chart fronts pass explicit settings; the attrs dict is retired (amended by [0066](0066-front-body-one-call.md))
 - [0008](0008-unmanaged-figures.md) — Figures are unmanaged; showing is explicit via `Figure.show()` (amended by [0031](0031-interactive-show-hover-seam.md))
@@ -55,9 +55,10 @@ adds no tag; one that reverses, narrows, widens or replaces a commitment does.
 - [0085](0085-one-private-matplotlib-touchpoint.md) — One private matplotlib touchpoint, guarded and locked, never a version cap
 - [0012](0012-orientation-aware-panel.md) — A Panel has an orientation, inferred from its layers, and its value axis follows it (amended by [0017](0017-pyramid-chart.md))
 - [0041](0041-panel-axis-scales.md) — Panel takes axis scales, and a layer group carries its source figure's scale
-- [0070](0070-composition-furniture-vocabulary.md) — Panel and Grid take the chart fronts' furniture vocabulary; one grid layout path
+- [0070](0070-composition-furniture-vocabulary.md) — Panel and Grid take the chart fronts' furniture vocabulary; one grid layout path (amended by [0090](0090-grid-series-label-colours.md))
 - [0080](0080-per-axis-stacking.md) — Each value axis of a Panel stacks only its own layers
 - [0087](0087-py-typed-and-public-figure-type.md) — The package ships `py.typed`, the figure type is public, and composition items are settings
+- [0090](0090-grid-series-label-colours.md) — A grid gives each series label one colour across its cells
 
 ## Emphasis and category order
 
@@ -77,7 +78,7 @@ adds no tag; one that reverses, narrows, widens or replaces a commitment does.
 - [0072](0072-typing-roles-and-theme-conformance.md) — Every public typing carries one of four role suffixes, and the theme keys are the style types (amended by [0087](0087-py-typed-and-public-figure-type.md))
 - [0073](0073-palette-score-gate.md) — A palette is scored by one function, and every predefined theme passes its gate (amended by [0078](0078-palette-gate-warns-at-registration.md))
 - [0074](0074-theme-traits-and-palette-leads.md) — A look owns its furniture, a trait composes, a palette is a lead (amended by [0075](0075-furniture-defaults-follow-the-guidelines.md))
-- [0075](0075-furniture-defaults-follow-the-guidelines.md) — Furniture defaults follow the guidelines: no legend title, solid grids, and a warning when series outrun the palette (amended by [0077](0077-own-colored-series-take-no-palette-slot.md))
+- [0075](0075-furniture-defaults-follow-the-guidelines.md) — Furniture defaults follow the guidelines: no legend title, solid grids, and a warning when series outrun the palette (amended by [0077](0077-own-colored-series-take-no-palette-slot.md), [0090](0090-grid-series-label-colours.md))
 - [0077](0077-own-colored-series-take-no-palette-slot.md) — A series with its own colour draws none from the palette
 - [0078](0078-palette-gate-warns-at-registration.md) — The palette gate warns when a theme is registered, not when one is derived
 - [0081](0081-violin-and-ridge-theme-defaults.md) — Themes set the violin inner, the strip jitter and the ridge marks

@@ -685,7 +685,7 @@ class TestGridFurniture:
         fig = Grid([[_lines(0, "a"), _lines(5, "b")]], show_legend=True)
         legends = _legends(fig)
         assert len(legends) == 1
-        assert [t.get_text() for t in legends[0].get_texts()] == ["a"]
+        assert [t.get_text() for t in legends[0].get_texts()] == ["a", "b"]
         plt.close("all")
 
     def test_legend_location_names_the_edge(self):
