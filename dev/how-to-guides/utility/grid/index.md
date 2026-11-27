@@ -54,21 +54,22 @@ Grid(
 
 Every customization is either a keyword argument of `Grid` or the shape of the list it is given: nested rows, or a flat list with layout options. The table maps common tasks to the one you need and links to the subsection that shows it.
 
-| I want to…                            | Use                                | See                                                                                                     |
-| ------------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| add a title over the whole grid       | `title`                            | [Title and axis labels](#title-and-axis-labels)                                                         |
-| label the axes once for every cell    | `xlabel`, `ylabel`                 | [Title and axis labels](#title-and-axis-labels)                                                         |
-| resize the figure                     | `figsize`                          | [Figure size](#figure-size)                                                                             |
-| let the grid lay the figures out      | a flat list, `max_cols`            | [Automatic layout](#automatic-layout)                                                                   |
-| set the rows myself                   | nested rows                        | [Nested rows](#nested-rows)                                                                             |
-| leave a cell blank                    | `None` in a row                    | [Blank cells](#blank-cells)                                                                             |
-| compare the cells on one scale        | `sharex`, `sharey`                 | [Sharing axes](#sharing-axes)                                                                           |
-| put every cell on a log axis          | `scalex`, `scaley`                 | [Sharing axes](#sharing-axes)                                                                           |
-| span a figure across rows or columns  | per-figure `"layout_spec"`         | [Irregular layouts](#irregular-layouts)                                                                 |
-| use a grid or a panel as one cell     | nest `Grid` and `Panel` figures    | [Nesting grids and panels](#nesting-grids-and-panels)                                                   |
-| put a chart with subplots in one cell | a chart drawn with `subplots=True` | [Subplot figures](#subplot-figures)                                                                     |
-| annotate a chart in the grid          | the charts' `texts`, `Annotate`    | [Annotations](#annotations)                                                                             |
-| save the grid to a file               | `save_figure`                      | [Saving Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md) guide |
+| I want to…                                  | Use                                | See                                                                                                     |
+| ------------------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| add a title over the whole grid             | `title`                            | [Title and axis labels](#title-and-axis-labels)                                                         |
+| label the axes once for every cell          | `xlabel`, `ylabel`                 | [Title and axis labels](#title-and-axis-labels)                                                         |
+| resize the figure                           | `figsize`                          | [Figure size](#figure-size)                                                                             |
+| let the grid lay the figures out            | a flat list, `max_cols`            | [Automatic layout](#automatic-layout)                                                                   |
+| set the rows myself                         | nested rows                        | [Nested rows](#nested-rows)                                                                             |
+| leave a cell blank                          | `None` in a row                    | [Blank cells](#blank-cells)                                                                             |
+| compare the cells on one scale              | `sharex`, `sharey`                 | [Sharing axes](#sharing-axes)                                                                           |
+| put every cell on a log axis                | `scalex`, `scaley`                 | [Sharing axes](#sharing-axes)                                                                           |
+| draw one series in one colour in every cell | the `subtitle` of each chart       | [Series colours](#series-colours)                                                                       |
+| span a figure across rows or columns        | per-figure `"layout_spec"`         | [Irregular layouts](#irregular-layouts)                                                                 |
+| use a grid or a panel as one cell           | nest `Grid` and `Panel` figures    | [Nesting grids and panels](#nesting-grids-and-panels)                                                   |
+| put a chart with subplots in one cell       | a chart drawn with `subplots=True` | [Subplot figures](#subplot-figures)                                                                     |
+| annotate a chart in the grid                | the charts' `texts`, `Annotate`    | [Annotations](#annotations)                                                                             |
+| save the grid to a file                     | `save_figure`                      | [Saving Figures](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/saving/index.md) guide |
 
 The full list of parameters and layout options is in the [datachart.utils.Grid](https://eriknovak.github.io/datachart/dev/references/utils/#datachart.utils.Grid) reference. The look of each figure (colors, line widths, markers, labels) is set on the chart itself through its attributes and `style`; see the guide of each chart in the [Charts](https://eriknovak.github.io/datachart/dev/how-to-guides/charts/index.md) section.
 
@@ -172,6 +173,39 @@ Grid(
 ).show()
 ```
 
+### Series colours
+
+Readers match the cells of a grid by colour: the blue line in one cell is taken for the same series as the blue line in the next. A chart drawn alone hands out the colours of its palette in the order of its data, so a city listed second in one chart and first in another would change colour between the cells. The grid prevents it. It gives each series label one colour in all its cells, and the first cell that shows a label decides it. A series is labelled by the `subtitle` of its chart (or by the `legend_label` of a single-series figure in a [Panel](#nesting-grids-and-panels)). Below, Helsinki and Berlin come in a different order in the two charts, yet each keeps its colour. Moscow and Athens, each in one cell only, take the next colours of the palette. A series with no label keeps the colour its chart gives it alone, and a series muted by emphasis keeps the muted colour.
+
+```
+# the same cities, listed in a different order in each chart
+north = LineChart(
+    data=[city_data["Helsinki"], city_data["Moscow"], city_data["Berlin"]],
+    title="Northern cities",
+    # the subtitles name the series, in the order of the data
+    subtitle=["Helsinki", "Moscow", "Berlin"],
+    show_legend=True,
+    figsize=FIG_SIZE.HALF_SHORT,
+    **QUARTERS,
+)
+mixed = LineChart(
+    data=[city_data["Berlin"], city_data["Athens"], city_data["Helsinki"]],
+    title="Berlin, Athens and Helsinki",
+    subtitle=["Berlin", "Athens", "Helsinki"],
+    show_legend=True,
+    figsize=FIG_SIZE.HALF_SHORT,
+    **QUARTERS,
+)
+
+Grid(
+    [north, mixed],
+    # read both cells against the same y-axis
+    sharey=True,
+    title="Mean monthly temperature (°C)",
+    figsize=FIG_SIZE.FULL_SHORT,
+).show()
+```
+
 ### Irregular layouts
 
 Some layouts are not rows at all: a tall main chart with smaller ones stacked beside it. For those, wrap the figures of a flat list in dictionaries and add the per-figure `"layout_spec"` option, a dictionary with the `"row"` and `"col"` of the top-left cell and the `"rowspan"` and `"colspan"` the figure covers. Nested rows and `"layout_spec"` cannot be mixed in one call. Here Ljubljana's temperature takes the left column top to bottom, with the two extremes stacked to its right:
@@ -225,7 +259,7 @@ Grid(
 
 ### Subplot figures
 
-A chart drawn with `subplots=True` is already a small grid, and it takes one cell as it is. The cell rebuilds the chart's subplots inside it, each headed by its `subtitle` and scaled on its own. Here the temperatures of Ljubljana and Moscow, drawn as one chart with two subplots, share a grid with Ljubljana's precipitation:
+A chart drawn with `subplots=True` is already a small grid, and it takes one cell as it is. The cell rebuilds the chart's subplots inside it, each headed by its `subtitle` and scaled on its own. The subtitles also name the series, so the grid gives the two subplots two colours, as it does for any labelled series (see [Series colours](#series-colours)). Here the temperatures of Ljubljana and Moscow, drawn as one chart with two subplots, share a grid with Ljubljana's precipitation:
 
 ```
 pair = LineChart(

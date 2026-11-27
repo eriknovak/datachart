@@ -59,7 +59,7 @@ themes; per-chart overrides go in each chart's `style` parameter.
 
 - [Composition](https://eriknovak.github.io/datachart/dev/how-to-guides/composition/index.md): Map of Panel, Grid, and text annotations with Annotate.
 - [Panel](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/panel/index.md): Overlaying charts in one coordinate space with Panel: two value axes, legend, drawing order, emphasis, limits and scales, bar mode, nesting, horizontal panels, configuration, and worked examples.
-- [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md): Grid basics on the climate of Ljubljana and eight European cities, titles and shared axis labels, figure size, automatic layout, nested rows, blank cells, shared axes, irregular layouts, nested grids and panels, subplot figures, annotations, and worked examples on real data.
+- [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md): Grid basics on the climate of Ljubljana and eight European cities, titles and shared axis labels, figure size, automatic layout, nested rows, blank cells, shared axes, shared series colours, irregular layouts, nested grids and panels, subplot figures, annotations, and worked examples on real data.
 - [Text Annotations](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/annotations/index.md): Text annotation basics on Ljubljana's climate normals, data and axes coordinates, targets and connectors, connector looks, text and box style, per-subplot notes, annotating finished figures, panels and subplots with Annotate, the text configuration, and worked examples on real data.
 
 ## Styling

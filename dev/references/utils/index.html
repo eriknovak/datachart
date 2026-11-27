@@ -5116,6 +5116,13 @@ reverse — a Grid figure inside a Panel — stays an error.</p>
 figure. Its limits, scales, <code>show_grid</code> and <code>aspect_ratio</code> apply to every
 cell, nested grids included; one left unset keeps what each cell's chart
 was built with.</p>
+<p>Series that share a label (their chart's <code>subtitle</code>, or the
+<code>legend_label</code> of a single-series figure in a <code>Panel</code>) draw in one colour
+across every cell, nested grids and subplot figures included. The first cell that shows a label
+decides its colour: a colour set in that chart's style, else the next
+palette colour. A series with a colour set in its own chart's style
+keeps that colour in every cell. Unlabelled series keep the colours their
+chart draws alone, and muted series keep the muted colour.</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -5331,8 +5338,9 @@ If None, calculated from the first figure's size.</p>
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>Whether to show one legend for the whole grid, with the
-entries of the first cell that has any. A cell's own legend stays.</p>
+                <p>Whether to show one legend for the whole grid. It
+gathers the entries of every top-level cell and lists each label
+once, in order of first appearance. A cell's own legend stays.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
