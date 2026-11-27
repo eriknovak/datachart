@@ -54,7 +54,8 @@ and a left column (figure-level `supxlabel`/`supylabel` at the top level), and
 its axis sharing stays local. The front takes the shared figure-level
 parameters of the chart fronts (ADR 0070): title, labels and one grid legend
 apply to the figure; `show_grid`, limits and `aspect_ratio` override every
-cell only when given.
+cell only when given. A series label draws in one colour across all cells
+(ADR 0090), and the grid legend lists each label once.
 _Avoid_: grid layout (for the front), figure grid
 
 **Projection**:

@@ -820,6 +820,14 @@ def Grid(
     cell, nested grids included; one left unset keeps what each cell's chart
     was built with.
 
+    Series that share a label (their chart's `subtitle`, or the
+    `legend_label` of a single-series figure in a `Panel`) draw in one colour
+    across every cell, nested grids and subplot figures included. The first cell that shows a label
+    decides its colour: a colour set in that chart's style, else the next
+    palette colour. A series with a colour set in its own chart's style
+    keeps that colour in every cell. Unlabelled series keep the colours their
+    chart draws alone, and muted series keep the muted colour.
+
     Examples:
         >>> from datachart.charts import LineChart, BarChart, ScatterChart
         >>> from datachart.utils import Grid
@@ -870,8 +878,9 @@ def Grid(
             If None, calculated from the first figure's size.
         sharex: Whether to share the x-axis across all subplots.
         sharey: Whether to share the y-axis across all subplots.
-        show_legend: Whether to show one legend for the whole grid, with the
-            entries of the first cell that has any. A cell's own legend stays.
+        show_legend: Whether to show one legend for the whole grid. It
+            gathers the entries of every top-level cell and lists each label
+            once, in order of first appearance. A cell's own legend stays.
         legend: The per-figure legend setting: title, location, column count
             and alignment; each field falls back to the theme. The location
             picks the grid edge the legend sits on: an outside location its

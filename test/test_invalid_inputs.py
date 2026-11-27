@@ -145,7 +145,7 @@ class TestGridLegendSideTags(InvalidInputCase):
         figure = Grid([panel, line_fig(subtitle="other")], show_legend=True)
         legends = [ax.get_legend() for ax in figure.axes if ax.get_legend()]
         labels = [t.get_text() for t in legends[-1].get_texts()]
-        self.assertEqual(labels, ["bars (L)", "line (R)"])
+        self.assertEqual(labels, ["bars (L)", "line (R)", "other"])
 
 
 class TestRadialRequiredY(InvalidInputCase):

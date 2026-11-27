@@ -110,6 +110,7 @@ from .panel import (
     Panel,
     REF_LINE_ZORDER,
     determine_axis_assignment,
+    grid_label_colors,
     group_from_chart,
     layers_per_chart,
 )
