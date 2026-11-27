@@ -735,6 +735,13 @@ class TestShowInteractive:
         _show_interactive(figure)
         assert _hover(figure, figure.axes[0], 1, 0) == ["Col: b\nRow: p\nvalue: 2"]
 
+    def test_heatmap_hover_names_a_missing_cell(self):
+        figure = Heatmap(
+            data={"x": ["a", "b"], "y": ["p", "q"], "z": [[1, None], [3, 4]]}
+        )
+        _show_interactive(figure)
+        assert _hover(figure, figure.axes[0], 1, 0) == ["x: b\ny: p\nvalue: missing"]
+
     def test_missing_mplcursors_raises_import_error(self, monkeypatch):
         monkeypatch.setitem(sys.modules, "mplcursors", None)
         with pytest.raises(ImportError, match=r"datachart\[interactive\]"):

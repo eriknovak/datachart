@@ -1073,6 +1073,31 @@ def get_heatmap_edge_style(heatmap_style: dict, prefix: str = "plot_heatmap") ->
     return create_config_dict(heatmap_style, config_attrs)
 
 
+def get_heatmap_missing_style(heatmap_style: dict) -> dict:
+    """Get the style of the cells a heatmap draws for missing values.
+
+    Always read under the heatmap prefix: the calendar heatmap draws no
+    missing cells. An empty hatch counts as none.
+
+    Args:
+        heatmap_style: The heatmap style dictionary.
+
+    Returns:
+        The missing-cell style setting; a key set to `None` is left out.
+
+    """
+
+    config_attrs = [
+        ("color", "plot_heatmap_missing_color"),
+        ("hatch", "plot_heatmap_missing_hatch"),
+    ]
+
+    style = create_config_dict(heatmap_style, config_attrs)
+    if not style.get("hatch"):
+        style.pop("hatch", None)
+    return style
+
+
 def get_calendar_month_line_style(calendar_style: dict) -> dict:
     """Get the style of the separators drawn between the months of a calendar heatmap.
 

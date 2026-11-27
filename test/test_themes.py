@@ -21,10 +21,17 @@ from datachart.themes import (
     score_palette,
 )
 from datachart.themes._base import TRAITS
-from datachart.themes.score import palette_colors, theme_palette_score
+from datachart.themes.score import (
+    CONTRAST_FLOOR,
+    NORMAL_FLOOR,
+    palette_colors,
+    theme_palette_score,
+)
 from datachart.utils._internal.colors import (
+    delta_e,
     get_color_scale,
     oklab_lightness as lightness,
+    wcag_contrast,
 )
 
 LEAD_KEYS = (
@@ -278,6 +285,33 @@ class TestFurnitureDefaults(unittest.TestCase):
             with self.subTest(theme=name):
                 self.assertEqual(theme["plot_grid_linestyle"], LINE_STYLE.SOLID)
                 self.assertIsNone(theme["plot_legend_title"])
+
+
+class TestMissingCellStyle(unittest.TestCase):
+    """The no-data heatmap cell is readable on every theme (#355)."""
+
+    def test_every_theme_carries_both_keys(self):
+        for name, theme in THEMES.items():
+            with self.subTest(theme=name):
+                self.assertIn("plot_heatmap_missing_color", theme)
+                self.assertIn("plot_heatmap_missing_hatch", theme)
+
+    def test_default_colour_is_clear_of_both_default_colormaps(self):
+        colour = DEFAULT_THEME["plot_heatmap_missing_color"]
+        for key in ("plot_heatmap_cmap", "plot_heatmap_cmap_diverging"):
+            scale = get_color_scale(DEFAULT_THEME[key])
+            for end in (scale[0], scale[-1]):
+                with self.subTest(cmap=DEFAULT_THEME[key], end=end):
+                    self.assertGreaterEqual(delta_e(colour, end), NORMAL_FLOOR)
+
+    def test_dark_colour_holds_contrast_on_its_axes_face(self):
+        contrast = wcag_contrast(
+            DARK_THEME["plot_heatmap_missing_color"], DARK_THEME["axes_facecolor"]
+        )
+        self.assertGreaterEqual(contrast, CONTRAST_FLOOR)
+
+    def test_quill_hatch_differs_from_its_etched_steps(self):
+        self.assertEqual(THEMES[THEME.QUILL]["plot_heatmap_missing_hatch"], "\\\\")
 
 
 class TestFailingPaletteWarns(unittest.TestCase):

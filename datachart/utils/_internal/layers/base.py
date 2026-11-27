@@ -1039,9 +1039,16 @@ class Layer:
                 collection.set_alpha(alphas[mask])
             ax.add_collection(collection, autolim=False)
 
-    def _draw_step_legend(self, ax, entries: list, title: Optional[str]) -> None:
+    def _draw_step_legend(
+        self,
+        ax,
+        entries: list,
+        title: Optional[str],
+        trailing: Optional[list] = None,
+    ) -> None:
         """A legend of `(step, label)` entries beside the axes, in place of a colorbar.
 
+        `trailing` holds `(handle, label)` entries listed after the steps.
         Added as an artist, so a panel legend on the same axes keeps it.
         """
 
@@ -1056,10 +1063,14 @@ class Layer:
             )
             for k, _ in entries
         ]
+        labels = [label for _, label in entries]
+        for handle, label in trailing or []:
+            handles.append(handle)
+            labels.append(label)
         style = dict(self.step_legend_style)
         family = style.pop("family")
         style["title"] = title or None
-        legend = Legend(ax, handles, [label for _, label in entries], **style)
+        legend = Legend(ax, handles, labels, **style)
         for text in legend.get_texts() + [legend.get_title()]:
             text.set_fontfamily(family)
         ax.add_artist(legend)
@@ -1069,13 +1080,15 @@ class Layer:
             ax, lambda renderer: _fit_outside_legend(legend, [ax], renderer)
         )
 
-    def _draw_even_step_legend(self, ax, norm, title: Optional[str]) -> None:
+    def _draw_even_step_legend(
+        self, ax, norm, title: Optional[str], trailing: Optional[list] = None
+    ) -> None:
         """The step legend of a normalized value scale: one entry per even step."""
 
         n = len(self.value_etch_steps)
         edges = norm.inverse(step_edges(n, self.step_centre))
         entries = [(k, _step_label(edges[k], edges[k + 1])) for k in range(n)]
-        self._draw_step_legend(ax, entries, title)
+        self._draw_step_legend(ax, entries, title, trailing)
 
     @staticmethod
     def _merge_color(color_key: str, ctx_color: Optional[str], style: dict) -> dict:
