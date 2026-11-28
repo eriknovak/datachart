@@ -86,7 +86,7 @@ NetworkChart(
 
 ### Node labels
 
-Family names are longer than the markers, and printed on the node, as in the basic example, they run over the edges and over each other. `label_position` moves them, using [NETWORK_LABEL_POSITION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.NETWORK_LABEL_POSITION): `CENTER` (the default) prints on the marker, `ABOVE` prints above it like a place name on a map, and `BEST` picks the spot beside each marker with the least overlap. A node's `label` key changes what is printed without changing its id, and an empty label prints nothing. The example prints the names above the markers, where they stay clear of the edges, and adds each family's number of ties to its label. The rest of the guide prints the names above the markers too.
+Family names are longer than the markers, and printed on the node, as in the basic example, they run over the edges. A name that would cover another name or a marker moves to the first clear spot beside its own marker; a name with no clear spot is left out, with a warning that suggests a larger `figsize`. `label_position` moves them, using [NETWORK_LABEL_POSITION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.NETWORK_LABEL_POSITION): `CENTER` (the default) prints on the marker, `ABOVE` prints above it like a place name on a map, and `BEST` picks the spot beside each marker with the least overlap. A node's `label` key changes what is printed without changing its id, and an empty label prints nothing. The example prints the names above the markers, where they stay clear of the edges, and adds each family's number of ties to its label. The rest of the guide prints the names above the markers too.
 
 ```
 from datachart.constants import NETWORK_LABEL_POSITION
@@ -122,7 +122,7 @@ Grid(
         # another arrangement of the same network
         NetworkChart(marriages, seed=2, label_position=NETWORK_LABEL_POSITION.ABOVE, title="SPRING, seed=2"),
     ]],
-    figsize=(6.3, 3.4),
+    figsize=(8.0, 4.3),
 ).show()
 ```
 
@@ -169,7 +169,7 @@ Grid(
             title="FIXED, rows by distance",
         ),
     ]],
-    figsize=(6.3, 3.4),
+    figsize=(7.5, 4.0),
 ).show()
 ```
 
@@ -325,7 +325,8 @@ NetworkChart(
     data=bridge,
     label_position=NETWORK_LABEL_POSITION.ABOVE,
     title="Three families tied to the rest only by the Medici",
-    figsize=FIG_SIZE.SQUARE,
+    # a larger square keeps the names of neighbouring nodes apart
+    figsize=(5.4, 5.4),
 ).show()
 ```
 
@@ -343,7 +344,8 @@ NetworkChart(
     # the three families with the most ties
     emphasis_rule={"top": 3},
     title="The best-married families",
-    figsize=FIG_SIZE.SQUARE,
+    # a larger square keeps the names of neighbouring nodes apart
+    figsize=(5.4, 5.4),
 ).show()
 ```
 
@@ -449,7 +451,7 @@ NetworkChart(
     label_position=NETWORK_LABEL_POSITION.ABOVE,
     max_cols=2,
     title="The network falls apart without the Medici",
-    figsize=(6.3, 3.4),
+    figsize=(7.5, 4.0),
 ).show()
 ```
 
@@ -593,12 +595,14 @@ for s, t, n in SHIPMENTS:
     received[t] += n
 # the busiest port first
 PORT_ORDER = sorted(PORTS, key=lambda port: shipped[port] + received[port], reverse=True)
+# the map's heights shrink a little so Rotterdam's name clears the panel title
+MAP_HEIGHT_SCALE = 0.92
 
 throughput = NetworkChart(
     data={
-        # each port sized by the containers it handles
+        # each port sized by the containers it handles, at its scaled height
         "nodes": [
-            {"id": port, "x": x, "y": y, "size": shipped[port] + received[port]}
+            {"id": port, "x": x, "y": MAP_HEIGHT_SCALE * y, "size": shipped[port] + received[port]}
             for port, (x, y) in PORTS.items()
         ],
         "edges": shipping["edges"],
@@ -606,8 +610,8 @@ throughput = NetworkChart(
     layout=NETWORK_LAYOUT.FIXED,
     directed=True,
     label_position=NETWORK_LABEL_POSITION.ABOVE,
-    # a note pointing at Shanghai
-    texts={"text": "the largest port", "x": 0.7, "y": 0.02, "target": PORTS["Shanghai"]},
+    # a note pointing at Shanghai at its scaled height
+    texts={"text": "the largest port", "x": 0.9, "y": 0.5, "target": (PORTS["Shanghai"][0], MAP_HEIGHT_SCALE * PORTS["Shanghai"][1])},
     title="Container traffic",
 )
 balance = BarChart(
@@ -626,5 +630,5 @@ balance = BarChart(
     ymin=0,
 )
 
-Grid([[throughput, balance]], title="Container traffic between six ports", figsize=(6.3, 3.8)).show()
+Grid([[throughput, balance]], title="Container traffic between six ports", figsize=(7.2, 4.2)).show()
 ```

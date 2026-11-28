@@ -676,7 +676,8 @@ StackedAreaChart(
     # fossil is the question, the rest the context
     emphasis=[EMPHASIS.HIGHLIGHT, EMPHASIS.BACKGROUND, EMPHASIS.BACKGROUND],
     show_legend=True,
-    legend={"title": "Group", "location": LEGEND_LOCATION.UPPER_RIGHT},
+    # upper left, clear of the note and its arrow
+    legend={"title": "Group", "location": LEGEND_LOCATION.UPPER_LEFT},
     # the halfway mark, attached to the first series so it draws once
     hlines=[
         {"y": 50, "label": "half of generation", "style": {"plot_hline_color": "#1f1f1f", "plot_hline_style": LINE_STYLE.DASHED}},

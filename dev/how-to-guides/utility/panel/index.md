@@ -145,7 +145,7 @@ Panel(
     auto_secondary_axis=10.0,
     title="Climate of Ljubljana",
     xlabel="Month",
-    ylabel_left="Precipitation (mm) / Temperature (°C)",
+    ylabel_left="mm / °C",
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
     show_legend=True,
@@ -494,7 +494,8 @@ Panel(
     xlabel="Reason",
     ylabel_left="Returns",
     ylabel_right="Cumulative share (%)",
-    figsize=FIG_SIZE.FULL_SHORT,
+    # wider than the page width, so the six reason names stay apart
+    figsize=(7.2, 2.4),
     show_grid=SHOW_GRID.Y,
     show_legend=True,
     legend={"location": LEGEND_LOCATION.OUTSIDE_TOP, "ncols": 2},

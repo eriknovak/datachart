@@ -260,7 +260,7 @@ calendar_figure = CalendarHeatmap(
     # the mainshock day is an order of magnitude above any other
     vmax=12,
     show_colorbar=True,
-    colorbar={"label": "Earthquakes of magnitude 4 and above"},
+    colorbar={"label": "Magnitude 4 and above"},
 )
 calendar_figure.show()
 ```
@@ -376,7 +376,7 @@ Grid(
         ]
     ],
     title=f"Broadband stations and the baselines shorter than {BASELINE_KM} km",
-    figsize=(11.0, 5.6),
+    figsize=(11.0, 6.0),
 ).show()
 ```
 

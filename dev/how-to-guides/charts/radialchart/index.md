@@ -321,7 +321,7 @@ RadialChart(
     texts={
         "text": "strongest\nfrom the west",
         "x": math.radians(270),
-        "y": 9,
+        "y": 12,
         "target": (math.radians(270), SPEED[COMPASS.index("W")]),
     },
     title="Average wind speed by direction",
@@ -560,7 +560,8 @@ RadialChart(
     ymax=10,
     title="Interview skill assessment",
     show_legend=True,
-    legend={"location": LEGEND_LOCATION.OUTSIDE_RIGHT},
+    # below the radar, so the skill names keep the full width
+    legend={"location": LEGEND_LOCATION.OUTSIDE_BOTTOM, "ncols": 3},
     figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
 ```

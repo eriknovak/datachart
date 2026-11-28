@@ -264,7 +264,7 @@ Treemap(
         "plot_treemap_edge_color": "white",
         "plot_treemap_edge_width": 1.5,
         # keep smaller labels, without a halo
-        "plot_treemap_min_fontsize": 5,
+        "plot_treemap_min_fontsize": 5.5,
         "plot_treemap_label_halo_width": 0,
     },
     title="World population by continent and country, 2024 (millions)",
@@ -348,6 +348,8 @@ config.set_theme(THEME.QUILL)
 figure = Treemap(
     data=world,
     show_legend=True,
+    # below the tiles, so the etched tiling keeps the full width
+    legend={"location": LEGEND_LOCATION.OUTSIDE_BOTTOM, "ncols": 3},
     title="World population by continent and country, 2024 (millions)",
     figsize=FIG_SIZE.FULL_MEDIUM,
 )

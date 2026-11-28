@@ -150,6 +150,8 @@ CalendarHeatmap(
     # write the count into every cell
     show_values=True,
     value_format=VALUE_FORMAT.INTEGER,
+    # a taller figure gives each cell room for a three-digit count
+    figsize=(6.4, 2.4),
     title="Cyclists counted per day, January and February 2024",
 ).show()
 ```
@@ -225,7 +227,7 @@ CalendarHeatmap(
     norm=COLOR_NORM.CENTERED,
     title="Cyclists per day against the 2024 mean",
     show_colorbar=True,
-    colorbar={"label": "Departure from the mean"},
+    colorbar={"label": "Departure from mean"},
 ).show()
 ```
 
@@ -412,7 +414,7 @@ CalendarHeatmap(
 
 ### Example 3: Which Day Fills the Shop? (Cell Values, a Note, a Pinned Range, and a Grid)
 
-`footfall` holds the illustrative number of visitors to a shop on each day of the last quarter of 2024: busy Saturdays, a closed Sunday every week, and the run-up to Christmas, and `by_weekday` the mean visitors per weekday over the quarter. The calendar answers the question by row: the values are written into the cells, the range is pinned so the December rush saturates while the ordinary weeks keep their contrast, and a `texts` note above the calendar names the two dark December columns, its target column computed from the first drawn month, October. A bar chart of the weekday means under it puts a number on the Saturday row, with `emphasis_rule` highlighting the busiest day, and [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md) stacks the two in one figure.
+`footfall` holds the illustrative number of visitors to a shop on each day of the last quarter of 2024: busy Saturdays, a closed Sunday every week, and the run-up to Christmas, and `by_weekday` the mean visitors per weekday over the quarter. The calendar answers the question by row: the values are written into the cells, the range is pinned so the December rush saturates while the ordinary weeks keep their contrast, and a `texts` note in the empty Sunday row names the two dark December columns, its target column computed from the first drawn month, October. A bar chart of the weekday means under it puts a number on the Saturday row, with `emphasis_rule` highlighting the busiest day, and [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md) stacks the two in one figure.
 
 ```
 # the second week of the Christmas rush, counted from the week of 1 October
@@ -426,15 +428,17 @@ visits = CalendarHeatmap(
     title="Visitors per day",
     show_values=True,
     value_format=VALUE_FORMAT.INTEGER,
+    # a taller figure gives each cell room for a three-digit count
+    figsize=(6.4, 2.6),
     # the Christmas rush saturates, the ordinary weeks keep their contrast
     vmin=100,
     vmax=450,
     texts={
         "text": "Christmas rush",
-        # above and to the right, an arrow down onto the Monday cell
-        "x": rush_week + 3.2,
-        "y": -1,
-        "target": (rush_week, 0),
+        # in the closed Sunday row, an arrow up onto the Saturday cell
+        "x": rush_week + 1,
+        "y": 6,
+        "target": (rush_week, 5),
         "style": {"plot_text_arrow_style": ARROW_STYLE.ARROW},
     },
 )
@@ -450,5 +454,5 @@ weekdays = BarChart(
     ymax=400,
 )
 
-Grid([[visits], [weekdays]], title="Shop visitors, October to December 2024", figsize=FIG_SIZE.FULL_MEDIUM).show()
+Grid([[visits], [weekdays]], title="Shop visitors, October to December 2024", figsize=(6.3, 5.0)).show()
 ```

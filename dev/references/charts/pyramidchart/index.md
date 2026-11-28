@@ -121,7 +121,7 @@ Creates the pyramid chart.
 
 A pyramid chart draws exactly two series as horizontal bars mirrored around a shared category axis, the first series to the left and the second to the right: the classic age-sex population pyramid. Use it to compare the distribution of two groups over the same ordered categories, such as age bands, where the symmetry (or lack of it) is the message.
 
-Both series are supplied as positive values; value ticks and labels show absolute values. Unlike the other chart fronts, the axis parameters are spatial: `xlabel`, `xticks`, and `xmax` address the horizontal value axis, and `ylabel` the vertical category axis.
+Both series are supplied as positive values; value ticks and labels show absolute values. Unlike the other chart fronts, the axis parameters are spatial: `xlabel`, `xticks`, and `xmax` address the horizontal value axis, and `ylabel` the vertical category axis. When the category labels would overlap, every band keeps its tick but only every k-th band is labelled, the smallest step that keeps the labels apart.
 
 Examples:
 

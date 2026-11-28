@@ -1845,7 +1845,8 @@ StackedAreaChart(
     # fossil is the question, the rest the context
     emphasis=[EMPHASIS.HIGHLIGHT, EMPHASIS.BACKGROUND, EMPHASIS.BACKGROUND],
     show_legend=True,
-    legend={"title": "Group", "location": LEGEND_LOCATION.UPPER_RIGHT},
+    # upper left, clear of the note and its arrow
+    legend={"title": "Group", "location": LEGEND_LOCATION.UPPER_LEFT},
     # the halfway mark, attached to the first series so it draws once
     hlines=[
         {"y": 50, "label": "half of generation", "style": {"plot_hline_color": "#1f1f1f", "plot_hline_style": LINE_STYLE.DASHED}},
@@ -2759,7 +2760,7 @@ BarChart(
 
 ### Sorting
 
-The medal table ranks by gold, but that is a convention, and the same numbers tell a different story ranked by total medals. `sort` orders the categories by value: `SORT.DESCENDING` puts the largest bar first, `SORT.ASCENDING` the smallest, and `None` keeps the input order ([SORT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT)). Ranked by total, Great Britain climbs from seventh to third and France moves above Japan and Australia.
+The medal table ranks by gold, but that is a convention, and the same numbers tell a different story ranked by total medals. `sort` orders the categories by value: `SORT.DESCENDING` puts the largest bar first, `SORT.ASCENDING` the smallest, and `None` keeps the input order ([SORT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT)). Ranked by total, Britain climbs from seventh to third and France moves above Japan and Australia.
 
 ```
 from datachart.constants import SORT
@@ -2964,7 +2965,7 @@ BarChart(
     data=medals_total,
     # a note pinned to the axes, pointing at China's bar
     texts={
-        "text": "tied on 40 golds; the United States\nleads on silver and bronze",
+        "text": "tied on 40 golds; the USA\nleads on silver and bronze",
         "x": 0.5,
         "y": 0.8,
         "coords": "axes",
@@ -3073,7 +3074,7 @@ BarChart(
 ).show()
 ```
 
-An overlay pairs each country's Paris result with its Tokyo result. `golds_2020`, defined in a hidden cell, holds the same ten countries' gold medals at Tokyo 2020 (source: the official Tokyo 2020 medal table). The Tokyo series is drawn first, in grey, and the Paris series over it in gold, so a grey bar showing above a gold one is a country that won fewer golds in Paris than in Tokyo: Japan, the previous host, and Great Britain.
+An overlay pairs each country's Paris result with its Tokyo result. `golds_2020`, defined in a hidden cell, holds the same ten countries' gold medals at Tokyo 2020 (source: the official Tokyo 2020 medal table). The Tokyo series is drawn first, in grey, and the Paris series over it in gold, so a grey bar showing above a gold one is a country that won fewer golds in Paris than in Tokyo: Japan, the previous host, and Britain.
 
 ```
 BarChart(
@@ -4211,7 +4212,7 @@ RadialChart(
     texts={
         "text": "strongest\nfrom the west",
         "x": math.radians(270),
-        "y": 9,
+        "y": 12,
         "target": (math.radians(270), SPEED[COMPASS.index("W")]),
     },
     title="Average wind speed by direction",
@@ -4450,7 +4451,8 @@ RadialChart(
     ymax=10,
     title="Interview skill assessment",
     show_legend=True,
-    legend={"location": LEGEND_LOCATION.OUTSIDE_RIGHT},
+    # below the radar, so the skill names keep the full width
+    legend={"location": LEGEND_LOCATION.OUTSIDE_BOTTOM, "ncols": 3},
     figsize=FIG_SIZE.FULL_MEDIUM,
 ).show()
 ```
@@ -5983,6 +5985,8 @@ CalendarHeatmap(
     # write the count into every cell
     show_values=True,
     value_format=VALUE_FORMAT.INTEGER,
+    # a taller figure gives each cell room for a three-digit count
+    figsize=(6.4, 2.4),
     title="Cyclists counted per day, January and February 2024",
 ).show()
 ```
@@ -6058,7 +6062,7 @@ CalendarHeatmap(
     norm=COLOR_NORM.CENTERED,
     title="Cyclists per day against the 2024 mean",
     show_colorbar=True,
-    colorbar={"label": "Departure from the mean"},
+    colorbar={"label": "Departure from mean"},
 ).show()
 ```
 
@@ -6245,7 +6249,7 @@ CalendarHeatmap(
 
 ### Example 3: Which Day Fills the Shop? (Cell Values, a Note, a Pinned Range, and a Grid)
 
-`footfall` holds the illustrative number of visitors to a shop on each day of the last quarter of 2024: busy Saturdays, a closed Sunday every week, and the run-up to Christmas, and `by_weekday` the mean visitors per weekday over the quarter. The calendar answers the question by row: the values are written into the cells, the range is pinned so the December rush saturates while the ordinary weeks keep their contrast, and a `texts` note above the calendar names the two dark December columns, its target column computed from the first drawn month, October. A bar chart of the weekday means under it puts a number on the Saturday row, with `emphasis_rule` highlighting the busiest day, and [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md) stacks the two in one figure.
+`footfall` holds the illustrative number of visitors to a shop on each day of the last quarter of 2024: busy Saturdays, a closed Sunday every week, and the run-up to Christmas, and `by_weekday` the mean visitors per weekday over the quarter. The calendar answers the question by row: the values are written into the cells, the range is pinned so the December rush saturates while the ordinary weeks keep their contrast, and a `texts` note in the empty Sunday row names the two dark December columns, its target column computed from the first drawn month, October. A bar chart of the weekday means under it puts a number on the Saturday row, with `emphasis_rule` highlighting the busiest day, and [Grid](https://eriknovak.github.io/datachart/dev/how-to-guides/utility/grid/index.md) stacks the two in one figure.
 
 ```
 # the second week of the Christmas rush, counted from the week of 1 October
@@ -6259,15 +6263,17 @@ visits = CalendarHeatmap(
     title="Visitors per day",
     show_values=True,
     value_format=VALUE_FORMAT.INTEGER,
+    # a taller figure gives each cell room for a three-digit count
+    figsize=(6.4, 2.6),
     # the Christmas rush saturates, the ordinary weeks keep their contrast
     vmin=100,
     vmax=450,
     texts={
         "text": "Christmas rush",
-        # above and to the right, an arrow down onto the Monday cell
-        "x": rush_week + 3.2,
-        "y": -1,
-        "target": (rush_week, 0),
+        # in the closed Sunday row, an arrow up onto the Saturday cell
+        "x": rush_week + 1,
+        "y": 6,
+        "target": (rush_week, 5),
         "style": {"plot_text_arrow_style": ARROW_STYLE.ARROW},
     },
 )
@@ -6283,7 +6289,7 @@ weekdays = BarChart(
     ymax=400,
 )
 
-Grid([[visits], [weekdays]], title="Shop visitors, October to December 2024", figsize=FIG_SIZE.FULL_MEDIUM).show()
+Grid([[visits], [weekdays]], title="Shop visitors, October to December 2024", figsize=(6.3, 5.0)).show()
 ```
 
 # Histogram
@@ -12520,7 +12526,8 @@ Grid(
         ]
     ],
     title="The hill and its chamois",
-    figsize=FIG_SIZE.FULL_SHORT,
+    # taller than the short preset, so the hilltop's level labels keep apart
+    figsize=(6.3, 3.2),
 ).show()
 ```
 
@@ -12979,7 +12986,7 @@ HexbinChart(
     # the longest-listed apartment in every hexagon
     reduce=HEXBIN_REDUCE.MAX,
     min_count=3,
-    colorbar={"label": "Longest time on the market (days)"},
+    colorbar={"label": "Most days on the market"},
     title="The slowest listings",
     xlabel="Floor area (m²)",
     ylabel="Rent (€/month)",
@@ -13525,7 +13532,7 @@ SankeyChart(
 
 ### Column labels and ribbon values
 
-Four columns of names do not say what each column stands for; `column_labels` heads them, one label per column, left to right, in the subtitle style. When the exact amounts matter, `show_values` writes each flow's value at the end of its ribbon, just before the node it enters, and `value_format` formats it: a [VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) constant (`VALUE_FORMAT.THOUSANDS` for large counts, as in [Example 2](#example-2-where-does-a-signup-funnel-leak-explicit-columns-grey-ribbons-and-a-note)) or any `"{x:.1f}"`, `"{:.1f}%"` or `"%g"` style string. The values here are already percentages of the primary energy, so a positional `"{:.0f}%"` string appends the sign (`VALUE_FORMAT.PERCENT` would multiply by 100). A ribbon too thin for its value slides the value along the ribbon to the first clear spot, keeping clear of the node bars; where the chart is too dense to leave any clear spot, the value is left out rather than written over a bar or another value.
+Four columns of names do not say what each column stands for; `column_labels` heads them, one label per column, left to right, in the subtitle style. When the exact amounts matter, `show_values` writes each flow's value at the end of its ribbon, just before the node it enters, and `value_format` formats it: a [VALUE_FORMAT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.VALUE_FORMAT) constant (`VALUE_FORMAT.THOUSANDS` for large counts, as in [Example 2](#example-2-where-does-a-signup-funnel-leak-explicit-columns-grey-ribbons-and-a-note)) or any `"{x:.1f}"`, `"{:.1f}%"` or `"%g"` style string. The values here are already percentages of the primary energy, so a positional `"{:.0f}%"` string appends the sign (`VALUE_FORMAT.PERCENT` would multiply by 100). A ribbon too thin for its value slides the value along the ribbon to the first clear spot, keeping clear of the node bars; where the chart is too dense to leave any clear spot, the value is left out rather than written over a bar or another value, and a warning names how many were left out; a larger `figsize` makes room for them.
 
 ```
 from datachart.constants import VALUE_FORMAT
@@ -13869,7 +13876,7 @@ NetworkChart(
 
 ### Node labels
 
-Family names are longer than the markers, and printed on the node, as in the basic example, they run over the edges and over each other. `label_position` moves them, using [NETWORK_LABEL_POSITION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.NETWORK_LABEL_POSITION): `CENTER` (the default) prints on the marker, `ABOVE` prints above it like a place name on a map, and `BEST` picks the spot beside each marker with the least overlap. A node's `label` key changes what is printed without changing its id, and an empty label prints nothing. The example prints the names above the markers, where they stay clear of the edges, and adds each family's number of ties to its label. The rest of the guide prints the names above the markers too.
+Family names are longer than the markers, and printed on the node, as in the basic example, they run over the edges. A name that would cover another name or a marker moves to the first clear spot beside its own marker; a name with no clear spot is left out, with a warning that suggests a larger `figsize`. `label_position` moves them, using [NETWORK_LABEL_POSITION](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.NETWORK_LABEL_POSITION): `CENTER` (the default) prints on the marker, `ABOVE` prints above it like a place name on a map, and `BEST` picks the spot beside each marker with the least overlap. A node's `label` key changes what is printed without changing its id, and an empty label prints nothing. The example prints the names above the markers, where they stay clear of the edges, and adds each family's number of ties to its label. The rest of the guide prints the names above the markers too.
 
 ```
 from datachart.constants import NETWORK_LABEL_POSITION
@@ -13905,7 +13912,7 @@ Grid(
         # another arrangement of the same network
         NetworkChart(marriages, seed=2, label_position=NETWORK_LABEL_POSITION.ABOVE, title="SPRING, seed=2"),
     ]],
-    figsize=(6.3, 3.4),
+    figsize=(8.0, 4.3),
 ).show()
 ```
 
@@ -13952,7 +13959,7 @@ Grid(
             title="FIXED, rows by distance",
         ),
     ]],
-    figsize=(6.3, 3.4),
+    figsize=(7.5, 4.0),
 ).show()
 ```
 
@@ -14108,7 +14115,8 @@ NetworkChart(
     data=bridge,
     label_position=NETWORK_LABEL_POSITION.ABOVE,
     title="Three families tied to the rest only by the Medici",
-    figsize=FIG_SIZE.SQUARE,
+    # a larger square keeps the names of neighbouring nodes apart
+    figsize=(5.4, 5.4),
 ).show()
 ```
 
@@ -14126,7 +14134,8 @@ NetworkChart(
     # the three families with the most ties
     emphasis_rule={"top": 3},
     title="The best-married families",
-    figsize=FIG_SIZE.SQUARE,
+    # a larger square keeps the names of neighbouring nodes apart
+    figsize=(5.4, 5.4),
 ).show()
 ```
 
@@ -14232,7 +14241,7 @@ NetworkChart(
     label_position=NETWORK_LABEL_POSITION.ABOVE,
     max_cols=2,
     title="The network falls apart without the Medici",
-    figsize=(6.3, 3.4),
+    figsize=(7.5, 4.0),
 ).show()
 ```
 
@@ -14376,12 +14385,14 @@ for s, t, n in SHIPMENTS:
     received[t] += n
 # the busiest port first
 PORT_ORDER = sorted(PORTS, key=lambda port: shipped[port] + received[port], reverse=True)
+# the map's heights shrink a little so Rotterdam's name clears the panel title
+MAP_HEIGHT_SCALE = 0.92
 
 throughput = NetworkChart(
     data={
-        # each port sized by the containers it handles
+        # each port sized by the containers it handles, at its scaled height
         "nodes": [
-            {"id": port, "x": x, "y": y, "size": shipped[port] + received[port]}
+            {"id": port, "x": x, "y": MAP_HEIGHT_SCALE * y, "size": shipped[port] + received[port]}
             for port, (x, y) in PORTS.items()
         ],
         "edges": shipping["edges"],
@@ -14389,8 +14400,8 @@ throughput = NetworkChart(
     layout=NETWORK_LAYOUT.FIXED,
     directed=True,
     label_position=NETWORK_LABEL_POSITION.ABOVE,
-    # a note pointing at Shanghai
-    texts={"text": "the largest port", "x": 0.7, "y": 0.02, "target": PORTS["Shanghai"]},
+    # a note pointing at Shanghai at its scaled height
+    texts={"text": "the largest port", "x": 0.9, "y": 0.5, "target": (PORTS["Shanghai"][0], MAP_HEIGHT_SCALE * PORTS["Shanghai"][1])},
     title="Container traffic",
 )
 balance = BarChart(
@@ -14409,7 +14420,7 @@ balance = BarChart(
     ymin=0,
 )
 
-Grid([[throughput, balance]], title="Container traffic between six ports", figsize=(6.3, 3.8)).show()
+Grid([[throughput, balance]], title="Container traffic between six ports", figsize=(7.2, 4.2)).show()
 ```
 
 # Treemap
@@ -14678,7 +14689,7 @@ Treemap(
         "plot_treemap_edge_color": "white",
         "plot_treemap_edge_width": 1.5,
         # keep smaller labels, without a halo
-        "plot_treemap_min_fontsize": 5,
+        "plot_treemap_min_fontsize": 5.5,
         "plot_treemap_label_halo_width": 0,
     },
     title="World population by continent and country, 2024 (millions)",
@@ -14762,6 +14773,8 @@ config.set_theme(THEME.QUILL)
 figure = Treemap(
     data=world,
     show_legend=True,
+    # below the tiles, so the etched tiling keeps the full width
+    legend={"location": LEGEND_LOCATION.OUTSIDE_BOTTOM, "ncols": 3},
     title="World population by continent and country, 2024 (millions)",
     figsize=FIG_SIZE.FULL_MEDIUM,
 )
@@ -17010,7 +17023,7 @@ Panel(
     auto_secondary_axis=10.0,
     title="Climate of Ljubljana",
     xlabel="Month",
-    ylabel_left="Precipitation (mm) / Temperature (°C)",
+    ylabel_left="mm / °C",
     figsize=FIG_SIZE.FULL_SHORT,
     show_grid=SHOW_GRID.Y,
     show_legend=True,
@@ -17359,7 +17372,8 @@ Panel(
     xlabel="Reason",
     ylabel_left="Returns",
     ylabel_right="Cumulative share (%)",
-    figsize=FIG_SIZE.FULL_SHORT,
+    # wider than the page width, so the six reason names stay apart
+    figsize=(7.2, 2.4),
     show_grid=SHOW_GRID.Y,
     show_legend=True,
     legend={"location": LEGEND_LOCATION.OUTSIDE_TOP, "ncols": 2},
@@ -20392,7 +20406,7 @@ SankeyChart(
     title="Six thousand labelled tickets out of a million crawled documents",
     show_values=True,
     value_format=VALUE_FORMAT.THOUSANDS,
-    figsize=(9.0, 4.8),
+    figsize=(11.0, 4.8),
 ).show()
 ```
 
@@ -21001,7 +21015,7 @@ migration_figure = SankeyChart(
     column_labels=["Arrivals", "Citizenship", "Departures"],
     show_values=True,
     value_format=VALUE_FORMAT.THOUSANDS,
-    figsize=(9.0, 5.5),
+    figsize=(11.0, 5.5),
 )
 migration_figure.show()
 ```
@@ -21354,7 +21368,7 @@ Grid(
         [cohort_figure, funnel_figure],
     ],
     title="2025 in review: the revenue mix, the channels, the cohorts, and the funnel",
-    figsize=(12.0, 9.0),
+    figsize=(13.0, 9.0),
 ).show()
 ```
 
@@ -21448,6 +21462,8 @@ rank_figure = BumpChart(
         for country in COUNTRIES
     ],
     xticks=[year for year, _ in GDP_RANK["United States"]],
+    # 2020 keeps its tick but no label, which would touch 2023's in the panel below
+    xticklabels=["" if year == 2020 else str(year) for year, _ in GDP_RANK["United States"]],
     figsize=(8.0, 5.5),
 )
 rank_figure.show()
@@ -21582,6 +21598,8 @@ profile_figure = ParallelCoords(
     hue="income",
     show_legend=True,
     legend={"location": LEGEND_LOCATION.OUTSIDE_TOP, "ncols": 3},
+    # tilt the axis names, so the long ones keep clear of their neighbours
+    style={"plot_parallel_dim_label_rotation": 15},
     figsize=(9.0, 5.0),
 )
 profile_figure.show()
@@ -21868,7 +21886,7 @@ calendar_figure = CalendarHeatmap(
     # the mainshock day is an order of magnitude above any other
     vmax=12,
     show_colorbar=True,
-    colorbar={"label": "Earthquakes of magnitude 4 and above"},
+    colorbar={"label": "Magnitude 4 and above"},
 )
 calendar_figure.show()
 ```
@@ -21984,7 +22002,7 @@ Grid(
         ]
     ],
     title=f"Broadband stations and the baselines shorter than {BASELINE_KM} km",
-    figsize=(11.0, 5.6),
+    figsize=(11.0, 6.0),
 ).show()
 ```
 
@@ -23312,7 +23330,7 @@ Creates the pyramid chart.
 
 A pyramid chart draws exactly two series as horizontal bars mirrored around a shared category axis, the first series to the left and the second to the right: the classic age-sex population pyramid. Use it to compare the distribution of two groups over the same ordered categories, such as age bands, where the symmetry (or lack of it) is the message.
 
-Both series are supplied as positive values; value ticks and labels show absolute values. Unlike the other chart fronts, the axis parameters are spatial: `xlabel`, `xticks`, and `xmax` address the horizontal value axis, and `ylabel` the vertical category axis.
+Both series are supplied as positive values; value ticks and labels show absolute values. Unlike the other chart fronts, the axis parameters are spatial: `xlabel`, `xticks`, and `xmax` address the horizontal value axis, and `ylabel` the vertical category axis. When the category labels would overlap, every band keeps its tick but only every k-th band is labelled, the smallest step that keeps the labels apart.
 
 Examples:
 
@@ -23710,7 +23728,7 @@ Examples:
 | `aspect_ratio`        | The aspect ratio of the cells: ASPECT_RATIO.EQUAL (the default) keeps them square, ASPECT_RATIO.AUTO stretches them to the figure. See ASPECT_RATIO. **TYPE:** \`ASPECT_RATIO                                                                                                                                                                                                                                                    |
 | `max_cols`            | Maximum number of calendars per row when several are drawn. Defaults to 1, one calendar per row. **TYPE:** \`int                                                                                                                                                                                                                                                                                                                 |
 | `show_colorbar`       | Whether to show the colorbar(s). **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                |
-| `show_values`         | Whether to write each day's value into its cell. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                |
+| `show_values`         | Whether to write each day's value into its cell. When the widest value does not fit a cell at the theme's font size, as on a full year at the default size, no value is written and a warning suggests a larger figure or a shorter value_format. **TYPE:** \`bool                                                                                                                                                               |
 | `value_format`        | The format of the cell values: a VALUE_FORMAT constant (default VALUE_FORMAT.DEFAULT) or any "{x:.1f}", "{:.1f}", or "%g" style string. **TYPE:** \`VALUE_FORMAT                                                                                                                                                                                                                                                                 |
 | `style`               | Style configuration(s) for the calendar(s). **TYPE:** \`CalendarHeatmapStyleAttrs                                                                                                                                                                                                                                                                                                                                                |
 | `norm`                | Value normalization method(s). "centered" and "twoslope" hold vcenter in the middle of the theme's diverging colormap; see COLOR_NORM. **TYPE:** \`COLOR_NORM                                                                                                                                                                                                                                                                    |
@@ -26424,7 +26442,7 @@ Examples:
 | `legend`        | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** \`LegendSettingAttrs                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | `show_grid`     | Which grid lines to show (e.g., "both", "x", "y"); False draws none. **TYPE:** \`SHOW_GRID                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | `show_colorbar` | Whether to show the colorbar(s). **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| `show_values`   | Whether to write each cell's value in the cell. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `show_values`   | Whether to write each cell's value in the cell. When the widest value does not fit a cell at the theme's font size, no value is written and a warning suggests a larger figure or a shorter value_format. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                     |
 | `aspect_ratio`  | The aspect ratio of the axes ("auto" or "equal"). See ASPECT_RATIO. **TYPE:** \`ASPECT_RATIO                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | `subplots`      | Whether to create separate subplots for each heatmap. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | `max_cols`      | Maximum number of columns in subplots (when subplots=True). **TYPE:** \`int                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
@@ -26708,7 +26726,7 @@ Examples:
 | `show_grid`     | Which grid lines to show (e.g., "both", "x", "y"); False draws none. Off by default for filled contours. **TYPE:** \`SHOW_GRID                                                                                                                                                                                                                                                                                                        |
 | `fill`          | Whether to fill the bands between the levels (colored by the colormap) instead of drawing iso-lines (in the chart's color). **TYPE:** \`bool                                                                                                                                                                                                                                                                                          |
 | `levels`        | Which levels cut the surface: a rule of CONTOUR_LEVELS ("auto", the default, leaves the choice to matplotlib), a target level count, or an explicit list of level values. Filled values beyond a list's ends take the end colors, and the colorbar marks the overflow. **TYPE:** \`CONTOUR_LEVELS                                                                                                                                     |
-| `show_labels`   | Whether to write the level values along the iso-lines. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                               |
+| `show_labels`   | Whether to write the level values along the iso-lines. A label is kept only where it lies inside the axes and clear of the other labels; each level keeps one label where one fits. **TYPE:** \`bool                                                                                                                                                                                                                                  |
 | `show_colorbar` | Whether to show the colorbar(s) of filled contours. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                  |
 | `aspect_ratio`  | The aspect ratio of the axes ("auto" or "equal"). See ASPECT_RATIO. **TYPE:** \`ASPECT_RATIO                                                                                                                                                                                                                                                                                                                                          |
 | `scalex`        | The x-axis scale (e.g., "log", "linear"). **TYPE:** \`AXIS_SCALE                                                                                                                                                                                                                                                                                                                                                                      |
@@ -27331,8 +27349,8 @@ Examples:
 | `layout`         | How the nodes are placed: a NETWORK_LAYOUT constant (default NETWORK_LAYOUT.SPRING); on a disconnected network, SPRING and WEIGHTED place each connected part on its own, side by side, with the unlinked nodes on a ring around them. WEIGHTED lets each edge's weight set how hard it pulls its nodes together; GROUPED clusters the nodes by group, arranges the clusters by the summed weight of the edges between them, and marks each with a disc in the group color (plot_network_group_alpha). FIXED reads each node's x/y, each between 0 and 1, and draws that space inside the margin the other layouts keep. The three spring layouts cost the square of the node count; past about 1,000 nodes prefer CIRCULAR or FIXED. **TYPE:** \`NETWORK_LAYOUT |
 | `directed`       | Whether the edges end in an arrowhead at the target. When False (the default), an edge and its reverse draw as one line. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | `seed`           | The seed of the spring layouts (default 0); another seed gives another arrangement of the same data. **TYPE:** \`int                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| `label_position` | Where the node names print: a NETWORK_LABEL_POSITION constant (default NETWORK_LABEL_POSITION.CENTER, or the theme's chart_default_network_label_position). **TYPE:** \`NETWORK_LABEL_POSITION                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| `show_values`    | Whether to write each edge's weight at its midpoint. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `label_position` | Where the node names print: a NETWORK_LABEL_POSITION constant (default NETWORK_LABEL_POSITION.CENTER, or the theme's chart_default_network_label_position). A name that would cover another node or text moves to the first clear spot around its marker; one with no clear spot is left out, with one warning that suggests a larger figsize. **TYPE:** \`NETWORK_LABEL_POSITION                                                                                                                                                                                                                                                                                                                                                                                |
+| `show_values`    | Whether to write each edge's weight at its midpoint. A value that would cover a node or another text slides along its edge to the first clear spot, or is left out under the same warning. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | `value_format`   | The format of the edge values: a VALUE_FORMAT constant (default VALUE_FORMAT.DEFAULT) or any "{x:.1f}", "{:.1f}%", or "%g" style string. **TYPE:** \`VALUE_FORMAT                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | `show_legend`    | Whether to list the node groups in a legend. **TYPE:** \`bool                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | `legend`         | The per-figure legend setting: title, location, column count and alignment; each field falls back to the theme. See LegendSettingAttrs. **TYPE:** \`LegendSettingAttrs                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
@@ -27489,6 +27507,8 @@ ScatterMatrix(
 Creates a scatter matrix.
 
 Every pair of numeric dimensions gets a scatter chart, and each dimension's own distribution sits on the diagonal. Use it to scan many variables for relationships, clusters and outliers at once, optionally split by a categorical `hue`. For two variables use ScatterChart; for many dimensions per observation read as lines, use ParallelCoords.
+
+Each cell shows only as many tick labels as stay apart. An axis writes them short when every label shortens to three characters or fewer (2000 reads 2k, 3000000 reads 3M); otherwise, as for years, the plain numbers stay.
 
 The figure is a grid: it nests inside Grid and cannot be overlaid with Panel.
 
@@ -27969,7 +27989,7 @@ Examples:
 | `data`          | The chart data: a {"links": [...]} dict whose links are {"source", "target", "value"} records, or a list of such dicts drawing one Sankey per subplot. A node is the string that names it, which is also its drawn label. **TYPE:** \`SankeySingleChartAttrs                     |
 | `nodes`         | The node columns, left to right, each a list of node names top to bottom. Must name every node in the links exactly once. When omitted, a node's column is its longest path from any source and nodes keep their first-seen order within a column. **TYPE:** \`list\[list[str]\] |
 | `column_labels` | One heading per column, drawn above it; must match the number of columns. **TYPE:** \`list[str]                                                                                                                                                                                  |
-| `show_values`   | Whether to write each flow's value on its ribbon. **TYPE:** \`bool                                                                                                                                                                                                               |
+| `show_values`   | Whether to write each flow's value on its ribbon. A value with no spot clear of the node bars, the labels and the other values is left out, and a warning suggests a larger figsize. **TYPE:** \`bool                                                                            |
 | `value_format`  | The format of the ribbon values: a VALUE_FORMAT constant (default VALUE_FORMAT.DEFAULT) or any "{x:.1f}", "{:.1f}%", or "%g" style string. **TYPE:** \`VALUE_FORMAT                                                                                                              |
 | `title`         | The title of the chart. **TYPE:** \`str                                                                                                                                                                                                                                          |
 | `subtitle`      | The subtitle(s) for individual charts. **TYPE:** \`str                                                                                                                                                                                                                           |
@@ -29615,7 +29635,7 @@ Examples:
 ...     config.get("font_general_size")
 14
 >>> config.get("font_general_size")
-10
+11
 ```
 
 | PARAMETER | DESCRIPTION                                                                         |
@@ -29994,7 +30014,7 @@ MINIMAL_THEME: StyleAttrs = make_theme(
         "plot_bar_alpha": 1.0,
         "plot_bar_edge_width": 0,
         "plot_stackedarea_edge_width": 0,
-        "plot_value_fontsize": 9,
+        "plot_value_fontsize": 11,
         "plot_value_color": "#1F1F1F",
         "plot_hist_edge_width": 0,
         "plot_line_width": 2.0,
@@ -30479,7 +30499,7 @@ QUILL_THEME: StyleAttrs = make_theme(
         "axes_ticks_color": INK,
         "axes_spines_width": 1.4,
         "axes_ticks_length": 5,
-        "axes_ticks_label_size": 9,
+        "axes_ticks_label_size": 11,
         "chart_default_show_grid": None,
         "chart_default_network_label_position": NETWORK_LABEL_POSITION.ABOVE,
         "plot_hatch_cycle": ["/", ".", "\\", "x", "-", "|"],
@@ -30520,8 +30540,8 @@ QUILL_THEME: StyleAttrs = make_theme(
             "hatches": ["", ".", "..", "//", "xx"],
         },
         "plot_legend_label_color": INK,
-        "plot_legend_font_size": 9,
-        "plot_legend_title_size": 10,
+        "plot_legend_font_size": 11,
+        "plot_legend_title_size": 11.5,
         "plot_legend_edge_color": INK,
         "plot_line_width": 2.2,
         "plot_area_alpha": 1.0,
@@ -30579,8 +30599,8 @@ QUILL_THEME: StyleAttrs = make_theme(
         "plot_heatmap_cmap_diverging": COLORS.RdBu,
         "plot_heatmap_frame_color": INK,
         "plot_heatmap_font_color": INK,
-        "plot_heatmap_font_size": 10,
-        "plot_calendar_heatmap_font_size": 8,
+        "plot_heatmap_font_size": 11.5,
+        "plot_calendar_heatmap_font_size": 10.5,
         "plot_heatmap_edge_width": 0.6,
         "plot_heatmap_edge_color": INK,
         "plot_heatmap_missing_hatch": "\\\\",
@@ -30604,7 +30624,7 @@ QUILL_THEME: StyleAttrs = make_theme(
         "plot_parallel_axis_color": INK,
         "plot_parallel_tick_color": INK,
         "plot_parallel_tick_label_color": INK,
-        "plot_parallel_tick_label_size": 9,
+        "plot_parallel_tick_label_size": 11,
         "plot_parallel_tick_label_bg_color": None,
         "plot_parallel_dim_label_color": INK,
         "plot_box_edgecolor": INK,

@@ -4674,7 +4674,10 @@ another arrangement of the same data.</p>
 <a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.NETWORK_LABEL_POSITION&lt;/span&gt;" href="../../constants/#datachart.constants.NETWORK_LABEL_POSITION"><code>NETWORK_LABEL_POSITION</code></a> constant
 (default
 <a class="autorefs autorefs-internal" title="&lt;code class=&quot;doc-symbol doc-symbol-heading doc-symbol-class&quot;&gt;&lt;/code&gt;            &lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;datachart.constants.NETWORK_LABEL_POSITION&lt;/span&gt;" href="../../constants/#datachart.constants.NETWORK_LABEL_POSITION"><code>NETWORK_LABEL_POSITION.CENTER</code></a>, or
-the theme's <code>chart_default_network_label_position</code>).</p>
+the theme's <code>chart_default_network_label_position</code>). A name that
+would cover another node or text moves to the first clear spot
+around its marker; one with no clear spot is left out, with one
+warning that suggests a larger <code>figsize</code>.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -4694,7 +4697,9 @@ the theme's <code>chart_default_network_label_position</code>).</p>
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>Whether to write each edge's weight at its midpoint.</p>
+                <p>Whether to write each edge's weight at its midpoint. A
+value that would cover a node or another text slides along its
+edge to the first clear spot, or is left out under the same warning.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">

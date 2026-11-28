@@ -147,7 +147,7 @@ BarChart(
 
 ### Sorting
 
-The medal table ranks by gold, but that is a convention, and the same numbers tell a different story ranked by total medals. `sort` orders the categories by value: `SORT.DESCENDING` puts the largest bar first, `SORT.ASCENDING` the smallest, and `None` keeps the input order ([SORT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT)). Ranked by total, Great Britain climbs from seventh to third and France moves above Japan and Australia.
+The medal table ranks by gold, but that is a convention, and the same numbers tell a different story ranked by total medals. `sort` orders the categories by value: `SORT.DESCENDING` puts the largest bar first, `SORT.ASCENDING` the smallest, and `None` keeps the input order ([SORT](https://eriknovak.github.io/datachart/dev/references/constants/#datachart.constants.SORT)). Ranked by total, Britain climbs from seventh to third and France moves above Japan and Australia.
 
 ```
 from datachart.constants import SORT
@@ -352,7 +352,7 @@ BarChart(
     data=medals_total,
     # a note pinned to the axes, pointing at China's bar
     texts={
-        "text": "tied on 40 golds; the United States\nleads on silver and bronze",
+        "text": "tied on 40 golds; the USA\nleads on silver and bronze",
         "x": 0.5,
         "y": 0.8,
         "coords": "axes",
@@ -461,7 +461,7 @@ BarChart(
 ).show()
 ```
 
-An overlay pairs each country's Paris result with its Tokyo result. `golds_2020`, defined in a hidden cell, holds the same ten countries' gold medals at Tokyo 2020 (source: the official Tokyo 2020 medal table). The Tokyo series is drawn first, in grey, and the Paris series over it in gold, so a grey bar showing above a gold one is a country that won fewer golds in Paris than in Tokyo: Japan, the previous host, and Great Britain.
+An overlay pairs each country's Paris result with its Tokyo result. `golds_2020`, defined in a hidden cell, holds the same ten countries' gold medals at Tokyo 2020 (source: the official Tokyo 2020 medal table). The Tokyo series is drawn first, in grey, and the Paris series over it in gold, so a grey bar showing above a gold one is a country that won fewer golds in Paris than in Tokyo: Japan, the previous host, and Britain.
 
 ```
 BarChart(

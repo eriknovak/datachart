@@ -86,6 +86,8 @@ rank_figure = BumpChart(
         for country in COUNTRIES
     ],
     xticks=[year for year, _ in GDP_RANK["United States"]],
+    # 2020 keeps its tick but no label, which would touch 2023's in the panel below
+    xticklabels=["" if year == 2020 else str(year) for year, _ in GDP_RANK["United States"]],
     figsize=(8.0, 5.5),
 )
 rank_figure.show()
@@ -220,6 +222,8 @@ profile_figure = ParallelCoords(
     hue="income",
     show_legend=True,
     legend={"location": LEGEND_LOCATION.OUTSIDE_TOP, "ncols": 3},
+    # tilt the axis names, so the long ones keep clear of their neighbours
+    style={"plot_parallel_dim_label_rotation": 15},
     figsize=(9.0, 5.0),
 )
 profile_figure.show()

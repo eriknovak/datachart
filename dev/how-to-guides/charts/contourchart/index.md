@@ -589,7 +589,8 @@ Grid(
         ]
     ],
     title="The hill and its chamois",
-    figsize=FIG_SIZE.FULL_SHORT,
+    # taller than the short preset, so the hilltop's level labels keep apart
+    figsize=(6.3, 3.2),
 ).show()
 ```
 

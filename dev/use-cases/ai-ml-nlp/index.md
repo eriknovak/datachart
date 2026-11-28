@@ -454,7 +454,7 @@ SankeyChart(
     title="Six thousand labelled tickets out of a million crawled documents",
     show_values=True,
     value_format=VALUE_FORMAT.THOUSANDS,
-    figsize=(9.0, 4.8),
+    figsize=(11.0, 4.8),
 ).show()
 ```
 

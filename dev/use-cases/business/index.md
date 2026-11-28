@@ -208,7 +208,7 @@ Grid(
         [cohort_figure, funnel_figure],
     ],
     title="2025 in review: the revenue mix, the channels, the cohorts, and the funnel",
-    figsize=(12.0, 9.0),
+    figsize=(13.0, 9.0),
 ).show()
 ```
 

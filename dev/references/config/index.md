@@ -218,7 +218,7 @@ Examples:
 ...     config.get("font_general_size")
 14
 >>> config.get("font_general_size")
-10
+11
 ```
 
 | PARAMETER | DESCRIPTION                                                                         |

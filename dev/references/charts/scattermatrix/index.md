@@ -34,6 +34,8 @@ Creates a scatter matrix.
 
 Every pair of numeric dimensions gets a scatter chart, and each dimension's own distribution sits on the diagonal. Use it to scan many variables for relationships, clusters and outliers at once, optionally split by a categorical `hue`. For two variables use ScatterChart; for many dimensions per observation read as lines, use ParallelCoords.
 
+Each cell shows only as many tick labels as stay apart. An axis writes them short when every label shortens to three characters or fewer (2000 reads 2k, 3000000 reads 3M); otherwise, as for years, the plain numbers stay.
+
 The figure is a grid: it nests inside Grid and cannot be overlaid with Panel.
 
 Examples:

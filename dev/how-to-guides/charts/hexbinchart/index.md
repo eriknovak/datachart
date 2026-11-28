@@ -237,7 +237,7 @@ HexbinChart(
     # the longest-listed apartment in every hexagon
     reduce=HEXBIN_REDUCE.MAX,
     min_count=3,
-    colorbar={"label": "Longest time on the market (days)"},
+    colorbar={"label": "Most days on the market"},
     title="The slowest listings",
     xlabel="Floor area (m²)",
     ylabel="Rent (€/month)",

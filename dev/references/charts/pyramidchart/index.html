@@ -4490,7 +4490,9 @@ age bands, where the symmetry (or lack of it) is the message.</p>
 <p>Both series are supplied as positive values; value ticks and labels show
 absolute values. Unlike the other chart fronts, the axis parameters are
 spatial: <code>xlabel</code>, <code>xticks</code>, and <code>xmax</code> address the horizontal value axis,
-and <code>ylabel</code> the vertical category axis.</p>
+and <code>ylabel</code> the vertical category axis. When the category labels would
+overlap, every band keeps its tick but only every k-th band is labelled,
+the smallest step that keeps the labels apart.</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>

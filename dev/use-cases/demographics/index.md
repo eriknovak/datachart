@@ -167,7 +167,7 @@ migration_figure = SankeyChart(
     column_labels=["Arrivals", "Citizenship", "Departures"],
     show_values=True,
     value_format=VALUE_FORMAT.THOUSANDS,
-    figsize=(9.0, 5.5),
+    figsize=(11.0, 5.5),
 )
 migration_figure.show()
 ```
