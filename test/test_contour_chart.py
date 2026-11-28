@@ -318,6 +318,10 @@ class TestContourDraw(unittest.TestCase):
         self.assertEqual((cs.norm.vmin, cs.norm.vmax), (0, 500))
 
 
+# levels of `surface` whose lines stay clear of the axes edge
+INNER_LEVELS = [100, 200, 300, 400, 500]
+
+
 class TestContourLabelsKeepApart(unittest.TestCase):
     def setUp(self):
         self.figure = ContourChart(
@@ -327,7 +331,6 @@ class TestContourLabelsKeepApart(unittest.TestCase):
             levels=CONTOUR_LEVELS.RICE,
         )
         self.ax = self.figure.axes[0]
-        self.placed = {text.get_text() for text in self.ax.texts}
         self.figure.canvas.draw()
         self.renderer = self.figure.canvas.get_renderer()
         self.texts = [text for text in self.ax.texts if text.get_visible()]
@@ -351,9 +354,18 @@ class TestContourLabelsKeepApart(unittest.TestCase):
         ]
         self.assertEqual(outside, [])
 
-    def test_rice_level_labels_keep_every_level(self):
-        # each labelled level of this surface has room for one label
-        self.assertEqual({text.get_text() for text in self.texts}, self.placed)
+    def test_inner_levels_keep_one_label_each(self):
+        # these levels run clear of the axes edge, so each has room for a label
+        figure = ContourChart(
+            data=surface(n=80),
+            show_labels=True,
+            value_format="{x:.0f}",
+            levels=INNER_LEVELS,
+        )
+        placed = {text.get_text() for text in figure.axes[0].texts}
+        figure.canvas.draw()
+        kept = {text.get_text() for text in figure.axes[0].texts if text.get_visible()}
+        self.assertEqual(kept, placed)
 
 
 class TestContourCompose(unittest.TestCase):

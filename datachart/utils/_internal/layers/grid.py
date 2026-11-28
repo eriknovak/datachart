@@ -1014,12 +1014,8 @@ def _label_fits(box, frame, kept_boxes) -> bool:
     return inside and not any(box.overlaps(other) for other in kept_boxes)
 
 
-def _keep_fitting_labels(labels, frame) -> list:
-    """The indices of the (anchor, extent, level) `labels` kept inside `frame`.
-
-    Each level first keeps its first label that fits, then every other label
-    that fits keeps its place, in order.
-    """
+def _keep_first_labels(labels, frame) -> list:
+    """The indices of each level's first (anchor, extent, level) label that fits."""
 
     kept = []
     for level in dict.fromkeys(cvalue for _, _, cvalue in labels):
@@ -1034,10 +1030,15 @@ def _keep_fitting_labels(labels, frame) -> list:
         )
         if first is not None:
             kept.append(first)
+    return kept
+
+
+def _keep_other_labels(labels, kept, frame) -> None:
+    """Append to `kept` every other label that fits, in order."""
+
     for i, (_, extent, _) in enumerate(labels):
         if i not in kept and _label_fits(extent, frame, [labels[j][1] for j in kept]):
             kept.append(i)
-    return kept
 
 
 # one layer for lines and fills, also the 2-D density chart (ADR 0022)
@@ -1288,9 +1289,10 @@ class ContourLayer(Layer):
 
         Runs once layout has sized the axes. Every label is placed again on
         the uncut lines at the laid-out scale. Each level first keeps its
-        first label that fits, then the other labels keep theirs in order. A
+        first label that fits; a level left with no label then tries other
+        spots along its line; the other labels keep theirs last, in order. A
         label fits when it lies inside the axes and clear of every kept
-        label. A level left with no label tries other spots along its line.
+        label.
         The lines are cut anew under the kept labels only, so a left out
         label leaves no gap.
         """
@@ -1304,10 +1306,11 @@ class ContourLayer(Layer):
             for text, cvalue in zip(lines.labelTexts, lines.labelCValues)
         ]
 
-        # keep the labels that fit, then find a spot for each bare level
+        # one label per level first, so a level's spot beats another's extras
         frame = lines.axes.bbox
-        kept = _keep_fitting_labels(labels, frame)
+        kept = _keep_first_labels(labels, frame)
         self._label_bare_levels(lines, labels, kept, frame, halo, renderer)
+        _keep_other_labels(labels, kept, frame)
 
         # cut the lines under the kept labels
         self._place_labels(lines, [labels[i][0] for i in sorted(kept)], True, halo)
