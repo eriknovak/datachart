@@ -15,6 +15,7 @@ from matplotlib.colors import to_hex, to_rgb
 from matplotlib.markers import MarkerStyle
 from matplotlib.patches import Patch
 from matplotlib.path import Path
+from matplotlib.textpath import text_to_path
 from matplotlib.transforms import (
     Bbox,
     IdentityTransform,
@@ -402,6 +403,12 @@ def _px_to_points(ax: plt.Axes, pixels: float) -> float:
     return pixels * 72.0 / ax.figure.dpi
 
 
+def _points_to_px(ax: plt.Axes, points: float) -> float:
+    """A distance in points as display pixels."""
+
+    return points * ax.figure.dpi / 72.0
+
+
 # build-time resolution keeps texts on the reference-line seam (ADR 0018)
 def _resolve_texts(chart: dict) -> List[tuple]:
     """Resolve text annotation styles at build time."""
@@ -502,10 +509,10 @@ def _legend_pad_px(figure) -> float:
     return LEGEND_HEADROOM_PAD_PT * figure.dpi / 72.0
 
 
-def _defer_legend_fit(ax: plt.Axes, fit) -> None:
-    """Queue a legend fit for the figure's first draw, once layout has run."""
+def _defer_fit(ax: plt.Axes, fit) -> None:
+    """Queue a fit to run at the figure's first draw, once layout has run."""
 
-    ax.figure.__dict__.setdefault("_legend_fits", []).append(fit)
+    ax.figure.__dict__.setdefault("_deferred_fits", []).append(fit)
 
 
 # ================================================
@@ -573,6 +580,8 @@ class DrawContext:
     category_scale: Optional[str] = None
     # the (min, max) size data every bubble on the axes maps from
     size_extent: Optional[tuple] = None
+    # the xmin, xmax, ymin and ymax the user set on the axes, applied after draw
+    axis_limits: Optional[dict] = None
 
 
 # ================================================
@@ -1065,9 +1074,7 @@ class Layer:
         ax.add_artist(legend)
         # add_artist clips to the axes patch; the legend sits outside it
         legend.set_clip_on(False)
-        _defer_legend_fit(
-            ax, lambda renderer: _fit_outside_legend(legend, [ax], renderer)
-        )
+        _defer_fit(ax, lambda renderer: _fit_outside_legend(legend, [ax], renderer))
 
     def _draw_even_step_legend(self, ax, norm, title: Optional[str]) -> None:
         """The step legend of a normalized value scale: one entry per even step."""
@@ -2008,6 +2015,15 @@ def _text_size(fontsize, text) -> tuple:
     return (
         TEXT_WIDTH_PER_CHAR * fontsize * max(len(line) for line in lines),
         TEXT_LINE_HEIGHT * fontsize * len(lines),
+    )
+
+
+def _text_width(text, font) -> float:
+    """A text's width in points, measured from the glyphs of its font."""
+
+    return max(
+        text_to_path.get_text_width_height_descent(line, font, ismath=False)[0]
+        for line in text.split("\n")
     )
 
 

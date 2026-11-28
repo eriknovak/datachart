@@ -1,6 +1,7 @@
 """Grid layers: heatmap, calendar heatmap, contour, and hexbin."""
 
 import math
+import warnings
 from collections import defaultdict
 from datetime import date, timedelta
 from typing import Callable, List, Optional, Union
@@ -16,6 +17,7 @@ from matplotlib.colors import (
     to_rgba_array,
 )
 from matplotlib.patches import Rectangle
+from matplotlib.text import Text
 from ..colors import get_colormap
 from ..validate import (
     AXIS_TEMPORAL,
@@ -59,6 +61,7 @@ from .base import (
     HIGHLIGHT_WIDTH_SCALE,
     InkStroke,
     Layer,
+    _defer_fit,
     _fill_role,
     _format_value,
     _keep_role,
@@ -66,6 +69,8 @@ from .base import (
     _scalar,
     _span_text,
     _step_label,
+    _text_size,
+    _text_width,
     _value_tab_bbox,
     axis_kind,
     emphasis_rule_roles,
@@ -284,6 +289,24 @@ def colormap_scaling(chart: dict) -> dict:
     return {"norm": CenteredNorm(vcenter, halfrange)}
 
 
+def _view_limits(ax: plt.Axes, limits: Optional[dict]) -> dict:
+    """The (low, high) data span of each axis once the user's limits apply.
+
+    A limit replaces the end it names, as the panel applies it after draw;
+    an unset or absent limit keeps the axes' current end.
+    """
+
+    limits = limits or {}
+    view = {}
+    for name, ends in (("x", ax.get_xlim()), ("y", ax.get_ylim())):
+        first, last = (
+            ends[k] if limits.get(f"{name}{end}") is None else limits[f"{name}{end}"]
+            for k, end in enumerate(("min", "max"))
+        )
+        view[name] = tuple(sorted((first, last)))
+    return view
+
+
 class HeatmapLayer(Layer):
     ticks_at_axis_ends = False
     kind = "heatmap"
@@ -397,7 +420,7 @@ class HeatmapLayer(Layer):
         self._draw_cell_emphasis(ax)
 
         if self.show_cell_values:
-            self._draw_cell_values(ax, im)
+            self._draw_cell_values(ax, im, ctx)
 
         if self.edge_style.get("linewidth"):
             self._draw_cell_borders(ax, len(data), len(data[0]))
@@ -443,8 +466,29 @@ class HeatmapLayer(Layer):
             "value": _scalar(self.z[row][col]),
         }
 
-    def _draw_cell_values(self, ax, im) -> None:
-        """Print each cell's value at its centre; a blank cell stays bare."""
+    def _draw_cell_values(self, ax, im, ctx) -> None:
+        """Print each cell's value at its centre; a blank cell stays bare.
+
+        No value prints when the widest one in view does not fit a cell.
+        """
+
+        texts = {
+            (i, j): self.cell_text(value)
+            for i, row in enumerate(self.z)
+            for j, value in enumerate(row)
+            if not np.isnan(value)
+        }
+        # only the values inside the user's limits must fit
+        view = _view_limits(ax, ctx.axis_limits)
+        in_view = {
+            text
+            for (i, j), text in texts.items()
+            if view["x"][0] <= j <= view["x"][1] and view["y"][0] <= i <= view["y"][1]
+        }
+        if not texts or (
+            in_view and not self._cell_values_fit(ax, in_view, view, ctx.aspect_locked)
+        ):
+            return
 
         tab = get_value_label_style(self.style).get("tab")
         if self.value_etch_steps:
@@ -454,31 +498,64 @@ class HeatmapLayer(Layer):
                 len(self.value_etch_steps),
                 self.step_centre,
             )
-        for i, row in enumerate(self.z):
-            for j, value in enumerate(row):
-                if np.isnan(value):
-                    continue
-                font_style = dict(self.font_style)
-                # a faded cell is light whatever its value
-                if (
-                    self.cell_roles[i][j] != EMPHASIS_BACKGROUND
-                    and _luminance(im.cmap(im.norm(value)))
-                    < HEATMAP_TEXT_DARK_LUMINANCE
-                ):
-                    font_style["color"] = "#FFFFFF"
-                if self.value_etch_steps:
-                    # a value over the etching reads through a halo of the
-                    # ground, or a tab where the etching is lines that cross it
-                    font_style["color"] = self.font_style.get("color")
-                    hatch = self.value_etch_steps[steps[i][j]][1]
-                    if tab and set(hatch) & set("/\\x+|-"):
-                        font_style["bbox"] = _value_tab_bbox(tab)
-                    else:
-                        font_style["path_effects"] = self.value_halo
-                text = ax.text(
-                    j, i, self.cell_text(value), ha="center", va="center", **font_style
-                )
-                self.register_limit_mark(text, j, i)
+        for (i, j), label in texts.items():
+            value = self.z[i][j]
+            font_style = dict(self.font_style)
+            # a faded cell is light whatever its value
+            if (
+                self.cell_roles[i][j] != EMPHASIS_BACKGROUND
+                and _luminance(im.cmap(im.norm(value))) < HEATMAP_TEXT_DARK_LUMINANCE
+            ):
+                font_style["color"] = "#FFFFFF"
+            if self.value_etch_steps:
+                # a value over the etching reads through a halo of the
+                # ground, or a tab where the etching is lines that cross it
+                font_style["color"] = self.font_style.get("color")
+                hatch = self.value_etch_steps[steps[i][j]][1]
+                if tab and set(hatch) & set("/\\x+|-"):
+                    font_style["bbox"] = _value_tab_bbox(tab)
+                else:
+                    font_style["path_effects"] = self.value_halo
+            text = ax.text(j, i, label, ha="center", va="center", **font_style)
+            self.register_limit_mark(text, j, i)
+
+    def _cell_values_fit(self, ax, texts: set, view: dict, aspect_locked: bool) -> bool:
+        """Whether the widest value fits one cell; warns when it does not.
+
+        The width comes from the font's glyphs, the height from the line
+        height, and the cell from the axes before layout spread over the
+        `view` span, with no margin. The layout usually grows the cell, but
+        long tick labels beside a colorbar can shrink it below the size
+        checked here. A locked aspect shrinks the box to square cells of the
+        shorter side.
+        """
+
+        font = Text(text="", **self.font_style).get_fontproperties()
+        fontsize = font.get_size_in_points()
+        widths = {text: _text_width(text, font) for text in texts}
+        widest = max(sorted(widths), key=widths.get)
+        height = max(_text_size(fontsize, text)[1] for text in texts)
+        # equal limits leave no span to spread the axes over
+        if any(high == low for low, high in view.values()):
+            return True
+        cell_width, cell_height = (
+            _px_to_points(ax, side / (high - low))
+            for side, (low, high) in (
+                (ax.bbox.width, view["x"]),
+                (ax.bbox.height, view["y"]),
+            )
+        )
+        if aspect_locked:
+            cell_width = cell_height = min(cell_width, cell_height)
+        if widths[widest] <= cell_width and height <= cell_height:
+            return True
+        warnings.warn(
+            f"Cell values left out: the widest value {widest!r} at {fontsize:g} pt "
+            f"needs {widths[widest]:.1f} x {height:.1f} pt, but a cell is "
+            f"{cell_width:.1f} x {cell_height:.1f} pt. A larger `figsize` or a "
+            "shorter `value_format` fits them."
+        )
+        return False
 
     def _cell_style(self) -> dict:
         """The image style; background cells fade to the muted alpha (ADR 0045).
@@ -788,6 +865,44 @@ def contour_levels(
     return [float(t) for t in ticks]
 
 
+def _label_fits(box, frame, kept_boxes) -> bool:
+    """A label's display box lies inside `frame` and clear of every kept box."""
+
+    inside = (
+        box.x0 >= frame.x0
+        and box.y0 >= frame.y0
+        and box.x1 <= frame.x1
+        and box.y1 <= frame.y1
+    )
+    return inside and not any(box.overlaps(other) for other in kept_boxes)
+
+
+def _keep_fitting_labels(labels, frame) -> list:
+    """The indices of the (anchor, extent, level) `labels` kept inside `frame`.
+
+    Each level first keeps its first label that fits, then every other label
+    that fits keeps its place, in order.
+    """
+
+    kept = []
+    for level in dict.fromkeys(cvalue for _, _, cvalue in labels):
+        kept_boxes = [labels[i][1] for i in kept]
+        first = next(
+            (
+                i
+                for i, (_, extent, cvalue) in enumerate(labels)
+                if cvalue == level and _label_fits(extent, frame, kept_boxes)
+            ),
+            None,
+        )
+        if first is not None:
+            kept.append(first)
+    for i, (_, extent, _) in enumerate(labels):
+        if i not in kept and _label_fits(extent, frame, [labels[j][1] for j in kept]):
+            kept.append(i)
+    return kept
+
+
 # one layer for lines and fills, also the 2-D density chart (ADR 0022)
 class ContourLayer(Layer):
     """A gridded surface drawn as iso-lines or filled bands."""
@@ -1008,9 +1123,100 @@ class ContourLayer(Layer):
                 label_style["colors"] = self.muted_color
             # a relief's labels sit over the etching and read through a halo
             halo = self.value_halo if self.fill and self.value_etch_steps else []
-            for text in ax.clabel(lines, **label_style):
-                text.set_fontfamily(self.label_family)
-                text.set_path_effects(halo)
+            # the uncut lines, so the fit after layout can cut them anew
+            paths = list(lines.get_paths())
+            self._style_labels(ax.clabel(lines, **label_style), halo)
+            _defer_fit(
+                ax, lambda renderer: self._fit_labels(lines, paths, halo, renderer)
+            )
+
+    def _style_labels(self, texts, halo) -> None:
+        """The theme's font and the relief's halo on the level labels."""
+
+        for text in texts:
+            text.set_fontfamily(self.label_family)
+            text.set_path_effects(halo)
+
+    def _place_labels(self, lines, anchors, inline: bool, halo) -> None:
+        """Replace the level labels with one near each anchor in data space."""
+
+        while lines.labelTexts:
+            lines.pop_label()
+        for x, y in anchors:
+            lines.add_label_near(x, y, inline=inline)
+        self._style_labels(lines.labelTexts, halo)
+
+    def _fit_labels(self, lines, paths, halo, renderer) -> None:
+        """Leave out the level labels that crowd or cross the axes edge.
+
+        Runs once layout has sized the axes. Every label is placed again on
+        the uncut lines at the laid-out scale. Each level first keeps its
+        first label that fits, then the other labels keep theirs in order. A
+        label fits when it lies inside the axes and clear of every kept
+        label. A level left with no label tries other spots along its line.
+        The lines are cut anew under the kept labels only, so a left out
+        label leaves no gap.
+        """
+
+        # place every label again at the laid-out scale, on the uncut lines
+        anchors = [text.get_position() for text in lines.labelTexts]
+        lines.set_paths(list(paths))
+        self._place_labels(lines, anchors, False, halo)
+        labels = [
+            (text.get_position(), text.get_window_extent(renderer), cvalue)
+            for text, cvalue in zip(lines.labelTexts, lines.labelCValues)
+        ]
+
+        # keep the labels that fit, then find a spot for each bare level
+        frame = lines.axes.bbox
+        kept = _keep_fitting_labels(labels, frame)
+        self._label_bare_levels(lines, labels, kept, frame, halo, renderer)
+
+        # cut the lines under the kept labels
+        self._place_labels(lines, [labels[i][0] for i in sorted(kept)], True, halo)
+
+    def _label_bare_levels(self, lines, labels, kept, frame, halo, renderer) -> None:
+        """Give each level with no kept label the first spot along its line that fits.
+
+        Appends the label taken to `labels` and its index to `kept`.
+        """
+
+        for level in dict.fromkeys(cvalue for _, _, cvalue in labels):
+            if any(labels[i][2] == level for i in kept):
+                continue
+            box = next(extent for _, extent, cvalue in labels if cvalue == level)
+            spacing = max(box.width, box.height)
+            kept_boxes = [labels[i][1] for i in kept]
+            for label in self._spot_labels(lines, level, spacing, halo, renderer):
+                if _label_fits(label[1], frame, kept_boxes):
+                    labels.append(label)
+                    kept.append(len(labels) - 1)
+                    break
+
+    def _spot_labels(self, lines, level, spacing, halo, renderer):
+        """Trial labels of one level, `spacing` display units apart along its line.
+
+        Yields each trial's (anchor, window extent, level) and takes the
+        trial label off the axes before the next.
+        """
+
+        k = list(lines.labelCValueList).index(level)
+        path = lines.get_paths()[lines.labelIndiceList[k]]
+        spots = lines.get_transform().transform(path.vertices)
+        walked = spacing
+        for previous, (x, y) in zip(spots[:-1], spots[1:]):
+            walked += math.dist(previous, (x, y))
+            if walked < spacing:
+                continue
+            walked = 0.0
+            lines.add_label_near(x, y, inline=False, transform=False)
+            text = lines.labelTexts[-1]
+            self._style_labels([text], halo)
+            label = (text.get_position(), text.get_window_extent(renderer))
+            on_level = lines.labelCValues[-1] == level
+            lines.pop_label()
+            if on_level:
+                yield (*label, level)
 
     @staticmethod
     def _level_resolver(contours, label, edges=None) -> Callable:

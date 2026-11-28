@@ -138,7 +138,10 @@ def Heatmap(
         show_grid: Which grid lines to show (e.g., "both", "x", "y");
             `False` draws none.
         show_colorbar: Whether to show the colorbar(s).
-        show_values: Whether to write each cell's value in the cell.
+        show_values: Whether to write each cell's value in the cell. When the
+            widest value does not fit a cell at the theme's font size, no value
+            is written and a warning suggests a larger figure or a shorter
+            `value_format`.
         aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
             [`ASPECT_RATIO`][datachart.constants.ASPECT_RATIO].
         subplots: Whether to create separate subplots for each heatmap.

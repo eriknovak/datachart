@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.collections import PathCollection
 from matplotlib.colors import to_hex
+from matplotlib.text import Text
 
 from datachart.charts import LineChart, ScatterMatrix
 from datachart.config import config
@@ -20,6 +21,8 @@ from datachart.utils._internal.layers import (
     ScatterLayer,
     TextLayer,
 )
+
+from .text_overlap import overlapping_pairs
 
 THEMES = [
     THEME.DEFAULT,
@@ -53,6 +56,14 @@ def columns():
     }
 
 
+def thousands():
+    """Five columns of data at thousands scale, split by a two-group hue."""
+    rng = np.random.RandomState(0)
+    data = {f"d{k}": list(rng.randn(20) * 1000) for k in range(5)}
+    data["g"] = ["p", "q"] * 10
+    return data
+
+
 def records():
     data = columns()
     return [dict(zip(data, row)) for row in zip(*data.values())]
@@ -76,6 +87,48 @@ def cell_axes(figure):
             # a host axes is added before its twin
             axes.setdefault((ss.rowspan.start, ss.colspan.start), ax)
     return axes
+
+
+def ticks_in_view(axis, ticks):
+    """The ticks whose location lies inside the axis view, within float noise."""
+    lo, hi = sorted(axis.get_view_interval())
+    tolerance = (hi - lo) * 1e-6
+    return [
+        tick for tick in ticks if lo - tolerance <= tick.get_loc() <= hi + tolerance
+    ]
+
+
+def drawn_tick_labels(ax, axis):
+    """The tick labels an axis draws: visible, non-empty, for a tick in view."""
+    if not (ax.axison and axis.get_visible()):
+        return []
+    return [
+        tick.label1.get_text()
+        for tick in ticks_in_view(axis, axis.get_major_ticks())
+        if tick.label1.get_visible() and tick.label1.get_text().strip()
+    ]
+
+
+def overlapping_texts(figure):
+    """Pairs of drawn texts whose boxes overlap."""
+    figure.canvas.draw()
+    renderer = figure.canvas.get_renderer()
+    # a tick label is drawn only on a shown axis, for a tick inside the view
+    undrawn = set()
+    for ax in figure.axes:
+        for axis in (ax.xaxis, ax.yaxis):
+            ticks = axis.get_major_ticks() + axis.get_minor_ticks()
+            shown = ax.axison and axis.get_visible()
+            drawn = ticks_in_view(axis, ticks) if shown else []
+            for tick in ticks:
+                if tick not in drawn:
+                    undrawn |= {id(tick.label1), id(tick.label2)}
+    texts = [
+        t
+        for t in figure.findobj(Text)
+        if t.get_visible() and t.get_text().strip() and id(t) not in undrawn
+    ]
+    return overlapping_pairs(texts, renderer)
 
 
 class TestScatterMatrixInputs(unittest.TestCase):
@@ -429,6 +482,7 @@ class TestScatterMatrixLegend(unittest.TestCase):
 
 class TestScatterMatrixSize(unittest.TestCase):
     def tearDown(self):
+        config.set_theme(THEME.DEFAULT)
         plt.close("all")
 
     def wide(self, n):
@@ -457,6 +511,46 @@ class TestScatterMatrixSize(unittest.TestCase):
                 self.assertAlmostEqual(figure.get_figheight(), height)
         figure = ScatterMatrix(self.wide(5))
         self.assertEqual(tuple(figure.get_size_inches()), (6.3, 6.3))
+
+    def test_default_size_keeps_text_apart(self):
+        cases = [
+            ("thousands", thousands(), THEME.DEFAULT),
+            ("unit", self.wide(5), THEME.DEFAULT),
+            ("thousands", thousands(), THEME.QUILL),
+        ]
+        for name, data, theme in cases:
+            with self.subTest(data=name, theme=theme):
+                config.set_theme(theme)
+                figure = ScatterMatrix(data, hue="g")
+                self.assertEqual(overlapping_texts(figure), [])
+                self.assertAlmostEqual(figure.get_figwidth(), 6.3)
+
+    def test_default_size_labels_every_axis_twice(self):
+        figure = ScatterMatrix(thousands(), hue="g")
+        figure.canvas.draw()
+        for (row, col), ax in cell_axes(figure).items():
+            for name, axis, labelled in (
+                ("x", ax.xaxis, row == 4),
+                ("y", ax.yaxis, col == 0),
+            ):
+                if labelled:
+                    with self.subTest(cell=(row, col), axis=name):
+                        self.assertGreaterEqual(len(drawn_tick_labels(ax, axis)), 2)
+
+    def test_thousands_labels_read_short(self):
+        figure = ScatterMatrix(thousands(), hue="g")
+        figure.canvas.draw()
+        ax = cell_axes(figure)[(4, 0)]
+        self.assertIn("2k", drawn_tick_labels(ax, ax.xaxis))
+
+    def test_year_labels_stay_plain(self):
+        rng = np.random.RandomState(0)
+        data = {"year": list(rng.randint(1990, 2021, 20)), "v": list(rng.randn(20))}
+        figure = ScatterMatrix(data)
+        figure.canvas.draw()
+        ax = cell_axes(figure)[(1, 0)]
+        labels = drawn_tick_labels(ax, ax.xaxis)
+        self.assertTrue(labels and all(label.isdigit() for label in labels), labels)
 
     def test_given_figsize_wins(self):
         figure = ScatterMatrix(self.wide(5), figsize=(9, 9))
@@ -497,6 +591,23 @@ class TestScatterMatrixComposition(unittest.TestCase):
                 outer = Grid([[figure]])
                 self.assertEqual(len(outer.axes), 8)
                 outer.canvas.draw()
+
+    def test_nested_thousands_matrix_keeps_text_apart(self):
+        line = LineChart([{"x": 0, "y": 1}, {"x": 1, "y": 2}])
+        figure = Grid([[line, ScatterMatrix(thousands(), hue="g")]])
+        self.assertEqual(overlapping_texts(figure), [])
+
+    def test_nested_log_scale_keeps_its_log_ticks(self):
+        rng = np.random.RandomState(0)
+        data = {f"d{k}": list(10 ** rng.uniform(1, 4, 20)) for k in range(3)}
+        figure = Grid([[ScatterMatrix(data)]], scalex="log")
+        scales = {ax.xaxis.get_scale() for ax in figure.axes if ax.axison}
+        locators = {
+            type(ax.xaxis.get_major_locator()).__name__
+            for ax in figure.axes
+            if ax.axison
+        }
+        self.assertEqual((scales, locators), ({"log"}, {"LogLocator"}))
 
     def test_nested_columns_keep_equal_widths(self):
         matrix = ScatterMatrix(columns(), hue="species", dimensions=["a", "b", "c"])

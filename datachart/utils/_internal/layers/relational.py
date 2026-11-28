@@ -1,16 +1,18 @@
 """Relational layers: sankey, treemap, and network."""
 
 import math
+import warnings
 from collections import defaultdict
 from typing import List, NamedTuple, Optional
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import to_rgba
+from matplotlib.font_manager import FontProperties
 from matplotlib.lines import Line2D
 from matplotlib.patches import Circle, FancyArrowPatch, Patch, PathPatch, Rectangle
 from matplotlib.path import Path
 from matplotlib.text import Text
-from matplotlib.transforms import ScaledTranslation
+from matplotlib.transforms import offset_copy
 from ..colors import create_color_cycle
 from ..validate import (
     infer_network_nodes,
@@ -37,13 +39,17 @@ from .base import (
     InkStroke,
     Layer,
     PointLabelMixin,
+    _defer_fit,
     _fill_role,
     _format_value,
     _halo_effects,
     _keep_role,
     _lighten,
     _marker_edge_widths,
+    _points_to_px,
+    _px_to_points,
     _text_size,
+    _text_width,
     theme_default,
 )
 
@@ -160,8 +166,28 @@ NETWORK_INKED_HEAD_WIDTH = 0.6
 NETWORK_RING_WIDTH = 0.9
 
 
-# the gap between a node's marker and a name printed above it, in points
+# the gap between a node's marker and a name printed beside it, in points
 NETWORK_LABEL_GAP = 2.0
+
+
+# a colliding name's spots beside its marker, as (ha, va, dx, dy), in order
+NETWORK_NAME_SPOTS = (
+    ("center", "bottom", 0, 1),
+    ("center", "top", 0, -1),
+    ("left", "center", 1, 0),
+    ("right", "center", -1, 0),
+    ("left", "bottom", 1, 1),
+    ("right", "bottom", -1, 1),
+    ("left", "top", 1, -1),
+    ("right", "top", -1, -1),
+)
+
+
+NETWORK_NAME_ON_MARKER = ("center", "center", 0, 0)
+
+
+# an edge value's spots along its edge, as shares of its length from the source
+NETWORK_VALUE_POSITIONS = (0.5, 0.35, 0.65, 0.2, 0.8)
 
 
 # the spacing, in pixels, of the boxes an edge is sampled into for BEST labels
@@ -183,19 +209,29 @@ def _ribbon_centerline(x1, y1, x2, y2, t):
     return x, y
 
 
-def _text_box(ax, x, y, text, fontsize, ha, pad_points=0.0):
-    """A text's estimated (x0, y0, x1, y1) in data units, before any layout pass."""
+def _font_properties(style: dict) -> FontProperties:
+    """The font a text drawn with the `style` kwargs takes."""
+
+    return Text(text="", **style).get_fontproperties()
+
+
+def _text_box(ax, x, y, text, font, ha, pad_points=0.0):
+    """A text's (x0, y0, x1, y1) in data units, before any layout pass.
+
+    `font` is the text's `FontProperties`; `pad_points` widens every side.
+    """
 
     fig_w, fig_h = ax.figure.get_size_inches()
     pos = ax.get_position()
     xlim, ylim = ax.get_xlim(), ax.get_ylim()
     per_point_x = (xlim[1] - xlim[0]) / (fig_w * pos.width * 72)
     per_point_y = (ylim[1] - ylim[0]) / (fig_h * pos.height * 72)
-    text_w, text_h = _text_size(fontsize, text)
+    # the width from the font's glyphs, the height from the line height
+    text_w = _text_width(text, font)
+    text_h = _text_size(font.get_size_in_points(), text)[1]
     width = (text_w + 2 * pad_points) * per_point_x
     height = (text_h + 2 * pad_points) * per_point_y
-    x0 = x - width / 2 if ha == "center" else x - width if ha == "right" else x
-    return (x0, y - height / 2, x0 + width, y + height / 2)
+    return _aligned_box(x, y, width, height, ha, "center")
 
 
 def _overlap_area(a, b) -> float:
@@ -306,6 +342,7 @@ class SankeyLayer(Layer):
         # ribbon values to avoid
         occupied = []
         effects = _halo_effects(halo, self.ground)
+        font = _font_properties(self.label_style)
 
         for ci, column in enumerate(self.columns):
             for name in column:
@@ -343,9 +380,7 @@ class SankeyLayer(Layer):
                     path_effects=effects,
                     **self.label_style,
                 )
-                occupied.append(
-                    _text_box(ax, tx, ty, name, self.label_style["fontsize"], ha, halo)
-                )
+                occupied.append(_text_box(ax, tx, ty, name, font, ha, halo))
 
         if self.column_labels is not None:
             for column, label in zip(self.columns, self.column_labels):
@@ -438,20 +473,22 @@ class SankeyLayer(Layer):
         # the widest ribbons claim their midpoints first; the rest slide along
         # their curve to the first spot clear of the bars, the labels, and the
         # earlier values
+        font = _font_properties(self.value_font)
+        left_out = 0
         for _, line, text in sorted(values, key=lambda v: v[0], reverse=True):
-            fontsize = self.value_font["fontsize"]
             x1, y1, x2, y2 = line
             candidates = [(x2 - SANKEY_LABEL_PAD, y2, "right")] + [
                 (*_ribbon_centerline(*line, t), "center")
                 for t in SANKEY_VALUE_POSITIONS
             ]
             for x, y, ha in candidates:
-                box = _text_box(ax, x, y, text, fontsize, ha, halo)
+                box = _text_box(ax, x, y, text, font, ha, halo)
                 if not any(_overlap_area(box, other) for other in occupied):
                     break
             else:
                 # nothing clear along the ribbon: the value is left out rather
                 # than written over a bar or a neighbour; hover still reads it
+                left_out += 1
                 continue
             occupied.append(box)
             ax.text(
@@ -465,6 +502,12 @@ class SankeyLayer(Layer):
                 **self.value_font,
             )
 
+        if left_out:
+            warnings.warn(
+                f"Sankey values left out: {left_out} of {len(values)} ribbon values "
+                "found no spot clear of the node bars, the labels and the other "
+                "values. A larger `figsize` fits them."
+            )
         self.register_patch_hover(node_marks)
         self.register_patch_hover(link_marks)
         ax.axis("off")
@@ -1190,6 +1233,197 @@ def _ring(n: int) -> np.ndarray:
     return np.column_stack([np.cos(angles), np.sin(angles)])
 
 
+def _aligned_box(x, y, width, height, ha, va) -> tuple:
+    """The (x0, y0, x1, y1) of a `width` x `height` text anchored at (x, y)."""
+
+    x0 = x - width / 2 if ha == "center" else x - width if ha == "right" else x
+    y0 = y - height / 2 if va == "center" else y - height if va == "top" else y
+    return (x0, y0, x0 + width, y0 + height)
+
+
+def _defer_label_pass(ax, place) -> None:
+    """Queue a network's label pass for the figure's first draw.
+
+    Every network of a figure shares one queued fit, so the figure warns once
+    with the total `place` calls report left out.
+    """
+
+    figure = ax.figure
+    passes = figure.__dict__.get("_network_label_passes")
+    if passes is None:
+        passes = figure.__dict__["_network_label_passes"] = []
+
+        def fit(renderer) -> None:
+            queued = figure.__dict__.pop("_network_label_passes")
+            left_out = sum(place(renderer) for place in queued)
+            if left_out:
+                warnings.warn(
+                    f"Network labels left out: {left_out} node names or edge "
+                    "values found no spot clear of the nodes and the other "
+                    "labels. A larger `figsize` fits them."
+                )
+
+        _defer_fit(ax, fit)
+    passes.append(place)
+
+
+def _figure_obstacles(ax, renderer, mine: set) -> list:
+    """Display boxes a network's labels avoid: the other axes and every text.
+
+    The texts are the figure's, the titles and texts of every axes, and the
+    legends; the ids in `mine` are left out.
+    """
+
+    figure = ax.figure
+    # a twin shares the axes box, so it is no obstacle
+    boxes = [
+        tuple(other.bbox.extents)
+        for other in figure.axes
+        if other.get_visible()
+        and other is not ax
+        and other.bbox.extents.tolist() != ax.bbox.extents.tolist()
+    ]
+    texts = list(figure.texts)
+    for other in figure.axes:
+        # an axes' own texts are its three titles and its annotations
+        texts += [child for child in other.get_children() if isinstance(child, Text)]
+        legend = other.get_legend()
+        if legend is not None and legend.get_visible():
+            boxes.append(tuple(legend.get_window_extent(renderer).extents))
+    boxes += [
+        tuple(text.get_window_extent(renderer).extents)
+        for text in texts
+        if text.get_visible() and text.get_text().strip() and id(text) not in mine
+    ]
+    return boxes
+
+
+def _name_offset(spot, radius) -> np.ndarray:
+    """A name's offset in points from its marker's centre at `spot`.
+
+    The name clears the marker's rim by the label gap; a diagonal keeps the gap.
+    """
+
+    _, _, dx, dy = spot
+    gap = radius + NETWORK_LABEL_GAP
+    step = gap / math.sqrt(2) if dx and dy else gap
+    return np.array([dx * step, dy * step])
+
+
+def _name_transform(ax, spot, radius):
+    """The transform that writes a name at `spot` beside its marker."""
+
+    return offset_copy(
+        ax.transData, ax.figure, *_name_offset(spot, radius), units="points"
+    )
+
+
+def _name_boxes(ax, renderer, center, text, radius, spots) -> list:
+    """A drawn name's display box at each of `spots` around its marker."""
+
+    extent = text.get_window_extent(renderer)
+    return [
+        _aligned_box(
+            *(center + _points_to_px(ax, _name_offset(spot, radius))),
+            extent.width,
+            extent.height,
+            spot[0],
+            spot[1],
+        )
+        for spot in spots
+    ]
+
+
+def _value_boxes(ax, renderer, text, points) -> list:
+    """A drawn edge value's display box at each of its edge `points`."""
+
+    extent = text.get_window_extent(renderer)
+    return [
+        _aligned_box(x, y, extent.width, extent.height, "center", "center")
+        for x, y in ax.transData.transform(points)
+    ]
+
+
+def _move_names(ax, names, chosen, spots, radii) -> None:
+    """Write each name at its chosen spot; a name with none is left out.
+
+    A moved name never resizes the axes.
+    """
+
+    for (k, text), spot in zip(names, chosen):
+        if spot is None:
+            text.set_visible(False)
+            continue
+        if spot > 0:
+            text.set_in_layout(False)
+        text.set_transform(_name_transform(ax, spots[spot], radii[k]))
+        text.set_horizontalalignment(spots[spot][0])
+        text.set_verticalalignment(spots[spot][1])
+
+
+def _move_values(values, chosen) -> None:
+    """Write each edge value at its chosen point; a value with none is left out.
+
+    A moved value never resizes the axes.
+    """
+
+    for (text, points), spot in zip(values, chosen):
+        if spot is None:
+            text.set_visible(False)
+            continue
+        text.set_in_layout(spot == 0)
+        text.set_position(points[spot])
+
+
+def _first_clear_spots(candidates, owners, nodes, frame, placed) -> tuple:
+    """The spot each text takes, or None for a text with no clear spot.
+
+    `candidates[i]` are text i's display boxes in preference order, and
+    `owners[i]` the index of the node whose marker it may cover, or None. A
+    spot is clear off every other node and off the `placed` boxes. A spot
+    past the first must also lie inside `frame`; the first is exempt, as the
+    layout margin keeps it in view. A text whose first spot is clear of the
+    other first spots keeps it; the rest, in order, take their first clear
+    spot. Returns the chosen spot indices and the placed boxes, `placed`
+    included.
+    """
+
+    def clear(box, owner, others, framed=True) -> bool:
+        inside = not framed or (
+            box[0] >= frame[0]
+            and box[1] >= frame[1]
+            and box[2] <= frame[2]
+            and box[3] <= frame[3]
+        )
+        return (
+            inside
+            and not any(
+                _overlap_area(box, node) for k, node in enumerate(nodes) if k != owner
+            )
+            and not any(_overlap_area(box, other) for other in others)
+        )
+
+    # texts clear at their first spot keep it
+    firsts = [boxes[0] for boxes in candidates]
+    chosen = [None] * len(candidates)
+    for i, owner in enumerate(owners):
+        others = placed + firsts[:i] + firsts[i + 1 :]
+        if clear(firsts[i], owner, others, framed=False):
+            chosen[i] = 0
+    placed = placed + [firsts[i] for i, spot in enumerate(chosen) if spot == 0]
+
+    # the rest take their first spot clear of everything placed so far
+    for i, (boxes, owner) in enumerate(zip(candidates, owners)):
+        if chosen[i] is not None:
+            continue
+        for spot, box in enumerate(boxes):
+            if clear(box, owner, placed, framed=spot > 0):
+                chosen[i] = spot
+                placed.append(box)
+                break
+    return chosen, placed
+
+
 def _linear_map(values: list, low: float, high: float, missing: float) -> np.ndarray:
     """Values mapped linearly onto [low, high]; None and a degenerate range map to `missing`."""
 
@@ -1394,12 +1628,14 @@ class NetworkLayer(PointLabelMixin, Layer):
         connection = f"arc3,rad={curve}"
         pen = style.get("edge_ink_stroke")
         pen = [InkStroke(**pen)] if pen else []
+        # every name's (node, text, style), every value's (source, target, text, style)
+        names, values = [], []
 
         # a translucent disc in the group color behind each cluster, reaching
         # past the largest marker of the group (points to 0–1 data units)
         if style.get("group_alpha"):
             ax.apply_aspect()
-            axis_pt = ax.get_window_extent().width * 72 / ax.figure.dpi
+            axis_pt = _px_to_points(ax, ax.get_window_extent().width)
             ring = style.get("group_linestyle")
             for group, centre, radius in self.clusters:
                 marker_pt = max(r for r, g in zip(radii, self.groups) if g == group)
@@ -1498,28 +1734,22 @@ class NetworkLayer(PointLabelMixin, Layer):
                 datum["weight"] = record["weight"]
             self.register_hover(patch, lambda _, datum=datum: datum)
             if self.show_values and record.get("weight") is not None:
-                # the midpoint of the arc3 quadratic Bézier, not of the chord
-                mid = (pos[i] + pos[j]) / 2
-                dx, dy = pos[j] - pos[i]
-                mid = mid + curve / 2 * np.array([dy, -dx])
-                value = ax.text(
-                    mid[0],
-                    mid[1],
-                    _format_value(self.value_format, record["weight"]),
-                    ha="center",
-                    va="center",
-                    zorder=4,
-                    path_effects=effects,
-                    gid=f"value:{record['source']}->{record['target']}",
-                    **{
-                        **self.value_font,
-                        "color": (
-                            self.muted_color if edge_muted else self.value_font["color"]
-                        ),
-                    },
+                text_style = {
+                    **self.value_font,
+                    "color": (
+                        self.muted_color if edge_muted else self.value_font["color"]
+                    ),
+                    "path_effects": effects,
+                    "gid": f"value:{record['source']}->{record['target']}",
+                }
+                values.append(
+                    (
+                        i,
+                        j,
+                        _format_value(self.value_format, record["weight"]),
+                        text_style,
+                    )
                 )
-                if best:
-                    self._obstacles.setdefault(id(ax), []).append(value)
 
         face = [
             self.muted_color if muted[k] else color
@@ -1575,18 +1805,22 @@ class NetworkLayer(PointLabelMixin, Layer):
             )
             self.register_hover(points, lambda i, ks=ks: self.node_datums[ks[i]])
 
-        above = self.label_position == NETWORK_LABEL_POSITION.ABOVE
+        written = set()
         for k, node in enumerate(self.nodes):
             label = node.get("label")
             label = node["id"] if label is None else label
-            if label == "":
+            # a name already written at the same point is not written twice
+            if label == "" or (label, *pos[k]) in written:
                 continue
-            font = {
+            written.add((label, *pos[k]))
+            text_style = {
                 **self.label_style,
                 "color": self.muted_color if muted[k] else self.label_style["color"],
+                "path_effects": effects,
+                "gid": f"label:{node['id']}",
             }
             if style.get("label_family"):
-                font["family"] = resolve_font_family(style["label_family"])
+                text_style["family"] = resolve_font_family(style["label_family"])
             if best:
                 # the panel places it once every mark is drawn, clear of the rest
                 self._record_points(
@@ -1596,29 +1830,108 @@ class NetworkLayer(PointLabelMixin, Layer):
                     pos[k : k + 1, 1],
                     self.areas[k : k + 1],
                     labels=[label],
-                    font={
-                        **font,
-                        "path_effects": effects,
-                        "gid": f"label:{node['id']}",
-                    },
+                    font=text_style,
                     pad=NETWORK_LABEL_GAP,
                 )
                 continue
-            # a name above its node sits clear of the marker, like a place name
-            lift = (radii[k] + NETWORK_LABEL_GAP) / 72 if above else 0
-            ax.text(
+            names.append((k, label, text_style))
+        self._draw_texts(ax, names, values, radii, curve)
+
+    def _draw_texts(self, ax, names: list, values: list, radii, curve) -> None:
+        """Write the names and values at their first spots; queue the clear-spot pass.
+
+        A name starts at its configured spot, a value at its edge's midpoint.
+        Once the figure is laid out, each text that collides moves to its
+        first clear spot or is left out (`_first_clear_spots`).
+        """
+
+        pos = self.positions
+        spots = list(NETWORK_NAME_SPOTS)
+        if self.label_position == NETWORK_LABEL_POSITION.CENTER:
+            spots.insert(0, NETWORK_NAME_ON_MARKER)
+        name_texts = []
+        for k, label, text_style in names:
+            text = ax.text(
                 pos[k, 0],
                 pos[k, 1],
                 label,
-                transform=ax.transData
-                + ScaledTranslation(0, lift, ax.figure.dpi_scale_trans),
-                ha="center",
-                va="bottom" if above else "center",
+                transform=_name_transform(ax, spots[0], radii[k]),
+                ha=spots[0][0],
+                va=spots[0][1],
                 zorder=5,
-                path_effects=effects,
-                gid=f"label:{node['id']}",
-                **font,
+                **text_style,
             )
+            name_texts.append((k, text))
+
+        # a value's spots along its edge, on the arc3 quadratic Bézier
+        value_texts = []
+        for i, j, label, text_style in values:
+            dx, dy = pos[j] - pos[i]
+            control = (pos[i] + pos[j]) / 2 + curve * np.array([dy, -dx])
+            points = [
+                (1 - t) ** 2 * pos[i] + 2 * t * (1 - t) * control + t**2 * pos[j]
+                for t in NETWORK_VALUE_POSITIONS
+            ]
+            text = ax.text(
+                *points[0], label, ha="center", va="center", zorder=4, **text_style
+            )
+            if self.label_position == NETWORK_LABEL_POSITION.BEST:
+                self._obstacles.setdefault(id(ax), []).append(text)
+            value_texts.append((text, points))
+
+        if not name_texts and not value_texts:
+            return
+        _defer_label_pass(
+            ax,
+            lambda renderer: self._place_texts(
+                ax, renderer, spots, name_texts, value_texts, radii
+            ),
+        )
+
+    def _place_texts(self, ax, renderer, spots, names, values, radii) -> int:
+        """Move each colliding name and value to its first clear spot; leave out the rest.
+
+        Runs on the laid-out figure and measures each text by its drawn
+        extent. Names try `spots` around their marker, values their edge
+        points. A spot is clear off the other nodes, the figure's other axes
+        and texts, and the texts placed before it; a moved text may use the
+        figure's margin but never crosses its edge. Returns how many texts
+        were left out.
+        """
+
+        # the equal aspect shrinks the laid-out box only at draw
+        ax.apply_aspect()
+        centers = ax.transData.transform(self.positions)
+        nodes = [
+            (cx - half, cy - half, cx + half, cy + half)
+            for (cx, cy), half in zip(centers, _points_to_px(ax, radii))
+        ]
+        frame = tuple(ax.figure.bbox.extents)
+        mine = {id(text) for _, text in names} | {id(text) for text, _ in values}
+
+        # the names first, then the values clear of the names too
+        name_boxes = [
+            _name_boxes(ax, renderer, centers[k], text, radii[k], spots)
+            for k, text in names
+        ]
+        name_spots, placed = _first_clear_spots(
+            name_boxes,
+            [k for k, _ in names],
+            nodes,
+            frame,
+            _figure_obstacles(ax, renderer, mine),
+        )
+        value_boxes = [
+            _value_boxes(ax, renderer, text, points) for text, points in values
+        ]
+        value_spots, _ = _first_clear_spots(
+            value_boxes, [None] * len(values), nodes, frame, placed
+        )
+
+        # move each text to its spot
+        _move_names(ax, names, name_spots, spots, radii)
+        _move_values(values, value_spots)
+        return (name_spots + value_spots).count(None)
 
     def label_obstacles(self, ax) -> list:
         """The edges and edge values drawn into `ax`, as display-space boxes.
@@ -1629,18 +1942,17 @@ class NetworkLayer(PointLabelMixin, Layer):
         """
 
         ax.apply_aspect()
-        px_per_pt = ax.figure.dpi / 72.0
         boxes = []
         for artist in self._obstacles.pop(id(ax), []):
             if isinstance(artist, Text):
                 cx, cy = ax.transData.transform(artist.get_position())
                 w, h = (
-                    v * px_per_pt
+                    _points_to_px(ax, v)
                     for v in _text_size(artist.get_fontsize(), artist.get_text())
                 )
                 boxes.append((cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2))
                 continue
-            half = max(artist.get_linewidth() * px_per_pt, 2.0) / 2
+            half = max(_points_to_px(ax, artist.get_linewidth()), 2.0) / 2
             path = artist.get_transform().transform_path(artist.get_path())
             previous = None
             for vertices, code in path.iter_segments(curves=False, simplify=False):

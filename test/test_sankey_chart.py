@@ -1,6 +1,7 @@
 """Tests for the Sankey chart: style, column inference, validation, and composition."""
 
 import unittest
+import warnings
 
 import matplotlib
 
@@ -256,7 +257,10 @@ class TestRendering(unittest.TestCase):
             SankeyChart({"links": CHAIN}, column_labels=["w", "x"])
 
     def test_show_values(self):
-        fig = SankeyChart({"links": FUNNEL}, show_values=True)
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            fig = SankeyChart({"links": FUNNEL}, show_values=True)
+        self.assertEqual([w for w in caught if "left out" in str(w.message)], [])
         texts = [t.get_text() for t in fig.axes[0].texts]
         self.assertEqual(len(texts), 7 + len(FUNNEL))
         self.assertIn("300", texts)
@@ -275,7 +279,7 @@ class TestRendering(unittest.TestCase):
                 ax,
                 *t.get_position(),
                 t.get_text(),
-                t.get_fontsize(),
+                t.get_fontproperties(),
                 t.get_ha(),
                 config["plot_sankey_label_halo_width"],
             )
@@ -308,9 +312,12 @@ class TestRendering(unittest.TestCase):
     def test_a_value_with_nowhere_clear_is_dropped(self):
         # every ribbon is a sliver, and every value is wider than its own room
         links = [link("A", f"t{i}", 1) for i in range(30)]
-        figure = SankeyChart(
-            {"links": links}, show_values=True, value_format="{:.3f} units of energy"
-        )
+        with self.assertWarnsRegex(UserWarning, "left out.*figsize"):
+            figure = SankeyChart(
+                {"links": links},
+                show_values=True,
+                value_format="{:.3f} units of energy",
+            )
         values = [t.get_text() for t in figure.axes[0].texts if "units" in t.get_text()]
         self.assertLess(len(values), len(links))
 

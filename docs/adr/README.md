@@ -82,6 +82,7 @@ adds no tag; one that reverses, narrows, widens or replaces a commitment does.
 - [0078](0078-palette-gate-warns-at-registration.md) — The palette gate warns when a theme is registered, not when one is derived
 - [0081](0081-violin-and-ridge-theme-defaults.md) — Themes set the violin inner, the strip jitter and the ridge marks
 - [0088](0088-installed-themes-through-entry-points.md) — An installed package registers its themes and names the startup theme through entry points
+- [0091](0091-readable-text-floor.md) — Readable text has a 10.5 pt floor in every predefined theme, and text that does not fit is left out
 
 See also 0009, which names the themes for their look, and 0063, which moves the
 theme faces out of the wheel.
@@ -126,12 +127,12 @@ theme faces out of the wheel.
 - [0029](0029-network-chart.md) — NetworkChart draws node-link diagrams from a nodes/edges dict through one layer (amended by [0030](0030-network-weighted-and-grouped-layouts.md))
 - [0030](0030-network-weighted-and-grouped-layouts.md) — NetworkChart gains the WEIGHTED and GROUPED layouts
 - [0032](0032-treemap-nesting-depth.md) — Treemap nests to four levels through the same group rules
-- [0044](0044-calendar-heatmap.md) — A calendar heatmap draws one panel per year through the heatmap's cell seam (amended by [0052](0052-chart-prefixed-constants.md))
+- [0044](0044-calendar-heatmap.md) — A calendar heatmap draws one panel per year through the heatmap's cell seam (amended by [0052](0052-chart-prefixed-constants.md), [0091](0091-readable-text-floor.md))
 - [0046](0046-bump-chart.md) — A bump chart ranks per period and draws through the line layer (amended by [0052](0052-chart-prefixed-constants.md), [0076](0076-line-end-labels.md))
 - [0047](0047-ridgeline-plot.md) — RidgelinePlot stacks per-label density ridges on the category index
 - [0049](0049-gantt-chart.md) — A gantt chart puts time on the value axis and stays a bare figure (amended by [0052](0052-chart-prefixed-constants.md))
 - [0050](0050-dumbbell-chart.md) — A dumbbell chart is a group layer on the category index, not a bar
-- [0051](0051-scatter-matrix.md) — A scatter matrix is a grid figure composed from scatter and histogram cells (amended by [0052](0052-chart-prefixed-constants.md))
+- [0051](0051-scatter-matrix.md) — A scatter matrix is a grid figure composed from scatter and histogram cells (amended by [0052](0052-chart-prefixed-constants.md), [0091](0091-readable-text-floor.md))
 - [0057](0057-scatter-error-bars.md) — Scatter error bars are distances drawn in the point's colour
 - [0060](0060-image-chart.md) — An image is a chart front anchored by an extent, not a setting on other charts (amended by [0062](0062-basemap.md))
 - [0062](0062-basemap.md) — The basemap draws unprojected outlines fetched into a cache (amended by [0063](0063-downloaded-theme-fonts.md))

@@ -299,7 +299,7 @@ class Config:
             ...     config.get("font_general_size")
             14
             >>> config.get("font_general_size")
-            10
+            11
 
         Args:
             config: The attributes to override, as a dictionary.

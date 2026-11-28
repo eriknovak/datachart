@@ -10,6 +10,8 @@ import pytest
 from datachart.charts import BarChart, PyramidChart
 from datachart.utils import Grid, Panel
 
+from .text_overlap import overlapping_pairs
+
 AGES = ["0-14", "15-29", "30-44", "45-59", "60+"]
 LEFT = [{"label": a, "y": v} for a, v in zip(AGES, [12, 18, 22, 15, 9])]
 RIGHT = [{"label": a, "y": v} for a, v in zip(AGES, [11, 19, 24, 16, 12])]
@@ -176,6 +178,45 @@ class TestMirroredDrawing:
         left_bars, right_bars = figure.axes[0].containers
         assert all(patch.get_width() < 0 for patch in left_bars)
         assert all(patch.get_width() > 0 for patch in right_bars)
+
+
+def two_year_bands(count):
+    """`count` two-year age bands, 0-1 upward, each with a positive value."""
+    return [{"label": f"{2 * i}-{2 * i + 1}", "y": 100 - i} for i in range(count)]
+
+
+def drawn_band_labels(figure):
+    """The non-empty category tick labels as drawn."""
+    figure.canvas.draw()
+    return [t for t in figure.axes[0].get_yticklabels() if t.get_text()]
+
+
+def overlapping_band_labels(figure):
+    """Pairs of drawn category labels that overlap."""
+    labels = drawn_band_labels(figure)
+    return overlapping_pairs(labels, figure.canvas.get_renderer())
+
+
+class TestBandLabels:
+    def test_dense_bands_label_apart_with_a_tick_per_band(self):
+        bands = two_year_bands(40)
+        figure = PyramidChart(data=[bands, bands])
+        assert overlapping_band_labels(figure) == []
+        assert len(figure.axes[0].get_yticks()) == 40
+
+    def test_few_bands_label_every_band(self):
+        bands = two_year_bands(10)
+        figure = PyramidChart(data=[bands, bands])
+        labels = [t.get_text() for t in drawn_band_labels(figure)]
+        assert labels == [band["label"] for band in bands]
+
+    def test_user_tick_labels_are_untouched(self):
+        bands = two_year_bands(40)
+        positions = list(range(40))
+        names = [band["label"] for band in bands]
+        figure = PyramidChart(data=[bands, bands], yticks=positions, yticklabels=names)
+        labels = [t.get_text() for t in drawn_band_labels(figure)]
+        assert labels == names
 
 
 class TestComposition:

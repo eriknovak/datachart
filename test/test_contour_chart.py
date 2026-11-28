@@ -23,6 +23,8 @@ from datachart.utils._internal.config_helpers import (
 from datachart.utils._internal.chart_kinds import build_layers
 from datachart.utils._internal.layers import contour_levels
 
+from .text_overlap import overlapping_pairs
+
 
 def surface(n=40, lo=-5, hi=5):
     x = np.linspace(lo, hi, n)
@@ -64,7 +66,8 @@ class TestContourStyle(unittest.TestCase):
         self.assertEqual(style["linewidths"], 3)
 
     def test_label_style_derives_font_size(self):
-        style = get_contour_label_style({})
+        with config.override(plot_contour_label_font_size=None):
+            style = get_contour_label_style({})
         self.assertEqual(style["fontsize"], config["font_general_size"] - 2)
         self.assertNotIn("colors", style)
         style = get_contour_label_style({"plot_contour_label_font_color": "#123456"})
@@ -166,12 +169,13 @@ class TestContourDraw(unittest.TestCase):
         self.assertEqual(cs.get_linewidth()[0], 3)
 
     def test_labels_drawn_with_value_format(self):
-        figure = ContourChart(
-            data=surface(),
-            show_labels=True,
-            value_format="{x:.0f}",
-            levels=[50, 100, 200],
-        )
+        with config.override(plot_contour_label_font_size=None):
+            figure = ContourChart(
+                data=surface(),
+                show_labels=True,
+                value_format="{x:.0f}",
+                levels=[50, 100, 200],
+            )
         ax = figure.axes[0]
         texts = [t.get_text() for t in ax.texts]
         self.assertTrue(texts)
@@ -312,6 +316,44 @@ class TestContourDraw(unittest.TestCase):
         figure = ContourChart(data=surface(), fill=True, vmin=0, vmax=500)
         cs = _contour_sets(figure.axes[0])[0]
         self.assertEqual((cs.norm.vmin, cs.norm.vmax), (0, 500))
+
+
+class TestContourLabelsKeepApart(unittest.TestCase):
+    def setUp(self):
+        self.figure = ContourChart(
+            data=surface(n=80),
+            show_labels=True,
+            value_format="{x:.0f}",
+            levels=CONTOUR_LEVELS.RICE,
+        )
+        self.ax = self.figure.axes[0]
+        self.placed = {text.get_text() for text in self.ax.texts}
+        self.figure.canvas.draw()
+        self.renderer = self.figure.canvas.get_renderer()
+        self.texts = [text for text in self.ax.texts if text.get_visible()]
+
+    def tearDown(self):
+        plt.close("all")
+
+    def test_rice_level_labels_do_not_clash(self):
+        self.assertEqual(overlapping_pairs(self.texts, self.renderer), [])
+
+    def test_rice_level_labels_stay_inside_the_axes(self):
+        frame = self.ax.bbox
+        boxes = [(t.get_text(), t.get_window_extent(self.renderer)) for t in self.texts]
+        outside = [
+            name
+            for name, box in boxes
+            if box.x0 < frame.x0
+            or box.y0 < frame.y0
+            or box.x1 > frame.x1
+            or box.y1 > frame.y1
+        ]
+        self.assertEqual(outside, [])
+
+    def test_rice_level_labels_keep_every_level(self):
+        # each labelled level of this surface has room for one label
+        self.assertEqual({text.get_text() for text in self.texts}, self.placed)
 
 
 class TestContourCompose(unittest.TestCase):
