@@ -21,11 +21,20 @@ from datachart.themes import (
     score_palette,
 )
 from datachart.themes._base import TRAITS
-from datachart.themes.score import palette_colors, theme_palette_score
+from datachart.themes.score import (
+    NORMAL_FLOOR,
+    palette_colors,
+    theme_palette_score,
+)
 from datachart.utils._internal.colors import (
+    delta_e,
     get_color_scale,
     oklab_lightness as lightness,
 )
+
+# the no-data face reuses the muted grey, under the normal floor; the hatch
+# carries the rest of the difference from the lightest value (ADR 0089)
+MISSING_FACE_FLOOR = 13.0
 
 LEAD_KEYS = (
     "color_general_singular",
@@ -325,6 +334,40 @@ class TestFurnitureDefaults(unittest.TestCase):
             with self.subTest(theme=name):
                 self.assertEqual(theme["plot_grid_linestyle"], LINE_STYLE.SOLID)
                 self.assertIsNone(theme["plot_legend_title"])
+
+
+class TestMissingCellStyle(unittest.TestCase):
+    """The no-data heatmap cell is readable on every theme (#355)."""
+
+    def test_every_theme_carries_both_keys(self):
+        for name, theme in THEMES.items():
+            with self.subTest(theme=name):
+                self.assertIn("plot_heatmap_missing_color", theme)
+                self.assertIn("plot_heatmap_missing_hatch", theme)
+
+    def test_every_colour_is_its_theme_muted_grey(self):
+        for name, theme in THEMES.items():
+            with self.subTest(theme=name):
+                self.assertEqual(
+                    theme["plot_heatmap_missing_color"], theme["muted_color"]
+                )
+
+    def test_default_colour_is_clear_of_both_default_colormaps(self):
+        colour = DEFAULT_THEME["plot_heatmap_missing_color"]
+        for key in ("plot_heatmap_cmap", "plot_heatmap_cmap_diverging"):
+            scale = get_color_scale(DEFAULT_THEME[key])
+            for end in (scale[0], scale[-1]):
+                with self.subTest(cmap=DEFAULT_THEME[key], end=end):
+                    self.assertGreaterEqual(delta_e(colour, end), MISSING_FACE_FLOOR)
+
+    def test_dark_colour_stands_apart_from_its_axes_face(self):
+        colour = DARK_THEME["plot_heatmap_missing_color"]
+        self.assertGreaterEqual(
+            delta_e(colour, DARK_THEME["axes_facecolor"]), NORMAL_FLOOR
+        )
+
+    def test_quill_hatch_differs_from_its_etched_steps(self):
+        self.assertEqual(THEMES[THEME.QUILL]["plot_heatmap_missing_hatch"], "\\\\")
 
 
 class TestFailingPaletteWarns(unittest.TestCase):

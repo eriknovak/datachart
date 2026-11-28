@@ -1,6 +1,6 @@
 ---
 status: accepted
-amended-by: [0077]
+amended-by: [0077, 0090]
 ---
 
 # Furniture defaults follow the guidelines: no legend title, solid grids, and a warning when series outrun the palette

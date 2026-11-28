@@ -189,11 +189,23 @@ def masked_cell(figure, row, column):
     return bool(np.ma.getmaskarray(image)[row, column])
 
 
+def no_data_squares(ax) -> int:
+    """The squares the heatmap draws for its missing cells on `ax`."""
+
+    return sum(
+        len(collection.get_paths())
+        for collection in ax.collections
+        if collection.get_gid() == "missing-cells"
+    )
+
+
 # front -> (data with one missing cell, check)
 GRID_FRONTS = {
     "Heatmap": (
         lambda m: Heatmap({"z": grid(m)}, show_values=True),
-        lambda f: masked_cell(f, 1, 1) and len(f.axes[0].texts) == 8,
+        lambda f: masked_cell(f, 1, 1)
+        and len(f.axes[0].texts) == 8
+        and no_data_squares(f.axes[0]) == 1,
     ),
     "ContourChart": (
         lambda m: ContourChart({"z": grid(m)}),
@@ -205,7 +217,8 @@ GRID_FRONTS = {
     ),
     "CalendarHeatmap": (
         lambda m: CalendarHeatmap(calendar(m)),
-        lambda f: np.ma.count(f.axes[0].images[0].get_array()) == 4,
+        lambda f: np.ma.count(f.axes[0].images[0].get_array()) == 4
+        and no_data_squares(f.axes[0]) == 0,
     ),
     "ImageChart": (
         lambda m: ImageChart({"image": grid(m), "extent": (0, 3, 0, 3)}),
@@ -284,7 +297,7 @@ class TestRecordFronts(MissingCase):
 
 
 class TestGridFronts(MissingCase):
-    def test_a_missing_cell_is_not_drawn(self):
+    def test_a_missing_cell_draws_no_value(self):
         for name, (draw, check) in GRID_FRONTS.items():
             for label, missing in MISSING.items():
                 with self.subTest(front=name, missing=label):
@@ -324,13 +337,16 @@ class TestEmptySeries(MissingCase):
                 empty = [{**record, key: None} for record in records]
                 figure = self.quietly(lambda: front([empty, records], subplots=True))
                 self.assertEqual(len(figure.axes), 2)
-        for front in (Heatmap, ContourChart):
-            with self.subTest(front=front.__name__):
-                grids = [{"z": [[None, None], [None, None]]}, {"z": [[1, 2], [3, 4]]}]
-                figure = self.quietly(lambda: front(grids, subplots=True))
-                ax = figure.axes[0]
-                drawn_cells = sum(np.ma.count(image.get_array()) for image in ax.images)
-                self.assertEqual(drawn_cells + len(ax.collections), 0)
+        grids = [{"z": [[None, None], [None, None]]}, {"z": [[1, 2], [3, 4]]}]
+        with self.subTest(front="ContourChart"):
+            figure = self.quietly(lambda: ContourChart(grids, subplots=True))
+            self.assertEqual(len(figure.axes[0].collections), 0)
+        with self.subTest(front="Heatmap"):
+            # every cell of the empty subplot draws as no data
+            figure = self.quietly(lambda: Heatmap(grids, subplots=True))
+            ax = figure.axes[0]
+            self.assertEqual(np.ma.count(ax.images[0].get_array()), 0)
+            self.assertEqual(no_data_squares(ax), 4)
 
     def test_a_missing_bar_adds_nothing_to_a_stack(self):
         below = [{"label": "a", "y": None}, {"label": "b", "y": 1}]

@@ -69,6 +69,7 @@ from .base import (
     axis_kind,
     get_chart_data,
     get_chart_observations,
+    resolve_bins,
     resolve_value_kind,
 )
 from .ticks import _auto_format, _column_tz, date_labels, to_date_numbers
@@ -902,7 +903,9 @@ class HistogramLayer(BinnedMarksMixin, Layer):
         if x is None or len(x) == 0:
             return None
         # the view decides the scale: densities and cumulative shares are not counts
-        heights, edges = np.histogram(x, bins=self.num_bins, density=self.show_density)
+        heights, edges = np.histogram(
+            x, bins=resolve_bins(x, self.num_bins), density=self.show_density
+        )
         if self.show_cumulative:
             heights = np.cumsum(
                 heights * np.diff(edges) if self.show_density else heights
@@ -947,7 +950,7 @@ class HistogramLayer(BinnedMarksMixin, Layer):
                 **hist_style,
             )
         else:
-            bins = ctx.bins if ctx.bins is not None else self.num_bins
+            bins = ctx.bins if ctx.bins is not None else resolve_bins(x, self.num_bins)
             counts, edges, bars = ax.hist(
                 x,
                 bins=bins,

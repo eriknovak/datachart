@@ -1,5 +1,6 @@
 """Invalid inputs raise the library's ValueError at the entry point (#306)."""
 
+import re
 import unittest
 
 import matplotlib
@@ -8,7 +9,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-from datachart.charts import BarChart, LineChart, RadialChart, ViolinPlot
+from datachart.charts import BarChart, Histogram, LineChart, RadialChart, ViolinPlot
 from datachart.utils import Grid, Panel
 from datachart.utils.stats import histogram, kde1d, loess
 
@@ -53,6 +54,28 @@ class TestBandwidth(InvalidInputCase):
 
     def test_a_positive_number_passes(self):
         self.assertEqual(len(kde1d(VALUES, bandwidth=0.5, grid_size=10)["y"]), 10)
+
+
+class TestNumBins(InvalidInputCase):
+    BAD = (0, -3, 2.5, True)
+
+    def test_histogram_rejects_a_non_positive_or_non_integer_count(self):
+        data = [{"x": v} for v in VALUES]
+        for num_bins in self.BAD:
+            with self.subTest(num_bins=num_bins):
+                with self.assertRaisesRegex(
+                    ValueError, rf"`num_bins` value {re.escape(repr(num_bins))}"
+                ):
+                    Histogram(data, num_bins=num_bins)
+
+    def test_radial_histogram_rejects_a_non_positive_or_non_integer_count(self):
+        data = [{"x": v} for v in VALUES]
+        for num_bins in self.BAD:
+            with self.subTest(num_bins=num_bins):
+                with self.assertRaisesRegex(
+                    ValueError, rf"`num_bins` value {re.escape(repr(num_bins))}"
+                ):
+                    RadialChart(data, mark="histogram", num_bins=num_bins)
 
 
 class TestPanelDicts(InvalidInputCase):
@@ -145,7 +168,7 @@ class TestGridLegendSideTags(InvalidInputCase):
         figure = Grid([panel, line_fig(subtitle="other")], show_legend=True)
         legends = [ax.get_legend() for ax in figure.axes if ax.get_legend()]
         labels = [t.get_text() for t in legends[-1].get_texts()]
-        self.assertEqual(labels, ["bars (L)", "line (R)"])
+        self.assertEqual(labels, ["bars (L)", "line (R)", "other"])
 
 
 class TestRadialRequiredY(InvalidInputCase):

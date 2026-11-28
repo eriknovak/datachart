@@ -1,5 +1,6 @@
 ---
 status: accepted
+amended-by: [0090]
 ---
 
 # Panel and Grid take the chart fronts' furniture vocabulary

@@ -8,8 +8,10 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 import matplotlib.ticker as mticker
 import numpy as np
+from matplotlib.legend import Legend
 from matplotlib.transforms import Bbox
 
 from datachart.charts import CalendarHeatmap, ContourChart, Heatmap, HexbinChart
@@ -396,6 +398,73 @@ class TestColorbarRendering(unittest.TestCase):
         self.assertEqual(bars[0].orientation, "horizontal")
         self.assertEqual(bars[0].ax.xaxis.label.get_text(), "Count")
         self.assertEqual(bars[0].formatter(1.5), "1.50")
+
+
+GAPPED = [[1.0, None, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, None]]
+
+
+def no_data_entries(figure):
+    """Every `(legend, text)` pair labelled "No data", after a canvas draw."""
+    figure.canvas.draw()
+    return [
+        (legend, text)
+        for legend in figure.findobj(Legend)
+        for text in legend.get_texts()
+        if text.get_text() == "No data"
+    ]
+
+
+class TestNoDataSwatch(unittest.TestCase):
+    def tearDown(self):
+        config.set_theme(THEME.DEFAULT)
+        plt.close("all")
+
+    def test_one_entry_inside_the_figure_and_clear_of_the_axes(self):
+        for aspect in (None, "equal"):
+            for location in COLORBAR_LOCATION.members():
+                with self.subTest(aspect=aspect, location=location):
+                    figure = Heatmap(
+                        data={"z": GAPPED},
+                        show_colorbar=True,
+                        colorbar={"location": location},
+                        aspect_ratio=aspect,
+                    )
+                    entries = no_data_entries(figure)
+                    self.assertEqual(len(entries), 1)
+                    renderer = figure.canvas.get_renderer()
+                    box = entries[0][0].get_window_extent(renderer)
+                    self.assertTrue(figure.bbox.contains(box.x0, box.y0))
+                    self.assertTrue(figure.bbox.contains(box.x1, box.y1))
+                    chart = figure.axes[0].get_window_extent(renderer)
+                    self.assertFalse(box.overlaps(chart), (box, chart))
+                    plt.close(figure)
+
+    def test_entry_wears_the_missing_style(self):
+        figure = Heatmap(data={"z": GAPPED}, show_colorbar=True)
+        ((legend, _),) = no_data_entries(figure)
+        (handle,) = legend.legend_handles
+        self.assertEqual(
+            mcolors.to_hex(handle.get_facecolor()),
+            mcolors.to_hex(config["plot_heatmap_missing_color"]),
+        )
+        self.assertEqual(handle.get_hatch(), config["plot_heatmap_missing_hatch"])
+
+    def test_no_entry_without_a_missing_cell(self):
+        figure = Heatmap(data={"z": Z}, show_colorbar=True)
+        self.assertEqual(no_data_entries(figure), [])
+
+    def test_no_entry_when_both_keys_are_none(self):
+        style = {"plot_heatmap_missing_color": None, "plot_heatmap_missing_hatch": None}
+        figure = Heatmap(data={"z": GAPPED}, show_colorbar=True, style=style)
+        self.assertEqual(no_data_entries(figure), [])
+
+    def test_etched_step_legend_ends_with_no_data(self):
+        config.set_theme(THEME.QUILL)
+        figure = Heatmap(data={"z": GAPPED}, show_colorbar=True)
+        ((legend, _),) = no_data_entries(figure)
+        texts = [text.get_text() for text in legend.get_texts()]
+        self.assertGreater(len(texts), 1)
+        self.assertEqual(texts[-1], "No data")
 
 
 Z_SMALL = {"z": [[1, 2], [3, 4]]}

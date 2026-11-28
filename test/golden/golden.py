@@ -135,7 +135,7 @@ EXPECTED_CHANGES = {
     "line_multi",
     "bar_multi_grouped",
     "hist_multi_stacked",
-    "scatter_hue_size",
+    "scatter_hue_size",  # bubble area proportional to value (#353)
     "overlay_zorder_grid",
     # theme renames: PUBLICATION -> INK (same style, new case name)
     "theme_ink_line",
@@ -410,6 +410,11 @@ EXPECTED_CHANGES = {
     "scatter_error_bars",
     # an emphasis rule on a quill heatmap keeps its per-cell fade (#305)
     "theme_quill_heatmap_rule_above",
+    # missing heatmap cells draw as hatched no-data cells, and the colorbar
+    # names them; heatmap_blank_cells, heatmap_rule_above and
+    # theme_quill_heatmap_rule_above, listed above, change with them (#355)
+    "heatmap_missing_colorbar_bottom",
+    "theme_dark_heatmap_missing",
 }
 
 
@@ -797,6 +802,17 @@ def heatmap_labels():
 def heatmap_blank_cells():
     data = {"z": [[1, None, 3], [None, 5, 6]]}
     return Heatmap(data=data, show_values=True, show_colorbar=True)
+
+
+@case
+def heatmap_missing_colorbar_bottom():
+    """No-data cells, a NaN among them, named past the high end of a bottom bar."""
+    data = {"z": [[1, None, 3, 4], [5, 6, float("nan"), 8], [None, 10, 11, 12]]}
+    return Heatmap(
+        data=data,
+        show_colorbar=True,
+        colorbar={"location": COLORBAR_LOCATION.BOTTOM, "label": "value"},
+    )
 
 
 def signed_matrix():
@@ -1317,6 +1333,23 @@ def theme_dark_heatmap():
     """The frame, separators and colorbar invert; a light cell keeps dark text."""
     config.set_theme(THEME.DARK)
     data = {"z": [[(i * j) % 7 for j in range(5)] for i in range(4)]}
+    return Heatmap(
+        data=data,
+        show_values=True,
+        show_colorbar=True,
+        colorbar={"label": "value"},
+    )
+
+
+@case
+def theme_dark_heatmap_missing():
+    """The dark theme's no-data grey stands apart from both Viridis ends."""
+    config.set_theme(THEME.DARK)
+    data = {
+        "z": [
+            [(i * j) % 7 if (i + j) % 4 else None for j in range(5)] for i in range(4)
+        ]
+    }
     return Heatmap(
         data=data,
         show_values=True,

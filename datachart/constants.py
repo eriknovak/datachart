@@ -72,6 +72,7 @@ Classes:
     COLORBAR_LOCATION: The `location` of the `colorbar` setting.
     DRAW_POSITION:     `position` of `ImageChart` and `BasemapChart`.
     HISTOGRAM_TYPE:    The `plot_hist_type` style attribute.
+    HISTOGRAM_BINS:    `num_bins` of `Histogram` and `RadialChart`.
 
 **Chart-Specific Constants**
 
@@ -105,6 +106,7 @@ Classes:
 
 """
 
+from numbers import Integral
 from typing import Any
 
 __all__ = [
@@ -139,6 +141,7 @@ __all__ = [
     "COLORBAR_LOCATION",
     "DRAW_POSITION",
     "HISTOGRAM_TYPE",
+    "HISTOGRAM_BINS",
     "STACKED_AREA_BASELINE",
     "BUMP_RANK",
     "LINE_LABEL_POSITION",
@@ -725,6 +728,59 @@ class HISTOGRAM_TYPE(Domain):
     BAR = "bar"
     STEP = "step"
     STEP_FILLED = "stepfilled"
+
+
+class HISTOGRAM_BINS(Domain):
+    """The supported histogram bin rules.
+
+    Passed as the `num_bins` of histograms: the rule that picks the bin
+    edges from the data, so no count has to be tried by hand. A positive
+    integer is also accepted, as the number of equal-width bins. A rule that
+    would give more than 1000 bins raises instead of drawing them.
+
+    ![HISTOGRAM_BINS at a glance](../assets/imgs/const-histogram-bins.svg){ width="100%" }
+
+    Examples:
+        >>> from datachart.constants import HISTOGRAM_BINS
+        >>> HISTOGRAM_BINS.DEFAULT
+        20
+
+    Attributes:
+        DEFAULT (int): The default number of bins. Equals to `20`.
+        AUTO (str): NumPy's default choice between Sturges and
+            Freedman–Diaconis. Equals to `"auto"`.
+        FD (str): The Freedman–Diaconis rule, which sizes the bins from the
+            interquartile range (the spread of the middle half) and the
+            sample size. Robust to outliers. Equals to `"fd"`.
+        STURGES (str): The Sturges rule, the base-2 logarithm of the sample
+            size plus one. Suits near-normal data and small samples. Equals
+            to `"sturges"`.
+        SCOTT (str): Scott's rule, which sizes the bins from the standard
+            deviation and the sample size. Equals to `"scott"`.
+        RICE (str): The Rice rule, twice the cube root of the sample size.
+            Equals to `"rice"`.
+        SQRT (str): The square root of the sample size. Equals to `"sqrt"`.
+        DOANE (str): Doane's rule, Sturges corrected for skewed data.
+            Equals to `"doane"`.
+
+    """
+
+    DEFAULT = 20
+    AUTO = "auto"
+    FD = "fd"
+    STURGES = "sturges"
+    SCOTT = "scott"
+    RICE = "rice"
+    SQRT = "sqrt"
+    DOANE = "doane"
+
+    _OTHER = "a positive integer"
+
+    @classmethod
+    def _accepts_other(cls, value) -> bool:
+        return (
+            isinstance(value, Integral) and not isinstance(value, bool) and value >= 1
+        )
 
 
 class BAR_MODE(Domain):

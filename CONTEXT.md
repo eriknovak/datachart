@@ -54,7 +54,8 @@ and a left column (figure-level `supxlabel`/`supylabel` at the top level), and
 its axis sharing stays local. The front takes the shared figure-level
 parameters of the chart fronts (ADR 0070): title, labels and one grid legend
 apply to the figure; `show_grid`, limits and `aspect_ratio` override every
-cell only when given.
+cell only when given. A series label draws in one colour across all cells
+(ADR 0090), and the grid legend lists each label once.
 _Avoid_: grid layout (for the front), figure grid
 
 **Projection**:
@@ -452,6 +453,15 @@ never changes cell size; that is the contour's job. A bare figure: rejected
 in `Panel`, a cell in `Grid`.
 _Avoid_: matrix plot, image plot, colormesh
 
+**No-data cell**:
+A heatmap cell whose value is missing (`None`, `NaN` or `±inf`), drawn as a
+neutral hatched square under the value image so it cannot be read as a low
+value (`plot_heatmap_missing_color`, `plot_heatmap_missing_hatch`). With a
+colorbar, a "No data" swatch beside it names the style. Both keys `None` turn
+the cell and the swatch off, for a matrix whose blank half is redundant. The
+calendar heatmap draws none (ADR 0089).
+_Avoid_: blank cell, empty cell, NaN cell
+
 **Calendar heatmap**:
 A daily series (`CalendarHeatmap`: a `{date, value}` dict per dataset,
 temporal dates only, each once) drawn as one cell per day, weeks as
@@ -628,7 +638,8 @@ A named rule that picks histogram bin edges from the data — `stats.histogram`
 passes `bins` straight to `numpy.histogram_bin_edges`, so `"auto"`, `"fd"`,
 `"rice"`, an integer, and an explicit edge list all work. Unrelated to the
 `CONTOUR_LEVELS` rules of the same name, which count contour levels from grid
-resolution; and the `Histogram` front still takes an integer `num_bins`.
+resolution. `num_bins` of `Histogram` and `RadialChart` takes a `HISTOGRAM_BINS`
+rule or an integer, and a rule that gives more than 1000 bins raises.
 _Avoid_: binning strategy, bin count (for the rule)
 
 **Level**:

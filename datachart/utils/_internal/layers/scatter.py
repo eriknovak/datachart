@@ -5,7 +5,7 @@ from typing import Optional
 import numpy as np
 from matplotlib.patches import FancyArrowPatch
 from ..colors import create_color_cycle
-from ..validate import validate_error_distances
+from ..validate import validate_error_distances, validate_size_values
 from ..config_helpers import (
     get_scatter_style,
     get_scatter_error_style,
@@ -58,17 +58,22 @@ ERROR_CAP_STYLE = "-[,widthB={width},lengthB=0"
 ERROR_KEYS = ("xerr", "yerr")
 
 
-def _normalize_sizes(
+def _bubble_areas(
     sizes: np.ndarray, size_range: tuple, extent: Optional[tuple] = None
 ) -> np.ndarray:
-    """Map size values from `extent` (default: their own) onto the (min, max) range."""
+    """The marker area of each size value: proportional to it, floored.
 
-    min_size, max_size = size_range
-    lo, hi = extent if extent is not None else (sizes.min(), sizes.max())
+    The maximum of `extent` (default: the values' own) draws at the top of
+    `size_range`, and an area below its bottom draws at the bottom. A
+    constant extent draws every value at the middle of the range.
+    """
+
+    floor, top = size_range
+    lo, hi = extent if extent is not None else (np.nanmin(sizes), np.nanmax(sizes))
+    # a constant column, all zeros included, never divides by its maximum
     if hi == lo:
-        return np.full_like(sizes, (min_size + max_size) / 2, dtype=float)
-    normalized = (sizes - lo) / (hi - lo)
-    return normalized * (max_size - min_size) + min_size
+        return np.full_like(sizes, (floor + top) / 2)
+    return np.maximum(sizes / hi * top, floor)
 
 
 def _axis_numbers(ax, transpose: bool, x) -> np.ndarray:
@@ -78,11 +83,14 @@ def _axis_numbers(ax, transpose: bool, x) -> np.ndarray:
     return np.asarray(axis.convert_units(x), dtype=float)
 
 
-def _masked_errors(errors: dict, mask) -> dict:
-    """The error distances of the points `mask` picks, per axis."""
+def _masked_errors(errors: dict, points) -> dict:
+    """The error distances of the picked points, per axis, in their order.
+
+    `points` is a boolean mask or an index array.
+    """
 
     return {
-        axis: None if distances is None else distances[:, mask]
+        axis: None if distances is None else distances[:, points]
         for axis, distances in errors.items()
     }
 
@@ -92,7 +100,13 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, MarkerCycleMixin, Layer
     record_roles_beat_layer = True
 
     def size_values(self) -> Optional[np.ndarray]:
-        return get_chart_data("size", self.chart)
+        """One size per drawn point, NaN where a record has none; None without sizes."""
+
+        records = _keyed_records(self.chart, "x")
+        if not any("size" in record for record in records):
+            return None
+        sizes = [record.get("size") for record in records]
+        return np.array([np.nan if s is None else s for s in sizes], dtype=float)
 
     def _resolve_style(self):
         self.scatter_style = get_scatter_style(self.style)
@@ -110,6 +124,9 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, MarkerCycleMixin, Layer
         # default key; the theme default yields to them
         self.show_values_explicit = self.settings.get("show_values") is not None
         self.size_range = self.settings.get("size_range") or DEFAULT_SIZE_RANGE
+        size_data = self.size_values()
+        if size_data is not None:
+            validate_size_values(size_data, self.subtitle or "scatter chart")
         self.show_regression = self.settings.get("show_regression")
         self.show_ci = self.settings.get("show_ci")
         self.ci_level = self.settings.get("ci_level") or DEFAULT_CI_LEVEL
@@ -148,7 +165,7 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, MarkerCycleMixin, Layer
 
     def _sizes(self, size_data, extent: Optional[tuple] = None):
         if size_data is not None:
-            return _normalize_sizes(size_data, self.size_range, extent)
+            return _bubble_areas(size_data, self.size_range, extent)
         return self.scatter_style.get("s", self.default_size)
 
     def _mark_legend_size(self, collection, size_data):
@@ -340,7 +357,7 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, MarkerCycleMixin, Layer
     def draw(self, ax, ctx):
         x_data = get_chart_data("x", self.chart)
         y_data = get_chart_data("y", self.chart)
-        size_data = get_chart_data("size", self.chart)
+        size_data = self.size_values()
         hue_data = get_chart_data("hue", self.chart)
 
         if x_data is None or y_data is None:
@@ -358,19 +375,26 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, MarkerCycleMixin, Layer
 
         _, _, scatter = _oriented(ax, ctx.transpose)
 
+        # a point missing its size draws nothing: no marker, bar or label
+        drawn = np.ones(len(x_data), dtype=bool)
+        if size_data is not None:
+            drawn = ~np.isnan(size_data)
+
         # one unit per hue group, or the whole series; each keeps one legend entry
         if hue_data is not None:
             units = [
-                (hue_data == hue_val, self.hue_colors[i], str(hue_val))
+                (drawn & (hue_data == hue_val), self.hue_colors[i], str(hue_val))
                 for i, hue_val in enumerate(np.unique(hue_data))
             ]
         else:
             series_color = scatter_style.get("c")
             if series_color is None:
                 series_color = ctx.color
-            units = [(np.ones(len(x_data), dtype=bool), series_color, self.label(ctx))]
+            units = [(drawn, series_color, self.label(ctx))]
         errors = {axis: self._error_distances(axis, len(x_data)) for axis in ERROR_KEYS}
         for mask, color, label in units:
+            if not mask.any():
+                continue
             sizes = self._sizes(
                 size_data[mask] if size_data is not None else None, ctx.size_extent
             )
@@ -396,12 +420,12 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, MarkerCycleMixin, Layer
             return
         x_fit = _axis_numbers(ax, ctx.transpose, x_data)
         y_fit = np.asarray(y_data, dtype=float)
-        # a point missing a coordinate stays out of the fit and the correlation
-        present = np.isfinite(x_fit) & np.isfinite(y_fit)
+        # a point missing a coordinate or its size stays out of the fit
+        present = drawn & np.isfinite(x_fit) & np.isfinite(y_fit)
         if not present.any():
             raise ValueError(
-                f"The scatter chart `{self.label(ctx)}` has no point with finite "
-                "`x` and `y` values to fit."
+                f"The scatter chart `{self.label(ctx)}` has no drawn point with "
+                "finite `x` and `y` values to fit."
             )
         x_fit, y_fit = x_fit[present], y_fit[present]
         if hue_data is not None:
@@ -439,14 +463,19 @@ class ScatterLayer(UnclippedMarksMixin, PointLabelMixin, MarkerCycleMixin, Layer
     ) -> None:
         """Draw one hue group or series: one collection per emphasis role.
 
-        The first unmuted collection carries the legend entry.
+        Each collection draws its bubbles largest first; the one ordering
+        applies to every per-point read. The first unmuted collection
+        carries the legend entry.
         """
 
         legend_label = label
         for role in MARKER_ROLE_ORDER:
-            picked = roles == role
-            if not picked.any():
+            picked = np.flatnonzero(roles == role)
+            if not len(picked):
                 continue
+            # the largest bubbles draw first, so none hides a smaller one
+            if np.ndim(sizes):
+                picked = picked[np.argsort(-sizes[picked], kind="stable")]
             style = dict(base_style)
             style["c"] = self.muted_color if role == EMPHASIS_BACKGROUND else color
             self._apply_emphasis(style, role, width_key="linewidths", color_key=None)

@@ -26,6 +26,7 @@ from ...constants import (
     DUMBBELL_SORT_KEY,
     DUMBBELL_VALUE,
     EMPHASIS,
+    HISTOGRAM_BINS,
     LEGEND_LOCATION,
     GANTT_ARROW_ENTRY,
     GANTT_SORT_KEY,
@@ -84,6 +85,24 @@ def validate_bandwidth(bandwidth) -> None:
             f"Invalid `bandwidth` value {bandwidth!r}. "
             f"Must be None, one of {BANDWIDTH.members()}, or a finite number "
             "greater than 0."
+        )
+
+
+def validate_num_bins(num_bins) -> None:
+    """Raise unless `num_bins` is None, a rule name, or an integer >= 1.
+
+    A rule name is checked against `HISTOGRAM_BINS` where the value is read.
+    """
+
+    if not (
+        num_bins is None
+        or isinstance(num_bins, str)
+        or (is_integer(num_bins) and num_bins >= 1)
+    ):
+        members = tuple(m for m in HISTOGRAM_BINS.members() if isinstance(m, str))
+        raise ValueError(
+            f"Invalid `num_bins` value {num_bins!r}. "
+            f"Must be None, one of {members}, or a positive integer."
         )
 
 
@@ -304,6 +323,22 @@ def validate_error_distances(values: list, key: str) -> List[Optional[tuple]]:
             )
         distances.append((float(pair[0]), float(pair[1])))
     return distances
+
+
+def validate_size_values(values, chart_name: str) -> None:
+    """Raise on the first negative bubble size, naming the chart and the value.
+
+    A missing size is skipped: its point draws no marker.
+    """
+
+    for index, value in enumerate(values):
+        if is_missing(value) or value >= 0:
+            continue
+        raise ValueError(
+            f"Invalid `size` value {value} for point {index} in {chart_name!r}. "
+            "Must be a non-negative number, as a bubble's area is proportional "
+            "to it."
+        )
 
 
 def validate_value_step(step):

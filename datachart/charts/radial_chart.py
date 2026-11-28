@@ -3,6 +3,7 @@ from typing import Union, List, Optional, Tuple
 
 from ..utils._internal.plot_engine import render
 from ..utils._internal.figures import DatachartFigure
+from ..utils._internal.validate import validate_num_bins
 from ..typings import (
     EmphasisRuleAttrs,
     LegendSettingAttrs,
@@ -19,6 +20,7 @@ from ..constants import (
     BAR_MODE,
     EMPHASIS,
     FIG_SIZE,
+    HISTOGRAM_BINS,
     RADIAL_DIRECTION,
     RADIAL_TYPE,
     AXIS_SCALE,
@@ -61,7 +63,7 @@ def RadialChart(
     sort: Optional[Union[SORT, str]] = None,
     sort_by: Optional[str] = None,
     emphasis_rule: Optional[EmphasisRuleAttrs] = None,
-    num_bins: Optional[int] = None,
+    num_bins: Optional[Union[HISTOGRAM_BINS, str, int]] = None,
     start_angle: Optional[Union[str, int, float]] = None,
     direction: Optional[Union[RADIAL_DIRECTION, str]] = None,
     inner_radius: Optional[float] = None,
@@ -173,7 +175,9 @@ def RadialChart(
             `{"below": v}` (strict), `{"between": (lo, hi)}` (inclusive),
             `{"top": n}` or `{"bottom": n}`. Reads each bar's own value; a
             record's own `emphasis` key wins over the rule.
-        num_bins: The number of angular bins over [0, 360) (histogram visual).
+        num_bins: The number of equal-width angular bins over [0, 360), or a
+            [`HISTOGRAM_BINS`][datachart.constants.HISTOGRAM_BINS] rule that picks
+            the edges from the data (histogram visual). Defaults to 20.
         start_angle: Where the first point sits: a compass location ("N", "NE",
             "E", "SE", "S", "SW", "W", "NW") or a numeric compass bearing in
             degrees clockwise from north. Defaults to "N".
@@ -215,4 +219,5 @@ def RadialChart(
     """
     params = dict(locals())
 
+    validate_num_bins(num_bins)
     return render("radialchart", params)

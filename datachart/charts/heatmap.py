@@ -107,7 +107,7 @@ def Heatmap(
         data: The labelled grid(s) for the heatmap(s): one `{x, y, z}` dict,
             or a list of them for multiple heatmaps/subplots. `z` is the 2-D
             matrix of cell values (rows along `y`, columns along `x`; `None`
-            cells stay blank); `x` and `y` are optional tick labels for its
+            cells draw as no-data cells); `x` and `y` are optional tick labels for its
             columns and rows (any values, the indices by default). An
             explicit `xticks`/`xticklabels` (`yticks`/`yticklabels`)
             overrides them. An optional `emphasis` grid aligned with `z`
@@ -123,7 +123,7 @@ def Heatmap(
         emphasis_rule: A rule that highlights the cells matching it and mutes the rest:
             `{"above": v}` or `{"below": v}` (strict), `{"between": (lo, hi)}`
             (inclusive), `{"top": n}` or `{"bottom": n}`, read against each cell's
-            value; a blank cell never matches. A cell's role in the `emphasis` grid of
+            value; a missing cell never matches. A cell's role in the `emphasis` grid of
             `data` wins. The rule takes no `by`. See
             [`EmphasisRuleAttrs`][datachart.typings.EmphasisRuleAttrs].
         figsize: The size of the figure.

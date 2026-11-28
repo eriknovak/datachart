@@ -16,8 +16,10 @@ from matplotlib.colors import (
     TwoSlopeNorm,
     to_rgba_array,
 )
-from matplotlib.patches import Rectangle
+from matplotlib.legend import Legend
+from matplotlib.patches import Patch, Rectangle
 from matplotlib.text import Text
+from matplotlib.transforms import ScaledTranslation
 from ..colors import get_colormap
 from ..validate import (
     AXIS_TEMPORAL,
@@ -34,6 +36,7 @@ from ..config_helpers import (
     get_heatmap_style,
     get_heatmap_font_style,
     get_heatmap_edge_style,
+    get_heatmap_missing_style,
     get_calendar_month_line_style,
     get_contour_style,
     get_contour_label_style,
@@ -63,6 +66,7 @@ from .base import (
     Layer,
     _defer_fit,
     _fill_role,
+    _fit_outside_legend,
     _format_value,
     _keep_role,
     _px_to_points,
@@ -91,6 +95,14 @@ HEATMAP_TEXT_DARK_LUMINANCE = 0.5
 
 # the norms that hold `vcenter` in the middle of a diverging cmap (ADR 0056)
 CENTRED_NORMS = (COLOR_NORM.CENTERED, COLOR_NORM.TWOSLOPE)
+
+
+# the corners of a heatmap cell around its centre
+CELL_SQUARE = np.array([[-0.5, -0.5], [0.5, -0.5], [0.5, 0.5], [-0.5, 0.5]])
+
+
+# the missing cells sit just under the value image, as hexbin steps under tiles
+MISSING_CELL_Z_OFFSET = 0.01
 
 
 # the low end of a sequential cmap vanishes on white: iso-lines sample from here
@@ -137,18 +149,40 @@ def get_chart_grid(chart: dict, kind: str, dtype=float) -> tuple:
 COLORBAR_PAD = 0.03
 
 
+# the label of the swatch that keys the missing heatmap cells
+NO_DATA_LABEL = "No data"
+
+# the hover value of a missing heatmap cell
+MISSING_HOVER_VALUE = "missing"
+
+# the gap between the colorbar and its no-data swatch, in points
+NO_DATA_GAP_PT = 4.0
+
+
+# the swatch's legend location, anchor on the bar, and outward direction per
+# edge: under a side bar opening away from the chart, past a flat bar's high end
+NO_DATA_PLACEMENT = {
+    COLORBAR_LOCATION.RIGHT: ("upper left", (0.0, 0.0), (0, -1)),
+    COLORBAR_LOCATION.LEFT: ("upper right", (1.0, 0.0), (0, -1)),
+    COLORBAR_LOCATION.TOP: ("center left", (1.0, 0.5), (1, 0)),
+    COLORBAR_LOCATION.BOTTOM: ("center left", (1.0, 0.5), (1, 0)),
+}
+
+
 def _draw_colorbar(
     ax: plt.Axes,
     mappable,
     setting: dict,
     aspect_locked: bool = False,
     centre: Optional[float] = None,
+    no_data: Optional[Patch] = None,
 ) -> None:
     """Draw a colorbar on the edge the resolved setting names (ADR 0035).
 
     `centre` is the value a centred norm holds fixed: the bar marks it
     alongside its even ticks, so the sign reads off the scale (ADR 0056).
-    A `ticks` setting is the user's own list and replaces both.
+    A `ticks` setting is the user's own list and replaces both. `no_data`,
+    the handle of the missing cells, adds a "No data" swatch beside the bar.
     """
 
     colorbar = _place_colorbar(ax, mappable, setting, aspect_locked)
@@ -177,6 +211,41 @@ def _draw_colorbar(
     family = setting["label_style"]["family"]
     for label in colorbar.ax.get_xticklabels() + colorbar.ax.get_yticklabels():
         label.set_fontfamily(family)
+    if no_data is not None:
+        _draw_no_data_swatch(colorbar, no_data, setting)
+
+
+def _draw_no_data_swatch(colorbar, handle: Patch, setting: dict) -> None:
+    """A frameless "No data" entry beside the bar, outward from the chart.
+
+    The label reads as the bar's tick labels do. At the first draw the entry
+    moves past the tick labels that overhang the bar's end.
+    """
+
+    cax = colorbar.ax
+    axis = cax.yaxis if setting["orientation"] == ORIENTATION.VERTICAL else cax.xaxis
+    tick_label = axis.get_major_ticks(1)[0].label1
+    loc, anchor, (dx, dy) = NO_DATA_PLACEMENT[setting["location"]]
+    gap = NO_DATA_GAP_PT / 72.0
+    offset = ScaledTranslation(dx * gap, dy * gap, cax.figure.dpi_scale_trans)
+    legend = Legend(
+        cax,
+        [handle],
+        [NO_DATA_LABEL],
+        loc=loc,
+        bbox_to_anchor=anchor,
+        bbox_transform=cax.transAxes + offset,
+        frameon=False,
+        borderpad=0,
+        borderaxespad=0,
+        fontsize=tick_label.get_fontsize(),
+        labelcolor=setting["furniture"]["labelcolor"],
+    )
+    legend.get_texts()[0].set_fontfamily(setting["label_style"]["family"])
+    cax.add_artist(legend)
+    # add_artist clips to the axes patch; the swatch sits outside it
+    legend.set_clip_on(False)
+    _defer_fit(cax, lambda renderer: _fit_outside_legend(legend, [cax], renderer))
 
 
 def _place_colorbar(ax: plt.Axes, mappable, setting: dict, aspect_locked: bool):
@@ -258,6 +327,13 @@ def heatmap_cell_roles(chart: dict, z: list) -> list:
     ]
 
 
+def cell_squares(mask: np.ndarray) -> PolyCollection:
+    """One unit square per true cell of `mask`, row by row, where imshow puts it."""
+
+    rows, cols = np.nonzero(mask)
+    return PolyCollection([CELL_SQUARE + (col, row) for row, col in zip(rows, cols)])
+
+
 def _luminance(rgba) -> float:
     """The perceived brightness of a color, 0 (black) to 1 (white)."""
 
@@ -313,6 +389,8 @@ class HeatmapLayer(Layer):
     overlayable = False
     # the theme keys the cells, values, and borders read
     style_prefix = "plot_heatmap"
+    # missing cells draw in the theme's no-data style (#355)
+    draws_missing_cells = True
 
     def _resolve_style(self):
         self.show_colorbar = self.settings.get("show_colorbar")
@@ -328,6 +406,9 @@ class HeatmapLayer(Layer):
         self.heatmap_style = heatmap_style
         self.font_style = get_heatmap_font_style(self.style, self.style_prefix)
         self.edge_style = get_heatmap_edge_style(self.style, self.style_prefix)
+        self.missing_style = (
+            get_heatmap_missing_style(self.style) if self.draws_missing_cells else {}
+        )
         self.frame_color = self.style.get(
             "plot_heatmap_frame_color",
             config.get("plot_heatmap_frame_color") or "#000000",
@@ -393,7 +474,7 @@ class HeatmapLayer(Layer):
         if not (0 <= row < n_rows and 0 <= col < n_cols):
             return None
         value = self.z[row][col]
-        # a blank cell (off the calendar year, or a gap) draws no mark
+        # a missing cell, or a day off the calendar year, is no annotation target
         if value is None or (isinstance(value, float) and math.isnan(value)):
             return None
         corners = ax.transData.transform(
@@ -415,6 +496,8 @@ class HeatmapLayer(Layer):
         )
         label = self.label(ctx)
         self.register_hover(im, lambda index: self._cell_datum(label, *index))
+        if self.missing_style:
+            self._draw_missing_cells(ax, im)
         if self.value_etch_steps:
             self._draw_cell_steps(ax, im)
         self._draw_cell_emphasis(ax)
@@ -425,10 +508,14 @@ class HeatmapLayer(Layer):
         if self.edge_style.get("linewidth"):
             self._draw_cell_borders(ax, len(data), len(data[0]))
 
+        no_data = self._no_data_handle() if self.show_colorbar else None
         if self.show_colorbar and self.value_etch_steps:
-            self._draw_even_step_legend(ax, im.norm, self.colorbar["label"])
+            trailing = [(no_data, NO_DATA_LABEL)] if no_data else None
+            self._draw_even_step_legend(ax, im.norm, self.colorbar["label"], trailing)
         elif self.show_colorbar:
-            _draw_colorbar(ax, im, self.colorbar, ctx.aspect_locked, self.vcenter)
+            _draw_colorbar(
+                ax, im, self.colorbar, ctx.aspect_locked, self.vcenter, no_data
+            )
 
         self._draw_frame(ax)
 
@@ -442,32 +529,71 @@ class HeatmapLayer(Layer):
             len(self.value_etch_steps),
             self.step_centre,
         )
-        rows, cols = np.indices(values.shape)
-        squares = np.array([[-0.5, -0.5], [0.5, -0.5], [0.5, 0.5], [-0.5, 0.5]])
-
-        def cells(mask):
-            centres = np.column_stack([cols[mask], rows[mask]])
-            return PolyCollection([squares + centre for centre in centres])
-
         # a muted cell keeps its fade (ADR 0045)
         alpha = self._cell_style().get("alpha")
         alphas = np.broadcast_to(1.0 if alpha is None else alpha, values.shape)
-        self._draw_value_steps(ax, steps, cells, im.get_zorder(), alphas)
+        self._draw_value_steps(ax, steps, cell_squares, im.get_zorder(), alphas)
         # an array: the image may already hold the per-cell fade array
         im.set_alpha(np.zeros(values.shape))
+
+    def _draw_missing_cells(self, ax, im) -> None:
+        """The missing cells as one hatched collection under the image.
+
+        The image leaves them transparent, so the collection shows through.
+        """
+
+        missing = self._missing_mask()
+        if not missing.any():
+            return
+        cells = cell_squares(missing)
+        cells.set(
+            **self._missing_look(),
+            # the no-data cells recede with the faded cells (ADR 0045)
+            alpha=self._muted_cell_alpha(),
+            zorder=im.get_zorder() - MISSING_CELL_Z_OFFSET,
+            gid="missing-cells",
+        )
+        # autolim=False keeps the squares from widening the image's tight limits
+        ax.add_collection(cells, autolim=False)
+
+    def _no_data_handle(self) -> Optional[Patch]:
+        """The legend handle of the missing cells; None when none draws."""
+
+        if not self.missing_style:
+            return None
+        if not self._missing_mask().any():
+            return None
+        return Patch(**self._missing_look())
+
+    def _missing_mask(self) -> np.ndarray:
+        """True where a cell holds no value; read at draw, never stored."""
+
+        return np.isnan(np.asarray(self.z, dtype=float))
+
+    def _missing_look(self) -> dict:
+        """The face and hatch the no-data cells and their swatch share."""
+
+        return {
+            "facecolor": self.missing_style.get("color", "none"),
+            # the hatch takes the edge colour; a zero width draws no outline
+            "edgecolor": self.edge_style.get("color") or self.frame_color,
+            "linewidth": 0,
+            "hatch": self.missing_style.get("hatch"),
+        }
 
     def _cell_datum(self, label, row, col) -> dict:
         """The hover datum of a cell: the indices the tick labels name."""
 
+        value = self.z[row][col]
         return {
             "label": label,
             "x": col,
             "y": row,
-            "value": _scalar(self.z[row][col]),
+            "value": MISSING_HOVER_VALUE if np.isnan(value) else _scalar(value),
         }
 
     def _draw_cell_values(self, ax, im, ctx) -> None:
-        """Print each cell's value at its centre; a blank cell stays bare.
+        """Print each cell's value at its centre; a missing cell stays bare.
 
         No value prints when the widest one in view does not fit a cell.
         """
@@ -566,10 +692,10 @@ class HeatmapLayer(Layer):
 
         style = self.heatmap_style
         roles = self.cell_roles
-        if not any(role == EMPHASIS_BACKGROUND for row in roles for role in row):
+        faded = self._muted_cell_alpha()
+        if faded is None:
             return style
         alpha = 1.0 if style.get("alpha") is None else style["alpha"]
-        faded = alpha * self.muted_alpha
         return {
             **style,
             "alpha": np.array(
@@ -579,6 +705,15 @@ class HeatmapLayer(Layer):
                 ]
             ),
         }
+
+    def _muted_cell_alpha(self) -> Optional[float]:
+        """The alpha of a background cell; None when no cell carries the role."""
+
+        roles = self.cell_roles
+        if not any(role == EMPHASIS_BACKGROUND for row in roles for role in row):
+            return None
+        alpha = self.heatmap_style.get("alpha")
+        return (1.0 if alpha is None else alpha) * self.muted_alpha
 
     def _draw_cell_emphasis(self, ax) -> None:
         """Outline the highlighted cells in the bolder highlight stroke."""
@@ -692,6 +827,8 @@ class CalendarHeatmapLayer(HeatmapLayer):
 
     kind = "calendarheatmap"
     style_prefix = "plot_calendar_heatmap"
+    # a day without a value stays blank (#355 leaves the calendar out)
+    draws_missing_cells = False
 
     def _resolve_style(self):
         self.week_start = (
@@ -1457,7 +1594,7 @@ def value_steps(normed, n: int, centre: Optional[float] = None) -> np.ndarray:
 
 
 def heatmap_units(charts: List[dict], settings: dict, by) -> tuple:
-    """One unit per cell, by its value; a blank cell never matches."""
+    """One unit per cell, by its value; a missing cell never matches."""
 
     filled, units = [], []
     for chart in charts:
@@ -1465,7 +1602,7 @@ def heatmap_units(charts: List[dict], settings: dict, by) -> tuple:
         roles = heatmap_cell_roles(chart, z)
         for i, row in enumerate(z):
             for j, value in enumerate(row):
-                # a blank cell draws nothing to mute
+                # a missing cell takes no role from the rule
                 if value is None or math.isnan(value):
                     units.append((math.nan, _keep_role))
                 else:
