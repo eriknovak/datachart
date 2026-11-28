@@ -78,11 +78,12 @@ from .base import (
     UnclippedMarksMixin,
     _category_positions,
     _chart_column,
-    _defer_legend_fit,
+    _defer_fit,
     _fit_outside_legend,
     _format_value,
     _halo_effects,
     _legend_pad_px,
+    _points_to_px,
     _text_size,
     axis_kind,
     get_chart_data,
@@ -454,12 +455,6 @@ TEXT_SHORT_GAP = 1.5
 
 
 TEXT_SHORT_NONE = 2 * TEXT_SHORT_GAP
-
-
-def _points_to_px(ax: plt.Axes, points: float) -> float:
-    """A distance in points as display pixels."""
-
-    return points * ax.figure.dpi / 72.0
 
 
 def _target_gap(
@@ -903,19 +898,31 @@ def _draw_ref_spans(
             (data_ax.set_xlim if along_x else data_ax.set_ylim)(limits)
 
 
-def _hide_marks_past_limits(ax: plt.Axes, limits: dict, marks: list) -> None:
+def _user_limits(settings: dict) -> dict:
+    """The axis limits the user set, each None where left to the axes."""
+
+    return {k: settings.get(k) for k in ("xmin", "xmax", "ymin", "ymax")}
+
+
+def _hide_marks_past_limits(
+    ax: plt.Axes, limits: dict, marks: list, inverted: dict
+) -> None:
     """Hide the unclipped marks anchored past a limit the user set.
 
     Auto limits keep a mark overflowing the axes edge on purpose; a user
     limit crops the data, and a mark left beside the axes names nothing.
+    `inverted` holds each axis direction before the limits applied: on an
+    inverted axis a min limit names the high end, and a lone limit past the
+    far end, which flips the axis, still crops on the side it named.
     """
 
     ends = {"x": sorted(ax.get_xlim()), "y": sorted(ax.get_ylim())}
     for artist, anchor in marks:
         for name, value in zip("xy", anchor):
             lo, hi = ends[name]
-            if (limits[f"{name}min"] is not None and value < lo) or (
-                limits[f"{name}max"] is not None and value > hi
+            below, above = ("max", "min") if inverted[name] else ("min", "max")
+            if (limits[f"{name}{below}"] is not None and value < lo) or (
+                limits[f"{name}{above}"] is not None and value > hi
             ):
                 artist.set_visible(False)
 
@@ -1999,6 +2006,7 @@ class Panel:
         # draw the layers group by group, in order
         # user limits name the host axes, so only host marks are hidden past them
         limit_marks = []
+        user_limits = None if self.bare else _user_limits(s)
         for group, target_ax in zip(self.groups, group_axes):
             cycle = cycles[palette_key(group.palette)]
             # a grid's colors by series label, across its cells (ADR 0090)
@@ -2071,6 +2079,7 @@ class Panel:
                     value_scale=value_scale,
                     category_scale=category_scale,
                     size_extent=size_extents.get(target_ax),
+                    axis_limits=user_limits if target_ax is ax else None,
                 )
                 layer.draw(target_ax, ctx)
                 hover_targets.extend(layer.take_hover_targets())
@@ -2522,10 +2531,11 @@ class Panel:
                 pinned.add("x" if horizontal else "y")
 
         # axis limits; a bare layer fixed its own
-        limits = {k: s.get(k) for k in ("xmin", "xmax", "ymin", "ymax")}
+        limits = _user_limits(s)
         if not bare:
+            inverted = {"x": ax.xaxis_inverted(), "y": ax.yaxis_inverted()}
             configure_axis_limits(ax, limits)
-            _hide_marks_past_limits(ax, limits, limit_marks)
+            _hide_marks_past_limits(ax, limits, limit_marks, inverted)
         # rank 1 sits at the top, inverted after any user limits apply
         if rank_axis and not ax.yaxis_inverted():
             ax.invert_yaxis()
@@ -2788,7 +2798,7 @@ class Panel:
             if legend is not None and not bare and "bbox_to_anchor" in legend_style:
                 # an outside legend clears the axis furniture at draw time
                 axes = [ax] + ([ax_right] if ax_right is not None else [])
-                _defer_legend_fit(
+                _defer_fit(
                     top_ax, lambda renderer: _fit_outside_legend(legend, axes, renderer)
                 )
 
@@ -2814,7 +2824,7 @@ class Panel:
                 axes = [ax] + ([ax_right] if ax_right is not None else [])
                 dim = 0 if horizontal else 1
                 mirror = bool(s.get("pyramid"))
-                _defer_legend_fit(
+                _defer_fit(
                     top_ax,
                     lambda renderer: _fit_legend(legend, axes, dim, renderer, mirror),
                 )

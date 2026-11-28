@@ -115,8 +115,13 @@ def NetworkChart(
             [`NETWORK_LABEL_POSITION`][datachart.constants.NETWORK_LABEL_POSITION] constant
             (default
             [`NETWORK_LABEL_POSITION.CENTER`][datachart.constants.NETWORK_LABEL_POSITION], or
-            the theme's `chart_default_network_label_position`).
-        show_values: Whether to write each edge's weight at its midpoint.
+            the theme's `chart_default_network_label_position`). A name that
+            would cover another node or text moves to the first clear spot
+            around its marker; one with no clear spot is left out, with one
+            warning that suggests a larger `figsize`.
+        show_values: Whether to write each edge's weight at its midpoint. A
+            value that would cover a node or another text slides along its
+            edge to the first clear spot, or is left out under the same warning.
         value_format: The format of the edge values: a
             [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT] constant (default
             [`VALUE_FORMAT.DEFAULT`][datachart.constants.VALUE_FORMAT]) or any

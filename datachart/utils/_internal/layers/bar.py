@@ -2,6 +2,7 @@
 
 from collections import defaultdict
 from datetime import date
+import math
 from typing import Callable, List, Optional
 import numpy as np
 import matplotlib.pyplot as plt
@@ -9,6 +10,7 @@ import matplotlib.ticker as mticker
 from matplotlib.container import BarContainer
 from matplotlib.colors import to_hex, to_rgb
 from matplotlib.patches import FancyArrowPatch, Patch
+from matplotlib.textpath import text_to_path
 from matplotlib.transforms import Bbox, ScaledTranslation
 from ..colors import create_color_cycle
 from ..validate import (
@@ -58,10 +60,13 @@ from .base import (
     _is_bar_record,
     _point_resolver,
     _present_range,
+    _px_to_points,
     _record_emphasis,
     _scalar,
     _span_text,
+    _text_width,
     _vertex_coordinate,
+    axis_kind,
     get_chart_data,
     get_chart_observations,
     resolve_bins,
@@ -76,6 +81,55 @@ def _axis_formatter(ax: plt.Axes, which: str) -> Callable:
     return getattr(ax, f"format_{which}data")
 
 
+# the clear space between neighbouring pyramid band labels, in points
+BAND_LABEL_GAP = 1.0
+
+
+# matplotlib sizes a line of text by the ascent and descent of these glyphs
+LINE_HEIGHT_GLYPHS = "lp"
+
+
+class _BandLabels(mticker.Formatter):
+    """A pyramid's band labels on every k-th band, counted from the first.
+
+    k is the smallest step at which neighbouring labels clear each other by
+    a gap. It is measured at draw, from the tick font's line height and the
+    axis length in points, so a figure that fits every label shows them all.
+    """
+
+    def __init__(self, labels: dict, rotation: float):
+        self.labels = labels
+        self.rotation = rotation
+
+    def __call__(self, x, pos=None):
+        return self.labels.get(round(x), "")
+
+    def format_ticks(self, values):
+        step = self._step()
+        return [self(x) if round(x) % step == 0 else "" for x in values]
+
+    def _step(self) -> int:
+        """The smallest band step whose labels clear each other."""
+
+        # the length one band takes along the axis, in points
+        axis = self.axis
+        lo, hi = sorted(axis.get_view_interval())
+        if not hi > lo or not self.labels:
+            return 1
+        band = _px_to_points(axis.axes, axis.axes.bbox.height) / (hi - lo)
+
+        # each label's reach along the axis at the tick font, rotated as drawn
+        font = axis.get_major_ticks(1)[0].label1.get_fontproperties()
+        _, height, _ = text_to_path.get_text_width_height_descent(
+            LINE_HEIGHT_GLYPHS, font, ismath=False
+        )
+        widest = max(_text_width(label, font) for label in self.labels.values())
+        angle = math.radians(self.rotation)
+        reach = height * abs(math.cos(angle)) + widest * abs(math.sin(angle))
+
+        return max(1, math.ceil((reach + BAND_LABEL_GAP) / band))
+
+
 class BarLayer(BarSlotMixin, Layer):
     kind = "bar"
     color_style = "bar_style"
@@ -86,6 +140,8 @@ class BarLayer(BarSlotMixin, Layer):
         orientation = self.settings.get("orientation") or DEFAULT_ORIENTATION
         self.is_horizontal = orientation == ORIENTATION.HORIZONTAL
         self.is_pyramid = bool(self.settings.get("pyramid"))
+        # a pyramid's band labels by category position, named at draw
+        self.band_labels = None
         self.bar_style = get_bar_style(self.style, self.is_horizontal)
         self.show_yerr = self.settings.get("show_yerr")
         self.record_roles = _record_emphasis(self.chart)
@@ -116,6 +172,31 @@ class BarLayer(BarSlotMixin, Layer):
         key = "height" if self.is_horizontal else "width"
         return self.bar_style.get(key, config["plot_bar_width"])
 
+    def _name_bands(self, category_index: dict) -> dict:
+        """Each category position's tick text; dates print through the y format."""
+
+        names = list(category_index.keys())
+        if axis_kind(names) == AXIS_TEMPORAL:
+            names = date_labels(names, self.settings.get("yticks_format"))
+        return dict(zip(category_index.values(), names))
+
+    def apply_row_ticks(self, ax, rotation: float) -> bool:
+        """Tick every pyramid band and label as many as clear each other.
+
+        Bands the chart labels itself through `yticks` or `yticklabels` are
+        left to the panel and the user's ticks.
+        """
+
+        user_ticks = (
+            self.chart.get(key) is not None for key in ("yticks", "yticklabels")
+        )
+        if not self.is_pyramid or not self.band_labels or any(user_ticks):
+            return False
+        ax.yaxis.set_major_locator(mticker.FixedLocator(list(self.band_labels)))
+        ax.yaxis.set_major_formatter(_BandLabels(self.band_labels, rotation))
+        ax.tick_params(axis="y", labelrotation=rotation)
+        return True
+
     def draw(self, ax, ctx):
         y = self.y_values()
         labels = self.labels()
@@ -125,6 +206,8 @@ class BarLayer(BarSlotMixin, Layer):
         yerr = get_chart_data("yerr", self.chart) if self.show_yerr else None
         # each bar sits at its label's place on the panel's category axis
         x = _category_positions(labels, ctx.category_index)
+        if self.is_pyramid:
+            self.band_labels = self._name_bands(ctx.category_index)
 
         bar_style = self._merge_color("color", ctx.color, self.bar_style)
         if ctx.z_order is not None:

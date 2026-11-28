@@ -1,6 +1,6 @@
 ---
 status: accepted
-amended-by: [0052]
+amended-by: [0052, 0091]
 ---
 
 # A scatter matrix is a grid figure composed from scatter and histogram cells
@@ -54,6 +54,9 @@ grid machinery `Grid` uses (ADR 0002, 0006).
   draws on a hidden twin axis with its own height. Tick labels show only on
   the outer edge; dimension names label the outer left column and bottom
   row.
+  Amended (ADR 0091): each cell shows only as many tick labels as stay
+  apart, short (2k) when every label on the axis is three characters or
+  fewer, and the rule travels with the stored layout so `Grid` applies it.
 - **Input shape.** One dict of columns or a list of records; `dimensions`
   selects and orders columns and defaults to every numeric non-hue column
   in input order.

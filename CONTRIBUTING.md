@@ -24,6 +24,11 @@ Run `baseline` before your change and `candidate` after; a diff means the
 change altered rendered output, which is expected for a styling change but
 worth double-checking otherwise.
 
+## Coding standards
+
+The rules for writing code and tests are in
+[`CODING_STANDARDS.md`](CODING_STANDARDS.md).
+
 ## Architecture decision records (ADRs)
 
 A design decision that was hard to reverse, surprising without context, or

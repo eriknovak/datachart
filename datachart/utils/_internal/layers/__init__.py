@@ -21,6 +21,7 @@ from .base import (
     TEXT_LINE_HEIGHT,
     _marker_edge_widths,
     _rule_summary,
+    _text_width,
     emphasis_rule_roles,
     get_chart_hash,
     is_temporal,

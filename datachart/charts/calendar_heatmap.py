@@ -111,7 +111,10 @@ def CalendarHeatmap(
         max_cols: Maximum number of calendars per row when several are
             drawn. Defaults to `1`, one calendar per row.
         show_colorbar: Whether to show the colorbar(s).
-        show_values: Whether to write each day's value into its cell.
+        show_values: Whether to write each day's value into its cell. When the
+            widest value does not fit a cell at the theme's font size, as on a
+            full year at the default size, no value is written and a warning
+            suggests a larger figure or a shorter `value_format`.
         value_format: The format of the cell values: a
             [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT] constant (default
             [`VALUE_FORMAT.DEFAULT`][datachart.constants.VALUE_FORMAT]) or any

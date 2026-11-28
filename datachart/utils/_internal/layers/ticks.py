@@ -1,5 +1,6 @@
-"""Tick locators and formatters for date periods and schedules."""
+"""Tick locators and formatters for date periods, schedules and matrix cells."""
 
+import math
 from datetime import datetime, tzinfo
 from typing import List, Optional, Tuple
 import numpy as np
@@ -8,9 +9,10 @@ import matplotlib.dates as mdates
 from dateutil.relativedelta import relativedelta
 from matplotlib.font_manager import FontProperties
 import matplotlib.ticker as mticker
+from matplotlib.axes import Axes
 from ..validate import is_number
 from ....constants import DATE_FORMAT, GANTT_DATE_PERIOD
-from .base import _format_value, _text_size
+from .base import _format_value, _px_to_points, _text_size, _text_width
 
 # an AUTO date label carries the time only when one of the labels has one
 DATE_LABEL_WITH_TIME = "%Y-%m-%d %H:%M"
@@ -505,3 +507,202 @@ class PeriodTicks(mticker.Locator):
             kept.pop()
         kept.append(last)
         return periods[kept]
+
+
+# the tick steps a fitted cell picks from, times a power of ten; 2.5 is long
+TICK_STEPS = [1, 2, 5, 10]
+# the clear space between neighbouring tick labels, in ems of their font
+TICK_LABEL_GAP = 0.5
+# the most bins a fitted axis tries, as matplotlib's automatic count caps it
+MAX_TICK_BINS = 9
+# the labels a fitted axis shows when that many fit apart
+MIN_TICK_LABELS = 2
+# the fallbacks when no count clears every label, the most preferred first
+EVEN_SUBSET, ALL_OF_FEWER, ANY_SUBSET = 1, 2, 3
+# a short tick label divides by a power of a thousand and names it
+SHORT_SCALE = 1000
+SHORT_SUFFIXES = ("k", "M", "G", "T")
+# the most characters a short label's number keeps: 1.5k, never 2.01k
+SHORT_CHARACTERS = 3
+# a power of ten no tick reaches: a large label takes a suffix, never 1e6
+NO_SCIENTIFIC_ABOVE = 100
+
+
+class _ShortFormatter(mticker.ScalarFormatter):
+    """Tick labels that name a thousand and up by a suffix: 2000 is 2k.
+
+    An axis takes the suffix only when every tick of a thousand or more
+    shortens to a number of at most three characters (2k, 1.5k, 125k).
+    Otherwise, as for years like 2010, the axis keeps matplotlib's own format.
+    """
+
+    def __init__(self):
+        super().__init__()
+        self.is_short = False
+
+    def set_locs(self, locs):
+        # a short axis needs no offset, and its large values take no 1e6
+        large = [x for x in locs if abs(x) >= SHORT_SCALE]
+        self.is_short = bool(large) and all(
+            len(_short_number(x)[0].lstrip("-")) <= SHORT_CHARACTERS for x in large
+        )
+        limits = mpl.rcParams["axes.formatter.limits"]
+        self.set_useOffset(
+            not self.is_short and mpl.rcParams["axes.formatter.useoffset"]
+        )
+        self.set_powerlimits(
+            (limits[0], NO_SCIENTIFIC_ABOVE) if self.is_short else limits
+        )
+        super().set_locs(locs)
+
+    def __call__(self, x, pos=None):
+        if not self.is_short or abs(x) < SHORT_SCALE:
+            return super().__call__(x, pos)
+        number, suffix = _short_number(x)
+        return self.fix_minus(number + suffix)
+
+
+def _short_number(x: float) -> Tuple[str, str]:
+    """A value of a thousand or more as a number and its suffix: ("1.5", "k")."""
+
+    power = min(int(math.log10(abs(x)) // 3), len(SHORT_SUFFIXES))
+    # twelve significant digits keep a tick's digits but drop float noise
+    return f"{x / SHORT_SCALE**power:.12g}", SHORT_SUFFIXES[power - 1]
+
+
+class _FittingTicks(mticker.MaxNLocator):
+    """Round ticks, as many as keep a cell's labels apart from every other.
+
+    The count starts at matplotlib's own for the axis length and drops until
+    neighbouring labels sit a gap apart. If that leaves fewer than two
+    labels, a larger count that shows two apart wins, or else an evenly
+    spaced subset of one count's labels. A label at a cell's end may reach
+    into the space beside the cell only up to its middle, so it never meets
+    a label of the next cell.
+    """
+
+    def __init__(self):
+        super().__init__(nbins="auto", steps=TICK_STEPS)
+
+    def __call__(self):
+        # an empty view keeps matplotlib's ticks
+        axis = self.axis
+        lo, hi = sorted(axis.get_view_interval())
+        if not hi > lo:
+            return super().__call__()
+
+        # the label font and the cell's place along the axis, in points
+        along_x = axis.axis_name == "x"
+        font = axis.get_major_ticks(1)[0].label1.get_fontproperties()
+        size = font.get_size_in_points()
+        gap = TICK_LABEL_GAP * size
+        start, end, before, after = _cell_span(axis.axes, along_x)
+        formatter = axis.get_major_formatter()
+
+        # the ticks in reach and which clear, labelled as the axis labels them
+        def labels_in_reach(values):
+            labels = formatter.format_ticks(values)
+            if along_x:
+                extents = [_text_width(label, font) for label in labels]
+            else:
+                extents = [_text_size(size, label)[1] for label in labels]
+            half = np.array(extents) / 2
+            centres = start + (values - lo) / (hi - lo) * (end - start)
+            reach = (centres - half >= start - before) & (centres + half <= end + after)
+            return values[reach], _apart(centres[reach], half[reach], gap)
+
+        # whether every value stays in reach and clear, labelled on its own
+        def all_clear(values):
+            in_reach, apart = labels_in_reach(values)
+            return len(in_reach) == len(values) and apart.all()
+
+        # matplotlib's count first, then fewer bins, then more, until two clear
+        nbins = int(np.clip(axis.get_tick_space(), 1, MAX_TICK_BINS))
+        order = [*range(nbins, 0, -1), *range(nbins + 1, MAX_TICK_BINS + 1)]
+        best_rank, best = np.inf, np.array([])
+        for bins in order:
+            values = mticker.MaxNLocator(nbins=bins, steps=TICK_STEPS).tick_values(
+                lo, hi
+            )
+            values, apart = labels_in_reach(values[(values >= lo) & (values <= hi)])
+            kept = values[apart]
+            shows_two = len(kept) >= MIN_TICK_LABELS
+            if apart.all() and shows_two:
+                return values
+
+            # short of that: keep the best fallback, each still clear once its
+            # own labels are formatted
+            if shows_two and _evenly_spaced(kept):
+                rank = EVEN_SUBSET
+            elif apart.all():
+                rank = ALL_OF_FEWER
+            else:
+                rank = ANY_SUBSET
+            if rank < best_rank and (apart.all() or all_clear(kept)):
+                best_rank, best = rank, kept
+        return best
+
+
+def _apart(centres: np.ndarray, half: np.ndarray, gap: float) -> np.ndarray:
+    """Which labels to keep, in order, so each clears the last kept by a gap."""
+
+    keep = np.zeros(len(centres), dtype=bool)
+    edge = -np.inf
+    for k, (centre, extent) in enumerate(zip(centres, half)):
+        if centre - extent >= edge + gap:
+            keep[k] = True
+            edge = centre + extent
+    return keep
+
+
+def _evenly_spaced(values: np.ndarray) -> bool:
+    """Whether two or more values sit one step apart throughout."""
+
+    steps = np.diff(values)
+    return bool(np.allclose(steps, steps[0]))
+
+
+def _cell_span(ax: Axes, along_x: bool) -> Tuple[float, float, float, float]:
+    """The axes' (start, end, reach before, reach after) along one direction.
+
+    All four are in points. A reach is half the space to the nearest axes on
+    that side in the same row or column; a side with none reaches without
+    limit.
+    """
+
+    # the axes' own extent along and across the direction, in pixels
+    box = ax.bbox
+    start, end = (box.x0, box.x1) if along_x else (box.y0, box.y1)
+    across = (box.y0, box.y1) if along_x else (box.x0, box.x1)
+
+    # half the space to the nearest shown axes on each side in its row or column
+    before = after = np.inf
+    for other in ax.figure.axes:
+        if not other.get_visible():
+            continue
+        b = other.bbox
+        o_start, o_end = (b.x0, b.x1) if along_x else (b.y0, b.y1)
+        o_across = (b.y0, b.y1) if along_x else (b.x0, b.x1)
+        if o_across[1] <= across[0] or o_across[0] >= across[1]:
+            continue
+        if o_start >= end:
+            after = min(after, (o_start - end) / 2)
+        elif o_end <= start:
+            before = min(before, (start - o_end) / 2)
+    return (
+        _px_to_points(ax, start),
+        _px_to_points(ax, end),
+        _px_to_points(ax, before),
+        _px_to_points(ax, after),
+    )
+
+
+def fit_ticks(ax: Axes) -> None:
+    """Give both axes short tick labels, as many as stay apart at draw time."""
+
+    for axis in (ax.xaxis, ax.yaxis):
+        # a log or other scale keeps its own ticks
+        if axis.get_scale() != "linear":
+            continue
+        axis.set_major_locator(_FittingTicks())
+        axis.set_major_formatter(_ShortFormatter())

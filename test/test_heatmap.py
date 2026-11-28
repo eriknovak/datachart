@@ -7,6 +7,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib import colors
 
 from datachart.charts import Heatmap
@@ -138,6 +139,12 @@ class TestMarksOutsideUserLimits(unittest.TestCase):
         figure = Heatmap({"z": Z}, show_values=True, xmax=0.5)
         shown = [t.get_text() for t in figure.axes[0].texts if t.get_visible()]
         self.assertEqual(sorted(shown), ["1", "4"])
+
+    def test_cell_values_past_a_lone_xmin_beyond_the_grid_are_hidden(self):
+        # the lone limit lands past the far end and flips the x axis
+        figure = Heatmap({"z": Z}, show_values=True, xmin=100)
+        shown = [t.get_text() for t in figure.axes[0].texts if t.get_visible()]
+        self.assertEqual(shown, [])
 
 
 class TestCenteredNorm(unittest.TestCase):
@@ -291,6 +298,50 @@ class TestCenteredValueSteps(unittest.TestCase):
     def test_even_steps_stay_even_without_a_centre(self):
         ranges = self._step_ranges()
         self.assertFalse(any(r.startswith("0 ") for r in ranges[1:]), ranges)
+
+
+class TestCellValuesFitTheCells(unittest.TestCase):
+    """Cell values print only when the widest one fits a cell at the theme size."""
+
+    def tearDown(self):
+        config.set_theme(THEME.DEFAULT)
+        plt.close("all")
+
+    def _draw(self, n, **limits):
+        z = np.random.RandomState(0).rand(n, n).round(2).tolist()
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            figure = Heatmap(
+                {"z": z}, show_values=True, value_format="{x:.2f}", **limits
+            )
+        texts = [t for t in figure.axes[0].texts if t.get_visible()]
+        return texts, [w for w in caught if w.category is UserWarning]
+
+    def test_two_decimal_values_fill_a_16_by_16_grid_without_warning(self):
+        texts, caught = self._draw(16)
+        self.assertEqual((len(texts), caught), (256, []))
+
+    def test_a_40_by_40_grid_writes_no_values_and_warns_once(self):
+        texts, caught = self._draw(40)
+        self.assertEqual((len(texts), len(caught)), (0, 1))
+
+    def test_a_40_by_40_grid_zoomed_to_10_by_10_writes_its_values_without_warning(
+        self,
+    ):
+        # the y axis runs down the rows, so `ymin` names its bottom edge
+        texts, caught = self._draw(40, xmax=9.5, ymin=9.5)
+        self.assertEqual((len(texts), caught), (100, []))
+
+    def test_equal_limits_skip_the_fit_check_without_a_runtime_warning(self):
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            figure = Heatmap(
+                {"z": [[1, 2, 3, 4]] * 4}, show_values=True, xmin=2, xmax=2
+            )
+        messages = [str(w.message) for w in caught]
+        self.assertFalse([w for w in caught if w.category is RuntimeWarning])
+        self.assertFalse([m for m in messages if m.startswith("Cell values left out")])
+        self.assertEqual(len(figure.axes[0].texts), 16)
 
 
 GAPPED = [[1, None, 3], [4, 5, float("nan")]]

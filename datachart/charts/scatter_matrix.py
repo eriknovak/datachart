@@ -272,6 +272,11 @@ def ScatterMatrix(
     per observation read as lines, use
     [`ParallelCoords`][datachart.charts.ParallelCoords].
 
+    Each cell shows only as many tick labels as stay apart. An axis writes
+    them short when every label shortens to three characters or fewer
+    (2000 reads 2k, 3000000 reads 3M); otherwise, as for years, the plain
+    numbers stay.
+
     The figure is a grid: it nests inside
     [`Grid`][datachart.utils.Grid] and cannot be overlaid with
     [`Panel`][datachart.utils.Panel].
@@ -476,6 +481,8 @@ def ScatterMatrix(
         "legend": matrix_legend,
         # cells stay square whatever figure or grid cell holds the matrix
         "box_aspect": 1,
+        # short tick labels, only as many as stay apart at any cell size
+        "fit_ticks": True,
     }
 
     size = n - trim

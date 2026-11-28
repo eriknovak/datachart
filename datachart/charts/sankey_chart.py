@@ -69,7 +69,9 @@ def SankeyChart(
             source and nodes keep their first-seen order within a column.
         column_labels: One heading per column, drawn above it; must match the
             number of columns.
-        show_values: Whether to write each flow's value on its ribbon.
+        show_values: Whether to write each flow's value on its ribbon. A value
+            with no spot clear of the node bars, the labels and the other
+            values is left out, and a warning suggests a larger `figsize`.
         value_format: The format of the ribbon values: a
             [`VALUE_FORMAT`][datachart.constants.VALUE_FORMAT] constant (default
             [`VALUE_FORMAT.DEFAULT`][datachart.constants.VALUE_FORMAT]) or any

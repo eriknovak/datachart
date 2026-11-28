@@ -45,6 +45,27 @@ LEAD_KEYS = (
     "plot_dumbbell_end_color",
 )
 
+# 14 px at 96 dpi is 10.5 pt
+TEXT_FLOOR_PT = 10.5
+
+READABLE_TEXT_KEYS = (
+    "font_general_size",
+    "axes_ticks_label_size",
+    "font_xlabel_size",
+    "font_ylabel_size",
+    "plot_legend_font_size",
+    "plot_legend_title_size",
+    "plot_value_fontsize",
+    "font_subtitle_size",
+    "plot_heatmap_font_size",
+    "plot_calendar_heatmap_font_size",
+    "plot_parallel_dim_label_size",
+    "plot_parallel_tick_label_size",
+    "plot_contour_label_font_size",
+    "plot_scatter_matrix_correlation_size",
+    "plot_text_size",
+)
+
 
 class TestDeriveTheme(unittest.TestCase):
     def tearDown(self):
@@ -275,6 +296,32 @@ class TestPredefinedThemesPassTheGate(unittest.TestCase):
                 continue  # one ink: series differ by pattern, not colour
             with self.subTest(theme=name):
                 self.assertEqual(score.verdict, "pass", str(score))
+
+
+class TestPredefinedThemesKeepTextReadable(unittest.TestCase):
+    """Every predefined theme keeps its readable text at the floor (#363)."""
+
+    def setUp(self):
+        self.predefined = [name for name in themes.__all__ if name.endswith("_THEME")]
+
+    def test_readable_text_meets_the_floor(self):
+        for name in self.predefined:
+            theme = getattr(themes, name)
+            for key in READABLE_TEXT_KEYS:
+                with self.subTest(theme=name, key=key):
+                    size = theme[key]
+                    self.assertIsInstance(size, (int, float), f"{key}={size!r}")
+                    self.assertGreaterEqual(size, TEXT_FLOOR_PT)
+
+    def test_title_is_the_largest_text(self):
+        for name in self.predefined:
+            theme = getattr(themes, name)
+            for key in (*READABLE_TEXT_KEYS, "plot_treemap_min_fontsize"):
+                size = theme[key]
+                if size is None:
+                    continue  # unset sizes derive from the general size
+                with self.subTest(theme=name, key=key):
+                    self.assertGreater(theme["font_title_size"], size)
 
 
 class TestFurnitureDefaults(unittest.TestCase):

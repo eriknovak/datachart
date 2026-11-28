@@ -123,7 +123,9 @@ def PyramidChart(
     Both series are supplied as positive values; value ticks and labels show
     absolute values. Unlike the other chart fronts, the axis parameters are
     spatial: `xlabel`, `xticks`, and `xmax` address the horizontal value axis,
-    and `ylabel` the vertical category axis.
+    and `ylabel` the vertical category axis. When the category labels would
+    overlap, every band keeps its tick but only every k-th band is labelled,
+    the smallest step that keeps the labels apart.
 
     Examples:
         >>> from datachart.charts import PyramidChart

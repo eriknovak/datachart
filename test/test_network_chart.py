@@ -1,6 +1,7 @@
 """Tests for the network chart: style, validation, layouts, encoding, emphasis, and composition."""
 
 import unittest
+import warnings
 
 import matplotlib
 
@@ -9,6 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.colors import to_rgb
 from matplotlib.patches import ArrowStyle, Circle, FancyArrowPatch
+from matplotlib.text import Text
 
 from datachart.charts import NetworkChart, LineChart
 from datachart.config import config
@@ -39,6 +41,8 @@ from datachart.utils._internal.validate import (
     validate_network_edge_style,
     validate_network_records,
 )
+
+from .text_overlap import overlapping_pairs
 
 THEMES = [
     THEME.DEFAULT,
@@ -83,6 +87,30 @@ EDGES = [edge("A", "B"), edge("B", "C"), edge("C", "D"), edge("D", "A")]
 DATA = {"nodes": NODES, "edges": EDGES}
 LINE = [{"x": 0, "y": 1}, {"x": 1, "y": 2}]
 
+# two names side by side, and two straight edges crossing at one midpoint
+CLOSE_NODES = [
+    {"id": "A", "label": "Acciaiuoli", "x": 0.46, "y": 0.2},
+    {"id": "B", "label": "Ginori", "x": 0.54, "y": 0.2},
+    {"id": "C", "x": 0.2, "y": 0.5},
+    {"id": "D", "x": 0.8, "y": 0.9},
+    {"id": "E", "x": 0.2, "y": 0.9},
+    {"id": "F", "x": 0.8, "y": 0.5},
+]
+
+# a 4 x 4 block of long names, far closer than any name is wide
+CROWDED = {
+    "nodes": [
+        {
+            "id": f"n{i}",
+            "label": f"Long name {i}",
+            "x": 0.45 + 0.03 * (i % 4),
+            "y": 0.45 + 0.03 * (i // 4),
+        }
+        for i in range(16)
+    ],
+    "edges": [edge(f"n{i}", f"n{i + 1}") for i in range(15)],
+}
+
 
 def _nodes(ax):
     """The node scatter of the axes."""
@@ -110,8 +138,32 @@ def _values(ax):
     return [t for t in ax.texts if (t.get_gid() or "").startswith("value:")]
 
 
+def _shown(texts):
+    """The texts left visible once the figure is drawn."""
+    return [t for t in texts if t.get_visible()]
+
+
 def _positions(figure):
     return _nodes(figure.axes[0]).get_offsets().data.copy()
+
+
+def overlapping_texts(figure):
+    """Pairs of drawn texts whose boxes overlap."""
+    figure.canvas.draw()
+    renderer = figure.canvas.get_renderer()
+    # a tick label of an axes drawn with the axis off is never drawn
+    undrawn = set()
+    for ax in figure.axes:
+        for axis in (ax.xaxis, ax.yaxis):
+            if not (ax.axison and axis.get_visible()):
+                for tick in axis.get_major_ticks() + axis.get_minor_ticks():
+                    undrawn |= {id(tick.label1), id(tick.label2)}
+    texts = [
+        t
+        for t in figure.findobj(Text)
+        if t.get_visible() and t.get_text().strip() and id(t) not in undrawn
+    ]
+    return overlapping_pairs(texts, renderer)
 
 
 class TestNetworkStyle(unittest.TestCase):
@@ -658,6 +710,77 @@ class TestEncoding(unittest.TestCase):
                         and ax.bbox.containsy(extent.y1),
                         f"label {name!r} crosses the axes box",
                     )
+
+    def test_close_labels_move_apart(self):
+        nodes = CLOSE_NODES
+        edges = [edge("A", "B"), edge("C", "D", 6), edge("E", "F", 3)]
+        for position in ("center", "above"):
+            with self.subTest(label_position=position):
+                figure = NetworkChart(
+                    {"nodes": nodes, "edges": edges},
+                    layout=NETWORK_LAYOUT.FIXED,
+                    label_position=position,
+                    show_values=True,
+                    style={"plot_network_edge_style": ARROW_STYLE.STRAIGHT},
+                )
+                self.assertEqual(overlapping_texts(figure), [])
+                ax = figure.axes[0]
+                self.assertEqual(len(_shown(_labels(ax).values())), len(nodes))
+                self.assertEqual(len(_shown(_values(ax))), 2)
+
+    def test_crowded_labels_are_left_out_with_one_warning(self):
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            figure = NetworkChart(CROWDED, layout=NETWORK_LAYOUT.FIXED)
+            figure.canvas.draw()
+        left_out = [w for w in caught if "left out" in str(w.message)]
+        self.assertEqual(len(left_out), 1)
+        self.assertIn("figsize", str(left_out[0].message))
+
+    def test_crowded_labels_leave_some_names_out(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            figure = NetworkChart(CROWDED, layout=NETWORK_LAYOUT.FIXED)
+            figure.canvas.draw()
+        shown = _shown(_labels(figure.axes[0]).values())
+        self.assertLess(len(shown), len(CROWDED["nodes"]))
+
+    def test_crowded_labels_kept_do_not_overlap(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            figure = NetworkChart(CROWDED, layout=NETWORK_LAYOUT.FIXED)
+            self.assertEqual(overlapping_texts(figure), [])
+
+    def test_two_crowded_networks_in_a_grid_warn_once(self):
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            charts = [
+                NetworkChart(CROWDED, layout=NETWORK_LAYOUT.FIXED) for _ in range(2)
+            ]
+            figure = Grid([charts])
+            figure.canvas.draw()
+        left_out = [w for w in caught if "left out" in str(w.message)]
+        self.assertEqual(len(left_out), 1)
+
+    def test_close_names_in_a_grid_cell_do_not_overlap(self):
+        names = {"nodes": CLOSE_NODES[:2], "edges": [edge("A", "B")]}
+        network = NetworkChart(names, layout=NETWORK_LAYOUT.FIXED)
+        figure = Grid([[network, LineChart(LINE)]])
+        self.assertEqual(overlapping_texts(figure), [])
+
+    def test_a_name_repeated_at_one_point_is_written_once(self):
+        # two stations of one town share its coordinates
+        nodes = [
+            {"id": "s1", "label": "Kobe", "x": 0.3, "y": 0.3},
+            {"id": "s2", "label": "Kobe", "x": 0.3, "y": 0.3},
+            {"id": "s3", "label": "Osaka", "x": 0.7, "y": 0.7},
+        ]
+        edges = [edge("s1", "s3"), edge("s2", "s3")]
+        ax = NetworkChart(
+            {"nodes": nodes, "edges": edges}, layout=NETWORK_LAYOUT.FIXED
+        ).axes[0]
+        written = [t for t in _labels(ax).values() if t.get_text() == "Kobe"]
+        self.assertEqual(len(written), 1)
 
     def test_labels_default_to_id_and_empty_draws_nothing(self):
         nodes = [{"id": "A", "label": "Alpha"}, {"id": "B", "label": ""}, {"id": "C"}]

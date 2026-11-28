@@ -30,6 +30,7 @@ from ._internal.figures import (
     subgridspec as _subgridspec,
 )
 from ._internal.layers import grid_label_colors as _grid_label_colors
+from ._internal.layers.ticks import fit_ticks as _fit_ticks
 from ._internal.plot_engine import SUBPLOT_FURNITURE_KEYS as _SUBPLOT_FURNITURE_KEYS
 from ._internal.validate import (
     validate_layout_specs as _validate_layout_specs,
@@ -232,7 +233,8 @@ def _render_grid_node(
     cell's entries, and with no `cell` every drawn cell lends its entries, each
     label once. The
     node's `overrides` — and, over them, an enclosing grid's — are laid over
-    every cell's panel settings, to any depth.
+    every cell's panel settings, to any depth. A node with `fit_ticks` gives
+    every drawn cell short tick labels, only as many as stay apart.
     """
     overrides = {**node.get("overrides", {}), **(overrides or {})}
     nrows, ncols = node["shape"]
@@ -340,6 +342,8 @@ def _render_grid_node(
             continue
         if node.get("box_aspect"):
             drawn[0].set_box_aspect(node["box_aspect"])
+        if node.get("fit_ticks") and drawn[0].axison:
+            _fit_ticks(drawn[0])
         cell_axes[index] = drawn
 
     entries = None

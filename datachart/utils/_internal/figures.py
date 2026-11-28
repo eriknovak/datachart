@@ -190,8 +190,8 @@ class DatachartFigure(Figure):
     """
 
     def draw(self, renderer):
-        # legends fit their headroom against the laid-out axes, once per figure
-        fits = self.__dict__.pop("_legend_fits", None)
+        # the deferred fits run once per figure, against the laid-out axes
+        fits = self.__dict__.pop("_deferred_fits", None)
         if fits:
             engine = self.get_layout_engine()
             if engine is not None:

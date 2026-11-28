@@ -206,6 +206,8 @@ def ContourChart(
             explicit list of level values. Filled values beyond a list's ends
             take the end colors, and the colorbar marks the overflow.
         show_labels: Whether to write the level values along the iso-lines.
+            A label is kept only where it lies inside the axes and clear of
+            the other labels; each level keeps one label where one fits.
         show_colorbar: Whether to show the colorbar(s) of filled contours.
         aspect_ratio: The aspect ratio of the axes ("auto" or "equal"). See
             [`ASPECT_RATIO`][datachart.constants.ASPECT_RATIO].

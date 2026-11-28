@@ -1,6 +1,6 @@
 ---
 status: accepted
-amended-by: [0052]
+amended-by: [0052, 0091]
 ---
 
 # A calendar heatmap draws one panel per year through the heatmap's cell seam
@@ -39,6 +39,9 @@ temporal detection (ADR 0037), the heatmap's cells, value labels (ADR
   `plot_heatmap_*`. The layer adds only the year layout, the month
   separators, and the month and weekday labels. Value labels take the
   shared `show_values`/`value_format` vocabulary (ADR 0033).
+  Amended (ADR 0091): values are written only when the widest fits a cell
+  at the theme's cell font size; otherwise none are and one warning says so,
+  as on a full year at the default size.
 - **A calendar spans the months holding data, whole months at a time.**
   A fourth-quarter series draws October to December, not nine blank
   months; a full year draws the year. Missing days inside that range are

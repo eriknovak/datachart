@@ -1,6 +1,7 @@
 """Tests for the calendar heatmap: validation, year panels, cell layout, composition."""
 
 import unittest
+import warnings
 from datetime import date, datetime, timedelta
 
 import matplotlib
@@ -539,6 +540,30 @@ class TestCalendarCenteredNorm(unittest.TestCase):
         )
         halfranges = {ax.images[0].norm.halfrange for ax in figure.axes if ax.images}
         self.assertEqual(len(halfranges), 1)
+
+
+class TestCalendarCellValuesFit(unittest.TestCase):
+    """A calendar writes its values only when the widest one fits a day's cell."""
+
+    def tearDown(self):
+        config.set_theme(THEME.DEFAULT)
+        plt.close("all")
+
+    def _draw(self, draw):
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            figure = draw()
+        return figure.axes[0].texts, [w for w in caught if w.category is UserWarning]
+
+    def test_a_full_year_writes_no_values_and_warns_once(self):
+        texts, caught = self._draw(lambda: year_calendar(2024, show_values=True))
+        self.assertEqual((len(texts), len(caught)), (0, 1))
+
+    def test_january_to_february_writes_every_value_without_warning(self):
+        texts, caught = self._draw(
+            lambda: calendar(date(2024, 1, 1), 60, show_values=True)
+        )
+        self.assertEqual((len(texts), caught), (60, []))
 
 
 if __name__ == "__main__":
